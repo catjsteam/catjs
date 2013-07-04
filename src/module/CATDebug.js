@@ -1,0 +1,1 @@
+require("./CATCli.js").init();

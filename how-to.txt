@@ -1,0 +1,6 @@
+************ Node Modules Standalone usage
+node ./src/module/CATCli.js scan "test/config
+
+
+************ Node Modules with Grunt usage
+grunt scan

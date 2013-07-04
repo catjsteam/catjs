@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+'use strict';
+require("./src/module/CATCli.js").init(__dirname);

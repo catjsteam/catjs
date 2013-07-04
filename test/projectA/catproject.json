@@ -1,0 +1,37 @@
+{
+    "name": "test-1",
+    "base": {
+        "path": "/home/arik/dev/projects/test-project"
+    },
+    "actions": [
+        {
+            "name": "initCopy",
+            "type": "copy",
+            "from": {
+                "path": "/"
+            },
+            "to": {
+                "path": "/home/arik/dev/projects/tmp/"
+            },
+            "filters": [
+                {
+                    "type": "file",
+                    "ext": [".txt"],
+                    "exclude": true
+                }
+            ]
+        }
+    ],
+    "tasks": [
+        {
+            "name": "init",
+            "actions": ["initCopy"]
+        },
+        {
+            "name": "clean",
+            "actions": ["initCopy"]
+        }
+    ]
+
+
+}

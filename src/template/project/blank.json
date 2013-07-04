@@ -1,0 +1,12 @@
+[
+    {
+        "name": "test-project",
+        "src" : {
+            "path": "~/dev/projects/"
+        },
+        "dest": {
+            "path": "~/dev/projects/"
+        }
+
+    }
+]

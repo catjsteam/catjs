@@ -1,0 +1,36 @@
+Day 1 (23.6)
+	Grunt including:
+		1) learning ...
+		2) creating a basic environment
+		3) building a basic project
+
+Day 2
+	Grunt including:
+		1) Creating CAT project
+		2) Parent project which runs two subprojects (plugin, core)
+		3) I have an issue working with nodejs fs (file system) :-/
+
+Day 3
+		Grunt Issue.. still trying to figure out why I cannot work with fs.extra or pure node fs.
+		I found out that running grunt spawn - meaning running nodejs as a child process - works... so something about grunt process is wrong.
+		Trying to code standalone node module, running the module from grunt - still not working
+
+Day 4
+		Grunt Issue - I found the solution,
+		All I had to do it tell grunt that I'm working in async mode. I think that this one sucks big time!!
+
+		// Tell grunt this task is asynchronous.
+		var done = this.async();
+
+		At last moving forward to the real stuff... scanning a given project.
+		Adding filters support - currently testing excluding files out of a given scanning.
+
+Day 5
+
+	    - Log support - for external file as well.
+	    - (Maintenance) support for standalone node modules.
+	    - Event management for the actions (e.g. copy); current support file|folder events.
+	    - External configuration support - can be used anywhere
+	    - Creating test configuration for the san action
+	    - Preparing the project for production mode
+	    - Preparing a blank CAT project

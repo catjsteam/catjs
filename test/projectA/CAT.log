@@ -1,0 +1,45 @@
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [CAT] Initial, command line arguments: {"task":"scan","project":".","argv":{"remain":[],"cooked":["--task","scan","--project","."],"original":["-sp"]},"home":{"path":"/home/arik/dev/projects/cat","working":{"path":"/home/arik/dev/projects/cat/test/projectA"}}}
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [CAT] Initial, current location: /home/arik/dev/projects/cat/test/projectA
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Scan] Instantiating action: ../action/copy.js
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [copy action] target folder was created: /home/arik/dev/projects/tmp/test-1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Scan] Loading project:  { name: 'test-1',
+  base: { path: '/home/arik/dev/projects/test-project' },
+  actions: 
+   [ { name: 'initCopy',
+       type: 'copy',
+       from: [Object],
+       to: [Object],
+       filters: [Object] } ],
+  tasks: 
+   [ { name: 'init', actions: [Object] },
+     { name: 'clean', actions: [Object] } ] }
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] INFO [CAT] running target: scan
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] INFO [Scanner] Initialized
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] scan folder: /home/arik/dev/projects/tmp/test-1/test1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] No filter match, create folder:  /home/arik/dev/projects/tmp/test-1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [copy action] target folder was created: /home/arik/dev/projects/tmp/test-1/test1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [SCAN] folder: /home/arik/dev/projects/test-project/test1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] scan folder: /home/arik/dev/projects/tmp/test-1/test1/nested1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] No filter match, create folder:  /home/arik/dev/projects/tmp/test-1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [copy action] target folder was created: /home/arik/dev/projects/tmp/test-1/test1/nested1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [SCAN] folder: /home/arik/dev/projects/test-project/test1/nested1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] scan file: /test1/nested1/readme.txt
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] filter match, skipping file: /test1/nested1/readme.txt
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [SCAN] file: /home/arik/dev/projects/test-project/test1/nested1/readme.txt; ext: .txt
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] scan folder: /home/arik/dev/projects/tmp/test-1/test2
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] No filter match, create folder:  /home/arik/dev/projects/tmp/test-1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [copy action] target folder was created: /home/arik/dev/projects/tmp/test-1/test2
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [SCAN] folder: /home/arik/dev/projects/test-project/test2
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] scan file: /test2/app.js
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] No filter match, copy to:  /home/arik/dev/projects/tmp/test-1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [SCAN] file: /home/arik/dev/projects/test-project/test2/app.js; ext: .js
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] scan folder: /home/arik/dev/projects/tmp/test-1/test2/images
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] No filter match, create folder:  /home/arik/dev/projects/tmp/test-1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [copy action] target folder was created: /home/arik/dev/projects/tmp/test-1/test2/images
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [SCAN] folder: /home/arik/dev/projects/test-project/test2/images
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] scan file: /test2/images/ubuntu-4735-800x600.jpg
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] No filter match, copy to:  /home/arik/dev/projects/tmp/test-1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [SCAN] file: /home/arik/dev/projects/test-project/test2/images/ubuntu-4735-800x600.jpg; ext: .jpg
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] scan file: /test2/images/ubuntu-black-wallpaper-wide-hd-pictures-2013.jpg
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [Copy Action] No filter match, copy to:  /home/arik/dev/projects/tmp/test-1
+[Thu Jul 04 2013 11:17:31 GMT+0300 (IDT)] DEBUG [SCAN] file: /home/arik/dev/projects/test-project/test2/images/ubuntu-black-wallpaper-wide-hd-pictures-2013.jpg; ext: .jpg
