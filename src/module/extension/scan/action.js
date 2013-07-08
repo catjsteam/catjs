@@ -1,6 +1,6 @@
 var _fs = require('fs'),
     _path = require('path'),
-    _log = require("../../CATGlob.js").log();
+    _log = require("./../../CATGlob.js").log();
 
 module.exports = function () {
 

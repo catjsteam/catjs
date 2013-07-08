@@ -60,8 +60,8 @@ module.exports = function Action(config) {
                 // Load action per type
                 if (me.type) {
                     // instantiating action per type [common/action/copy, common/action/inject, etc..]
-                    actionType = ["../action/", me.type , ".js"].join("");
-                    _log.debug("[Scan] Instantiating action: " + actionType);
+                    actionType = ["../../../common/plugin/", me.type , ".js"].join("");
+                    _log.debug("[Action] Instantiating action: " + actionType);
                     try {
                         me.ref = require(actionType);
                         if (me.ref) {
@@ -72,7 +72,7 @@ module.exports = function Action(config) {
                             me.action.init({data: me, emitter: emitter, global: global, internalConfig: internalConfig});
                         }
                     } catch (e) {
-                        _log.error("[Scan] action type not found or failed to load module ", e);
+                        _log.error("[Action] action type not found or failed to load module ", e);
                     }
                 }
 

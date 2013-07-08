@@ -1,5 +1,5 @@
 var _fsconfig = require("./fs/Config.js"),
-    _Config = require("./action/common/config/Config.js"),
+    _Config = require("./../module/common/project/config/Config.js"),
     _log = require("./CATGlob.js").log(),
     _path = require("path"),
     _console = require("./Console"),
@@ -37,8 +37,8 @@ var _fsconfig = require("./fs/Config.js"),
         }
 
         var msg = ["[Project] config argument is not valid",
-                "[Scan] Data is not valid, expecting data of type Array",
-                "[Scan] Loading project: "], projectConfig,
+                "[Project] Data is not valid, expecting data of type Array",
+                "[Project] Loading project: "], projectConfig,
             path, emitter;
 
         if (!config) {

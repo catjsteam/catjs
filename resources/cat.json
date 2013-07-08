@@ -2,7 +2,7 @@
     "extensions" : [
         {
             "name": "scan",
-            "impl": "src/module/action/scan/action.js"
+            "impl": "src/module/extension/scan/action.js"
         }
     ]
 }

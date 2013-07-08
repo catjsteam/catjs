@@ -1,6 +1,6 @@
 var _typedas = require("typedas"),
-    _log = require("../../../CATGlob.js").log(),
-    _utils = require("../../../Utils.js"),
+    _log = require("../../CATGlob.js").log(),
+    _utils = require("../../Utils.js"),
     _path = require("path"),
     _fs = require("fs.extra"),
     _q = require("q"),
