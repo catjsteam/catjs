@@ -34,3 +34,19 @@ Day 5
 	    - Creating test configuration for the san action
 	    - Preparing the project for production mode
 	    - Preparing a blank CAT project
+
+
+(30.6 - 3.7)
+        - Create CAT project
+        - Loading log file messages (TBD: extract embed messages)
+        - Project Configuration refactor & proper classes creation
+        - Align the code according to the new project configuration
+
+(4.7)
+        - VBox issues no more disk space need to resize the disk.
+
+(7.7)
+        - Load internal configuration for loading extensions
+
+(8.7)
+        - align the code according to the internal configuration

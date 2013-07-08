@@ -1,9 +1,6 @@
 var _fs = require('fs'),
     _path = require('path'),
-    _typedas = require('typedas'),
-    _log = require("../../CATGlob.js").log(),
-    _fsconfig = require("../../fs/Config.js"),
-    _Config = require("../common/config/Config.js")
+    _log = require("../../CATGlob.js").log();
 
 module.exports = function () {
 
@@ -99,6 +96,6 @@ module.exports = function () {
     }
 
     return {
-        scan: scan
+        init: scan
     };
 }();

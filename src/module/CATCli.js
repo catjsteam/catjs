@@ -19,12 +19,12 @@ module.exports = function() {
 
             // Everything looks good. Require local grunt and run it.
             moduleName = [home, "src/module/CAT.js"].join("/");
-            console.log("[CAT] loading module: " + moduleName);
             _parsed.home = {
                 path: home,
                 working: {path:workingPath}
             };
 
+            // CAT Module Initialization
             require(moduleName).init(_parsed);
 
         }

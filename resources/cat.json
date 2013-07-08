@@ -1,0 +1,8 @@
+{
+    "extensions" : [
+        {
+            "name": "scan",
+            "impl": "src/module/action/scan/action.js"
+        }
+    ]
+}

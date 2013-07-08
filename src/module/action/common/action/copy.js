@@ -132,6 +132,7 @@ module.exports = function () {
          *          data - The configuration data
          *          emitter - The emitter reference
          *          global - The global data configuration
+         *          internalConfig - CAT internal configuration
          */
         init: function (config) {
 
@@ -149,6 +150,7 @@ module.exports = function () {
             _emitter = config.emitter;
             global = config.global;
             data = config.data;
+            // Listen to the process emitter
             if (_emitter) {
                 _emitter.on("file", _module.file);
                 _emitter.on("folder", _module.folder);

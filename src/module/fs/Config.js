@@ -33,7 +33,8 @@ module.exports = function () {
                 }
 
             } catch(e) {
-                _log.error("[Config] error occured: ",e);
+                _log.error("[Config] error occured, probably not valid cat project [catproject.json]: ",e);
+                throw e;
             }
         };
 

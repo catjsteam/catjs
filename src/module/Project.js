@@ -2,6 +2,7 @@ var _fsconfig = require("./fs/Config.js"),
     _Config = require("./action/common/config/Config.js"),
     _log = require("./CATGlob.js").log(),
     _path = require("path"),
+    _console = require("./Console"),
 
     /**
      * Project configuration loader
@@ -11,6 +12,29 @@ var _fsconfig = require("./fs/Config.js"),
      *        emitter - The emitter to be used for the project
      */
     _loader = function (config) {
+
+
+        function _loadProject() {
+            try {
+                (new _fsconfig(path, function (data) {
+                    if (data) {
+                        try {
+                            projectConfig = new _Config({data: data, emitter: emitter});
+
+                        } catch (e) {
+                            throw Error(e);
+                        }
+
+                    } else {
+                        _log.error(msg[1]);
+                    }
+                    _log.debug(msg[2], data);
+                }));
+            } catch (e) {
+                _console.log("[Config] error occured, probably not valid cat project [catproject.json]: ");
+            }
+
+        }
 
         var msg = ["[Project] config argument is not valid",
                 "[Scan] Data is not valid, expecting data of type Array",
@@ -31,20 +55,8 @@ var _fsconfig = require("./fs/Config.js"),
             path = [path, "catproject.json"].join("/");
             path = _path.normalize(path);
 
-            (new _fsconfig(path, function (data) {
-                if (data) {
-                    try {
-                        projectConfig = new _Config({data: data, emitter: emitter});
-
-                    } catch (e) {
-                        throw Error(e);
-                    }
-
-                } else {
-                    _log.error(msg[1]);
-                }
-                _log.debug(msg[2], data);
-            }));
+            // Load the project according to the given configuration
+            _loadProject();
         }
         return projectConfig;
     };

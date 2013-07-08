@@ -1,6 +1,7 @@
 module.exports = function () {
 
     var _fs = require("fs.extra"),
+        _typedas = require("typedas"),
         _log = require("./CATGlob.js").log(),
         _mkdirSync = function (folder) {
             if (!_fs.existsSync(folder)) {
@@ -44,7 +45,21 @@ module.exports = function () {
 
         mkdirSync: _mkdirSync,
 
-        copySync: _copySync
+        copySync: _copySync,
+
+        contains: function(obj, value) {
+            if (obj && value) {
+                if (_typedas.isArray(obj)) {
+                    obj.forEach(function(item){
+                        if (item && value == item) {
+                            return true;
+                        }
+                    });
+                }
+            }
+
+            return false;
+        }
     }
 
 }();

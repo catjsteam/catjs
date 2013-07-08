@@ -1,9 +1,15 @@
 var _properties = require("properties"),
-    _q = require("q"),
-    _async = require("async"),
     _global = require("./CATGlob.js"),
     _log =  _global.log();
 
+/**
+ * Loading property file for internal use
+ * Currently support only log.properties for log messages.
+ *
+ * TODO load property files according to a given path
+ *
+ * @type {module.exports}
+ */
 module.exports = function () {
 
     var config = {
@@ -15,19 +21,8 @@ module.exports = function () {
 
     return {
 
-        init: function (catRef, args) {
-
-            var callback = function (error, p) {
-                if (error) {
-                    // we don't have the error properties just yet
-                    _log.error("[Properties] " + error + " result: " + p);
-                    return undefined;
-                }
-                properties = p;
-                global.CAT.props = properties;
-
-                catRef.apply.call(catRef, args);
-            }, home, homePath;
+        init: function (callback) {
+            var home, homePath;
 
             home = _global.get("home");
             if (home) {

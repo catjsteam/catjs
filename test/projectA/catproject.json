@@ -1,12 +1,15 @@
 {
     "name": "test-1",
+
     "base": {
         "path": "/home/arik/dev/projects/test-project"
     },
+
     "actions": [
         {
             "name": "initCopy",
             "type": "copy",
+            "listen": ["scan"],
             "from": {
                 "path": "/"
             },
@@ -22,14 +25,15 @@
             ]
         }
     ],
+
     "tasks": [
         {
-            "name": "init",
+            "name": "scan",
             "actions": ["initCopy"]
         },
         {
-            "name": "clean",
-            "actions": ["initCopy"]
+            "name": "clean"
+
         }
     ]
 
