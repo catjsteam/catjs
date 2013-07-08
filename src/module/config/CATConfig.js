@@ -11,7 +11,19 @@ var _global = require("./../CATGlob.js"),
     _CATConfig = function (externalConfig, data) {
 
         var path, extimp,
-            me = this;
+            me = this,
+            project = externalConfig.project,
+            task = externalConfig.task,
+            taskExtensions = task.extenstions;
+
+        function _isSupportedExtensions(extensionName, taskExtensions) {
+            if (task && extensionName) {
+                if (_utils.contains(taskExtensions, extensionName)){
+                    return true;
+                }
+            }
+            return false;
+        }
 
         this.extmap = {};
         this.extensions = data.extensions,
@@ -21,7 +33,7 @@ var _global = require("./../CATGlob.js"),
 
             // Load all CAT extensions
             this.extensions.forEach(function (ext) {
-                if (ext) {
+                if (ext && ext.name && _isSupportedExtensions(ext.name, taskExtensions)) {
                     path = ["../../../", ext.impl].join("/");
                     path = _path.normalize(path);
                     extimp = me.extmap[ext.name] = {impl:null};

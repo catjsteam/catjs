@@ -4,12 +4,21 @@
     "base": {
         "path": "/home/arik/dev/projects/test-project"
     },
-
     "actions": [
+        {
+            "name": "initScrap",
+            "type": "scrap",
+            "filters": [
+                {
+                    "type": "file",
+                    "ext": [".txt"],
+                    "exclude": true
+                }
+            ]
+        },
         {
             "name": "initCopy",
             "type": "copy",
-            "listen": ["scan"],
             "from": {
                 "path": "/"
             },
@@ -28,11 +37,14 @@
 
     "tasks": [
         {
-            "name": "scan",
+            "name": "init",
+            "extensions": ["scan"],
             "actions": ["initCopy"]
         },
         {
-            "name": "clean"
+            "name": "scrap",
+            "extensions": ["scan"],
+            "actions": ["initScrap"]
 
         }
     ]

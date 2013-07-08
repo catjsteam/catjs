@@ -4,7 +4,8 @@ var _nopt = require("nopt"),
     "task":[String, null],
     "project" : [String, null]
 }, {
-    "s" : ["--task", "scan"],
+    "s" : ["--task", "scrap"],
+    "i" : ["--task", "init"],
     "p" : ["--project" , "."]
 });
 

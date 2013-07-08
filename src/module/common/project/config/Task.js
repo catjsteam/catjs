@@ -37,6 +37,7 @@ module.exports = function Action(config) {
 
         if (data) {
             this.name = data.name;
+            this.extenstions = data.extensions;
             this.actions = data.actions;
 
             /**

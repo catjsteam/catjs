@@ -94,17 +94,17 @@ var CAT = function() {
 
                     if (project) {
 
-                        // Load CAT internal configuration
-                        catconfig = _catconfig.load({project: project, grunt: grunt, emitter: _emitter});
-
-
                         // apply project's tasks
                         if (target) {
                             target = target.toString();
                             target = target.toLowerCase();
-
                             task = project.getTask(target);
                             if (task) {
+
+                                // Load CAT internal configuration
+                                catconfig = _catconfig.load({project: project, task: task, grunt: grunt, emitter: _emitter});
+
+                                // execute task
                                 task.apply(catconfig);
 
                             } else {
@@ -113,26 +113,6 @@ var CAT = function() {
                         }
                     }
 
-//                    // Apply CAT task [e.g. scan]
-//                    if (target) {
-//                        target = target.toString();
-//                        target = target.toLowerCase();
-//
-//                        _log.info("[CAT] running target: " + target);
-//                        // import the target module and call it
-//                        try {
-//                            targetlib = require(["./action/", target, "/action.js"].join(""));
-//                            if (targetlib) {
-//                                if (targetlib[target] && _typedas.isFunction(targetlib[target])) {
-//                                    targetlib[target].call(CAT, {grunt: grunt, project: project, emitter: _emitter});
-//                                } else {
-//                                    throw ["Error occurred, Task: ", target, "is not valid or not a function "].join("");
-//                                }
-//                            }
-//                        } catch (e) {
-//                            _log.error("[CAT] Failed to run project task: " + target + " "  + e);
-//                        }
-//                    }
                 } else {
                     _log.error(msg[0]);
                     throw msg[0];

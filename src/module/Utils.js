@@ -47,18 +47,23 @@ module.exports = function () {
 
         copySync: _copySync,
 
-        contains: function(obj, value) {
+        contains: function (obj, value) {
+            var contain = 0,
+                ii = 0, size = 0, item;
             if (obj && value) {
                 if (_typedas.isArray(obj)) {
-                    obj.forEach(function(item){
+                    size = obj.length;
+                    for (; ii < size; ii++) {
+                        item = obj[ii];
                         if (item && value == item) {
-                            return true;
+                            contain++;
+                            break;
                         }
-                    });
+                    }
                 }
             }
 
-            return false;
+            return (contain > 0 ? true : false);
         }
     }
 
