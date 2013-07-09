@@ -57,3 +57,6 @@ Day 5
         - project configuration
             tie between extension plugins and internal cat configuration extensions impl.
         - added init listener for the scan extension. Alignment for the scrap and copy plugins.
+        - basic comment block parser for multi-line
+         - Scrap class implementation
+         - Hook the comment parser to the scrap plugin

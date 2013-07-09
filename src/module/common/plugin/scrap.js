@@ -1,14 +1,17 @@
 var _log = require("../../CATGlob.js").log(),
     _path = require("path"),
-    _lineReader = require('line-reader'),
-    _utils = require("./../../Utils.js");
+    _utils = require("./../../Utils.js"),
+    _Scrap = require("./scrap/Scrap.js"),
+    _parser = require("./../parser/Parser.js"),
+    _typedas = require("typedas");
 
 module.exports = function () {
 
     var _basePath,
         _disabled = false,
         _emitter,
-        _module;
+        _module,
+        _parsers = {};
 
     function isDisabled() {
         return _disabled;
@@ -29,7 +32,8 @@ module.exports = function () {
 
         file: function (file) {
 
-            var from = file, to;
+
+            var from = file;
 
             if (isDisabled()) {
                 return undefined;
@@ -37,15 +41,20 @@ module.exports = function () {
             if (file) {
                 from = _getRelativeFile(file);
                 _log.debug("[scrap Action] scan file: " + from);
-
-                _lineReader.eachLine(file, function(line, last) {
-                    console.log(line);
-
-                    if (line.indexOf("module.exports") != -1) {
-
-                        return false; // stop reading
+                if (!_parsers["Comment"]) {
+                    _parsers["Comment"] = _parser.get("Comment");
+                }
+                _parsers["Comment"].parse({file: file, callback: function(comments) {
+                    if (comments && _typedas.isArray(comments)) {
+                        comments.forEach(function(comment) {
+                            if (comment) {
+                                console.log("----");
+                                console.log(comment);
+                                console.log("----");
+                            }
+                        });
                     }
-                });
+                }});
 
             }
         },
@@ -110,15 +119,18 @@ module.exports = function () {
                 _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
             }
 
-//            // setting 'from' folder
-//            //fromFolder = data.from;
-//            if (global) {
-//                _basePath = global.base.path;
-//            } else {
-//                _log.error(errors[0]);
-//                setDisabled(true);
-//            }
+            _Scrap.add({name: "code", func: function(config) {
+                var code;
+                if (config) {
+                    code = config.code;
+                }
+            }});
 
+            /**
+             *  scrap usage example
+             *  var scrap = new _Scrap.clazz({id: "testScrap", code: "console.log(':)');"});
+             *  scrap.codeApply();
+             */
         }
     };
 

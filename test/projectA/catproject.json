@@ -15,9 +15,6 @@
         {
             "name": "initScrap",
             "type": "scrap",
-            "from": {
-
-            },
             "filters": [
                 {
                     "type": "file",
@@ -53,7 +50,7 @@
         },
         {
             "name": "scrap",
-            "extensions": ["rootScan"],
+            "extensions": ["targetScan"],
             "plugins": ["initScrap"]
 
         }
