@@ -1,6 +1,7 @@
 var _log = require("../../CATGlob.js").log(),
     _path = require("path"),
-    _lineReader = require('line-reader');
+    _lineReader = require('line-reader'),
+    _utils = require("./../../Utils.js");
 
 module.exports = function () {
 
@@ -37,14 +38,14 @@ module.exports = function () {
                 from = _getRelativeFile(file);
                 _log.debug("[scrap Action] scan file: " + from);
 
-//                _lineReader.eachLine(file, function(line, last) {
-//                    console.log(line);
-//
-//                    if (line.indexOf("module.exports") != -1) {
-//
-//                        return false; // stop reading
-//                    }
-//                });
+                _lineReader.eachLine(file, function(line, last) {
+                    console.log(line);
+
+                    if (line.indexOf("module.exports") != -1) {
+
+                        return false; // stop reading
+                    }
+                });
 
             }
         },
@@ -69,6 +70,14 @@ module.exports = function () {
 
         },
 
+        initListener: function(config) {
+            _basePath = (config ? config.path : undefined);
+            if (!_basePath) {
+                _utils.error("[Scrap Plugin] No valid base path");
+            }
+
+        },
+
         /**
          * e.g. [{type:"file|folder|*", ext:"png", name:"*test*" callback: function(file/folder) {}}]
          *
@@ -81,7 +90,7 @@ module.exports = function () {
         init: function (config) {
 
             // TODO extract messages to resource bundle with message format
-            var errors = ["[scrap action] scrap operation disabled, No valid configuration"],
+            var errors = ["[Scrap plugin] scrap operation disabled, No valid configuration"],
                 data, global, toFolder, fromFolder;
 
             if (!config) {
@@ -94,20 +103,21 @@ module.exports = function () {
             data = config.data;
             // Listen to the process emitter
             if (_emitter) {
+                _emitter.on("init", _module.initListener);
                 _emitter.on("file", _module.file);
                 _emitter.on("folder", _module.folder);
             } else {
-                _log.warning("[copy action] No valid emitter, failed to assign listeners");
+                _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
             }
 
-            // setting 'from' folder
-            //fromFolder = data.from;
-            if (global) {
-                _basePath = global.base.path;
-            } else {
-                _log.error(errors[0]);
-                setDisabled(true);
-            }
+//            // setting 'from' folder
+//            //fromFolder = data.from;
+//            if (global) {
+//                _basePath = global.base.path;
+//            } else {
+//                _log.error(errors[0]);
+//                setDisabled(true);
+//            }
 
         }
     };

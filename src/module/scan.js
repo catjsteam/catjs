@@ -1,3 +1,10 @@
+/**
+ * @deprecated should be deleted
+ *
+ * @type {*}
+ * @private
+ */
+
 var _fs = require('fs'),
     _path = require('path'),
     _typedas = require('typedas'),

@@ -125,6 +125,13 @@ module.exports = function () {
 
         },
 
+        initListener: function(config) {
+            _basePath = (config ? config.path : undefined);
+            if (!_basePath);
+            _utils.error("[Scrap Plugin] No valid base path");
+
+        },
+
         /**
          * e.g. [{type:"file|folder|*", ext:"png", name:"*test*" callback: function(file/folder) {}}]
          *
@@ -152,6 +159,7 @@ module.exports = function () {
             data = config.data;
             // Listen to the process emitter
             if (_emitter) {
+                _emitter.on("init", _module.initListener);
                 _emitter.on("file", _module.file);
                 _emitter.on("folder", _module.folder);
             } else {

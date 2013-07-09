@@ -1,13 +1,23 @@
 {
     "name": "test-1",
 
-    "base": {
+    "extensions" : [{
+        "name": "rootScan",
+        "type": "scan",
         "path": "/home/arik/dev/projects/test-project"
-    },
-    "actions": [
+    },{
+        "name": "targetScan",
+        "type": "scan",
+        "path": "/home/arik/dev/projects/tmp/"
+    }],
+
+    "plugins": [
         {
             "name": "initScrap",
             "type": "scrap",
+            "from": {
+
+            },
             "filters": [
                 {
                     "type": "file",
@@ -38,13 +48,13 @@
     "tasks": [
         {
             "name": "init",
-            "extensions": ["scan"],
-            "actions": ["initCopy"]
+            "extensions": ["rootScan"],
+            "plugins": ["initCopy"]
         },
         {
             "name": "scrap",
-            "extensions": ["scan"],
-            "actions": ["initScrap"]
+            "extensions": ["rootScan"],
+            "plugins": ["initScrap"]
 
         }
     ]

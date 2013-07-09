@@ -1,6 +1,7 @@
 var _typedas = require('typedas'),
-    _Action = require("./Action"),
-    _Task = require("./Task"),
+    _Action = require("./Action.js"),
+    _Extension = require("./Extension.js"),
+    _Task = require("./Task.js"),
     _log = require("../../../CATGlob.js").log();
 
 /**
@@ -14,12 +15,14 @@ var _typedas = require('typedas'),
  */
 module.exports = function Config(config) {
 
-    var actions = [], tasks = [],
+    var actions = [], tasks = [], extensions = [],
         vars = {
             actions: actions,
-            tasks: tasks
+            tasks: tasks,
+            extensions: extensions
         },
-        map = {tasks: {}, actions: {}},
+        map = {tasks: {}, actions: {}, extensions:{}},
+        extensionsConfig,
         actionsConfig,
         tasksConfig,
         emitter = config.emitter,
@@ -47,9 +50,10 @@ module.exports = function Config(config) {
 
         initModule("actions");
         initModule("tasks");
+        initModule("extensions");
     }
 
-    if (!data || !(data && data.actions)) {
+    if (!data || !(data && data.plugins)) {
         _log.error("[CAT Config] no valid configuration");
         return undefined;
     }
@@ -66,7 +70,7 @@ module.exports = function Config(config) {
         _log.warning("[CAT Config] Missing 'tasks' configuration section");
     }
 
-    actionsConfig = data.actions;
+    actionsConfig = data.plugins;
     if (actionsConfig &&
         _typedas.isArray(actionsConfig)) {
         actionsConfig.forEach(function (item) {
@@ -78,10 +82,23 @@ module.exports = function Config(config) {
         _log.warning("[CAT Config] Missing 'actions' configuration section");
     }
 
+    extensionsConfig = data.extensions;
+    if (extensionsConfig &&
+        _typedas.isArray(extensionsConfig)) {
+        extensionsConfig.forEach(function (item) {
+            if (item) {
+                extensions.push(new _Extension({data: item, emitter: emitter, global: data, catconfig: me}));
+            }
+        });
+    } else {
+        _log.warning("[CAT Config] Missing 'actions' configuration section");
+    }
+
     // init the entity properties
     this.name = data.name;
     this.base = data.base;
     this.actions = actions;
+    this.extensions = extensions;
     this.tasks = tasks;
 
     // indexing the objects arrays [actions, tasks]
@@ -110,6 +127,17 @@ module.exports = function Config(config) {
             return map.actions[key];
         }
     };
+
+    /**
+     * Get an Extension by key
+     *
+     * @param key
+     */
+    this.getExtension = function(key) {
+        if (key && map.extensions) {
+            return map.extensions[key];
+        }
+    }
 
     return this;
 };

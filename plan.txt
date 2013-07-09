@@ -50,3 +50,10 @@ Day 5
 
 (8.7)
         - align the code according to the internal configuration
+        - scrap plugin initial support (plugin for comment scanning)
+        - tasks project support - in specific extensions dependency
+
+(9.7)
+        - project configuration
+            tie between extension plugins and internal cat configuration extensions impl.
+        - added init listener for the scan extension. Alignment for the scrap and copy plugins.

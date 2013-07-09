@@ -47,6 +47,11 @@ module.exports = function () {
 
         copySync: _copySync,
 
+        error: function(msg) {
+            _log.error(msg);
+            throw msg;
+        },
+
         contains: function (obj, value) {
             var contain = 0,
                 ii = 0, size = 0, item;

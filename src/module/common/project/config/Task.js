@@ -2,7 +2,7 @@ var _log = require("../../../CATGlob.js").log(),
     _typedas = require("typedas");
 
 /**
- * Action configuration class
+ * Task configuration class
  *
  * @param config The configuration:
  *              data - the configuration data
@@ -11,7 +11,7 @@ var _log = require("../../../CATGlob.js").log(),
  * @returns {*}
  * @constructor
  */
-module.exports = function Action(config) {
+module.exports = function (config) {
 
     var me = this,
         data, emitter, global, catconfig;
@@ -37,8 +37,8 @@ module.exports = function Action(config) {
 
         if (data) {
             this.name = data.name;
-            this.extenstions = data.extensions;
-            this.actions = data.actions;
+            this.extensions = data.extensions;
+            this.actions = data.plugins;
 
             /**
              * Apply task:
@@ -46,19 +46,34 @@ module.exports = function Action(config) {
              *      - call dependencies
              * @param internalConfig The CAT internal configuration
              */
-            this.apply = function(internalConfig) {
-                var actionobj
+            this.apply = function (internalConfig) {
+                var actionobj,
+                    extensionConfig;
+
                 if (!me.actions) {
                     _log.error("[CAT] No actions for task: " + this.name);
                 } else {
-                    if (_typedas.isArray(me.actions)) {
-                        me.actions.forEach(function(action){
-                           if (action) {
-                               actionobj = catconfig.getAction(action);
-                               actionobj.apply(internalConfig);
 
-                           }
+                    // apply all plugins
+                    if (_typedas.isArray(me.actions)) {
+                        me.actions.forEach(function (action) {
+                            if (action) {
+                                actionobj = catconfig.getAction(action);
+                                actionobj.apply(internalConfig);
+                            }
                         });
+                    }
+
+                    // apply all extensions
+                    if (_typedas.isArray(me.extensions)) {
+                        me.extensions.forEach(function (ext) {
+                            if (ext) {
+                                extensionConfig = catconfig.getExtension(ext);
+                                extensionConfig.apply(internalConfig);
+                            }
+                        });
+
+
                     }
                 }
             }

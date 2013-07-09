@@ -5,6 +5,7 @@ var _global = require("./../CATGlob.js"),
     _fsconfig = require("./../fs/Config.js"),
     _typedas = require("typedas"),
 
+    _catconfig,
     /**
      * CAT Configuration class
      */
@@ -14,11 +15,17 @@ var _global = require("./../CATGlob.js"),
             me = this,
             project = externalConfig.project,
             task = externalConfig.task,
-            taskExtensions = task.extenstions;
+            taskExtensions = task.extensions;
 
         function _isSupportedExtensions(extensionName, taskExtensions) {
-            if (task && extensionName) {
-                if (_utils.contains(taskExtensions, extensionName)){
+            var taskExtensionsTypes = [],
+                project = (externalConfig ? externalConfig.project : undefined);
+            if (project && taskExtensions && extensionName) {
+                taskExtensions.forEach(function(item){
+                    var extensionRealType = project.getExtension(item);
+                    taskExtensionsTypes.push(extensionRealType.type);
+                });
+                if (_utils.contains(taskExtensionsTypes, extensionName)){
                     return true;
                 }
             }
@@ -26,6 +33,12 @@ var _global = require("./../CATGlob.js"),
         }
 
         this.extmap = {};
+        this.getExtension = function(key) {
+            if (key) {
+                return me.extmap[key];
+            }
+        };
+
         this.extensions = data.extensions,
             this.plugins = data.plugins;
 
@@ -36,12 +49,12 @@ var _global = require("./../CATGlob.js"),
                 if (ext && ext.name && _isSupportedExtensions(ext.name, taskExtensions)) {
                     path = ["../../../", ext.impl].join("/");
                     path = _path.normalize(path);
-                    extimp = me.extmap[ext.name] = {impl:null};
+                    me.extmap[ext.name] = null;
                     try {
-                        extimp.impl = require(path);
-                        if (extimp.impl) {
-                            if (extimp.impl.init) {
-                                extimp.impl.init(externalConfig);
+                        extimp = me.extmap[ext.name] = require(path);
+                        if (extimp) {
+                            if (extimp.init) {
+                                extimp.init(externalConfig);
                             } else {
                                 _log.warning("[CAT Config Loader] Extension, '" + ext.name + "' has no valid interface: 'init' ");
                             }
@@ -58,12 +71,11 @@ var _global = require("./../CATGlob.js"),
 
 _loadCATConfig = function (externalConfig, path) {
 
-    var catconfig;
     try {
         (new _fsconfig(path, function (data) {
             if (data) {
 
-                catconfig = new _CATConfig(externalConfig, data);
+                _catconfig = new _CATConfig(externalConfig, data);
 
             } else {
                 _log.error("[CAT Config Loader] Cannot read cat configuration file [cat.json]");
@@ -73,7 +85,7 @@ _loadCATConfig = function (externalConfig, path) {
         _log.error("[CAT Config Loader] error occurred, no valid cat configuration file [cat.json]"  + e);
     }
 
-    return catconfig;
+    return _catconfig;
 };
 
 

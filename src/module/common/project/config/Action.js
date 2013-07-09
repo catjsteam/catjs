@@ -11,7 +11,7 @@ var _log = require("../../../CATGlob.js").log(),
  * @returns {*}
  * @constructor
  */
-module.exports = function Action(config) {
+module.exports = function (config) {
 
     var filters,
         actionType,
@@ -75,20 +75,6 @@ module.exports = function Action(config) {
                         _log.error("[Action] action type not found or failed to load module ", e);
                     }
                 }
-
-//                // import the target module and call it
-//                try {
-//                    targetlib = require(["./action/", target, "/action.js"].join(""));
-//                    if (targetlib) {
-//                        if (targetlib[target] && _typedas.isFunction(targetlib[target])) {
-//                            targetlib[target].call(me, {project: catconfig, emitter: emitter});
-//                        } else {
-//                            throw ["Error occurred, Task: ", target, "is not valid or not a function "].join("");
-//                        }
-//                    }
-//                } catch (e) {
-//                    _log.error("[CAT] Failed to run project task: " + target + " "  + e);
-//                }
             };
 
 
