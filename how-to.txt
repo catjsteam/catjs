@@ -1,5 +1,7 @@
 ************ Node Modules Standalone usage
-node ./src/module/CATCli.js scan "test/config
+node ./src/module/CATCli.js scan "test/config"
+catcli -ip
+catcli -sp
 
 
 ************ Node Modules with Grunt usage

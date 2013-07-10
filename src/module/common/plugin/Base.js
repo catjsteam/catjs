@@ -75,8 +75,12 @@ module.exports = function() {
                                 me = this;
                             if (this.ext) {
                                 this.ext.forEach(function(item) {
-                                    if (me.exclude && item === extName) {
-                                        exitCondition++;
+                                    if ((item === extName || item === "*")) {
+                                        if (me.exclude) {
+                                            exitCondition++;
+                                        } else {
+                                            exitCondition--;
+                                        }
 
                                     }
                                 });

@@ -28,7 +28,8 @@ module.exports = _basePlugin.ext(function() {
         file: function (file) {
 
 
-            var from = file;
+            var from = file,
+                filters = _me.getFilters();
 
             if (_me.isDisabled()) {
                 return undefined;
@@ -36,34 +37,32 @@ module.exports = _basePlugin.ext(function() {
             if (file) {
                 from = _getRelativeFile(file);
                 _log.debug("[scrap Action] scan file: " + from);
-                if (!_parsers["Comment"]) {
-                    _parsers["Comment"] = _parser.get("Comment");
-                }
-                _parsers["Comment"].parse({file: file, callback: function(comments) {
-                    if (comments && _typedas.isArray(comments)) {
-                        comments.forEach(function(comment) {
-                            if (comment) {
-                                console.log("----");
-                                console.log(comment);
-                                console.log("----");
-                            }
-                        });
+                if (!_me.applyFileExtFilters(filters, file)) {
+                    if (!_parsers["Comment"]) {
+                        _parsers["Comment"] = _parser.get("Comment");
                     }
-                }});
-
+                    _parsers["Comment"].parse({file: file, callback: function(comments) {
+                        if (comments && _typedas.isArray(comments)) {
+                            comments.forEach(function(comment) {
+                                if (comment) {
+                                    console.log("----");
+                                    console.log(comment);
+                                    console.log("----");
+                                }
+                            });
+                        }
+                    }});
+                } else  {
+                    _log.debug("[Copy Action] filter match, skipping file: " + from);
+                }
             }
         },
 
         folder: function (folder) {
-            var tmpFolder;
-            if (_me.isDisabled()) {
-                return undefined;
-            }
-            if (folder) {
-                _log.debug("[scrap Action] scan folder: " + tmpFolder);
-
-
-            }
+//            var tmpFolder;
+//            if (_me.isDisabled()) {
+//                return undefined;
+//            }
         },
 
         getListeners: function (eventName) {
@@ -113,7 +112,7 @@ module.exports = _basePlugin.ext(function() {
             if (_emitter) {
                 _emitter.on("init", _module.initListener);
                 _emitter.on("file", _module.file);
-                _emitter.on("folder", _module.folder);
+              //  _emitter.on("folder", _module.folder);
             } else {
                 _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
             }

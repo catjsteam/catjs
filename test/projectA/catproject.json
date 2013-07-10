@@ -18,8 +18,13 @@
             "filters": [
                 {
                     "type": "file",
-                    "ext": [".txt"],
+                    "ext": ["*",".jpg"],
                     "exclude": true
+                },
+                {
+                    "type": "file",
+                    "ext": [".js"],
+                    "exclude": false
                 }
             ]
         },

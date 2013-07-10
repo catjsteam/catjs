@@ -60,3 +60,7 @@ Day 5
         - basic comment block parser for multi-line
          - Scrap class implementation
          - Hook the comment parser to the scrap plugin
+
+(10.7)  - Base plugin Class implementation and code alignment for copy and scrap plugins
+        - Filter class implementation and code alignment
+        - Apply Filter on scrap plugin
