@@ -3,23 +3,18 @@ var _log = require("../../CATGlob.js").log(),
     _utils = require("./../../Utils.js"),
     _Scrap = require("./scrap/Scrap.js"),
     _parser = require("./../parser/Parser.js"),
-    _typedas = require("typedas");
+    _typedas = require("typedas"),
+    _basePlugin = require("./Base.js");
 
-module.exports = function () {
+module.exports = _basePlugin.ext(function() {
 
     var _basePath,
-        _disabled = false,
+        _data,
+        _global,
+        _me = this,
         _emitter,
         _module,
         _parsers = {};
-
-    function isDisabled() {
-        return _disabled;
-    }
-
-    function setDisabled(bol) {
-        _disabled = bol;
-    }
 
     function _getRelativeFile(file) {
         if (!file) {
@@ -35,7 +30,7 @@ module.exports = function () {
 
             var from = file;
 
-            if (isDisabled()) {
+            if (_me.isDisabled()) {
                 return undefined;
             }
             if (file) {
@@ -61,7 +56,7 @@ module.exports = function () {
 
         folder: function (folder) {
             var tmpFolder;
-            if (isDisabled()) {
+            if (_me.isDisabled()) {
                 return undefined;
             }
             if (folder) {
@@ -72,7 +67,7 @@ module.exports = function () {
         },
 
         getListeners: function (eventName) {
-            if (isDisabled()) {
+            if (_me.isDisabled()) {
                 return undefined;
             }
             return _emitter.listeners(eventName);
@@ -100,16 +95,20 @@ module.exports = function () {
 
             // TODO extract messages to resource bundle with message format
             var errors = ["[Scrap plugin] scrap operation disabled, No valid configuration"],
-                data, global, toFolder, fromFolder;
+                data;
 
             if (!config) {
                 _log.error(errors[1]);
-                setDisabled(true);
+                _me.setDisabled(true);
             }
 
             _emitter = config.emitter;
-            global = config.global;
-            data = config.data;
+            _global = config.global;
+            _data = config.data;
+
+            // initial data binding to 'this'
+            _me.dataInit(_data);
+
             // Listen to the process emitter
             if (_emitter) {
                 _emitter.on("init", _module.initListener);
@@ -119,6 +118,7 @@ module.exports = function () {
                 _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
             }
 
+            /*
             _Scrap.add({name: "code", func: function(config) {
                 var code;
                 if (config) {
@@ -126,7 +126,6 @@ module.exports = function () {
                 }
             }});
 
-            /**
              *  scrap usage example
              *  var scrap = new _Scrap.clazz({id: "testScrap", code: "console.log(':)');"});
              *  scrap.codeApply();
@@ -135,4 +134,4 @@ module.exports = function () {
     };
 
     return _module;
-};
+});

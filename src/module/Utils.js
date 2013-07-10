@@ -47,7 +47,7 @@ module.exports = function () {
 
         copySync: _copySync,
 
-        error: function(msg) {
+        error: function (msg) {
             _log.error(msg);
             throw msg;
         },
@@ -69,6 +69,29 @@ module.exports = function () {
             }
 
             return (contain > 0 ? true : false);
+        },
+
+        /**
+         * Copy the source object's properties.
+         * TODO TBD make it more robust, recursion and function support
+         *
+         * @param srcObj
+         * @param destObj
+         */
+        copyObjProps: function (srcObj, destObj) {
+
+            var name;
+
+            if (srcObj && destObj) {
+                for (name in srcObj) {
+                    if (srcObj.hasOwnProperty(name)) {
+                        destObj[name] = srcObj[name];
+                    }
+                    else {
+
+                    }
+                }
+            }
         }
     }
 

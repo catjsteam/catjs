@@ -1,5 +1,6 @@
 var _log = require("../../../CATGlob.js").log(),
-    _typedas = require("typedas");
+    _typedas = require("typedas"),
+    _Filter = require("./Filter.js");
 
 /**
  * Action configuration class
@@ -19,15 +20,6 @@ module.exports = function (config) {
         data, emitter, global, catconfig;
 
     this.filters = [];
-
-    // TODO Use the Filter class instead
-    function Filter(config) {
-        if (config) {
-            this.type = (config.type || undefined);
-            this.ext = (config.ext || undefined);
-            this.exclude = (config.exclude || undefined);
-        }
-    }
 
     function _init() {
         data = config.data;
@@ -83,7 +75,7 @@ module.exports = function (config) {
             if (filters) {
                 filters.forEach(function (item) {
                     if (item) {
-                        me.filters.push(new Filter(item));
+                        me.filters.push(new _Filter(item));
                     }
                 });
             }
