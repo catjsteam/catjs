@@ -1,24 +1,32 @@
 {
     "name": "test-1",
 
-    "extensions" : [{
-        "name": "rootScan",
-        "type": "scan",
-        "path": "/home/arik/dev/projects/test-project"
-    },{
-        "name": "targetScan",
-        "type": "scan",
-        "path": "/home/arik/dev/projects/tmp/"
-    }],
+    "dependencies": [
+        {
+            "name": "target.clean",
+            "type": "clean",
+            "path": ["/home/arik/dev/projects/tmp"]
+        },
+        {
+            "name": "root.scan",
+            "type": "scan",
+            "path": "/home/arik/dev/projects/test-project"
+        },
+        {
+            "name": "target.scan",
+            "type": "scan",
+            "path": "/home/arik/dev/projects/tmp/"
+        }
+    ],
 
     "plugins": [
         {
-            "name": "initScrap",
+            "name": "init.scrap",
             "type": "scrap",
             "filters": [
                 {
                     "type": "file",
-                    "ext": ["*",".jpg"],
+                    "ext": ["*", ".jpg"],
                     "exclude": true
                 },
                 {
@@ -29,7 +37,7 @@
             ]
         },
         {
-            "name": "initCopy",
+            "name": "init.copy",
             "type": "copy",
             "from": {
                 "path": "/"
@@ -44,20 +52,27 @@
                     "exclude": true
                 }
             ]
+        },
+        {
+            "name": "target.clean"
         }
     ],
 
     "tasks": [
         {
             "name": "init",
-            "extensions": ["rootScan"],
-            "plugins": ["initCopy"]
+            "dependencies": ["root.scan"],
+            "plugins": ["init.copy"]
         },
         {
-            "name": "scrap",
-            "extensions": ["targetScan"],
-            "plugins": ["initScrap"]
-
+            "name": "init",
+            "dependencies": ["root.scan"],
+            "plugins": ["init.copy"]
+        },
+        {
+            "name": "clean",
+            "dependencies": ["target.clean"],
+            "plugins": ["target.clean"]
         }
     ]
 

@@ -82,7 +82,7 @@ module.exports = function Config(config) {
         _log.warning("[CAT Config] Missing 'actions' configuration section");
     }
 
-    extensionsConfig = data.extensions;
+    extensionsConfig = (data.extensions || data.dependencies);
     if (extensionsConfig &&
         _typedas.isArray(extensionsConfig)) {
         extensionsConfig.forEach(function (item) {

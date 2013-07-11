@@ -45,7 +45,7 @@ module.exports = function (config) {
              * @param internalConfig The CAT internal configuration
              */
             this.apply = function(internalConfig) {
-                var target = me.type,
+                var target = (me.type || me.name) ,
                     targetlib;
                 _log.info("[CAT] running target: " + target);
 

@@ -6,6 +6,7 @@ var _nopt = require("nopt"),
 }, {
     "s" : ["--task", "scrap"],
     "i" : ["--task", "init"],
+    "c" : ["--task", "clean"],
     "p" : ["--project" , "."]
 });
 

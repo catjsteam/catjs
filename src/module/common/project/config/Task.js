@@ -37,7 +37,7 @@ module.exports = function (config) {
 
         if (data) {
             this.name = data.name;
-            this.extensions = data.extensions;
+            this.extensions = (data.extensions || data.dependencies);
             this.actions = data.plugins;
 
             /**

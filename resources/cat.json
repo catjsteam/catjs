@@ -3,6 +3,10 @@
         {
             "name": "scan",
             "impl": "src/module/extension/scan/action.js"
+        },
+        {
+            "name": "clean",
+            "impl": "src/module/extension/clean/action.js"
         }
     ]
 }

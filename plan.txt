@@ -64,3 +64,7 @@ Day 5
 (10.7)  - Base plugin Class implementation and code alignment for copy and scrap plugins
         - Filter class implementation and code alignment
         - Apply Filter on scrap plugin
+
+(11.7)  - clean dependency was added (-c flag  for the catcli)
+        - string format npm added
+        - log messages - startup coverage

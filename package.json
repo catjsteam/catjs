@@ -41,7 +41,8 @@
     "nopt": "~2.1.1",
     "properties": "~0.3.3",
     "async": "~0.2.9",
-    "line-reader": "~0.2.3"
+    "line-reader": "~0.2.3",
+    "string-format": "~0.2.1"
   },
   "peerDependencies": {
     "grunt": "~0.4.1"
@@ -49,5 +50,4 @@
   "keywords": [
     "gruntplugin"
   ]
-
 }
