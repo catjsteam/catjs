@@ -1,4 +1,6 @@
 
+// TODO When CAT will go as library change the path
+var _Scrap = require("./../../../src/module/common/plugin/scrap/Scrap.js");
 
 module.exports = function() {
 
@@ -6,6 +8,15 @@ module.exports = function() {
 
         init: function() {
 
+             _Scrap.add({name: "code", func: function(config) {
+                 var code;
+                 if (config) {
+                     code = config.code;
+                 }
+             }});
+
+//             var scrap = new _Scrap.clazz({id: "testScrap", code: "console.log(':)');"});
+//             scrap.codeApply();
         },
 
         apply: function() {

@@ -4,9 +4,10 @@ var _log = require("../../CATGlob.js").log(),
     _Scrap = require("./scrap/Scrap.js"),
     _parser = require("./../parser/Parser.js"),
     _typedas = require("typedas"),
-    _basePlugin = require("./Base.js");
+    _basePlugin = require("./Base.js"),
+    _props = require("./../../Properties.js");
 
-module.exports = _basePlugin.ext(function() {
+module.exports = _basePlugin.ext(function () {
 
     var _basePath,
         _data,
@@ -14,7 +15,50 @@ module.exports = _basePlugin.ext(function() {
         _me = this,
         _emitter,
         _module,
-        _parsers = {};
+        _parsers = {},
+        _scraps = [];
+
+    function _extractValidScrap(comments) {
+
+        var scrapBlock = _Scrap.getScrapBlock(),
+            idx = 0, size, comment, scrap = [-1, -1], currentScrap = [],
+            gidx = 0, gsize, blockComment;
+
+        if (comments && _typedas.isArray(comments)) {
+
+            gsize = comments.length;
+            for (; gidx < gsize; gidx++) {
+
+                blockComment = comments[gidx];
+                if (blockComment) {
+                    size = blockComment.length;
+                    for (; idx < size; idx++) {
+                        comment = blockComment[idx];
+                        if (comment) {
+                            if (scrap[0] === -1) {
+                                scrap[0] = comment.indexOf(scrapBlock.open);
+                            }
+                            scrap[1] = comment.indexOf(scrapBlock.close);
+                            if (scrap[1] === -1) {
+                                currentScrap.push(comment);
+                            }
+                            if (scrap[1] > -1) {
+                                if (scrap[0] < -1 || scrap[0] > scrap[1]) {
+                                    currentScrap = [];
+                                    _log.warning(_props.get("cat.scrap.validation.close").format("[scrap plugin]"));
+                                }
+                                // valid comment
+                                currentScrap.push(comment);
+                                _scraps.push(currentScrap.splice(0));
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     function _getRelativeFile(file) {
         if (!file) {
@@ -41,18 +85,13 @@ module.exports = _basePlugin.ext(function() {
                     if (!_parsers["Comment"]) {
                         _parsers["Comment"] = _parser.get("Comment");
                     }
-                    _parsers["Comment"].parse({file: file, callback: function(comments) {
+                    _parsers["Comment"].parse({file: file, callback: function (comments) {
                         if (comments && _typedas.isArray(comments)) {
-                            comments.forEach(function(comment) {
-                                if (comment) {
-                                    console.log("----");
-                                    console.log(comment);
-                                    console.log("----");
-                                }
-                            });
+                            _extractValidScrap(comments);
+                            console.log(_scraps.join(".."));
                         }
                     }});
-                } else  {
+                } else {
                     _log.debug("[Copy Action] filter match, skipping file: " + from);
                 }
             }
@@ -73,7 +112,7 @@ module.exports = _basePlugin.ext(function() {
 
         },
 
-        initListener: function(config) {
+        initListener: function (config) {
             _basePath = (config ? config.path : undefined);
             if (!_basePath) {
                 _utils.error("[Scrap Plugin] No valid base path");
@@ -112,18 +151,18 @@ module.exports = _basePlugin.ext(function() {
             if (_emitter) {
                 _emitter.on("init", _module.initListener);
                 _emitter.on("file", _module.file);
-              //  _emitter.on("folder", _module.folder);
+                //  _emitter.on("folder", _module.folder);
             } else {
                 _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
             }
 
             /*
-            _Scrap.add({name: "code", func: function(config) {
-                var code;
-                if (config) {
-                    code = config.code;
-                }
-            }});
+             _Scrap.add({name: "code", func: function(config) {
+             var code;
+             if (config) {
+             code = config.code;
+             }
+             }});
 
              *  scrap usage example
              *  var scrap = new _Scrap.clazz({id: "testScrap", code: "console.log(':)');"});
@@ -131,7 +170,7 @@ module.exports = _basePlugin.ext(function() {
              */
         },
 
-        getType: function() {
+        getType: function () {
             return "scrap";
         }
     };

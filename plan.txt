@@ -68,3 +68,5 @@ Day 5
 (11.7)  - clean dependency was added (-c flag  for the catcli)
         - string format npm added
         - log messages - startup coverage
+
+(14.7)  - External annotation plugin support
