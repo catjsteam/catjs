@@ -2,7 +2,12 @@ var _typedas = require('typedas'),
     _Action = require("./Action.js"),
     _Extension = require("./Extension.js"),
     _Task = require("./Task.js"),
-    _log = require("../../../CATGlob.js").log();
+    _log = require("../../../CATGlob.js").log(),
+    _global= require("./../../../CATGlob.js"),
+    _utils = require("./../../../Utils.js"),
+    _props = require("./../../../Properties.js"),
+    _fs = require("fs.extra"),
+    _path = require("path");
 
 /**
  * Configuration Class
@@ -100,6 +105,7 @@ module.exports = function Config(config) {
     this.actions = actions;
     this.extensions = extensions;
     this.tasks = tasks;
+    this.pluginPaths = [[_global.get("home").path, "src/module/common/plugin/"].join("/")];
 
     // indexing the objects arrays [actions, tasks]
     _initIndexing();
@@ -137,7 +143,54 @@ module.exports = function Config(config) {
         if (key && map.extensions) {
             return map.extensions[key];
         }
-    }
+    };
+
+    /**
+     * Add plugin bundle locations
+     *
+     * @param paths The locations to be added
+     */
+    this.addPluginLocations = function(paths) {
+        if (_typedas.isArray(paths)) {
+            me.pluginPaths = me.pluginPaths.concat(paths);
+        } else {
+            _util.error(_props.get("cat.arguments.type").format("[cat config]", "Array"));
+        }
+    };
+
+    /**
+     * Look for plugin on all given locations, by type
+     * Note: in case of plugin type duplication, the first counts
+     *
+     * @param pluginType The plugin type
+     * @returns {string}
+     */
+    this.pluginLookup = function(pluginType) {
+
+        var plugin,
+            module,
+            pluginTypePaths = me.pluginPaths,
+            idx = 0, size = pluginTypePaths.length, item;
+
+        for (; idx<size; idx++) {
+            item = pluginTypePaths[idx];
+            if (item) {
+                try {
+                    module = [item, pluginType , ".js"].join("");
+                    module = _path.normalize(module);
+                    if (_fs.existsSync(module)) {
+                        plugin = require(module);
+                        break;
+                    }
+                } catch(e) {
+                    _utils.error(_props.get("cat.error.require.module").format("[cat config]", module));
+                }
+            }
+        }
+
+        return plugin;
+    };
+
 
     return this;
 };

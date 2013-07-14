@@ -7,6 +7,11 @@
         {
             "name": "clean",
             "impl": "src/module/extension/clean/action.js"
+        },
+        {
+            "name": "loader",
+            "impl": "src/module/extension/loader/action.js",
+            "phase": "init"
         }
     ]
 }

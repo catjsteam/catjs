@@ -6,7 +6,8 @@ var _fs = require('fs.extra'),
     _props = require("./../../Properties.js");
 
 /**
- * Clean extension for CAT.
+ * Dependency Loader extension for CAT.
+ * Mode set to 'init' the loader's 'apply' is being executed before the plugin.
  *
  * @type {module.exports}
  */
@@ -14,39 +15,39 @@ module.exports = function () {
 
     var _grunt,
         _project,
-        _emitter;
+        _emitter,
+        _phase,
+        _mode;
 
 
-    function _clean(dirs) {
+    function _load(dirs) {
+        var path;
+
         if (_typedas.isArray(dirs)) {
             dirs.forEach(function(dir) {
                 if (dir) {
                     try {
                         if (_fs.existsSync(dir)) {
-                            _fs.rmrf(dir, function (err) {
-                                if (err) {
-                                    _utils.error(_props.get("cat.error").format("[clean action]", e));
-                                }
-                            });
+                            path = _path.resolve(dir) + "/";
+                            _project.addPluginLocations([path]);
                         }
                     } catch (e) {
-                        _utils.error(_props.get("cat.error").format("[clean action]", e));
+                        _utils.error(_props.get("cat.error").format("[scrap ext]", e));
                     }
                 }
             });
         } else {
-            _log.warning(_props.get("cat.arguments.type").format("[clean action]", "Array"));
+            _log.warning(_props.get("cat.arguments.type").format("[scrap ext]", "Array"));
         }
     };
 
     function _apply(config) {
-        var dirs = (config ? config.path : undefined),
-            error = "[Scan Ext] no valid configuration for 'apply' functionality";
+        var dirs = (config ? config.path : undefined);
 
         if (!dirs) {
-            _utils.error(error);
+            _utils.error(_props.get("cat.error.config").format("[scrap ext]"));
         }
-        _clean(dirs);
+        _load(dirs);
 
         _log.info("[Scanner] Initialized");
         if (_grunt) {
@@ -71,14 +72,13 @@ module.exports = function () {
                 return undefined;
             }
             _emitter = config.emitter;
-            _grunt = (config.grunt || undefined);
-            _project = (config.project || undefined);
+            _grunt = config.grunt;
+            _project = config.project;
+            _phase = ext.phase;
+            _mode = ext.mode;
+
 
         }
-
-        // TODO create global functionality
-        // global settings
-        //dir = globalData.project.src.path;
 
         _init();
 
@@ -88,12 +88,10 @@ module.exports = function () {
 
         init: _init,
 
-        /**
-         * Apply the clean extension.
-         *
-         * @param config
-         *      path - The base path to clean from
-         */
-        apply: _apply
+        apply: _apply,
+
+        getPhase: function() {
+            return _phase;
+        }
     };
 }();

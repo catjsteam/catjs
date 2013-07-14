@@ -2,6 +2,7 @@
 var CAT = function() {
 
     var _global = require("./CATGlob.js"),
+        _stringFormat = require("string-format"),
         _log =  _global.log(),
         _project = require("./Project.js"),
         _catconfig = require("./config/CATConfig.js"),
@@ -104,8 +105,10 @@ var CAT = function() {
                                 // Load CAT internal configuration
                                 catconfig = _catconfig.load({project: project, task: task, grunt: grunt, emitter: _emitter});
 
-                                // execute task
-                                task.apply(catconfig);
+                                if (catconfig) {
+                                    // execute task
+                                    task.apply(catconfig);
+                                }
 
                             } else {
                                 _log.error("[CAT] No valid task named: '" + target + "', validate your cat's project configuration (catproject.json)");

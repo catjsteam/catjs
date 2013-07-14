@@ -3,6 +3,11 @@
 
     "dependencies": [
         {
+            "name": "dependency.loader",
+            "type": "loader",
+            "path": ["./plugins/"]
+        },
+        {
             "name": "target.clean",
             "type": "clean",
             "path": ["/home/arik/dev/projects/tmp"]
@@ -37,6 +42,22 @@
             ]
         },
         {
+            "name": "ext.scrap",
+            "type": "scrapext",
+            "filters": [
+                {
+                    "type": "file",
+                    "ext": ["*", ".jpg"],
+                    "exclude": true
+                },
+                {
+                    "type": "file",
+                    "ext": [".js"],
+                    "exclude": false
+                }
+            ]
+        },
+        {
             "name": "init.copy",
             "type": "copy",
             "from": {
@@ -54,7 +75,12 @@
             ]
         },
         {
-            "name": "target.clean"
+            "name": "target.clean",
+            "type": "clean"
+        },
+        {
+            "name": "dependency.loader",
+            "type": "scrapext"
         }
     ],
 
@@ -65,9 +91,9 @@
             "plugins": ["init.copy"]
         },
         {
-            "name": "init",
-            "dependencies": ["root.scan"],
-            "plugins": ["init.copy"]
+            "name": "scrap",
+            "dependencies": ["dependency.loader", "target.scan"],
+            "plugins": ["dependency.loader", "ext.scrap","init.scrap"]
         },
         {
             "name": "clean",

@@ -1,3 +1,10 @@
+var _fs = require('fs'),
+    _log = require("./../CATGlob.js").log(),
+    _utils = require("./../Utils.js"),
+    _props = require("./../Properties.js");
+
+
+
 /**
  * Configuration Module
  * Loading JSON configuration
@@ -7,9 +14,6 @@
  * @type {module.exports}
  */
 module.exports = function () {
-
-    var _fs = require('fs'),
-        _log = require("./../CATGlob.js").log();
 
     /**
      * Configuration functionality
@@ -33,7 +37,7 @@ module.exports = function () {
                 }
 
             } catch(e) {
-                _log.error("[Config] error occured, probably not valid cat project [catproject.json]: ",e);
+                _utils.error(_props.get("cat.error.config.loader").format("[Config Project Loader]", e));
                 throw e;
             }
         };

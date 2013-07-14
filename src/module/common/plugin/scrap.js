@@ -129,6 +129,10 @@ module.exports = _basePlugin.ext(function() {
              *  var scrap = new _Scrap.clazz({id: "testScrap", code: "console.log(':)');"});
              *  scrap.codeApply();
              */
+        },
+
+        getType: function() {
+            return "scrap";
         }
     };
 

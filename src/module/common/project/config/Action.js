@@ -45,17 +45,15 @@ module.exports = function (config) {
              * @param internalConfig The CAT internal configuration
              */
             this.apply = function(internalConfig) {
-                var target = (me.type || me.name) ,
-                    targetlib;
+                var target = (me.type || me.name);
+
                 _log.info("[CAT] running target: " + target);
 
                 // Load action per type
-                if (me.type) {
-                    // instantiating action per type [common/action/copy, common/action/inject, etc..]
-                    actionType = ["../../../common/plugin/", me.type , ".js"].join("");
+                if (target) {
                     _log.debug("[Action] Instantiating action: " + actionType);
                     try {
-                        me.ref = require(actionType);
+                        me.ref = catconfig.pluginLookup(target); // require(actionType);
                         if (me.ref) {
                             me.action = new me.ref();
                         }

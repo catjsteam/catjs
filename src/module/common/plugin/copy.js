@@ -188,6 +188,10 @@ module.exports = _basePlugin.ext(function () {
                 _log.warning("[copy action] No valid emitter, failed to assign listeners");
             }
 
+        },
+
+        getType: function() {
+            return "copy";
         }
     };
 

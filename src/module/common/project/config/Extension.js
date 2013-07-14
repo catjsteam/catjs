@@ -50,7 +50,6 @@ module.exports = function (config) {
                 }
             };
 
-
         } else {
             _log.warning("[Extension] No valid data configuration");
         }

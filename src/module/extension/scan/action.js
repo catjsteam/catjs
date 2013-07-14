@@ -1,7 +1,9 @@
 var _fs = require('fs'),
     _path = require('path'),
     _log = require("./../../CATGlob.js").log(),
-    _utils = require("./../../Utils.js");
+    _utils = require("./../../Utils.js"),
+    _props = require("./../../Properties.js");
+
 /**
  * Scan extension for CAT.
  * TODO: create an interface Class to enforce the extension to implement init, apply.
@@ -61,11 +63,10 @@ module.exports = function () {
 
 
     function _apply(config) {
-        var dir = (config ? config.path : undefined),
-            error = "[Scan Ext] no valid configuration for 'apply' functionality";
+        var dir = (config ? config.path : undefined);
 
         if (!dir) {
-            _utils.error(error);
+            _utils.error(_props.get("cat.error.config").format("[scan ext]"));
         }
         _walk(dir);
 
@@ -82,8 +83,9 @@ module.exports = function () {
      *          project - The project configuration object
      *          grunt - The grunt handle
      *          emitter - The emitter handle
+     * @param ext The extension properties
      */
-    function _init(config) {
+    function _init(config, ext) {
 
         function _init() {
 

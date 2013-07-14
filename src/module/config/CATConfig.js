@@ -4,6 +4,7 @@ var _global = require("./../CATGlob.js"),
     _path = require("path"),
     _fsconfig = require("./../fs/Config.js"),
     _typedas = require("typedas"),
+    _props = require("./../Properties.js"),
 
     _catconfig,
     /**
@@ -15,7 +16,8 @@ var _global = require("./../CATGlob.js"),
             me = this,
             project = externalConfig.project,
             task = externalConfig.task,
-            taskExtensions = task.extensions;
+            taskExtensions = task.extensions,
+            idx= 0, size;
 
         function _isSupportedExtensions(extensionName, taskExtensions) {
             var taskExtensionsTypes = [],
@@ -32,39 +34,53 @@ var _global = require("./../CATGlob.js"),
             return false;
         }
 
+        function _extension(ext) {
+            var mode = (ext.mode || "default"),
+                supportedExt = false;
+
+            if (mode === "default") {
+                supportedExt  = _isSupportedExtensions(ext.name, taskExtensions);
+            }
+
+            if (ext && ext.name && (supportedExt) ) {
+                path = ["../../../", ext.impl].join("/");
+                path = _path.normalize(path);
+                me.extmap[ext.name] = null;
+                try {
+                    extimp = me.extmap[ext.name] = require(path);
+                    if (extimp) {
+                        if (extimp.init) {
+                            extimp.init(externalConfig, ext);
+                        } else {
+                            _log.warning(_props.get("cat.config.interface").format("[CAT Config Loader]", ext.name, "init"));
+                        }
+                    }
+
+                } catch (e) {
+                    _log.error(_props.get("cat.error.class").format("[CAT Config Loader]", path), e);
+                }
+            }
+        };
+
         this.extmap = {};
+
         this.getExtension = function(key) {
             if (key) {
                 return me.extmap[key];
             }
         };
 
-        this.extensions = data.extensions,
+       this.extensions = data.extensions,
             this.plugins = data.plugins;
 
         if (this.extensions && _typedas.isArray(this.extensions)) {
 
             // Load all CAT extensions
-            this.extensions.forEach(function (ext) {
-                if (ext && ext.name && _isSupportedExtensions(ext.name, taskExtensions)) {
-                    path = ["../../../", ext.impl].join("/");
-                    path = _path.normalize(path);
-                    me.extmap[ext.name] = null;
-                    try {
-                        extimp = me.extmap[ext.name] = require(path);
-                        if (extimp) {
-                            if (extimp.init) {
-                                extimp.init(externalConfig);
-                            } else {
-                                _log.warning("[CAT Config Loader] Extension, '" + ext.name + "' has no valid interface: 'init' ");
-                            }
-                        }
 
-                    } catch (e) {
-                        _log.error("[CAT Config Loader] Failed to load required class: " + path + "; " + e);
-                    }
-                }
-            });
+            size = this.extensions.length;
+            for (; idx<size; idx++) {
+                _extension(this.extensions[idx]);
+            }
         }
     };
 
@@ -78,11 +94,11 @@ _loadCATConfig = function (externalConfig, path) {
                 _catconfig = new _CATConfig(externalConfig, data);
 
             } else {
-                _log.error("[CAT Config Loader] Cannot read cat configuration file [cat.json]");
+                _log.error(_props.get("cat.error.config").format("[CAT Config Loader]"));
             }
         }));
     } catch (e) {
-        _log.error("[CAT Config Loader] error occurred, no valid cat configuration file [cat.json]"  + e);
+        _log.error(_props.get("cat.error.config").format("[CAT Config Loader]"), e);
     }
 
     return _catconfig;

@@ -1,8 +1,10 @@
 var _utils = require("./../../../Utils.js"),
+    _props = require("../../../Properties.js"),
+
     _clazz = function(config) {
 
         if (!config) {
-            _utils.error("[Scrap Entity] No valid configuration")
+            _utils.error(_props.get("cat.error.config").format("[Scrap Entity]"));
         }
         this.config = config;
         this.id = function() {
@@ -29,7 +31,7 @@ module.exports = function() {
          */
         add: function(config) {
             if (!config) {
-                _utils.error("[Scrap Entity] No valid config for 'add' functionality ");
+                _utils.error(_props.get("cat.error.config").format("[Scrap Entity]"));
             }
 
             var attrName = config.name,
