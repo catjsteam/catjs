@@ -21,6 +21,7 @@ module.exports = _basePlugin.ext(function () {
     function _extractValidScrap(comments) {
 
         var scrapBlock = _Scrap.getScrapBlock(),
+            scrapName = _Scrap.getName().name,
             idx = 0, size, comment, scrap = [-1, -1], currentScrap = [],
             gidx = 0, gsize, blockComment;
 
@@ -36,10 +37,10 @@ module.exports = _basePlugin.ext(function () {
                         comment = blockComment[idx];
                         if (comment) {
                             if (scrap[0] === -1) {
-                                scrap[0] = comment.indexOf(scrapBlock.open);
+                                scrap[0] = comment.indexOf((scrapBlock.open + scrapName));
                             }
                             scrap[1] = comment.indexOf(scrapBlock.close);
-                            if (scrap[1] === -1) {
+                            if (scrap[0] > -1 && scrap[1] === -1) {
                                 currentScrap.push(comment);
                             }
                             if (scrap[1] > -1) {
@@ -73,7 +74,8 @@ module.exports = _basePlugin.ext(function () {
 
 
             var from = file,
-                filters = _me.getFilters();
+                filters = _me.getFilters(),
+                idx= 0, size, scrapComment;
 
             if (_me.isDisabled()) {
                 return undefined;
@@ -88,7 +90,14 @@ module.exports = _basePlugin.ext(function () {
                     _parsers["Comment"].parse({file: file, callback: function (comments) {
                         if (comments && _typedas.isArray(comments)) {
                             _extractValidScrap(comments);
-                            console.log(_scraps.join(".."));
+
+                            if (_scraps){
+                                size = _scraps.length;
+                                for (; idx<size; idx++) {
+                                    scrapComment = _scraps[idx];
+                                    _Scrap.create(scrapComment);
+                                }
+                            }
                         }
                     }});
                 } else {
