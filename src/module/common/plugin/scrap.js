@@ -1,11 +1,11 @@
-var _log = require("../../CATGlob.js").log(),
+var _log = catrequire("cat.global").log(),
     _path = require("path"),
-    _utils = require("./../../Utils.js"),
-    _Scrap = require("./scrap/Scrap.js"),
-    _parser = require("./../parser/Parser.js"),
+    _utils = catrequire("cat.utils"),
+    _Scrap = catrequire("cat.common.scrap"),
+    _parser = catrequire("cat.common.parser"),
     _typedas = require("typedas"),
-    _basePlugin = require("./Base.js"),
-    _props = require("./../../Properties.js");
+    _basePlugin = catrequire("cat.plugin.base"),
+    _props = catrequire("cat.props");
 
 module.exports = _basePlugin.ext(function () {
 
@@ -18,12 +18,16 @@ module.exports = _basePlugin.ext(function () {
         _parsers = {},
         _scraps = [];
 
-    function _extractValidScrap(comments) {
+    /**
+     * Extract valid main scrap blocks out of comments
+     *
+     * @param comments
+     * @private
+     */
+    function _extractValidScrapRoot(comments) {
 
-        var scrapBlock = _Scrap.getScrapBlock(),
-            scrapName = _Scrap.getName().name,
-            idx = 0, size, comment, scrap = [-1, -1], currentScrap = [],
-            gidx = 0, gsize, blockComment;
+        var gidx = 0, gsize, blockComment,
+            scraps;
 
         if (comments && _typedas.isArray(comments)) {
 
@@ -32,33 +36,13 @@ module.exports = _basePlugin.ext(function () {
 
                 blockComment = comments[gidx];
                 if (blockComment) {
-                    size = blockComment.length;
-                    for (; idx < size; idx++) {
-                        comment = blockComment[idx];
-                        if (comment) {
-                            if (scrap[0] === -1) {
-                                scrap[0] = comment.indexOf((scrapBlock.open + scrapName));
-                            }
-                            scrap[1] = comment.indexOf(scrapBlock.close);
-                            if (scrap[0] > -1 && scrap[1] === -1) {
-                                currentScrap.push(comment);
-                            }
-                            if (scrap[1] > -1) {
-                                if (scrap[0] < -1 || scrap[0] > scrap[1]) {
-                                    currentScrap = [];
-                                    _log.warning(_props.get("cat.scrap.validation.close").format("[scrap plugin]"));
-                                }
-                                // valid comment
-                                currentScrap.push(comment);
-                                _scraps.push(currentScrap.splice(0));
-                            }
-
-                        }
+                    scraps = _Scrap.extractScrapBlock(blockComment);
+                    if (scraps) {
+                        _scraps = _scraps.concat(scraps);
                     }
                 }
             }
         }
-        return false;
     }
 
     function _getRelativeFile(file) {
@@ -70,8 +54,22 @@ module.exports = _basePlugin.ext(function () {
 
     _module = {
 
-        file: function (file) {
+        /**
+         * Done listener
+         * Processing all of the Scrap that was collected out of the file
+         *
+         */
+        done: function() {
+            _Scrap.apply();
+        },
 
+        /**
+         * File listener
+         *
+         * @param file
+         * @returns {undefined}
+         */
+        file: function (file) {
 
             var from = file,
                 filters = _me.getFilters(),
@@ -83,19 +81,23 @@ module.exports = _basePlugin.ext(function () {
             if (file) {
                 from = _getRelativeFile(file);
                 _log.debug("[scrap Action] scan file: " + from);
+
                 if (!_me.applyFileExtFilters(filters, file)) {
                     if (!_parsers["Comment"]) {
                         _parsers["Comment"] = _parser.get("Comment");
                     }
                     _parsers["Comment"].parse({file: file, callback: function (comments) {
                         if (comments && _typedas.isArray(comments)) {
-                            _extractValidScrap(comments);
+                            _extractValidScrapRoot(comments);
 
                             if (_scraps){
                                 size = _scraps.length;
                                 for (; idx<size; idx++) {
                                     scrapComment = _scraps[idx];
-                                    _Scrap.create(scrapComment);
+                                    _Scrap.create({
+                                        file: file,
+                                        scrapComment:scrapComment
+                                    });
                                 }
                             }
                         }
@@ -106,6 +108,11 @@ module.exports = _basePlugin.ext(function () {
             }
         },
 
+        /**
+         * Folder listener
+         *
+         * @param folder
+         */
         folder: function (folder) {
 //            var tmpFolder;
 //            if (_me.isDisabled()) {
@@ -113,6 +120,12 @@ module.exports = _basePlugin.ext(function () {
 //            }
         },
 
+        /**
+         * Get All listeners
+         *
+         * @param eventName
+         * @returns {*}
+         */
         getListeners: function (eventName) {
             if (_me.isDisabled()) {
                 return undefined;
@@ -121,6 +134,11 @@ module.exports = _basePlugin.ext(function () {
 
         },
 
+        /**
+         * Init Listeners
+         *
+         * @param config
+         */
         initListener: function (config) {
             _basePath = (config ? config.path : undefined);
             if (!_basePath) {
@@ -159,6 +177,7 @@ module.exports = _basePlugin.ext(function () {
             // Listen to the process emitter
             if (_emitter) {
                 _emitter.on("init", _module.initListener);
+                _emitter.on("done", _module.done);
                 _emitter.on("file", _module.file);
                 //  _emitter.on("folder", _module.folder);
             } else {

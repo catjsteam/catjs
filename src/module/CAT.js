@@ -1,15 +1,28 @@
+var CAT = function () {
 
-var CAT = function() {
+    var _modules,
+        _global,
+        _stringFormat,
+        _log,
+        _project,
+        _catconfig,
+        _path,
+        _properties,
+        _events,
+        _emitter,
+        _basedir;
 
-    var _global = require("./CATGlob.js"),
-        _stringFormat = require("string-format"),
-        _log =  _global.log(),
-        _project = require("./Project.js"),
-        _catconfig = require("./config/CATConfig.js"),
-        _path = require("path"),
-        _properties = require("./Properties.js"),
-        _events = require('events'),
+    (function(){
+
+        _stringFormat = require("string-format");
+        _path = require("path");
+        _events = require('events');
         _emitter = new _events.EventEmitter();
+        _basedir = function (config) {
+            return ((config && config.home) || {home: {path: "."}});
+        };
+
+    })();
 
     return {
 
@@ -17,13 +30,53 @@ var CAT = function() {
          * Initial CAT module
          * @param config
          */
-        init: function(config) {
+        init: function (config) {
 
-            var me = this;
+            var me = this,
+                basedir,
+                projectDir;
 
-            // TODO create global class
-            // initial global "home" property
-            _global.set("home", ((config && config.home) || {home: {path: "."}}));
+            (function(config) {
+
+                global["cat.config.module"] = {
+                    "cat.config": "src/module/config/CATConfig.js",
+
+                    "cat.global": "src/module/CATGlob.js",
+                    "cat.utils": "src/module/Utils.js",
+                    "cat.project": "src/module/Project.js",
+                    "cat.props": "src/module/Properties.js",
+                    "cat.plugin.base": "src/module/common/plugin/Base.js",
+                    "cat.mdata": "src/module/fs/MetaData.js",
+                    "cat.common.scrap": "src/module/common/plugin/scrap/Scrap.js",
+                    "cat.common.parser": "src/module/common/parser/Parser.js"
+                };
+
+                global.catrequire = function (module) {
+                    var catconfig = global["cat.config.module"],
+                        modulepath;
+                    if (catconfig) {
+                        modulepath = ( catconfig[module] || module );
+                        modulepath = _path.normalize([projectDir, modulepath].join("/"));
+                    }
+                    return require(modulepath);
+                };
+
+                basedir = _basedir(config),
+                projectDir = basedir.path;
+
+                _global = catrequire("cat.global");
+                _log = _global.log();
+
+                _project = catrequire("cat.project");
+                _catconfig = catrequire("cat.config");
+                _properties = catrequire("cat.props");
+
+                // initial global "home" property
+                _global.set("home", basedir);
+
+
+            })(config);
+
 
             // Initial Property module
             _properties.init(function (error, properties) {
@@ -46,7 +99,7 @@ var CAT = function() {
          * Apply CAT module
          * @param config
          */
-        apply: function(config) {
+        apply: function (config) {
 
             /**
              * Set environment variables
@@ -139,7 +192,7 @@ var CAT = function() {
 }();
 
 
-module.exports = function() {
+module.exports = function () {
 
     return CAT;
 

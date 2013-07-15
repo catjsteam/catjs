@@ -2,7 +2,7 @@ module.exports = function () {
 
     var _fs = require("fs.extra"),
         _typedas = require("typedas"),
-        _log = require("./CATGlob.js").log(),
+        _log = catrequire("cat.global").log(),
         _mkdirSync = function (folder) {
             if (!_fs.existsSync(folder)) {
                 try {
@@ -86,6 +86,23 @@ module.exports = function () {
                 for (name in srcObj) {
                     if (srcObj.hasOwnProperty(name)) {
                         destObj[name] = srcObj[name];
+                    }
+                    else {
+
+                    }
+                }
+            }
+        },
+
+        forEachProp: function(srcObj, callback) {
+            var name;
+
+            if (srcObj) {
+                for (name in srcObj) {
+                    if (srcObj.hasOwnProperty(name)) {
+                        if (callback) {
+                            callback.call(srcObj, name);
+                        }
                     }
                     else {
 

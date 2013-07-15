@@ -42,7 +42,8 @@
     "properties": "~0.3.3",
     "async": "~0.2.9",
     "line-reader": "~0.2.3",
-    "string-format": "~0.2.1"
+    "string-format": "~0.2.1",
+    "js-beautify": "~1.4.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.1"

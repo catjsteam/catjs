@@ -55,7 +55,13 @@ module.exports = function () {
         };
 
         walk(dir, function (err, results) {
-            if (err) throw err;
+
+            _emitter.emit("done", {results: results});
+
+            if (err) {
+                _emitter.emit("error", {error: err});
+                throw err;
+            }
             // console.log(results);
         });
 

@@ -9,10 +9,11 @@ module.exports = function() {
         init: function() {
 
              _Scrap.add({name: "code", func: function(config) {
-                 var code;
-                 if (config) {
-                     code = config.code;
-                 }
+                 this.print(this.get("code"));
+             }});
+
+             _Scrap.add({name: "name", func: function(config) {
+
              }});
 
 //             var scrap = new _Scrap.clazz({id: "testScrap", code: "console.log(':)');"});

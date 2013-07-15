@@ -77,10 +77,6 @@
         {
             "name": "target.clean",
             "type": "clean"
-        },
-        {
-            "name": "dependency.loader",
-            "type": "scrapext"
         }
     ],
 
@@ -93,7 +89,7 @@
         {
             "name": "scrap",
             "dependencies": ["dependency.loader", "target.scan"],
-            "plugins": ["dependency.loader", "ext.scrap","init.scrap"]
+            "plugins": ["ext.scrap","init.scrap"]
         },
         {
             "name": "clean",
