@@ -41,7 +41,7 @@ var _lineReader = require('line-reader'),
                     comment.push({
                         line: line.substring(typeOpenAPos),
                         number: lineNumber,
-                        pos: typeOpenAPos
+                        col: typeOpenAPos
                     });
                 }
                 if (typeOpenBPos != -1) {
@@ -49,7 +49,7 @@ var _lineReader = require('line-reader'),
                     comment.push({
                         line: line.substring(typeOpenBPos),
                         number: lineNumber,
-                        pos: typeOpenBPos
+                        col: typeOpenBPos
                     });
                 }
             }
@@ -61,7 +61,7 @@ var _lineReader = require('line-reader'),
                         comment.push({
                             line: line.substring(0, (typeCloseAPos + closeBlock[0].length)),
                             number: lineNumber,
-                            pos: typeCloseAPos
+                            col: typeCloseAPos
                         });
                     }
                     if (typeCloseBPos != -1) {
@@ -69,7 +69,7 @@ var _lineReader = require('line-reader'),
                         comment.push({
                             line: line.substring(0, (typeCloseBPos + closeBlock[1].length)),
                             number: lineNumber,
-                            pos: typeCloseBPos
+                            col: typeCloseBPos
                         });
                     }
                 }
@@ -86,7 +86,7 @@ var _lineReader = require('line-reader'),
                     comment.push({
                         line: line,
                         number: lineNumber,
-                        pos: 0
+                        col: 0
                     });
                 }
             }

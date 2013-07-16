@@ -148,7 +148,7 @@ module.exports = function () {
                                 tmpString = comment.substring(scrap[0]);
                                 tmpPos = (tmpString.indexOf(" "));
                                 tmpPos = (tmpPos === -1 ? tmpPos = tmpString.length : tmpPos);
-                                scrapBlockName = tmpString.substring((scrap[0]), tmpPos);
+                                scrapBlockName = tmpString.substring(_scrapEnum.open.length, tmpPos);
                                 lineNumber[0] = commentobj.number;
                             }
                             currentScrap.push(comment);
@@ -156,16 +156,22 @@ module.exports = function () {
 
                         // closed block was found
                         if (scrap[1] > -1) {
-                            if (scrap[0] < -1 || scrap[0] > scrap[1]) {
-                                currentScrap = [];
-                                _log.warning(_props.get("cat.scrap.validation.close").format("[scrap plugin]"));
-                            }
                             // valid comment
                             currentScrap.push(comment);
                             if (scrapBlockName === _scrapEnum.name) {
                                 lineNumber[1] = commentobj.number;
-                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0), start:{line: lineNumber[0], pos: scrap[0]}, end:{line: lineNumber[1], pos:scrap[1]} });
+                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0), start:{line: lineNumber[0], col: scrap[0]}, end:{line: lineNumber[1], col:scrap[1]} });
                             }
+                            if (scrap[0] < -1 || lineNumber[0] > lineNumber[1]) {
+                                currentScrap = [];
+                                _log.warning(_props.get("cat.scrap.validation.close").format("[scrap plugin]"));
+                            }
+
+                            // reset for the next scrap if exists
+                            lineNumber = [0, 0];
+                            scrap = [-1, -1];
+                            scrapBlockName = undefined
+
                         }
 
                     }
@@ -204,10 +210,14 @@ module.exports = function () {
         create: function (configArg) {
 
             var scrapBlock,
-                file;
+                file,
+                commentInfo;
 
             if (configArg) {
                 scrapBlock = configArg.scrapComment;
+                if (scrapBlock) {
+                    commentInfo = {start: scrapBlock.start, end: scrapBlock.end};
+                }
                 file = configArg.file;
             }
 
@@ -252,7 +262,8 @@ module.exports = function () {
                 }
             }
 
-            config.file = configArg.file;
+            config.file = file;
+            config.fileinfo = commentInfo;
             scrap = new me.clazz(config);
             if (scrap) {
                 _scraps.push(scrap);
