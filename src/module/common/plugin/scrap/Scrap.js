@@ -156,6 +156,7 @@ module.exports = function () {
 
                         // closed block was found
                         if (scrap[1] > -1) {
+                            scrap[1] += _scrapEnum.close.length;
                             // valid comment
                             currentScrap.push(comment);
                             if (scrapBlockName === _scrapEnum.name) {
@@ -287,6 +288,7 @@ module.exports = function () {
                 });
             }
 
+            // create meta data file
             _md.write(JSON.stringify(metaData));
 
         },
