@@ -90,7 +90,7 @@ module.exports = _basePlugin.ext(function () {
                         if (comments && _typedas.isArray(comments)) {
                             _extractValidScrapRoot(comments);
 
-                            if (_scraps){
+                            if (_scraps) {
                                 size = _scraps.length;
                                 for (; idx<size; idx++) {
                                     scrapComment = _scraps[idx];

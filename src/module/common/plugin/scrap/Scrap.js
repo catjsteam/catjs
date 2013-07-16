@@ -121,8 +121,9 @@ module.exports = function () {
          * @private
          */
         _extractScrapBlock = function (scrapCommentBlock) {
-            var idx = 0, size, comment,
+            var idx = 0, size, comment, commentobj,
                 scrap = [-1, -1],
+                lineNumber = [0, 0],
                 scraps = [],
                 currentScrap = [],
                 scrapBlockName,
@@ -131,12 +132,16 @@ module.exports = function () {
             if (scrapCommentBlock) {
                 size = scrapCommentBlock.length;
                 for (; idx < size; idx++) {
-                    comment = scrapCommentBlock[idx];
+                    // see the Comment parser class for the object reference ({line: , number:, pos: })
+                    commentobj = scrapCommentBlock[idx];
+                    comment = ((commentobj && commentobj.line) ? commentobj.line : undefined);
                     if (comment) {
                         if (scrap[0] === -1) {
                             scrap[0] = comment.indexOf((_scrapEnum.open));
                         }
                         scrap[1] = comment.indexOf(_scrapEnum.close);
+
+                        // opened block was found
                         if (scrap[0] > -1 && scrap[1] === -1) {
                             if (!scrapBlockName) {
                                 // extract scrap name from the first block comment e.g. @[name
@@ -144,9 +149,12 @@ module.exports = function () {
                                 tmpPos = (tmpString.indexOf(" "));
                                 tmpPos = (tmpPos === -1 ? tmpPos = tmpString.length : tmpPos);
                                 scrapBlockName = tmpString.substring((scrap[0]), tmpPos);
+                                lineNumber[0] = commentobj.number;
                             }
                             currentScrap.push(comment);
                         }
+
+                        // closed block was found
                         if (scrap[1] > -1) {
                             if (scrap[0] < -1 || scrap[0] > scrap[1]) {
                                 currentScrap = [];
@@ -155,7 +163,8 @@ module.exports = function () {
                             // valid comment
                             currentScrap.push(comment);
                             if (scrapBlockName === _scrapEnum.name) {
-                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0)});
+                                lineNumber[1] = commentobj.number;
+                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0), start:{line: lineNumber[0], pos: scrap[0]}, end:{line: lineNumber[1], pos:scrap[1]} });
                             }
                         }
 

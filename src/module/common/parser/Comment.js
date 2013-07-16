@@ -2,6 +2,15 @@ var _lineReader = require('line-reader'),
     _fs = require("fs.extra"),
 
     _comments = [],
+
+    /**
+     *  Going over the file lines, looking for comments
+     *
+     *  @return comments of Array type, each cell comprised of:
+     *      line - The line data
+     *      number - The line number that was found in the file
+     *      pos - The pos of the first character on that line
+     */
     _commentParser = function (config) {
 
         var openBlock = ["/*", "<!--"],
@@ -12,7 +21,8 @@ var _lineReader = require('line-reader'),
             comments = [],
             file = config.file,
             cb = config.callback,
-            me = this;
+            me = this,
+            lineNumber = 1;
 
 
         _lineReader.eachLine(file,function (line) {
@@ -27,20 +37,40 @@ var _lineReader = require('line-reader'),
                 opened = 1;
                 collected = 1;
                 if (typeOpenAPos != -1) {
-                    comment.push(line.substring(typeOpenAPos));
+                    //comment.push(line.substring(typeOpenAPos));
+                    comment.push({
+                        line: line.substring(typeOpenAPos),
+                        number: lineNumber,
+                        pos: typeOpenAPos
+                    });
                 }
                 if (typeOpenBPos != -1) {
-                    comment.push(line.substring(typeOpenBPos));
+                    //comment.push(line.substring(typeOpenBPos));
+                    comment.push({
+                        line: line.substring(typeOpenBPos),
+                        number: lineNumber,
+                        pos: typeOpenBPos
+                    });
                 }
             }
             if (opened && (typeCloseAPos != -1 || typeCloseBPos != -1)) {
                 opened = 0;
                 if (comment.length > 1) {
                     if (typeCloseAPos != -1) {
-                        comment.push(line.substring(0, (typeCloseAPos + closeBlock[0].length)));
+//                        comment.push(line.substring(0, (typeCloseAPos + closeBlock[0].length)));
+                        comment.push({
+                            line: line.substring(0, (typeCloseAPos + closeBlock[0].length)),
+                            number: lineNumber,
+                            pos: typeCloseAPos
+                        });
                     }
                     if (typeCloseBPos != -1) {
-                        comment.push(line.substring(0, (typeCloseBPos + closeBlock[1].length)));
+                        //comment.push(line.substring(0, (typeCloseBPos + closeBlock[1].length)));
+                        comment.push({
+                            line: line.substring(0, (typeCloseBPos + closeBlock[1].length)),
+                            number: lineNumber,
+                            pos: typeCloseBPos
+                        });
                     }
                 }
                 comments.push(comment.slice(0));
@@ -53,12 +83,16 @@ var _lineReader = require('line-reader'),
                 if (collected) {
                     collected = 0;
                 } else {
-                    comment.push(line);
+                    comment.push({
+                        line: line,
+                        number: lineNumber,
+                        pos: 0
+                    });
                 }
             }
 
             // use 'return false' to stop this madness
-
+            lineNumber++;
 
         }).then(function () {
                 _comments.push(comment);
