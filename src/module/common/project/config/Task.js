@@ -41,16 +41,6 @@ module.exports = function (config) {
                 }
             }
         }
-//        me.actions.forEach(function (action) {
-//            if (action) {
-//                actionobj = catconfig.getAction(action);
-//                if (!actionobj.apply) {
-//                    _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
-//                } else {
-//                    actionobj.apply(internalConfig);
-//                }
-//            }
-//        });
     }
 
     function _extApply(byPhase, internalConfig) {
@@ -73,22 +63,6 @@ module.exports = function (config) {
                 }
             }
         }
-
-//        me.extensions.forEach(function (ext) {
-//            var mode;
-//            if (ext) {
-//                extensionConfig = catconfig.getExtension(ext);
-//                mode = extensionConfig.getMode();
-//                if (!extensionConfig.apply) {
-//                    _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
-//                } else {
-//                    if (mode === byMode) {
-//                        extensionConfig.apply(selfInternalConfig);
-//                    }
-//                }
-//            }
-//        });
-
     }
 
     function _init() {
@@ -121,7 +95,7 @@ module.exports = function (config) {
                     actionsExists = (me.actions && _typedas.isArray(me.actions) ? true : false);
 
                 if (!me.actions) {
-                    _log.error("[CAT] No actions for task: " + this.name);
+                    _log.warning("[CAT] No actions for task: " + this.name);
 
                 } else {
 
@@ -130,32 +104,6 @@ module.exports = function (config) {
                     if (extensionsExists) {
                         _extApply("init", internalConfig);
                     }
-
-                    // apply all plugins
-//                    if (_typedas.isArray(me.actions)) {
-//                        size = me.actions.length;
-//                        for (idx = 0; idx < size; idx++) {
-//                            action = me.actions[idx];
-//                            if (action) {
-//                                actionobj = catconfig.getAction(action);
-//                                if (!actionobj.apply) {
-//                                    _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
-//                                } else {
-//                                    actionobj.apply(internalConfig);
-//                                }
-//                            }
-//                        }
-//                        me.actions.forEach(function (action) {
-//                            if (action) {
-//                                actionobj = catconfig.getAction(action);
-//                                if (!actionobj.apply) {
-//                                    _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
-//                                } else {
-//                                    actionobj.apply(internalConfig);
-//                                }
-//                            }
-//                        });
-//                    }
 
                     // apply all actions
                     if (actionsExists) {
@@ -166,30 +114,6 @@ module.exports = function (config) {
                     if (extensionsExists) {
                         _extApply("default", internalConfig);
                     }
-
-//                        size = me.extensions.length;
-//                        for (idx = 0; idx < size; idx++) {
-//                            ext = me.extensions[idx];
-//                            if (ext) {
-//                                extensionConfig = catconfig.getExtension(ext);
-//                                if (!extensionConfig.apply) {
-//                                    _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
-//                                } else {
-//                                    extensionConfig.apply(internalConfig);
-//                                }
-//                            }
-//                        }
-//                        me.extensions.forEach(function (ext) {
-//                            if (ext) {
-//                                extensionConfig = catconfig.getExtension(ext);
-//                                if (!extensionConfig.apply) {
-//                                    _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
-//                                } else {
-//                                    extensionConfig.apply(internalConfig);
-//                                }
-//                            }
-//                        });
-
 
                 }
             }

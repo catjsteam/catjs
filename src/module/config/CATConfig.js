@@ -25,6 +25,9 @@ var _global = require("./../CATGlob.js"),
             if (project && taskExtensions && extensionName) {
                 taskExtensions.forEach(function(item){
                     var extensionRealType = project.getExtension(item);
+                    if (!extensionRealType) {
+                        _utils.error(_props.get("cat.error.config.ext").format("[CAT config loader]", item));
+                    }
                     taskExtensionsTypes.push(extensionRealType.type);
                 });
                 if (_utils.contains(taskExtensionsTypes, extensionName)){

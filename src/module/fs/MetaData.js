@@ -37,7 +37,7 @@ module.exports = function() {
                 try {
                     if (_fs.existsSync(_getMDFile())) {
                         data = _fs.readFileSync(_getMDFile());
-                        _log(_props.get("cat.mdata.read").format("[cat mdata]"));
+                        _log.debug(_props.get("cat.mdata.read").format("[cat mdata]"));
                     }
                 } catch(e) {
                     _utils.error(_props.get("cat.error").format("[cat mdata]", e));

@@ -124,6 +124,7 @@ module.exports = function () {
             var idx = 0, size, comment, commentobj,
                 scrap = [-1, -1],
                 lineNumber = [0, 0],
+                commentBlock = {start:{line:0, col:0}, end: {line:0, col:0}},
                 scraps = [],
                 currentScrap = [],
                 scrapBlockName,
@@ -134,6 +135,14 @@ module.exports = function () {
                 for (; idx < size; idx++) {
                     // see the Comment parser class for the object reference ({line: , number:, pos: })
                     commentobj = scrapCommentBlock[idx];
+                    if (idx == 0) {
+                        commentBlock.start.line = commentobj.number;
+                        commentBlock.start.col = commentobj.col;
+                    } else if (idx == size-1) {
+                        commentBlock.end.line = commentobj.number;
+                        commentBlock.end.col = commentobj.col;
+                    }
+
                     comment = ((commentobj && commentobj.line) ? commentobj.line : undefined);
                     if (comment) {
                         if (scrap[0] === -1) {
@@ -161,7 +170,7 @@ module.exports = function () {
                             currentScrap.push(comment);
                             if (scrapBlockName === _scrapEnum.name) {
                                 lineNumber[1] = commentobj.number;
-                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0), start:{line: lineNumber[0], col: scrap[0]}, end:{line: lineNumber[1], col:scrap[1]} });
+                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0), start:{line: lineNumber[0], col: scrap[0]}, end:{line: lineNumber[1], col:scrap[1]}, comment: commentBlock });
                             }
                             if (scrap[0] < -1 || lineNumber[0] > lineNumber[1]) {
                                 currentScrap = [];
@@ -212,12 +221,14 @@ module.exports = function () {
 
             var scrapBlock,
                 file,
-                commentInfo;
+                fileinfo,
+                commentinfo;
 
             if (configArg) {
                 scrapBlock = configArg.scrapComment;
                 if (scrapBlock) {
-                    commentInfo = {start: scrapBlock.start, end: scrapBlock.end};
+                    fileinfo = {start: scrapBlock.start, end: scrapBlock.end};
+                    commentinfo = scrapBlock.comment;
                 }
                 file = configArg.file;
             }
@@ -264,7 +275,8 @@ module.exports = function () {
             }
 
             config.file = file;
-            config.fileinfo = commentInfo;
+            config.fileinfo = fileinfo;
+            config.commentinfo = commentinfo;
             scrap = new me.clazz(config);
             if (scrap) {
                 _scraps.push(scrap);
@@ -272,18 +284,21 @@ module.exports = function () {
         },
 
         apply: function (key, config) {
-            var metaData = {},
-                fileName;
+            var metaData = {files:{}},
+                fileName,
+                root;
+
             if (_scraps) {
                 _scraps.forEach(function(scrap){
                     if (scrap) {
                         scrap.apply();
 
                         fileName = scrap.get("file");
-                        if (!metaData[fileName]) {
-                            metaData[fileName] = {};
+                        if (!metaData.files[fileName]) {
+                            root = metaData.files;
+                            root[fileName] = {};
                         }
-                        metaData[fileName][scrap.get("name")] = scrap.serialize();
+                        root[fileName][scrap.get("name")] = scrap.serialize();
                     }
                 });
             }

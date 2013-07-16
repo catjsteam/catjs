@@ -9,6 +9,10 @@
             "impl": "src/module/extension/clean/action.js"
         },
         {
+            "name": "inject",
+            "impl": "src/module/extension/inject/action.js"
+        },
+        {
             "name": "loader",
             "impl": "src/module/extension/loader/action.js",
             "phase": "init"

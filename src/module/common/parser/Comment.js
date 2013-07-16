@@ -61,7 +61,7 @@ var _lineReader = require('line-reader'),
                         comment.push({
                             line: line.substring(0, (typeCloseAPos + closeBlock[0].length)),
                             number: lineNumber,
-                            col: typeCloseAPos
+                            col: (typeCloseAPos + closeBlock[0].length)
                         });
                     }
                     if (typeCloseBPos != -1) {
@@ -69,7 +69,7 @@ var _lineReader = require('line-reader'),
                         comment.push({
                             line: line.substring(0, (typeCloseBPos + closeBlock[1].length)),
                             number: lineNumber,
-                            col: typeCloseBPos
+                            col: (typeCloseBPos + closeBlock[1].length)
                         });
                     }
                 }

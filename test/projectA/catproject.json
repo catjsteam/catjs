@@ -21,6 +21,10 @@
             "name": "target.scan",
             "type": "scan",
             "path": "/home/arik/dev/projects/tmp/"
+        },
+        {
+            "name": "target.inject",
+            "type": "inject"
         }
     ],
 
@@ -90,6 +94,10 @@
             "name": "scrap",
             "dependencies": ["dependency.loader", "target.scan"],
             "plugins": ["ext.scrap","init.scrap"]
+        },
+        {
+            "name": "inject",
+            "dependencies": ["target.inject"]
         },
         {
             "name": "clean",
