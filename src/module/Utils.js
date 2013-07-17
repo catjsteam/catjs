@@ -3,6 +3,10 @@ module.exports = function () {
     var _fs = require("fs.extra"),
         _typedas = require("typedas"),
         _log = catrequire("cat.global").log(),
+
+        /**
+         * Synchronized process for creating folder recursively
+         */
         _mkdirSync = function (folder) {
             if (!_fs.existsSync(folder)) {
                 try {
@@ -15,6 +19,10 @@ module.exports = function () {
                 }
             }
         },
+
+        /**
+         * Copy file synchronized
+         */
         _copySync = function (source, target, cb) {
             var cbCalled = false;
 
@@ -52,6 +60,10 @@ module.exports = function () {
             throw msg;
         },
 
+        getRelativePath: function(file, basePath) {
+            return ((file && basePath) ? file.substring(basePath.length) : undefined);
+        },
+
         contains: function (obj, value) {
             var contain = 0,
                 ii = 0, size = 0, item;
@@ -78,17 +90,27 @@ module.exports = function () {
          * @param srcObj
          * @param destObj
          */
-        copyObjProps: function (srcObj, destObj) {
+        copyObjProps: function (srcObj, destObj, override) {
 
-            var name;
+            var name, obj;
+
+            override = (override || false);
 
             if (srcObj && destObj) {
                 for (name in srcObj) {
                     if (srcObj.hasOwnProperty(name)) {
-                        destObj[name] = srcObj[name];
-                    }
-                    else {
-
+                        obj = destObj[name];
+                        if (!obj) {
+                            destObj[name] = srcObj[name];
+                        } else {
+                            if (srcObj[name] instanceof Object) {
+                                arguments.callee(srcObj[name], destObj[name], override);
+                            }	else {
+                                if (override || obj === undefined) {
+                                    destObj[name] = srcObj[name];
+                                }
+                            }
+                        }
                     }
                 }
             }

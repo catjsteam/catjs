@@ -15,8 +15,8 @@ module.exports = _basePlugin.ext(function () {
         _me = this,
         _emitter,
         _module,
-        _parsers = {},
-        _scraps = [];
+        _parsers = {};
+
 
     /**
      * Extract valid main scrap blocks out of comments
@@ -27,7 +27,7 @@ module.exports = _basePlugin.ext(function () {
     function _extractValidScrapRoot(comments) {
 
         var gidx = 0, gsize, blockComment,
-            scraps;
+            scrap = [];
 
         if (comments && _typedas.isArray(comments)) {
 
@@ -36,20 +36,12 @@ module.exports = _basePlugin.ext(function () {
 
                 blockComment = comments[gidx];
                 if (blockComment) {
-                    scraps = _Scrap.extractScrapBlock(blockComment);
-                    if (scraps) {
-                        _scraps = _scraps.concat(scraps);
-                    }
+                    scrap = scrap.concat(_Scrap.extractScrapBlock(blockComment));
                 }
             }
         }
-    }
 
-    function _getRelativeFile(file) {
-        if (!file) {
-            return file;
-        }
-        return file.substring(_basePath.length);
+        return scrap;
     }
 
     _module = {
@@ -59,8 +51,9 @@ module.exports = _basePlugin.ext(function () {
          * Processing all of the Scrap that was collected out of the file
          *
          */
-        done: function() {
-            _Scrap.apply();
+        done: function () {
+//            _Scrap.apply({basePath: _basePath});
+//            _scraps = [];
         },
 
         /**
@@ -73,13 +66,15 @@ module.exports = _basePlugin.ext(function () {
 
             var from = file,
                 filters = _me.getFilters(),
-                idx= 0, size, scrapComment;
+                scrapComment,
+                scrap, scraps,
+                size, idx = 0;
 
             if (_me.isDisabled()) {
                 return undefined;
             }
             if (file) {
-                from = _getRelativeFile(file);
+                from = _utils.getRelativePath(file, _basePath);
                 _log.debug("[scrap Action] scan file: " + from);
 
                 if (!_me.applyFileExtFilters(filters, file)) {
@@ -87,18 +82,27 @@ module.exports = _basePlugin.ext(function () {
                         _parsers["Comment"] = _parser.get("Comment");
                     }
                     _parsers["Comment"].parse({file: file, callback: function (comments) {
-                        if (comments && _typedas.isArray(comments)) {
-                            _extractValidScrapRoot(comments);
 
-                            if (_scraps) {
-                                size = _scraps.length;
-                                for (; idx<size; idx++) {
-                                    scrapComment = _scraps[idx];
-                                    _Scrap.create({
+                        if (comments && _typedas.isArray(comments)) {
+
+                            scraps = _extractValidScrapRoot(comments);
+                            if (scraps) {
+                                size = scraps.length;
+                                for (; idx < size; idx++) {
+                                    scrapComment = scraps[idx];
+                                    scrap = _Scrap.create({
                                         file: file,
-                                        scrapComment:scrapComment
+                                        scrapComment: scrapComment
                                     });
+
+                                    if (scrap) {
+                                        _Scrap.apply({
+                                            basePath: _basePath,
+                                            scrap: scrap
+                                        });
+                                    }
                                 }
+
                             }
                         }
                     }});

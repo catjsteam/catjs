@@ -275,36 +275,62 @@ module.exports = function () {
             }
 
             config.file = file;
-            config.fileinfo = fileinfo;
+            config.scrapinfo = fileinfo;
             config.commentinfo = commentinfo;
             scrap = new me.clazz(config);
             if (scrap) {
                 _scraps.push(scrap);
             }
+
+            return scrap;
         },
 
-        apply: function (key, config) {
-            var metaData = {files:{}},
-                fileName,
-                root;
+        /**
+         * Apply scrap(s)
+         *
+         * In case a specific scrap is passed to the config argument
+         * it will be processed or else this.getScraps() will be used
+         * for applying all of the stored scraps
+         *
+         *
+         * @param config The configuration data
+     *              basePath - the base project path
+         */
+        apply: function (config) {
 
-            if (_scraps) {
-                _scraps.forEach(function(scrap){
-                    if (scrap) {
-                        scrap.apply();
+            function _apply(scrap) {
+                if (scrap) {
+                    scrap.apply();
 
-                        fileName = scrap.get("file");
-                        if (!metaData.files[fileName]) {
-                            root = metaData.files;
-                            root[fileName] = {};
-                        }
-                        root[fileName][scrap.get("name")] = scrap.serialize();
+                    fileName = scrap.get("file");
+                    if (!metaData.files[fileName]) {
+                        root = metaData.files;
+                        root[fileName] = {};
                     }
+                    root[fileName][scrap.get("name")] = scrap.serialize();
+                }
+            }
+            var metaData = {files:{}, project:{}},
+                fileName, scrap,
+                root, baseClonedProjectPath;
+
+            if (config) {
+                scrap = config.scrap;
+                baseClonedProjectPath = config.basePath;
+                metaData.project.basepath = baseClonedProjectPath;
+            }
+
+            if (scrap) {
+                _apply(scrap);
+            }
+            else if (_scraps) {
+                _scraps.forEach(function(scrap){
+                    _apply(scrap);
                 });
             }
 
             // create meta data file
-            _md.write(JSON.stringify(metaData));
+            _md.update({files: metaData.files, project: metaData.project});
 
         },
 
