@@ -1,4 +1,7 @@
-var _log = require("../../../CATGlob.js").log();
+var _global = catrequire("cat.global")
+    _log = _global.log(),
+    _fs = require("fs.extra"),
+    _utils = catrequire("cat.utils");
 
 /**
  * Extension configuration class
@@ -39,12 +42,20 @@ module.exports = function (config) {
              * @param internalConfig The CAT internal configuration
              */
             this.apply = function(internalConfig) {
-                var extensionobj;
+                var extensionobj,
+                    path;
 
                 if (me.type) {
                     extensionobj = internalConfig.getExtension(me.type);
                     if (extensionobj) {
-                        extensionobj.apply({path: me.path});
+                        path = me.path;
+                        if (!path) {
+                            path = [_global.get("home").working.path, "target"].join("/");
+                            if (!_fs.existsSync(path)) {
+                                _utils.mkdirSync(path);
+                            }
+                        }
+                        extensionobj.apply({path: path});
                     }
 
                 }

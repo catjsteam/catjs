@@ -68,11 +68,14 @@ module.exports = function () {
             function _injectCodeByScrap(line) {
 
                 commentinfos.forEach(function (info) {
+                    var content;
                     if (lineNumber == info.line) {
-                        line = [line.substring(0, info.col), " console.log('cat scrap: " + info.scrap.get("name") + "'); " , line.substring(info.col, line.length)].join("");
+                        content = "console.log('cat scrap: " + info.scrap.get("name") + "'); ";
+                        line = [line.substring(0, info.col), "console.log('cat scrap: " + info.scrap.get("name") + "'); " , line.substring(info.col, line.length)].join("");
+                        info.scrap.set("injectinfo", {start:{line: lineNumber, col:info.col}, end:{line: lineNumber, col: (info.col + content.length)}});
                     }
-                });
 
+                });
                 return line;
 
             }
@@ -94,6 +97,8 @@ module.exports = function () {
                 lineNumber++;
 
             }).then(function () {
+
+                    _Scrap.apply({scraps: scraps});
 
                     _fs.writeFile(file, lines.join(""), function (err) {
                         if (err) {

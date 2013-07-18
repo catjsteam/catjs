@@ -98,7 +98,7 @@ module.exports = _basePlugin.ext(function () {
                                     if (scrap) {
                                         _Scrap.apply({
                                             basePath: _basePath,
-                                            scrap: scrap
+                                            scraps: [scrap]
                                         });
                                     }
                                 }

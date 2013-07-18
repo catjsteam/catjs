@@ -8,17 +8,19 @@
             "path": ["./plugins/"]
         },
         {
-            "name": "source.scan",
+            "name": "target.clean",
+            "type": "clean",
+            "path": ["/home/arik/dev/projects/tmp"]
+        },
+        {
+            "name": "root.scan",
             "type": "scan",
             "path": "/home/arik/dev/projects/test-project"
         },
         {
-            "name": "target.clean",
-            "type": "clean"
-        },
-        {
             "name": "target.scan",
-            "type": "scan"
+            "type": "scan",
+            "path": "/home/arik/dev/projects/tmp/"
         },
         {
             "name": "target.inject",
@@ -66,7 +68,7 @@
                 "path": "/"
             },
             "to": {
-                "path": "./target/"
+                "path": "/home/arik/dev/projects/tmp/"
             },
             "filters": [
                 {
@@ -85,7 +87,7 @@
     "tasks": [
         {
             "name": "init",
-            "dependencies": ["source.scan"],
+            "dependencies": ["root.scan"],
             "plugins": ["init.copy"]
         },
         {

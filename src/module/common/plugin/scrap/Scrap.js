@@ -9,24 +9,47 @@ module.exports = function () {
 
     var __id = 0,
 
+        _getScrapEnum = function (key) {
+            var obj = {};
+            _utils.copyObjProps(_scrapEnum[key], obj);
+
+            return obj;
+        },
+
+        _scrapBaseEnum = {
+            "_info": {
+                start: {
+                    line: -1,
+                    col: -1
+                },
+                end: {
+                    line: -1,
+                    col: -1
+                }
+            }
+        },
+
         _scraps = [],
 
         _scrapEnum = {
             open: "@[",
             close: "]@",
             single: "@@",
-            name: "scrap"
+            name: "scrap",
+
+            "injectinfo": _scrapBaseEnum["_info"],
+            "scrapinfo": _scrapBaseEnum["_info"]
         },
 
-        _scrapId = function() {
+        _scrapId = function () {
             __id++;
-            return ["scrap",__id].join("_");
+            return ["scrap", __id].join("_");
         },
 
         /**
          * Scrap class
          */
-        _clazz = function (config) {
+            _clazz = function (config) {
 
             var me = this;
 
@@ -44,6 +67,8 @@ module.exports = function () {
 
             this.config = config;
             this.output = [];
+
+            this.getEnum = _getScrapEnum;
 
             this.set = function (key, value) {
                 if (key) {
@@ -81,16 +106,16 @@ module.exports = function () {
                 }
             };
 
-            this.generate = function() {
+            this.generate = function () {
                 return ( this.output ? this.output.join(" \n ") : "");
             };
 
-            this.print = function(line) {
+            this.print = function (line) {
                 this.output.push(line);
             };
 
-            this.apply = function() {
-                _utils.forEachProp(me.config, function(prop) {
+            this.apply = function () {
+                _utils.forEachProp(me.config, function (prop) {
                     var func;
                     if (prop) {
                         func = me[prop + "Apply"];
@@ -101,9 +126,9 @@ module.exports = function () {
                 });
             };
 
-            this.serialize = function() {
+            this.serialize = function () {
                 var data = {};
-                _utils.forEachProp(me.config, function(key) {
+                _utils.forEachProp(me.config, function (key) {
                     if (key) {
                         data[key] = this[key];
                     }
@@ -120,11 +145,11 @@ module.exports = function () {
          * @returns {Array}
          * @private
          */
-        _extractScrapBlock = function (scrapCommentBlock) {
+            _extractScrapBlock = function (scrapCommentBlock) {
             var idx = 0, size, comment, commentobj,
                 scrap = [-1, -1],
                 lineNumber = [0, 0],
-                commentBlock = {start:{line:0, col:0}, end: {line:0, col:0}},
+                commentBlock = _getScrapEnum("scrapinfo"),
                 scraps = [],
                 currentScrap = [],
                 scrapBlockName,
@@ -138,7 +163,7 @@ module.exports = function () {
                     if (idx == 0) {
                         commentBlock.start.line = commentobj.number;
                         commentBlock.start.col = commentobj.col;
-                    } else if (idx == size-1) {
+                    } else if (idx == size - 1) {
                         commentBlock.end.line = commentobj.number;
                         commentBlock.end.col = commentobj.col;
                     }
@@ -170,7 +195,7 @@ module.exports = function () {
                             currentScrap.push(comment);
                             if (scrapBlockName === _scrapEnum.name) {
                                 lineNumber[1] = commentobj.number;
-                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0), start:{line: lineNumber[0], col: scrap[0]}, end:{line: lineNumber[1], col:scrap[1]}, comment: commentBlock });
+                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0), start: {line: lineNumber[0], col: scrap[0]}, end: {line: lineNumber[1], col: scrap[1]}, comment: commentBlock });
                             }
                             if (scrap[0] < -1 || lineNumber[0] > lineNumber[1]) {
                                 currentScrap = [];
@@ -191,7 +216,22 @@ module.exports = function () {
             return scraps;
         };
 
+    // Scrap class prototype
+    _clazz.prototype.update = function (key, config) {
+
+        var injectinfo = this.config[key];
+        if (!injectinfo) {
+            this.config[key] = this.getEnum(key);
+        }
+        _utils.copyObjProps(this.config[key], config);
+
+    };
+
     return {
+
+        getEnum: function (key) {
+            return _getScrapEnum(key);
+        },
 
         clazz: _clazz,
 
@@ -227,7 +267,9 @@ module.exports = function () {
             if (configArg) {
                 scrapBlock = configArg.scrapComment;
                 if (scrapBlock) {
-                    fileinfo = {start: scrapBlock.start, end: scrapBlock.end};
+                    fileinfo = _getScrapEnum("scrapinfo");
+                    fileinfo.start = scrapBlock.start;
+                    fileinfo.end = scrapBlock.end;
                     commentinfo = scrapBlock.comment;
                 }
                 file = configArg.file;
@@ -288,17 +330,19 @@ module.exports = function () {
         /**
          * Apply scrap(s)
          *
-         * In case a specific scrap is passed to the config argument
+         * In case a specific scrap(s) is passed to the config argument
          * it will be processed or else this.getScraps() will be used
          * for applying all of the stored scraps
          *
          *
          * @param config The configuration data
-     *              basePath - the base project path
+         *              basePath[optional] - the base project path
+         *              scraps[optional] - scraps to apply
          */
         apply: function (config) {
 
             function _apply(scrap) {
+
                 if (scrap) {
                     scrap.apply();
 
@@ -310,27 +354,31 @@ module.exports = function () {
                     root[fileName][scrap.get("name")] = scrap.serialize();
                 }
             }
-            var metaData = {files:{}, project:{}},
-                fileName, scrap,
-                root, baseClonedProjectPath;
+
+            var metaData = {files: {}, project: {}},
+                fileName, scrap, scraps,
+                root, baseClonedProjectPath,
+                updateobj = {files: metaData.files, project: metaData.project};
 
             if (config) {
-                scrap = config.scrap;
-                baseClonedProjectPath = config.basePath;
-                metaData.project.basepath = baseClonedProjectPath;
+                scraps = (config.scraps || _scraps);
+
+                if (config.basePath) {
+                    baseClonedProjectPath = config.basePath;
+                    metaData.project.basepath = baseClonedProjectPath;
+
+                } else {
+                    delete updateobj.project;
+                }
             }
 
-            if (scrap) {
+
+            scraps.forEach(function (scrap) {
                 _apply(scrap);
-            }
-            else if (_scraps) {
-                _scraps.forEach(function(scrap){
-                    _apply(scrap);
-                });
-            }
+            });
 
             // create meta data file
-            _md.update({files: metaData.files, project: metaData.project});
+            _md.update(updateobj);
 
         },
 
@@ -342,7 +390,7 @@ module.exports = function () {
             return _scrapEnum;
         },
 
-        getScraps: function() {
+        getScraps: function () {
             return _scraps;
         },
 

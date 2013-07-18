@@ -82,4 +82,8 @@ Day 5
         - fix for the file info - end column
         - initial inject data to the new deployment according to the metadata file
 
-(17.7)  -
+(17.7)  - utils - copy deep object support
+        - fix for multi-file scraps data extraction
+        - medata, update data support;
+
+(18.7)  - fixes for test project creation & scrap call injection
