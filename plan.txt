@@ -70,3 +70,16 @@ Day 5
         - log messages - startup coverage
 
 (14.7)  - External annotation plugin support
+        - Extract Scrap blocks from a given comment
+
+(15.7)  - extract scrap meta-data configuration
+        - beautify npm added
+        - meta-data file serialization support
+        - extract scrap data out of a file
+
+(16.7)  - metadata read support; Scrap, file information added e.g. line number
+        - fixes for the file info, start and exnd of the scrap within a file comment
+        - fix for the file info - end column
+        - initial inject data to the new deployment according to the metadata file
+
+(17.7)  -

@@ -12,14 +12,32 @@ module.exports = function () {
 
     var _mdobject,
 
-        _generateSourceProject = function(file) {
+        _generateSourceProject = function (scraps, file) {
+
+            function _generateFileContent(scraps) {
+
+                var output = [];
+
+                scraps.forEach(function (scrap) {
+                    if (scrap) {
+                        output.push("function " + scrap.get("name") + "() {");
+                        output.push("       /* test content in here */");
+                        output.push("}");
+                    }
+                });
+
+                return output.join("");
+
+            }
+
             var filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
                 workpath = _global.get("home").working.path,
-                targetfile, targetfolder;
+                targetfile, targetfolder, fileContent;
+
             if (filepath) {
                 targetfile = _path.normalize([workpath, "src", filepath].join("/"));
                 targetfolder = _path.dirname(targetfile);
-                if (targetfolder)  {
+                if (targetfolder) {
                     if (!_fs.existsSync(targetfolder)) {
                         _utils.mkdirSync(targetfolder);
                     }
@@ -27,26 +45,49 @@ module.exports = function () {
                 if (_fs.existsSync(targetfile)) {
                     _log.debug(_props.get("cat.source.project.file.exists").format("[inject ext]", targetfile));
                 }
-                _fs.writeFile(targetfile, " /** test */", function (err) {
-                    if (err) {
-                        _utils.error(_props.get("cat.error").format("[inject ext]", err));
-                    } else {
-                        _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
-                    }
-                });
 
+                fileContent = _generateFileContent(scraps);
+                if (fileContent) {
+                    _fs.writeFile(targetfile, fileContent, function (err) {
+                        if (err) {
+                            _utils.error(_props.get("cat.error").format("[inject ext]", err));
+                        } else {
+                            _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
+                        }
+                    });
+                }
             }
 
         },
-        _injectScrapCall = function (scrap, file, commentinfo) {
 
-            var lines = [] , lineNumber = 1;
+        _injectScrapCall = function (scraps, file) {
+
+            var lines = [] , lineNumber = 1,
+                commentinfos = [];
+
+            function _injectCodeByScrap(line) {
+
+                commentinfos.forEach(function (info) {
+                    if (lineNumber == info.line) {
+                        line = [line.substring(0, info.col), " console.log('cat scrap: " + info.scrap.get("name") + "'); " , line.substring(info.col, line.length)].join("");
+                    }
+                });
+
+                return line;
+
+            }
+
+            // get scrap info
+            scraps.forEach(function (scrap) {
+                var commentinfo = scrap.get("commentinfo");
+                if (commentinfo) {
+                    commentinfos.push({col: commentinfo.end.col, line: commentinfo.end.line,scrap: scrap});
+                }
+            });
 
             _lineReader.eachLine(file,function (line) {
 
-                if (lineNumber == commentinfo.end.line) {
-                    line = [line.substring(0, commentinfo.end.col), " console.log('cat scrap: " + scrap.get("name") + "'); " , line.substring(commentinfo.end.col, line.length)].join("");
-                }
+                line = _injectCodeByScrap(line);
                 lines.push(line + "\n");
 
                 // use 'return false' to stop this madness
@@ -66,21 +107,19 @@ module.exports = function () {
 
         },
 
-        _inject = function (scrap) {
+        _inject = function (scraps, fileName) {
 
-            var file = scrap.get("file"),
-                scrapinfo = scrap.get("scrapinfo"),
-                commentinfo = scrap.get("commentinfo");
-
+            var file = fileName;
 
             if (file) {
                 if (_fs.existsSync(file)) {
-                    _injectScrapCall(scrap, file, commentinfo);
-                    _generateSourceProject(file);
+                    _injectScrapCall(scraps, file);
+                    _generateSourceProject(scraps, file);
                 }
 
             }
         },
+
         _init = function () {
 
             var data = _mdata.read(),
@@ -95,7 +134,9 @@ module.exports = function () {
                 files = _mdobject.files;
                 if (files) {
                     for (fileName in files) {
+                        scraps = [];
                         if (fileName) {
+
                             scrapDataObj = files[fileName];
                             if (scrapDataObj) {
                                 for (scrapName in scrapDataObj) {
@@ -103,11 +144,12 @@ module.exports = function () {
                                     if (scrapData) {
                                         scrap = new _Scrap.clazz(scrapData);
                                         if (scrap) {
-                                            _inject(scrap);
+                                            scraps.push(scrap);
                                         }
                                     }
                                 }
                             }
+                            _inject(scraps, fileName);
                         }
 
                     }
