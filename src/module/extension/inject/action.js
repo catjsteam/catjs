@@ -118,7 +118,9 @@ module.exports = function () {
 
             if (file) {
                 if (_fs.existsSync(file)) {
+
                     _injectScrapCall(scraps, file);
+
                     _generateSourceProject(scraps, file);
                 }
 

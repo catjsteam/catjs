@@ -38,6 +38,7 @@ module.exports = function (config) {
             this.type = data.type;
             this.to = data.to;
             this.from = data.from;
+            this.data = data;
 
             /**
              * Apply Action

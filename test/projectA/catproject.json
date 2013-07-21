@@ -8,21 +8,24 @@
             "path": ["./plugins/"]
         },
         {
+            "name": "spawn",
+            "type": "spawn"
+        },{
             "name": "source.scan",
             "type": "scan",
-            "path": "/home/arik/dev/projects/test-project"
-        },
-        {
-            "name": "target.clean",
-            "type": "clean"
+            "path": "/home/arik/dev/projects/cat/test/test-project"
         },
         {
             "name": "target.scan",
             "type": "scan"
         },
         {
-            "name": "target.inject",
+            "name": "inject",
             "type": "inject"
+        },
+        {
+            "name": "target.clean",
+            "type": "clean"
         }
     ],
 
@@ -79,6 +82,21 @@
         {
             "name": "target.clean",
             "type": "clean"
+        },
+        {
+            "name": "target.inject",
+            "type": "inject"
+        },
+        {
+            "name": "project.install",
+            "type": "spawn",
+            "command": "grunt",
+            "args": ["install", "--no-color"]
+        },{
+            "name": "project.clean",
+            "type": "spawn",
+            "command": "grunt",
+            "args": ["clean", "--no-color"]
         }
     ],
 
@@ -95,12 +113,13 @@
         },
         {
             "name": "inject",
-            "dependencies": ["target.inject"]
+            "dependencies": ["dependency.loader", "inject", "spawn"],
+            "plugins": ["target.inject", "project.install"]
         },
         {
             "name": "clean",
-            "dependencies": ["target.clean"],
-            "plugins": ["target.clean"]
+            "dependencies": ["target.clean", "spawn"],
+            "plugins": ["target.clean", "project.clean"]
         }
     ]
 

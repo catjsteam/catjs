@@ -181,9 +181,9 @@ module.exports = _basePlugin.ext(function () {
 
             // Listen to the process emitter
             if (_emitter) {
-                _emitter.on("init", _module.initListener);
-                _emitter.on("file", _module.file);
-                _emitter.on("folder", _module.folder);
+                _emitter.on("scan.init", _module.initListener);
+                _emitter.on("scan.file", _module.file);
+                _emitter.on("scan.folder", _module.folder);
             } else {
                 _log.warning("[copy action] No valid emitter, failed to assign listeners");
             }

@@ -18,7 +18,7 @@ module.exports = function () {
 
     function _walk(dir) {
 
-        _emitter.emit("init", {path: dir});
+        _emitter.emit("scan.init", {path: dir});
 
         var walk = function (dir, done) {
             var results = [];
@@ -34,7 +34,7 @@ module.exports = function () {
                     _fs.stat(file, function (err, stat) {
                         if (stat && stat.isDirectory()) {
                             // On Directory
-                            _emitter.emit("folder", file);
+                            _emitter.emit("scan.folder", file);
                             _log.debug("[SCAN] folder: " + file);
                             walk(file, function (err, res) {
                                 //results = results.concat(res);
@@ -44,7 +44,7 @@ module.exports = function () {
                         } else {
                             // On File
                             //copyAction.file(file);
-                            _emitter.emit("file", file);
+                            _emitter.emit("scan.file", file);
                             _log.debug("[SCAN] file: " + file + "; ext: " + _path.extname(file));
                             results.push(file);
                             next();
@@ -56,10 +56,10 @@ module.exports = function () {
 
         walk(dir, function (err, results) {
 
-            _emitter.emit("done", {results: results});
+            _emitter.emit("scan.done", {results: results});
 
             if (err) {
-                _emitter.emit("error", {error: err});
+                _emitter.emit("scan.error", {error: err});
                 throw err;
             }
             // console.log(results);

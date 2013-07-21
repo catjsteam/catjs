@@ -1,6 +1,10 @@
 {
     "extensions" : [
         {
+            "name": "spawn",
+            "impl": "src/module/extension/spawn/action.js"
+        },
+        {
             "name": "scan",
             "impl": "src/module/extension/scan/action.js"
         },
