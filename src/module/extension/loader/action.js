@@ -51,7 +51,10 @@ module.exports = _basePlugin.ext(function () {
              *      path - The base path to scan from
              */
             apply: function (config) {
+
                 var dirs = (config ? config.path : undefined);
+
+                _me.apply(config);
 
                 if (!dirs) {
                     _utils.error(_props.get("cat.error.config").format("[scrap ext]"));

@@ -16,7 +16,8 @@ var _fs = require('fs.extra'),
  */
 module.exports = _basePlugin.ext(function () {
 
-    var _mdobject,
+    var _me = this,
+        _mdobject,
 
         /**
          * Generate CAT source test project files according to the metadata
@@ -201,7 +202,8 @@ module.exports = _basePlugin.ext(function () {
              * Empty apply method for the inject extension
              *
              */
-            apply: function () {
+            apply: function (config) {
+                _me.apply(config);
 
             }
         };

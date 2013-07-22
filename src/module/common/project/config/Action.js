@@ -3,7 +3,7 @@ var _log = require("../../../CATGlob.js").log(),
     _Filter = require("./Filter.js");
 
 /**
- * Action configuration class
+ * (Plugin) Action configuration class
  *
  * @param config The configuration:
  *              data - the configuration data
@@ -38,6 +38,7 @@ module.exports = function (config) {
             this.type = data.type;
             this.to = data.to;
             this.from = data.from;
+            this.dependency = data.dependency;
             this.data = data;
 
             /**

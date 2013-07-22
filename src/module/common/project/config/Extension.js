@@ -35,6 +35,7 @@ module.exports = function (config) {
             this.name = data.name;
             this.type = data.type;
             this.path = data.path;
+            this.type = data.type;
             this.data = data;
 
             /**
@@ -49,6 +50,7 @@ module.exports = function (config) {
                 if (me.type) {
                     extensionobj = internalConfig.getExtension(me.type);
                     if (extensionobj) {
+                        extensionobj = extensionobj.ref;
                         path = me.path;
                         if (!path) {
                             path = [_global.get("home").working.path, "target"].join("/");
@@ -56,7 +58,9 @@ module.exports = function (config) {
                                 _utils.mkdirSync(path);
                             }
                         }
-                        extensionobj.apply({path: path});
+                        if (extensionobj) {
+                            extensionobj.apply({path: path});
+                        }
                     }
 
                 }

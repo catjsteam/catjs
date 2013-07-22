@@ -80,7 +80,10 @@ module.exports = _basePlugin.ext(function () {
              *      path - The base path to scan from
              */
             apply: function (config) {
+
                 var dir = (config ? config.path : undefined);
+
+                _me.apply(config);
 
                 if (!dir) {
                     _utils.error(_props.get("cat.error.config").format("[scan ext]"));

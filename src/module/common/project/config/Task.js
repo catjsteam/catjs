@@ -1,7 +1,9 @@
-var _log = require("../../../CATGlob.js").log(),
+var _global = catrequire("cat.global"),
+    _log = _global.log(),
+    _path = require("path"),
     _typedas = require("typedas"),
-    _utils = require("./../../../Utils.js"),
-    _props = require("./../../../Properties.js");
+    _utils = catrequire("cat.utils"),
+    _props = catrequire("cat.props");
 
 /**
  * Task configuration class
@@ -29,33 +31,73 @@ module.exports = function (config) {
 
     function _actionApply(internalConfig) {
         var actionobj, action,
-            idx, size = me.actions.length;
+            idx, size = me.actions.length,
+            dependency, extension;
 
         for (idx = 0; idx < size; idx++) {
             action = me.actions[idx];
             if (action) {
                 actionobj = catconfig.getAction(action);
+                dependency = actionobj.dependency;
+
+                // apply plugin
                 if (!actionobj.apply) {
                     _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
                 } else {
                     actionobj.apply(internalConfig);
                 }
+                // apply default extensions
+                if (dependency) {
+                    extension = extLoaded[dependency];
+                    _extensionApply(dependency, "default", internalConfig, extension);
+                }
             }
         }
     }
 
-    function _extensionApply(ext, byPhase, internalConfig) {
-        var extensionConfig, phase,
+    function _extensionInit(extConfig) {
+        var extimp, path;
+
+        if (extConfig) {
+            if (!extConfig.ref) {
+                try {
+                    path = _path.normalize([_global.get("home").path, extConfig.ext.impl].join("/"));
+                    extimp = extConfig.ref = require(path);
+                    if (extimp) {
+                        if (extimp.init) {
+                            extimp.init(extConfig.externalConfig, extConfig.ext);
+                        } else {
+                            _log.warning(_props.get("cat.config.interface").format("[CAT Config Loader]", ext.name, "init"));
+                        }
+                    }
+
+                } catch (e) {
+                    _log.error(_props.get("cat.error.class").format("[CAT Config Loader]", path), e);
+                }
+            }
+        } else {
+            _log.warning(_props.get("cat.config.task.ext.not.found").format("[task config]", ext))
+        }
+    }
+
+    function _extensionApply(ext, byPhase, internalConfig, extensionConfig) {
+        var phase,
             extConfig;
 
         if (ext) {
-            extensionConfig = catconfig.getExtension(ext);
+            extensionConfig = (extensionConfig ? extensionConfig : catconfig.getExtension(ext));
             extConfig = internalConfig.getExtension(extensionConfig.type);
+
+            // extensions initialization
+            _extensionInit(extConfig);
+
             phase = (extConfig.getPhase ? extConfig.getPhase() : "default");
 
             // indexing extensions
             // TODO refactor cat project loading design - consider strong binding plugin<>extension
-            extLoaded[ext] = extensionConfig;
+            if (!extLoaded[ext]) {
+                extLoaded[ext] = extensionConfig;
+            }
 
             if (!extensionConfig.apply) {
                 _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
@@ -69,13 +111,20 @@ module.exports = function (config) {
         }
     }
 
+    /**
+     * @deprecated
+     *
+     * @param byPhase
+     * @param internalConfig
+     * @private
+     */
     function _extensionsApply(byPhase, internalConfig) {
-        var ext, idx, size = me.extensions.length;
+        var ext, idx, size = me.extensions.length,
+            extConfig = (extLoaded ? extLoaded[ext] : undefined);
 
         for (idx = 0; idx < size; idx++) {
             ext = me.extensions[idx];
-
-            _extensionApply(ext, byPhase, internalConfig);
+            _extensionApply(ext, byPhase, internalConfig, extConfig);
         }
     }
 
@@ -115,19 +164,19 @@ module.exports = function (config) {
 
                     // init mode - runt only init mode extensions
 
-                    if (extensionsExists) {
-                        _extensionsApply("init", internalConfig);
-                    }
+//                    if (extensionsExists) {
+//                        _extensionsApply("init", internalConfig);
+//                    }
 
                     // apply all actions
                     if (actionsExists) {
                         _actionApply(internalConfig);
                     }
 
-                    // apply all extensions
-                    if (extensionsExists) {
-                        _extensionsApply("default", internalConfig);
-                    }
+//                    // apply all extensions
+//                    if (extensionsExists) {
+//                        _extensionsApply("default", internalConfig);
+//                    }
 
                 }
             }

@@ -16,9 +16,9 @@ var _global = require("./../CATGlob.js"),
             me = this,
             project = externalConfig.project,
             task = externalConfig.task,
-            taskExtensions = task.extensions,
             idx= 0, size;
 
+        /* @deprecated
         function _isSupportedExtensions(extensionName, taskExtensions) {
             var taskExtensionsTypes = [],
                 project = (externalConfig ? externalConfig.project : undefined);
@@ -35,33 +35,42 @@ var _global = require("./../CATGlob.js"),
                 }
             }
             return false;
-        }
+        }*/
 
+        /**
+         * Extension initialization
+         *
+         * @param ext
+         * @private
+         */
         function _extension(ext) {
             var mode = (ext.mode || "default"),
                 supportedExt = false;
 
-            if (mode === "default") {
-                supportedExt  = _isSupportedExtensions(ext.name, taskExtensions);
-            }
-
-            if (ext && ext.name && (supportedExt) ) {
-                path = ["../../../", ext.impl].join("/");
-                path = _path.normalize(path);
-                me.extmap[ext.name] = null;
-                try {
-                    extimp = me.extmap[ext.name] = require(path);
-                    if (extimp) {
-                        if (extimp.init) {
-                            extimp.init(externalConfig, ext);
-                        } else {
-                            _log.warning(_props.get("cat.config.interface").format("[CAT Config Loader]", ext.name, "init"));
-                        }
-                    }
-
-                } catch (e) {
-                    _log.error(_props.get("cat.error.class").format("[CAT Config Loader]", path), e);
+            /*  not in use
+                if (mode === "default") {
+                    supportedExt  = _isSupportedExtensions(ext.name, taskExtensions);
                 }
+             */
+
+            if (ext && ext.name) {
+               // path = ["../../../", ext.impl].join("/");
+               // path = _path.normalize(path);
+              //  me.extmap[ext.name] = null;
+//                try {
+                    me.extmap[ext.name] = {externalConfig: externalConfig, ext: ext, ref: null};
+                    //  extimp = me.extmap[ext.name] = require(path);
+//                    if (extimp) {
+//                        if (extimp.init) {
+//                            extimp.init(externalConfig, ext);
+//                        } else {
+//                            _log.warning(_props.get("cat.config.interface").format("[CAT Config Loader]", ext.name, "init"));
+//                        }
+//                    }
+
+//                } catch (e) {
+//                    _log.error(_props.get("cat.error.class").format("[CAT Config Loader]", path), e);
+//                }
             }
         };
 

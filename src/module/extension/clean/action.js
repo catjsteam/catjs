@@ -71,8 +71,11 @@ module.exports = _basePlugin.ext(function () {
              *      path - The base path to clean from
              */
             apply: function (config) {
+
                 var dirs = (config ? config.path : undefined),
                     error = "[Scan Ext] no valid configuration for 'apply' functionality";
+
+                _me.apply(config);
 
                 if (!dirs) {
                     _utils.error(error);

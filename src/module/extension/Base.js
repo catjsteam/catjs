@@ -1,4 +1,5 @@
-var _log = catrequire("cat.global").log();
+var _log = catrequire("cat.global").log(),
+    _props = catrequire("cat.props");
 
 /**
  * Abstract Base extension functionality
@@ -9,6 +10,16 @@ module.exports = function () {
 
     // TODO consider auto generate straightforward getter / setter
     var _base = function (proto) {
+
+        /**
+         * Apply manager, mark as done, to occur just once
+         */
+        proto.apply = function() {
+            if (this._apply) {
+                _log.warning(_props.get("cat.ext.apply.warn").format("[base extension]", "?"));
+            }
+            this._apply ++;
+        };
 
         /**
          * Base initializer
@@ -25,6 +36,7 @@ module.exports = function () {
             if (!config) {
                 return undefined;
             }
+            this._apply = 0;
             this._emitter = config.emitter;
             this._grunt = config.grunt;
             this._project = config.project;

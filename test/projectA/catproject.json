@@ -8,7 +8,7 @@
             "path": ["./plugins/"]
         },
         {
-            "name": "spawn",
+            "name": "project.spawn",
             "type": "spawn"
         },{
             "name": "source.scan",
@@ -16,11 +16,11 @@
             "path": "/home/arik/dev/projects/cat/test/test-project"
         },
         {
-            "name": "target.scan",
+            "name": "project.scan",
             "type": "scan"
         },
         {
-            "name": "inject",
+            "name": "project.inject",
             "type": "inject"
         },
         {
@@ -33,6 +33,7 @@
         {
             "name": "init.scrap",
             "type": "scrap",
+            "dependency": "project.scan",
             "filters": [
                 {
                     "type": "file",
@@ -49,6 +50,7 @@
         {
             "name": "ext.scrap",
             "type": "scrapext",
+            "dependency": "dependency.loader",
             "filters": [
                 {
                     "type": "file",
@@ -65,6 +67,7 @@
         {
             "name": "init.copy",
             "type": "copy",
+            "dependency": "source.scan",
             "from": {
                 "path": "/"
             },
@@ -81,20 +84,25 @@
         },
         {
             "name": "target.clean",
-            "type": "clean"
+            "type": "clean",
+            "dependency": "target.clean"
         },
         {
             "name": "target.inject",
-            "type": "inject"
+            "type": "inject",
+            "dependency": "project.inject"
         },
         {
             "name": "project.install",
             "type": "spawn",
+            "dependency": "project.spawn",
             "command": "grunt",
             "args": ["install", "--no-color"]
-        },{
+        },
+        {
             "name": "project.clean",
             "type": "spawn",
+            "dependency": "project.spawn",
             "command": "grunt",
             "args": ["clean", "--no-color"]
         }
@@ -103,22 +111,18 @@
     "tasks": [
         {
             "name": "init",
-            "dependencies": ["source.scan"],
             "plugins": ["init.copy"]
         },
         {
             "name": "scrap",
-            "dependencies": ["dependency.loader", "target.scan"],
             "plugins": ["ext.scrap","init.scrap"]
         },
         {
             "name": "inject",
-            "dependencies": ["dependency.loader", "inject", "spawn"],
             "plugins": ["target.inject", "project.install"]
         },
         {
             "name": "clean",
-            "dependencies": ["target.clean", "spawn"],
             "plugins": ["target.clean", "project.clean"]
         }
     ]
