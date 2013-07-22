@@ -8,10 +8,21 @@ var _fs = require('fs.extra'),
     _utils = catrequire("cat.utils"),
     _props = catrequire("cat.props");
 
+/**
+ * Injection extension for CAT
+ *
+ * @type {module.exports}
+ */
 module.exports = function () {
 
     var _mdobject,
 
+        /**
+         * Generate CAT source test project files according to the metadata
+         *
+         * @param scraps The scraps data
+         * @param fileName The reference file to be processed
+         */
         _generateSourceProject = function (scraps, file) {
 
             function _generateFileContent(scraps) {
@@ -60,6 +71,12 @@ module.exports = function () {
 
         },
 
+        /**
+         * Inject CAT calls to the proper location according to the scraps data
+         *
+         * @param scraps The scraps data
+         * @param file The reference file to be processed
+         */
         _injectScrapCall = function (scraps, file) {
 
             var lines = [] , lineNumber = 1,
@@ -112,6 +129,13 @@ module.exports = function () {
 
         },
 
+        /**
+         * Generate CAT test project and create the proper functionality according to the scraps
+         * Injects the proper calls according to the scraps
+         *
+         * @param scraps The scraps data
+         * @param fileName The reference file to be processed
+         */
         _inject = function (scraps, fileName) {
 
             var file = fileName;
@@ -127,9 +151,14 @@ module.exports = function () {
             }
         },
 
+        /**
+         * Plugin initialization
+         * Reads the data out of CAT metadata file
+         * Go over the files and inject the data according to the metadata information
+         */
         _init = function () {
 
-            var data = _mdata.read(),
+            var data = (_mdata ? _mdata.read() : undefined),
                 fileName, scrapName, files, scrapData, scrapDataObj,
                 scrap, scraps = [];
 
@@ -163,9 +192,15 @@ module.exports = function () {
                 }
             }
 
-        }, _apply = function () {
+        },
 
-        }
+        /**
+         * Empty apply method for the inject extension
+         *
+         */
+        _apply = function () {
+
+        };
 
     return {
 

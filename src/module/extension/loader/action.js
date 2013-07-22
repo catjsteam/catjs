@@ -6,8 +6,8 @@ var _fs = require('fs.extra'),
     _props = require("./../../Properties.js");
 
 /**
- * Dependency Loader extension for CAT.
- * Mode set to 'init' the loader's 'apply' is being executed before the plugin.
+ * Dependency Loader extension for CAT
+ * Mode set to 'init' the loader's 'apply' is being executed before the plugin
  *
  * @type {module.exports}
  */
@@ -17,72 +17,81 @@ module.exports = function () {
         _project,
         _emitter,
         _phase,
-        _mode;
+        _mode,
 
+        /**
+         *  Load CAT external extensions according to the given path
+         *
+         *  @param dirs The reference directories
+         */
+        _load = function (dirs) {
+            var path;
 
-    function _load(dirs) {
-        var path;
-
-        if (_typedas.isArray(dirs)) {
-            dirs.forEach(function(dir) {
-                if (dir) {
-                    try {
-                        if (_fs.existsSync(dir)) {
-                            path = _path.resolve(dir) + "/";
-                            _project.addPluginLocations([path]);
+            if (_typedas.isArray(dirs)) {
+                dirs.forEach(function (dir) {
+                    if (dir) {
+                        try {
+                            if (_fs.existsSync(dir)) {
+                                path = _path.resolve(dir) + "/";
+                                _project.addPluginLocations([path]);
+                            }
+                        } catch (e) {
+                            _utils.error(_props.get("cat.error").format("[scrap ext]", e));
                         }
-                    } catch (e) {
-                        _utils.error(_props.get("cat.error").format("[scrap ext]", e));
                     }
-                }
-            });
-        } else {
-            _log.warning(_props.get("cat.arguments.type").format("[scrap ext]", "Array"));
-        }
-    };
-
-    function _apply(config) {
-        var dirs = (config ? config.path : undefined);
-
-        if (!dirs) {
-            _utils.error(_props.get("cat.error.config").format("[scrap ext]"));
-        }
-        _load(dirs);
-
-        _log.info("[Scanner] Initialized");
-        if (_grunt) {
-            _log("[Scanner] Grunt supported");
-        }
-    }
-
-    /**
-     *
-     *
-     * @param config The passed arguments
-     *          project - The project configuration object
-     *          grunt - The grunt handle
-     *          emitter - The emitter handle
-     * @param ext The extension properties
-     */
-    function _init(config, ext) {
-
-        function _init() {
-
-            if (!config) {
-                return undefined;
+                });
+            } else {
+                _log.warning(_props.get("cat.arguments.type").format("[scrap ext]", "Array"));
             }
-            _emitter = config.emitter;
-            _grunt = config.grunt;
-            _project = config.project;
-            _phase = ext.phase;
-            _mode = ext.mode;
+        },
 
+        /**
+         * Apply the load extension
+         *
+         * @param config
+         *      path - The base path to scan from
+         */
+        _apply = function (config) {
+            var dirs = (config ? config.path : undefined);
 
-        }
+            if (!dirs) {
+                _utils.error(_props.get("cat.error.config").format("[scrap ext]"));
+            }
+            _load(dirs);
 
-        _init();
+            _log.info("[Scanner] Initialized");
+            if (_grunt) {
+                _log("[Scanner] Grunt supported");
+            }
+        },
 
-    }
+        /**
+         * Plugin initialization
+         *
+         * @param config The passed arguments
+         *          project - The project configuration object
+         *          grunt - The grunt handle
+         *          emitter - The emitter handle
+         *
+         * @param ext The extension properties
+         */
+          _init = function (config, ext) {
+
+            function _init() {
+
+                if (!config) {
+                    return undefined;
+                }
+                _emitter = config.emitter;
+                _grunt = config.grunt;
+                _project = config.project;
+                _phase = ext.phase;
+                _mode = ext.mode;
+            }
+
+            _init();
+
+        };
 
     return {
 
@@ -90,7 +99,7 @@ module.exports = function () {
 
         apply: _apply,
 
-        getPhase: function() {
+        getPhase: function () {
             return _phase;
         }
     };
