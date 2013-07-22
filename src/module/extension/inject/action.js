@@ -6,14 +6,15 @@ var _fs = require('fs.extra'),
     _mdata = catrequire("cat.mdata"),
     _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
-    _props = catrequire("cat.props");
+    _props = catrequire("cat.props"),
+    _basePlugin = require("./../Base.js");
 
 /**
  * Injection extension for CAT
  *
  * @type {module.exports}
  */
-module.exports = function () {
+module.exports = _basePlugin.ext(function () {
 
     var _mdobject,
 
@@ -23,7 +24,7 @@ module.exports = function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-        _generateSourceProject = function (scraps, file) {
+         _generateSourceProject = function (scraps, file) {
 
             function _generateFileContent(scraps) {
 
@@ -77,7 +78,7 @@ module.exports = function () {
          * @param scraps The scraps data
          * @param file The reference file to be processed
          */
-        _injectScrapCall = function (scraps, file) {
+         _injectScrapCall = function (scraps, file) {
 
             var lines = [] , lineNumber = 1,
                 commentinfos = [];
@@ -89,7 +90,7 @@ module.exports = function () {
                     if (lineNumber == info.line) {
                         content = "console.log('cat scrap: " + info.scrap.get("name") + "'); ";
                         line = [line.substring(0, info.col), "console.log('cat scrap: " + info.scrap.get("name") + "'); " , line.substring(info.col, line.length)].join("");
-                        info.scrap.set("injectinfo", {start:{line: lineNumber, col:info.col}, end:{line: lineNumber, col: (info.col + content.length)}});
+                        info.scrap.set("injectinfo", {start: {line: lineNumber, col: info.col}, end: {line: lineNumber, col: (info.col + content.length)}});
                     }
 
                 });
@@ -101,7 +102,7 @@ module.exports = function () {
             scraps.forEach(function (scrap) {
                 var commentinfo = scrap.get("commentinfo");
                 if (commentinfo) {
-                    commentinfos.push({col: commentinfo.end.col, line: commentinfo.end.line,scrap: scrap});
+                    commentinfos.push({col: commentinfo.end.col, line: commentinfo.end.line, scrap: scrap});
                 }
             });
 
@@ -136,7 +137,7 @@ module.exports = function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-        _inject = function (scraps, fileName) {
+         _inject = function (scraps, fileName) {
 
             var file = fileName;
 
@@ -151,61 +152,59 @@ module.exports = function () {
             }
         },
 
-        /**
-         * Plugin initialization
-         * Reads the data out of CAT metadata file
-         * Go over the files and inject the data according to the metadata information
-         */
-        _init = function () {
+        _module = {
 
-            var data = (_mdata ? _mdata.read() : undefined),
-                fileName, scrapName, files, scrapData, scrapDataObj,
-                scrap, scraps = [];
+            /**
+             * Plugin initialization
+             * Reads the data out of CAT metadata file
+             * Go over the files and inject the data according to the metadata information
+             */
+            init: function () {
 
-            _mdobject = (data ? JSON.parse(data) : undefined);
-            if (_mdobject) {
+                var data = (_mdata ? _mdata.read() : undefined),
+                    fileName, scrapName, files, scrapData, scrapDataObj,
+                    scrap, scraps = [];
 
-                // TODO go over the updates for the file that was changed...
+                _mdobject = (data ? JSON.parse(data) : undefined);
+                if (_mdobject) {
 
-                files = _mdobject.files;
-                if (files) {
-                    for (fileName in files) {
-                        scraps = [];
-                        if (fileName) {
+                    // TODO go over the updates for the file that was changed...
 
-                            scrapDataObj = files[fileName];
-                            if (scrapDataObj) {
-                                for (scrapName in scrapDataObj) {
-                                    scrapData = scrapDataObj[scrapName];
-                                    if (scrapData) {
-                                        scrap = new _Scrap.clazz(scrapData);
-                                        if (scrap) {
-                                            scraps.push(scrap);
+                    files = _mdobject.files;
+                    if (files) {
+                        for (fileName in files) {
+                            scraps = [];
+                            if (fileName) {
+
+                                scrapDataObj = files[fileName];
+                                if (scrapDataObj) {
+                                    for (scrapName in scrapDataObj) {
+                                        scrapData = scrapDataObj[scrapName];
+                                        if (scrapData) {
+                                            scrap = new _Scrap.clazz(scrapData);
+                                            if (scrap) {
+                                                scraps.push(scrap);
+                                            }
                                         }
                                     }
                                 }
+                                _inject(scraps, fileName);
                             }
-                            _inject(scraps, fileName);
-                        }
 
+                        }
                     }
                 }
+
+            },
+
+            /**
+             * Empty apply method for the inject extension
+             *
+             */
+            apply: function () {
+
             }
-
-        },
-
-        /**
-         * Empty apply method for the inject extension
-         *
-         */
-        _apply = function () {
-
         };
 
-    return {
-
-        init: _init,
-
-        apply: _apply
-    };
-}();
+    return _module;
+});

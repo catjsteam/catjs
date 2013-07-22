@@ -4,18 +4,17 @@ var _fs = require('fs.extra'),
     _log = _global.log(),
     _utils = catrequire("cat.utils"),
     _typedas = require("typedas"),
-    _props = catrequire("cat.props");
+    _props = catrequire("cat.props"),
+    _basePlugin = require("./../Base.js");
 
 /**
  * Clean extension for CAT
  *
  * @type {module.exports}
  */
-module.exports = function () {
+module.exports = _basePlugin.ext(function () {
 
-    var _grunt,
-        _project,
-        _emitter,
+    var _me = this,
 
 
         /**
@@ -25,7 +24,7 @@ module.exports = function () {
          * @returns {undefined}
          * @private
          */
-         _clean = function (dirs) {
+          _clean = function (dirs) {
 
             function _delete(dir) {
                 if (dir) {
@@ -63,59 +62,40 @@ module.exports = function () {
             _delete([_global.get("home").working.path, "_cat_md.json"].join("/"));
         },
 
-        /**
-         * Apply the clean extension.
-         *
-         * @param config
-         *      path - The base path to clean from
-         */
-         _apply = function (config) {
-            var dirs = (config ? config.path : undefined),
-                error = "[Scan Ext] no valid configuration for 'apply' functionality";
 
-            if (!dirs) {
-                _utils.error(error);
-            }
-            _clean(dirs);
+        _module = {
+            /**
+             * Apply the clean extension.
+             *
+             * @param config
+             *      path - The base path to clean from
+             */
+            apply: function (config) {
+                var dirs = (config ? config.path : undefined),
+                    error = "[Scan Ext] no valid configuration for 'apply' functionality";
 
-            _log.info("[Scanner] Initialized");
-            if (_grunt) {
-                _log("[Scanner] Grunt supported");
-            }
-        },
-
-        /**
-         * Plugin initialization
-         *
-         * @param config The passed arguments
-         *          project - The project configuration object
-         *          grunt - The grunt handle
-         *          emitter - The emitter handle
-         *
-         * @param ext The extension properties
-         */
-         _init = function (config, ext) {
-
-            function _init() {
-
-                if (!config) {
-                    return undefined;
+                if (!dirs) {
+                    _utils.error(error);
                 }
-                _emitter = config.emitter;
-                _grunt = (config.grunt || undefined);
-                _project = (config.project || undefined);
+                _clean(dirs);
+            },
+
+            /**
+             * Plugin initialization
+             *
+             * @param config The passed arguments
+             *          project - The project configuration object
+             *          grunt - The grunt handle
+             *          emitter - The emitter handle
+             *
+             * @param ext The extension properties
+             */
+            init: function (config, ext) {
+                _me.initialize(config, ext);
 
             }
-
-            _init();
-
         };
 
-    return {
+    return _module;
 
-        init: _init,
-
-        apply: _apply
-    };
-
-}();
+});

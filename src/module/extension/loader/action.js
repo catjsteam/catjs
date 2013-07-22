@@ -3,7 +3,8 @@ var _fs = require('fs.extra'),
     _log = require("./../../CATGlob.js").log(),
     _utils = require("./../../Utils.js"),
     _typedas = require("typedas"),
-    _props = require("./../../Properties.js");
+    _props = require("./../../Properties.js"),
+    _basePlugin = require("./../Base.js");
 
 /**
  * Dependency Loader extension for CAT
@@ -11,20 +12,16 @@ var _fs = require('fs.extra'),
  *
  * @type {module.exports}
  */
-module.exports = function () {
+module.exports = _basePlugin.ext(function () {
 
-    var _grunt,
-        _project,
-        _emitter,
-        _phase,
-        _mode,
+    var _me = this,
 
         /**
          *  Load CAT external extensions according to the given path
          *
          *  @param dirs The reference directories
          */
-        _load = function (dirs) {
+         _load = function (dirs) {
             var path;
 
             if (_typedas.isArray(dirs)) {
@@ -33,7 +30,7 @@ module.exports = function () {
                         try {
                             if (_fs.existsSync(dir)) {
                                 path = _path.resolve(dir) + "/";
-                                _project.addPluginLocations([path]);
+                                _me.getProject().addPluginLocations([path]);
                             }
                         } catch (e) {
                             _utils.error(_props.get("cat.error").format("[scrap ext]", e));
@@ -45,62 +42,44 @@ module.exports = function () {
             }
         },
 
-        /**
-         * Apply the load extension
-         *
-         * @param config
-         *      path - The base path to scan from
-         */
-        _apply = function (config) {
-            var dirs = (config ? config.path : undefined);
+        _module = {
 
-            if (!dirs) {
-                _utils.error(_props.get("cat.error.config").format("[scrap ext]"));
-            }
-            _load(dirs);
+            /**
+             * Apply the load extension
+             *
+             * @param config
+             *      path - The base path to scan from
+             */
+            apply: function (config) {
+                var dirs = (config ? config.path : undefined);
 
-            _log.info("[Scanner] Initialized");
-            if (_grunt) {
-                _log("[Scanner] Grunt supported");
-            }
-        },
-
-        /**
-         * Plugin initialization
-         *
-         * @param config The passed arguments
-         *          project - The project configuration object
-         *          grunt - The grunt handle
-         *          emitter - The emitter handle
-         *
-         * @param ext The extension properties
-         */
-          _init = function (config, ext) {
-
-            function _init() {
-
-                if (!config) {
-                    return undefined;
+                if (!dirs) {
+                    _utils.error(_props.get("cat.error.config").format("[scrap ext]"));
                 }
-                _emitter = config.emitter;
-                _grunt = config.grunt;
-                _project = config.project;
-                _phase = ext.phase;
-                _mode = ext.mode;
-            }
+                _load(dirs);
+            },
 
-            _init();
+            /**
+             * Plugin initialization
+             * Use base initializer
+             *
+             * @param config The passed arguments
+             *          project - The project configuration object
+             *          grunt - The grunt handle
+             *          emitter - The emitter handle
+             *
+             * @param ext The extension properties
+             */
+            init: function (config, ext) {
+                _me.initialize(config, ext);
+
+            },
+
+            getPhase: function () {
+                return _me.getPhase();
+            }
 
         };
 
-    return {
-
-        init: _init,
-
-        apply: _apply,
-
-        getPhase: function () {
-            return _phase;
-        }
-    };
-}();
+    return _module;
+});

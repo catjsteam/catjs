@@ -3,6 +3,11 @@ var _utils = require("./../../Utils.js"),
     _typedas = require("typedas"),
     _path = require("path");
 
+/**
+ * Abstract Base plugin functionality
+ *
+ * @type {module.exports}
+ */
 module.exports = function() {
 
     // TODO consider auto generate straightforward getter / setter
@@ -21,11 +26,11 @@ module.exports = function() {
         };
 
         proto.isDisabled = function() {
-            return this.disabled;
+            return this._disabled;
         };
 
         proto.setDisabled = function(bol) {
-            this.disabled = bol;
+            this._disabled = bol;
         };
 
         proto.setTo = function(to) {
