@@ -10,9 +10,11 @@ var CAT = function () {
         _properties,
         _events,
         _emitter,
-        _basedir;
+        _basedir,
+        _watch,
+        _cache;
 
-    (function(){
+    (function () {
 
         _stringFormat = require("string-format");
         _path = require("path");
@@ -26,8 +28,11 @@ var CAT = function () {
 
     return {
 
+
         /**
          * Initial CAT module
+         * Note: Get called from CATCli module
+         *
          * @param config
          */
         init: function (config) {
@@ -36,8 +41,9 @@ var CAT = function () {
                 basedir,
                 projectDir;
 
-            (function(config) {
+            (function (config) {
 
+                // Map index for CAT modules
                 global["cat.config.module"] = {
                     "cat.config": "src/module/config/CATConfig.js",
 
@@ -48,9 +54,17 @@ var CAT = function () {
                     "cat.plugin.base": "src/module/common/plugin/Base.js",
                     "cat.mdata": "src/module/fs/MetaData.js",
                     "cat.common.scrap": "src/module/common/plugin/scrap/Scrap.js",
-                    "cat.common.parser": "src/module/common/parser/Parser.js"
+                    "cat.common.parser": "src/module/common/parser/Parser.js",
+                    "cat.watch": "src/module/Watch.js",
+                    "cat.cache": "src/module/Cache.js"
                 };
 
+                /**
+                 * CAT require implementation
+                 *
+                 * @param module The module key
+                 * @returns {*}
+                 */
                 global.catrequire = function (module) {
                     var catconfig = global["cat.config.module"],
                         modulepath;
@@ -62,7 +76,7 @@ var CAT = function () {
                 };
 
                 basedir = _basedir(config),
-                projectDir = basedir.path;
+                    projectDir = basedir.path;
 
                 _global = catrequire("cat.global");
                 _log = _global.log();
@@ -74,11 +88,14 @@ var CAT = function () {
                 // initial global "home" property
                 _global.set("home", basedir);
 
+                _cache = catrequire("cat.cache");
+                _cache.set("pid", process.pid);
+
 
             })(config);
 
 
-            // Initial Property module
+            // Property module initialization
             _properties.init(function (error, properties) {
 
                 // on error
@@ -90,16 +107,28 @@ var CAT = function () {
 
                 // After property log file loaded apply CAT module
                 global.CAT.props = properties;
+
+                /*
+                 CAT apply call
+                 */
                 me.apply.call(me, config);
+
             });
+
 
         },
 
         /**
          * Apply CAT module
+         * Note: Get called after properties module initialization
+         *
          * @param config
          */
         apply: function (config) {
+
+            // TODO messages should be taken from resource
+            var targets, grunt, args, path, watch = false, kill = 0,
+                msg = ["[CAT] Project failed to load, No valid argument path was found"];
 
             /**
              * Set environment variables
@@ -118,7 +147,9 @@ var CAT = function () {
                     workingDir = home.working.path;
                 }
 
-                target = config.task;
+                kill = (config.kill || kill);
+                watch = (config.watch || watch);
+                targets = config.task;
                 grunt = config.grunt;
                 args = config;
                 path = (config.path || workingDir);
@@ -141,6 +172,32 @@ var CAT = function () {
                 var project,
                     catconfig,
                     task;
+
+                /**
+                 * Get which task to get to run from the CAT command line.
+                 *
+                 * @param target The passed task
+                 * @private
+                 */
+                function _runTask(target) {
+
+                    target = target.toString();
+                    target = target.toLowerCase();
+
+                    if (catconfig) {
+
+                        task = project.getTask(target);
+                        if (task) {
+                            // execute task
+                            task.apply(catconfig);
+                        } else {
+                            _log.error("[CAT] No valid task named: '" + targets + "', validate your cat's project configuration (catproject.json)");
+                        }
+
+                    }
+
+                }
+
                 if (path) {
 
                     // load CAT project
@@ -149,38 +206,59 @@ var CAT = function () {
                     if (project) {
 
                         // apply project's tasks
-                        if (target) {
-                            target = target.toString();
-                            target = target.toLowerCase();
-                            task = project.getTask(target);
-                            if (task) {
+                        if (targets) {
 
-                                // Load CAT internal configuration
-                                catconfig = _catconfig.load({project: project, task: task, grunt: grunt, emitter: _emitter});
+                            // Load CAT internal configuration
+                            catconfig = _catconfig.load({project: project, grunt: grunt, emitter: _emitter});
 
-                                if (catconfig) {
-                                    // execute task
-                                    task.apply(catconfig);
-                                }
+                            targets.forEach(function (target) {
+                                _runTask(target);
+                            });
 
-                            } else {
-                                _log.error("[CAT] No valid task named: '" + target + "', validate your cat's project configuration (catproject.json)");
-                            }
                         }
                     }
 
                 } else {
-                    _log.error(msg[0]);
+
+                    _log.warning(msg[0]);
                     throw msg[0];
 
                 }
+
+                if (watch) {
+
+                    process.stdin.resume();
+
+                    process.on('uncaughtException', function (err) {
+                        console.error(err);
+                        process.exit(1);
+                    });
+                    process.on('exit', function () {
+                        _cache.removeByKey("pid", process.pid);
+                    });
+
+                    process.on('SIGINT', function () {
+                        process.exit(1);
+                    });
+
+                    _watch = catrequire("cat.watch");
+                    _watch.init();
+
+
+                }
+
+                console.log("watch: " + watch + " kill: " + kill + " process: " + process.pid);
+                if (kill) {
+                    //if (kill == process.getgid()) {
+                    process.exit(1);
+                    //}
+                }
+                console.log("watch: " + watch + " kill: " + kill + " process: " + process.pid);
+
             }
 
             _log.debug("[CAT] Initial, command line arguments: " + JSON.stringify(config));
 
-            // TODO messages should be taken from resource
-            var target, grunt, args, path,
-                msg = ["[CAT] Project failed to load, No valid argument path was found"];
 
             _init();
             _apply();

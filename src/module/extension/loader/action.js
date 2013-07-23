@@ -1,10 +1,12 @@
 var _fs = require('fs.extra'),
     _path = require('path'),
-    _log = require("./../../CATGlob.js").log(),
-    _utils = require("./../../Utils.js"),
+    _global = catrequire("cat.global"),
+    _log = _global.log(),
+    _utils = catrequire("cat.props"),
     _typedas = require("typedas"),
-    _props = require("./../../Properties.js"),
-    _basePlugin = require("./../Base.js");
+    _props = catrequire("cat.props"),
+    _basePlugin = require("./../Base.js"),
+    _watch = require("watch");
 
 /**
  * Dependency Loader extension for CAT
@@ -60,6 +62,7 @@ module.exports = _basePlugin.ext(function () {
                     _utils.error(_props.get("cat.error.config").format("[scrap ext]"));
                 }
                 _load(dirs);
+
             },
 
             /**
