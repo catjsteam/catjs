@@ -83,37 +83,64 @@ module.exports = function () {
         },
 
         remove: function (lines) {
-            var rows = [];
+            var rows = [],
+                idx = 0, size = ((lines && lines.length) ? lines.length : 0);
 
-            if (lines && lines.length) {
+            function _addRow(row) {
+                if (row.trim()) {
+                    if (row.indexOf("\n") === -1) {
+                        row += "\n";
+                    }
+                    rows.push(row);
+                }
+
+            }
+
+            if (size) {
                 _inspect(function () {
                     var row = this.row,
-                        line = this.line;
+                        lineNumber,
+                        line = this.line,
+                        validate = 0;
 
-                    lines.forEach(function(lineNumber){
-                        if (line !== lineNumber) {
-                            rows.push(row);
+                    for (idx = 0; idx<size; idx++) {
+                        lineNumber = lines[idx];
+                        if (line === lineNumber) {
+                            validate++;
+                            break;
                         }
-                    });
+                    }
+
+                    // add the row if no remove have been requested
+                    if (validate === 0) {
+                        _addRow(row);
+                        validate = 0;
+                    }
 
                 });
 
-                _store((rows.join("") + "\n"), "writeFileSync");
+                if (rows && rows.length > 0) {
+                    _store((rows.join("")), "writeFileSync");
+                }
             }
         },
 
-        removeByKey: function(key, value) {
+        removeByKey: function(key, value, kill) {
             var rows = this.get(key),
-                lines=[];
+                lines=[],
+                values = [];
 
             rows.forEach(function(row){
-                if (!value || (value && row.row && row.row.indexOf(value) !== -1)) {
+                if (!value || (value && row.row && row.row.indexOf(value) === -1)) {
                     lines.push(row.line);
+                    values.push((row.row.trim().split("="))[1]);
                 }
             });
             if (lines && lines.length && lines.length > 0) {
                 this.remove(lines);
             }
+
+            return values;
         }
 
     };

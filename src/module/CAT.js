@@ -12,7 +12,8 @@ var CAT = function () {
         _emitter,
         _basedir,
         _watch,
-        _cache;
+        _cache,
+        _utils;
 
     (function () {
 
@@ -171,7 +172,7 @@ var CAT = function () {
 
                 var project,
                     catconfig,
-                    task;
+                    task, pids;
 
                 /**
                  * Get which task to get to run from the CAT command line.
@@ -234,12 +235,19 @@ var CAT = function () {
                         process.exit(1);
                     });
                     process.on('exit', function () {
+                        console.log("SIGKILL");
                         _cache.removeByKey("pid", process.pid);
                     });
 
                     process.on('SIGINT', function () {
+                        console.log("SIGKILL");
                         process.exit(1);
                     });
+
+//                    process.on('SIGKILL', function () {
+//                        console.log("SIGKILL");
+//                       // process.exit(1);
+//                    });
 
                     _watch = catrequire("cat.watch");
                     _watch.init();
@@ -249,8 +257,19 @@ var CAT = function () {
 
                 console.log("watch: " + watch + " kill: " + kill + " process: " + process.pid);
                 if (kill) {
+                    _utils = catrequire("cat.utils");
+
+                    if (kill == 1) {
+                        // kill all current running processes except me.
+                        pids = _cache.removeByKey("pid", process.pid);
+                        _utils.kill(pids, [process.pid]);
+
+                    } else {
+                        _utils.kill([kill], [process.pid]);
+                    }
+
                     //if (kill == process.getgid()) {
-                    process.exit(1);
+                    //process.exit(1);
                     //}
                 }
                 console.log("watch: " + watch + " kill: " + kill + " process: " + process.pid);
