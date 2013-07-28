@@ -1,5 +1,6 @@
 var _global = catrequire("cat.global")
     _log = _global.log(),
+    _props = catrequire("cat.props"),
     _fs = require("fs.extra"),
     _utils = catrequire("cat.utils");
 
@@ -45,21 +46,31 @@ module.exports = function (config) {
              */
             this.apply = function(internalConfig) {
                 var extensionobj,
-                    path;
+                    path,
+                    project = internalConfig.externalConfig.project,
+                    projectInfo = project.info,
+                    targetFolder = projectInfo.targetFolder;
 
                 if (me.type) {
                     extensionobj = internalConfig.getExtension(me.type);
                     if (extensionobj) {
                         extensionobj = extensionobj.ref;
-                        path = me.path;
-                        if (!path) {
-                            path = [_global.get("home").working.path, "target"].join("/");
-                            if (!_fs.existsSync(path)) {
-                                _utils.mkdirSync(path);
-                            }
-                        }
+                        // in case the extension has no path defined get the defaults
+                        path = (me.path || targetFolder);
                         if (extensionobj) {
-                            extensionobj.apply({path: path});
+                            if (internalConfig.isWatch()) {
+                                if (!extensionobj.watch) {
+                                    _log.warning(_props.get("cat.error.interface").format("[extension config]", "watch"));
+                                } else {
+                                    extensionobj.watch({path: path, internalConfig: internalConfig});
+                                }
+                            } else  {
+                                if (!extensionobj.apply) {
+                                    _log.warning(_props.get("cat.error.interface").format("[extension config]", "apply"));
+                                } else  {
+                                    extensionobj.apply({path: path, internalConfig: internalConfig});
+                                }
+                            }
                         }
                     }
 

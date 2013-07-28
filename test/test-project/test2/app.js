@@ -8,7 +8,7 @@
 	@@name scrap2
 	@@code console.log('sdfsd2')
   ]@
-*/
+*/console.log('cat scrap: scrap2'); console.log('cat scrap: scrap1'); 
 module.exports = function() {
 
 	return function() {

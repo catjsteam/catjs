@@ -7,7 +7,8 @@ var _fs = require('fs.extra'),
     _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _props = catrequire("cat.props"),
-    _basePlugin = require("./../Base.js");
+    _basePlugin = require("./../Base.js"),
+    _project = catrequire("cat.project");
 
 /**
  * Injection extension for CAT
@@ -43,12 +44,21 @@ module.exports = _basePlugin.ext(function () {
 
             }
 
-            var filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
-                workpath = _global.get("home").working.path,
+//            var filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
+//                workpath = _global.get("home").working.path,
+//                targetfile, targetfolder, fileContent;
+            var  filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
+                projectInfo,
                 targetfile, targetfolder, fileContent;
 
-            if (filepath) {
-                targetfile = _path.normalize([workpath, "src", filepath].join("/"));
+            projectInfo = _project.getInfo();
+            if (!projectInfo) {
+                _log.warning(_props.get(""))
+            }
+
+
+            if (projectInfo) {
+                targetfile = _path.normalize([projectInfo.srcFolder, filepath].join("/"));
                 targetfolder = _path.dirname(targetfile);
                 if (targetfolder) {
                     if (!_fs.existsSync(targetfolder)) {
@@ -162,10 +172,36 @@ module.exports = _basePlugin.ext(function () {
              */
             init: function () {
 
-                var data = (_mdata ? _mdata.read() : undefined),
-                    fileName, scrapName, files, scrapData, scrapDataObj,
-                    scrap, scraps = [];
+            },
 
+            /**
+             * Apply sync changes coming from the watch.
+             *
+             * @param config
+             */
+            watch: function(config) {
+                console.log("inject");
+
+                var emitter = _me.getEmitter();
+
+                emitter.emit("job.done", {status: "done"});
+            },
+
+            /**
+             * Empty apply method for the inject extension
+             *
+             */
+            apply: function (config) {
+
+                var data,
+                    fileName, scrapName,
+                    files, scrapData, scrapDataObj,
+                    scrap, scraps = [],
+                    emitter = _me.getEmitter();
+
+                _me.apply(config);
+
+                data = (_mdata ? _mdata.read() : undefined);
                 _mdobject = (data ? JSON.parse(data) : undefined);
                 if (_mdobject) {
 
@@ -196,15 +232,7 @@ module.exports = _basePlugin.ext(function () {
                     }
                 }
 
-            },
-
-            /**
-             * Empty apply method for the inject extension
-             *
-             */
-            apply: function (config) {
-                _me.apply(config);
-
+                emitter.emit("job.done", {status: "done"});
             }
         };
 

@@ -44,7 +44,9 @@
     "line-reader": "~0.2.3",
     "string-format": "~0.2.1",
     "js-beautify": "~1.4.0",
-    "watch": "~0.8.0"
+    "watch": "~0.8.0",
+    "date-format-lite": "~0.1.5",
+    "line-by-line": "~0.1.1"
   },
   "peerDependencies": {
     "grunt": "~0.4.1"

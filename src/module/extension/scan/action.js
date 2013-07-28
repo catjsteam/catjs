@@ -62,9 +62,12 @@ module.exports = _basePlugin.ext(function () {
             walk(dir, function (err, results) {
 
                 emitter.emit("scan.done", {results: results});
+                emitter.emit("job.done", {status: "done"});
 
                 if (err) {
                     emitter.emit("scan.error", {error: err});
+                    emitter.emit("job.done", {status: "error", error: err});
+
                     throw err;
                 }
                 // console.log(results);
@@ -73,6 +76,35 @@ module.exports = _basePlugin.ext(function () {
         },
 
         _module = {
+
+            watch: function(config) {
+                console.log("scean: ", config);
+
+                var ic = config.internalConfig,
+                    emitter = _me.getEmitter(),
+                    watch = ic.getWatch(),
+                    path, stat;
+
+                path = config.path = watch.get("file"),
+                stat = watch.get("stat");
+
+                if(stat) {
+                    emitter.emit("scan.init", {path: _path.dirname(path)});
+
+                    if (stat.isDirectory()) {
+                        emitter.emit("scan.folder", path);
+                        _log.debug("[SCAN] folder: " + path);
+
+                    } else {
+                        emitter.emit("scan.file", path);
+                        _log.debug("[SCAN] file: " + path + "; ext: " + _path.extname(path));
+                    }
+
+                }
+
+                emitter.emit("job.done", {status: "done"});
+            },
+
             /**
              * Apply the scan extension
              *

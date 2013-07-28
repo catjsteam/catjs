@@ -15,6 +15,7 @@ var _fs = require('fs.extra'),
 module.exports = _basePlugin.ext(function () {
 
     var _me = this,
+        emitter,
 
 
         /**
@@ -42,6 +43,8 @@ module.exports = _basePlugin.ext(function () {
                 }
             }
 
+            emitter = _me.getEmitter()
+
             if (!dirs) {
 
                 _utils.error(_props.get("cat.arguments.missing").format("[cat action]", "dirs"));
@@ -60,10 +63,18 @@ module.exports = _basePlugin.ext(function () {
             }
 
             _delete([_global.get("home").working.path, "_cat_md.json"].join("/"));
+
+            emitter.emit("job.done", {status: "done"});
+
         },
 
 
         _module = {
+
+            watch: function() {
+
+            },
+
             /**
              * Apply the clean extension.
              *

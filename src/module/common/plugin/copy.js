@@ -1,4 +1,5 @@
-var _typedas = require("typedas"),
+var _fs = require("fs"),
+    _typedas = require("typedas"),
     _log = require("../../CATGlob.js").log(),
     _utils = require("../../Utils.js"),
     _path = require("path"),
@@ -100,8 +101,7 @@ module.exports = _basePlugin.ext(function () {
 
         folder: function (folder) {
             var tmpFolder,
-                to = _me.getTo(),
-                filters = _me.getFilters();
+                to = _me.getTo();
 
             if (_me.isDisabled()) {
                 return undefined;
@@ -110,7 +110,7 @@ module.exports = _basePlugin.ext(function () {
                 tmpFolder = _path.normalize(to + "/" + folder.substring(_basePath.length));
                 _log.debug("[Copy Action] scan folder: " + tmpFolder);
 
-                if (!_me.applyFileExtFilters(filters, tmpFolder)) {
+                if (!_fs.existsSync(tmpFolder)) {
                     _log.debug("[Copy Action] No filter match, create folder: ", to);
 
                     _utils.mkdirSync(tmpFolder);
@@ -146,8 +146,7 @@ module.exports = _basePlugin.ext(function () {
                 if (_global) {
                     _targetFolderName = _global.name;
 
-                    _me.setTo(_me.getTo() + _targetFolderName);
-                    _utils.mkdirSync(_me.getTo());
+                    _utils.mkdirSync(_me.getTo() + _targetFolderName);
                 }
             }
 

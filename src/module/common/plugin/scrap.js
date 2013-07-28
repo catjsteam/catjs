@@ -52,6 +52,7 @@ module.exports = _basePlugin.ext(function () {
          *
          */
         done: function () {
+
 //            _Scrap.apply({basePath: _basePath});
 //            _scraps = [];
         },

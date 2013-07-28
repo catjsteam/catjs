@@ -26,7 +26,7 @@ module.exports = function Config(config) {
             tasks: tasks,
             extensions: extensions
         },
-        map = {tasks: {}, actions: {}, extensions:{}},
+        map = {tasks: {}, actions: {}, extensions: {}},
         extensionsConfig,
         actionsConfig,
         tasksConfig,
@@ -56,6 +56,33 @@ module.exports = function Config(config) {
         initModule("actions");
         initModule("tasks");
         initModule("extensions");
+    }
+
+    function _postCreation() {
+        var workpath = _global.get("home").working.path,
+            targetfolder, targetPath;
+
+        // create project's src folder
+        targetfolder = _path.normalize([workpath, "src"].join("/"));
+        if (targetfolder) {
+            if (!_fs.existsSync(targetfolder)) {
+                _utils.mkdirSync(targetfolder);
+            } else {
+                _log.debug(_props.get("cat.project.resource.exists").format("[cat project]", targetfolder));
+            }
+            me.info.srcFolder = targetfolder;
+        }
+
+        // create target project's folder
+        targetPath = [workpath, "target"].join("/");
+        if (targetPath) {
+            if (!_fs.existsSync(targetPath)) {
+                _utils.mkdirSync(targetPath);
+            } else {
+                _log.debug(_props.get("cat.project.resource.exists").format("[cat project]", targetfolder));
+            }
+            me.info.targetFolder = targetPath;
+        }
     }
 
     if (!data || !(data && data.plugins)) {
@@ -106,9 +133,12 @@ module.exports = function Config(config) {
     this.extensions = extensions;
     this.tasks = tasks;
     this.pluginPaths = [[_global.get("home").path, "src/module/common/plugin/"].join("/")];
+    this.info = {};
 
     // indexing the objects arrays [actions, tasks]
     _initIndexing();
+    // create target skeleton project
+    _postCreation();
 
     /**
      * Get a task by key
@@ -139,7 +169,7 @@ module.exports = function Config(config) {
      *
      * @param key
      */
-    this.getExtension = function(key) {
+    this.getExtension = function (key) {
         if (key && map.extensions) {
             return map.extensions[key];
         }
@@ -150,7 +180,7 @@ module.exports = function Config(config) {
      *
      * @param paths The locations to be added
      */
-    this.addPluginLocations = function(paths) {
+    this.addPluginLocations = function (paths) {
         if (_typedas.isArray(paths)) {
             me.pluginPaths = me.pluginPaths.concat(paths);
         } else {
@@ -165,14 +195,14 @@ module.exports = function Config(config) {
      * @param pluginType The plugin type
      * @returns {string}
      */
-    this.pluginLookup = function(pluginType) {
+    this.pluginLookup = function (pluginType) {
 
         var plugin,
             module,
             pluginTypePaths = me.pluginPaths,
             idx = 0, size = pluginTypePaths.length, item;
 
-        for (; idx<size; idx++) {
+        for (; idx < size; idx++) {
             item = pluginTypePaths[idx];
             if (item) {
                 try {
@@ -182,13 +212,22 @@ module.exports = function Config(config) {
                         plugin = require(module);
                         break;
                     }
-                } catch(e) {
+                } catch (e) {
                     _utils.error(_props.get("cat.error.require.module").format("[cat config]", module));
                 }
             }
         }
 
         return plugin;
+    };
+
+    this.getInfo = function () {
+        return this.info;
+    };
+
+    this.update = function (config) {
+
+
     };
 
 

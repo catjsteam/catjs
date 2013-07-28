@@ -1,8 +1,13 @@
 var _fsconfig = require("./fs/Config.js"),
     _Config = require("./../module/common/project/config/Config.js"),
-    _log = require("./CATGlob.js").log(),
+    _global = catrequire("cat.global"),
+    _utils = catrequire("cat.utils"),
+    _props = catrequire("cat.props"),
+    _fs = require("fs.extra"),
+    _log = _global.log(),
     _path = require("path"),
     _console = require("./Console"),
+    _project,
 
     /**
      * Project configuration loader
@@ -19,7 +24,7 @@ var _fsconfig = require("./fs/Config.js"),
                 (new _fsconfig(path, function (data) {
                     if (data) {
                         try {
-                            projectConfig = new _Config({data: data, emitter: emitter});
+                            _project = new _Config({data: data, emitter: emitter});
 
                         } catch (e) {
                             throw Error(e);
@@ -38,7 +43,7 @@ var _fsconfig = require("./fs/Config.js"),
 
         var msg = ["[Project] config argument is not valid",
                 "[Project] Data is not valid, expecting data of type Array",
-                "[Project] Loading project: "], projectConfig,
+                "[Project] Loading project: "],
             path, emitter;
 
         if (!config) {
@@ -47,9 +52,8 @@ var _fsconfig = require("./fs/Config.js"),
             return undefined;
         }
 
-        var projectConfig,
-            path = (config.path || "."),
-            emitter = config.emitter;
+        path = (config.path || ".");
+        emitter = config.emitter;
 
         if (path) {
             path = [path, "catproject.json"].join("/");
@@ -58,12 +62,35 @@ var _fsconfig = require("./fs/Config.js"),
             // Load the project according to the given configuration
             _loadProject();
         }
-        return projectConfig;
+        return _project;
     };
 
 module.exports = function () {
 
     return {
-        load: _loader
+        load: _loader,
+
+        getProject: function() {
+            return _project;
+        },
+
+        getInfo: function() {
+            if (!_project || (_project && !_project.getInfo())) {
+                _log.warning(_props.get("cat.project.config.not.valid").format("[cat project]"));
+
+                return undefined;
+            }
+
+            return _project.getInfo();
+        },
+
+        update: function(config) {
+            if (_project) {
+                _project.update(config);
+
+            } else {
+
+            }
+        }
     };
 }();

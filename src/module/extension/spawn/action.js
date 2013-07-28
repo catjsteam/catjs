@@ -15,6 +15,11 @@ module.exports = _basePlugin.ext(function () {
     var _me = this,
 
         _module = {
+
+            watch: function(config) {
+                this.apply(config);
+            },
+
             /**
              * Apply the clean extension
              *
@@ -23,9 +28,7 @@ module.exports = _basePlugin.ext(function () {
              *      options - spawn options
              */
             apply: function (config) {
-
                 _me.getEmitter().emit("spawn.exec", {spawn: _process.spawn});
-
             },
 
             /**

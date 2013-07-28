@@ -5,10 +5,14 @@ var _global = require("./../CATGlob.js"),
     _fsconfig = require("./../fs/Config.js"),
     _typedas = require("typedas"),
     _props = require("./../Properties.js"),
-
+    _watch = catrequire("cat.watch"),
     _catconfig,
+
     /**
      * CAT Configuration class
+     *
+     * @param externalConfig
+     * @param data The incoming row configuration data
      */
      _CATConfig = function (externalConfig, data) {
 
@@ -27,20 +31,22 @@ var _global = require("./../CATGlob.js"),
 
 
             if (ext && ext.name) {
-                me.extmap[ext.name] = {externalConfig: externalConfig, ext: ext, ref: null};
+                me._extmap[ext.name] = {externalConfig: externalConfig, ext: ext, ref: null};
             }
         };
 
-        this.extmap = {};
+        this._extmap = {};
+        this._watch = {};
 
         this.getExtension = function (key) {
             if (key) {
-                return me.extmap[key];
+                return me._extmap[key];
             }
         };
 
-        this.extensions = data.extensions,
-            this.plugins = data.plugins;
+        this.extensions = data.extensions;
+        this.plugins = data.plugins;
+        this.externalConfig = externalConfig;
 
         if (this.extensions && _typedas.isArray(this.extensions)) {
 
@@ -53,7 +59,33 @@ var _global = require("./../CATGlob.js"),
         }
     };
 
+    /**
+     *  Sync configuration for a single task.
+     *  e.g. scan that applied for scanning a deep folder gets to process one file.
+     *
+     * @param config
+     */
+    _CATConfig.prototype.watch = function(config) {
+        this._watch.impl = config.impl;
+    };
 
+    _CATConfig.prototype.getWatch = function() {
+        return this._watch.impl;
+    };
+
+    _CATConfig.prototype.isWatch = function() {
+        return (this._watch.impl ? true : false);
+    };
+
+/**
+ * Load cat.json internal configuration file
+ * CAT configuration include the internal extensions meta data.
+ *
+ * @param externalConfig
+ * @param path
+ * @returns {*}
+ * @private
+ */
 _loadCATConfig = function (externalConfig, path) {
 
     try {
@@ -83,10 +115,13 @@ module.exports = function () {
          * @param externalConfig The configuration to be passed for all config classes
          *      - emitter The emitter reference
          *      - grunt The grunt reference
+         *      - project The current running project
          */
         load: function (externalConfig) {
+
             var home = _global.get("home"),
                 path = [home.path, "resources/cat.json"].join("/");
+
             return _loadCATConfig(externalConfig, path);
         }
     };

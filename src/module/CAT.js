@@ -1,7 +1,8 @@
+var _async = require("async");
+
 var CAT = function () {
 
-    var _modules,
-        _global,
+    var _global,
         _stringFormat,
         _log,
         _project,
@@ -13,7 +14,42 @@ var CAT = function () {
         _basedir,
         _watch,
         _cache,
-        _utils;
+        _utils,
+        _targets,
+        _catconfigInternal;
+
+    /**
+     * Get which task to get to run from the CAT command line.
+     *
+     * @param target The passed task
+     * @private
+     */
+    function _runTask(target, watch) {
+
+        var project,
+            task;
+
+        target = target.toString();
+        target = target.toLowerCase();
+
+        if (_catconfigInternal) {
+
+            project = _catconfigInternal.externalConfig.project;
+            task = project.getTask(target);
+            if (task) {
+                if (watch) {
+                    // set watch configuration
+                    _catconfigInternal.watch(watch);
+                }
+
+                // apply task
+                task.apply(_catconfigInternal);
+            } else {
+                _log.error("[CAT] No valid task named: '" + _targets + "', validate your cat's project configuration (catproject.json)");
+            }
+        }
+    }
+
 
     (function () {
 
@@ -46,8 +82,8 @@ var CAT = function () {
 
                 // Map index for CAT modules
                 global["cat.config.module"] = {
+                    "cat": "src/module/CAT.js",
                     "cat.config": "src/module/config/CATConfig.js",
-
                     "cat.global": "src/module/CATGlob.js",
                     "cat.utils": "src/module/Utils.js",
                     "cat.project": "src/module/Project.js",
@@ -119,6 +155,14 @@ var CAT = function () {
 
         },
 
+        watch: function(config) {
+            if (config) {
+                _targets.forEach(function (target) {
+                    _runTask(target, config);
+                });
+            }
+        },
+
         /**
          * Apply CAT module
          * Note: Get called after properties module initialization
@@ -128,7 +172,7 @@ var CAT = function () {
         apply: function (config) {
 
             // TODO messages should be taken from resource
-            var targets, grunt, args, path, watch = false, kill = 0,
+            var grunt, args, path, watch = false, kill = 0,
                 msg = ["[CAT] Project failed to load, No valid argument path was found"];
 
             /**
@@ -138,6 +182,7 @@ var CAT = function () {
              * @private
              */
             function _init() {
+
                 if (!config) {
                     return undefined;
                 }
@@ -150,7 +195,7 @@ var CAT = function () {
 
                 kill = (config.kill || kill);
                 watch = (config.watch || watch);
-                targets = config.task;
+                _targets = config.task;
                 grunt = config.grunt;
                 args = config;
                 path = (config.path || workingDir);
@@ -159,6 +204,23 @@ var CAT = function () {
                     _log.debug("[CAT] Initial, current location: " + _path.resolve(path));
                 }
 
+                _log.debug("[CAT] Initial, command line arguments: " + JSON.stringify(config));
+
+                // listen to the processes, do a cleanup on shutdown
+                //process.stdin.resume();
+
+                process.on('uncaughtException', function (err) {
+                    console.error(err);
+                    process.exit(1);
+                });
+
+                process.on('exit', function () {
+                    _cache.removeByKey("pid", process.pid);
+                });
+
+                process.on('SIGINT', function () {
+                    process.exit(1);
+                });
             }
 
             /**
@@ -169,52 +231,62 @@ var CAT = function () {
              */
             function _apply() {
 
-
                 var project,
-                    catconfig,
-                    task, pids;
+                    pids,
+                    targets = _targets, counter;
 
-                /**
-                 * Get which task to get to run from the CAT command line.
-                 *
-                 * @param target The passed task
-                 * @private
-                 */
-                function _runTask(target) {
 
-                    target = target.toString();
-                    target = target.toLowerCase();
+                _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
+                if (kill) {
+                    _utils = catrequire("cat.utils");
 
-                    if (catconfig) {
+                    // TODO 1 might be a process number, change it to negative maybe.
+                    if (kill == 1) {
+                        // kill all current running processes except me.
+                        pids = _cache.removeByKey("pid", process.pid);
+                        _utils.kill(pids, [process.pid]);
 
-                        task = project.getTask(target);
-                        if (task) {
-                            // execute task
-                            task.apply(catconfig);
-                        } else {
-                            _log.error("[CAT] No valid task named: '" + targets + "', validate your cat's project configuration (catproject.json)");
-                        }
-
+                    } else {
+                        _utils.kill([kill], [process.pid]);
                     }
-
                 }
 
-                if (path) {
 
-                    // load CAT project
-                    project = _project.load({path: path, emitter: _emitter});
+               if (path) {
+
+                   if (watch) {
+                       _watch = catrequire("cat.watch");
+                       _watch.init();
+                   }
+                       // load CAT project
+                    project = _project.load({
+                        path: path,
+                        emitter: _emitter
+                    });
 
                     if (project) {
 
                         // apply project's tasks
-                        if (targets) {
+                        if (_targets) {
 
-                            // Load CAT internal configuration
-                            catconfig = _catconfig.load({project: project, grunt: grunt, emitter: _emitter});
-
-                            targets.forEach(function (target) {
-                                _runTask(target);
+                            // Load CAT internal configuration (resources/cat.json)
+                            _catconfigInternal = _catconfig.load({
+                                project: project,
+                                grunt: grunt,
+                                emitter: _emitter
                             });
+
+                            if (!watch) {
+                                counter = 0;
+                                _runTask(targets[counter]);
+                                _emitter.on("job.done", function(obj) {
+                                    counter++;
+                                    if (counter < _targets.length) {
+                                        _emitter.removeAllListeners("job.done");
+                                        _runTask(targets[counter]);
+                                    }
+                                });
+                            }
 
                         }
                     }
@@ -226,58 +298,7 @@ var CAT = function () {
 
                 }
 
-                if (watch) {
-
-                    process.stdin.resume();
-
-                    process.on('uncaughtException', function (err) {
-                        console.error(err);
-                        process.exit(1);
-                    });
-                    process.on('exit', function () {
-                        console.log("SIGKILL");
-                        _cache.removeByKey("pid", process.pid);
-                    });
-
-                    process.on('SIGINT', function () {
-                        console.log("SIGKILL");
-                        process.exit(1);
-                    });
-
-//                    process.on('SIGKILL', function () {
-//                        console.log("SIGKILL");
-//                       // process.exit(1);
-//                    });
-
-                    _watch = catrequire("cat.watch");
-                    _watch.init();
-
-
-                }
-
-                console.log("watch: " + watch + " kill: " + kill + " process: " + process.pid);
-                if (kill) {
-                    _utils = catrequire("cat.utils");
-
-                    if (kill == 1) {
-                        // kill all current running processes except me.
-                        pids = _cache.removeByKey("pid", process.pid);
-                        _utils.kill(pids, [process.pid]);
-
-                    } else {
-                        _utils.kill([kill], [process.pid]);
-                    }
-
-                    //if (kill == process.getgid()) {
-                    //process.exit(1);
-                    //}
-                }
-                console.log("watch: " + watch + " kill: " + kill + " process: " + process.pid);
-
             }
-
-            _log.debug("[CAT] Initial, command line arguments: " + JSON.stringify(config));
-
 
             _init();
             _apply();

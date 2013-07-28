@@ -45,6 +45,7 @@ module.exports = _basePlugin.ext(function () {
                             if (code !== 0) {
                                 _log.info('[spawn close] exited with code ' + code);
                             }
+                            _emitter.emit("job.done", {status: "done"});
                         });
                     } catch (e) {
                         _utils.error(_props.get("cat.error").format("[spawn]", e));

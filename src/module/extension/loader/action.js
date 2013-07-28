@@ -54,7 +54,8 @@ module.exports = _basePlugin.ext(function () {
              */
             apply: function (config) {
 
-                var dirs = (config ? config.path : undefined);
+                var dirs = (config ? config.path : undefined),
+                    emitter = _me.getEmitter();
 
                 _me.apply(config);
 
@@ -62,6 +63,8 @@ module.exports = _basePlugin.ext(function () {
                     _utils.error(_props.get("cat.error.config").format("[scrap ext]"));
                 }
                 _load(dirs);
+
+                emitter.emit("job.done", {status: "done"});
 
             },
 

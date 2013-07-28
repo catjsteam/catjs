@@ -42,15 +42,17 @@ module.exports = function (config) {
 
                 // apply plugin
                 if (!actionobj.apply) {
-                    _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
+                    _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
                 } else {
                     actionobj.apply(internalConfig);
                 }
+
                 // apply default extensions
                 if (dependency) {
                     extension = extLoaded[dependency];
                     _extensionApply(dependency, "default", internalConfig, extension);
                 }
+
             }
         }
     }
@@ -99,32 +101,16 @@ module.exports = function (config) {
                 extLoaded[ext] = extensionConfig;
             }
 
-            if (!extensionConfig.apply) {
-                _utils.error(_props.get("cat.error.interface").format("[task config]", "apply"));
-            } else {
-                if (phase === byPhase) {
-                    if (phase !== "init") {
+            if (phase === byPhase) {
+                if (phase !== "init") {
+
+                    if (!extensionConfig.apply) {
+                        _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
+                    } else {
                         extensionConfig.apply(internalConfig);
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * @deprecated
-     *
-     * @param byPhase
-     * @param internalConfig
-     * @private
-     */
-    function _extensionsApply(byPhase, internalConfig) {
-        var ext, idx, size = me.extensions.length,
-            extConfig = (extLoaded ? extLoaded[ext] : undefined);
-
-        for (idx = 0; idx < size; idx++) {
-            ext = me.extensions[idx];
-            _extensionApply(ext, byPhase, internalConfig, extConfig);
         }
     }
 
@@ -148,35 +134,21 @@ module.exports = function (config) {
              * Apply task:
              *      - load dependencies
              *      - call dependencies
+             *
              * @param internalConfig The CAT internal configuration
              */
             this.apply = function (internalConfig) {
-                var actionobj,
-                    extensionConfig,
-                    idx = 0, size, action, ext,
-                    extensionsExists = (me.extensions && _typedas.isArray(me.extensions) ? true : false),
-                    actionsExists = (me.actions && _typedas.isArray(me.actions) ? true : false);
+                var actionsExists = (me.actions && _typedas.isArray(me.actions) ? true : false);
 
                 if (!me.actions) {
                     _log.warning("[CAT] No actions for task: " + this.name);
 
                 } else {
 
-                    // init mode - runt only init mode extensions
-
-//                    if (extensionsExists) {
-//                        _extensionsApply("init", internalConfig);
-//                    }
-
                     // apply all actions
                     if (actionsExists) {
                         _actionApply(internalConfig);
                     }
-
-//                    // apply all extensions
-//                    if (extensionsExists) {
-//                        _extensionsApply("default", internalConfig);
-//                    }
 
                 }
             }
