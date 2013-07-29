@@ -8,7 +8,8 @@ var _fs = require('fs.extra'),
     _utils = catrequire("cat.utils"),
     _props = catrequire("cat.props"),
     _basePlugin = require("./../Base.js"),
-    _project = catrequire("cat.project");
+    _project = catrequire("cat.project"),
+    _beautify = require('js-beautify').js_beautify;
 
 /**
  * Injection extension for CAT
@@ -71,6 +72,7 @@ module.exports = _basePlugin.ext(function () {
 
                 fileContent = _generateFileContent(scraps);
                 if (fileContent) {
+                    fileContent = _beautify(fileContent, { indent_size: 2 })
                     _fs.writeFile(targetfile, fileContent, function (err) {
                         if (err) {
                             _utils.error(_props.get("cat.error").format("[inject ext]", err));
@@ -170,7 +172,8 @@ module.exports = _basePlugin.ext(function () {
              * Reads the data out of CAT metadata file
              * Go over the files and inject the data according to the metadata information
              */
-            init: function () {
+            init: function (config, ext) {
+                _me.initialize(config, ext);
 
             },
 

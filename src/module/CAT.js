@@ -233,7 +233,8 @@ var CAT = function () {
 
                 var project,
                     pids,
-                    targets = _targets, counter;
+                    targets = _targets, counter,
+                    wait = false;
 
 
                 _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
@@ -264,6 +265,15 @@ var CAT = function () {
                         emitter: _emitter
                     });
 
+                   function runme() {
+                       _runTask(targets[counter]);
+                       _emitter.on("job.done", function(obj) {
+                           counter++;
+                           if (counter < _targets.length) {
+                               _emitter.removeAllListeners("job.done");
+                           }
+                       });
+                   }
                     if (project) {
 
                         // apply project's tasks
@@ -278,14 +288,7 @@ var CAT = function () {
 
                             if (!watch) {
                                 counter = 0;
-                                _runTask(targets[counter]);
-                                _emitter.on("job.done", function(obj) {
-                                    counter++;
-                                    if (counter < _targets.length) {
-                                        _emitter.removeAllListeners("job.done");
-                                        _runTask(targets[counter]);
-                                    }
-                                });
+                                runme();
                             }
 
                         }

@@ -35,6 +35,11 @@ module.exports = function Config(config) {
         me = this;
 
 
+    /**
+     * Configuration indexing
+     *
+     * @private
+     */
     function _initIndexing() {
 
         function initModule(name) {
@@ -58,6 +63,11 @@ module.exports = function Config(config) {
         initModule("extensions");
     }
 
+    /**
+     * Prepare the project skeleton
+     *
+     * @private
+     */
     function _postCreation() {
         var workpath = _global.get("home").working.path,
             targetfolder, targetPath;
@@ -135,7 +145,7 @@ module.exports = function Config(config) {
     this.pluginPaths = [[_global.get("home").path, "src/module/common/plugin/"].join("/")];
     this.info = {};
 
-    // indexing the objects arrays [actions, tasks]
+    // indexing the objects arrays [actions, tasks, etc..]
     _initIndexing();
     // create target skeleton project
     _postCreation();
@@ -226,6 +236,8 @@ module.exports = function Config(config) {
     };
 
     this.update = function (config) {
+
+        _utils.copyObjProps(config, this.info, true);
 
 
     };

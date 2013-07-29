@@ -57,7 +57,8 @@ module.exports = _basePlugin.ext(function () {
         _data,
         _emitter,
         _module,
-        _errors;
+        _errors,
+        _to;
 
 
     function _getRelativeFile(file) {
@@ -72,7 +73,6 @@ module.exports = _basePlugin.ext(function () {
         file: function (file) {
 
             var from = file,
-                to = _me.getTo(),
                 filters = _me.getFilters();
 
             if (_me.isDisabled()) {
@@ -83,9 +83,9 @@ module.exports = _basePlugin.ext(function () {
                 _log.debug("[Copy Action] scan file: " + from);
 
                 if (!_me.applyFileExtFilters(filters, file)) {
-                    _log.debug("[Copy Action] No filter match, copy to: ", to);
+                    _log.debug("[Copy Action] No filter match, copy to: ", _to);
 
-                    _utils.copySync(file, _path.normalize(to + "/" + from), function (err) {
+                    _utils.copySync(file, _path.normalize(_to + "/" + from), function (err) {
                         if (err) {
                             _log.error("[copy action] failed to copy file: " + file + "err: " + err);
                             throw err;
@@ -100,18 +100,17 @@ module.exports = _basePlugin.ext(function () {
         },
 
         folder: function (folder) {
-            var tmpFolder,
-                to = _me.getTo();
+            var tmpFolder;
 
             if (_me.isDisabled()) {
                 return undefined;
             }
             if (folder) {
-                tmpFolder = _path.normalize(to + "/" + folder.substring(_basePath.length));
+                tmpFolder = _path.normalize(_to + "/" + folder.substring(_basePath.length));
                 _log.debug("[Copy Action] scan folder: " + tmpFolder);
 
                 if (!_fs.existsSync(tmpFolder)) {
-                    _log.debug("[Copy Action] No filter match, create folder: ", to);
+                    _log.debug("[Copy Action] No filter match, create folder: ", _to);
 
                     _utils.mkdirSync(tmpFolder);
 
@@ -146,7 +145,8 @@ module.exports = _basePlugin.ext(function () {
                 if (_global) {
                     _targetFolderName = _global.name;
 
-                    _utils.mkdirSync(_me.getTo() + _targetFolderName);
+                    _to = _me.getTo() + _targetFolderName;
+                    _utils.mkdirSync(_to);
                 }
             }
 

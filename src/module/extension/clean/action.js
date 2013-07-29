@@ -29,21 +29,17 @@ module.exports = _basePlugin.ext(function () {
 
             function _delete(dir) {
                 if (dir) {
-                    try {
-                        if (_fs.existsSync(dir)) {
-                            _fs.rmrf(dir, function (err) {
-                                if (err) {
-                                    _utils.error(_props.get("cat.error").format("[clean action]", e));
-                                }
-                            });
+                    if (_fs.existsSync(dir)) {
+                        try {
+                            _fs.rmrfSync(dir);
+                        } catch (e) {
+                            _utils.error(_props.get("cat.error").format("[clean action]", e));
                         }
-                    } catch (e) {
-                        _utils.error(_props.get("cat.error").format("[clean action]", e));
                     }
                 }
             }
 
-            emitter = _me.getEmitter()
+            emitter = _me.getEmitter();
 
             if (!dirs) {
 

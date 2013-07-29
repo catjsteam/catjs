@@ -89,6 +89,7 @@ module.exports = function () {
          *
          * @param srcObj
          * @param destObj
+         * @param override Override existing property [false as default]
          */
         copyObjProps: function (srcObj, destObj, override) {
 
