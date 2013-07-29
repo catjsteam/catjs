@@ -40,17 +40,17 @@ module.exports = function (config) {
                 actionobj = catconfig.getAction(action);
                 dependency = actionobj.dependency;
 
-                // apply plugin
-                if (!actionobj.apply) {
-                    _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
-                } else {
-                    actionobj.apply(internalConfig);
-                }
+//                // apply plugin
+//                if (!actionobj.apply) {
+//                    _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
+//                } else {
+//                    actionobj.apply(internalConfig);
+//                }
 
                 // apply default extensions
                 if (dependency) {
                     extension = extLoaded[dependency];
-                    _extensionApply(dependency, "default", internalConfig, extension);
+                    _extensionApply(dependency, "default", internalConfig, extension, actionobj.apply);
                 }
 
             }
@@ -82,18 +82,35 @@ module.exports = function (config) {
         }
     }
 
-    function _extensionApply(ext, byPhase, internalConfig, extensionConfig) {
+    function _extensionApply(ext, byPhase, internalConfig, extensionConfig, actionApply) {
+
+        function extensionApplyImpl() {
+            if (!extensionConfig.apply) {
+                _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
+            } else {
+                extensionConfig.apply(internalConfig);
+            }
+        }
+
+        function actionApplyImpl(actionApply) {
+            // apply plugin
+            if (!actionApply) {
+                _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
+            } else {
+                actionApply(internalConfig);
+            }
+        }
+
         var phase,
             extConfig;
 
         if (ext) {
             extensionConfig = (extensionConfig ? extensionConfig : catconfig.getExtension(ext));
             extConfig = internalConfig.getExtension(extensionConfig.type);
+            phase = ( extConfig.ext ? extConfig.ext.getPhase() : "default");
 
             // extensions initialization
             _extensionInit(extConfig);
-
-            phase = (extConfig.getPhase ? extConfig.getPhase() : "default");
 
             // indexing extensions
             // TODO refactor cat project loading design - consider strong binding plugin<>extension
@@ -101,15 +118,12 @@ module.exports = function (config) {
                 extLoaded[ext] = extensionConfig;
             }
 
-            if (phase === byPhase) {
-                if (phase !== "init") {
-
-                    if (!extensionConfig.apply) {
-                        _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
-                    } else {
-                        extensionConfig.apply(internalConfig);
-                    }
-                }
+            if (phase == "default") {
+                actionApplyImpl(actionApply);
+                extensionApplyImpl();
+            } else {
+                extensionApplyImpl();
+                actionApplyImpl(actionApply);
             }
         }
     }

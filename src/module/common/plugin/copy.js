@@ -4,6 +4,7 @@ var _fs = require("fs"),
     _utils = require("../../Utils.js"),
     _path = require("path"),
     _basePlugin = require("./Base.js"),
+    _to,
 
         /**
          * @param typeObj The reference object of type file|folder
@@ -57,8 +58,7 @@ module.exports = _basePlugin.ext(function () {
         _data,
         _emitter,
         _module,
-        _errors,
-        _to;
+        _errors;
 
 
     function _getRelativeFile(file) {
@@ -70,10 +70,18 @@ module.exports = _basePlugin.ext(function () {
 
     _module = {
 
+        done: function () {
+            _emitter.removeListener("scan.init", _module.initListener);
+            _emitter.removeListener("scan.file", _module.file);
+            _emitter.removeListener("scan.folder", _module.folder);
+            _emitter.removeListener("scan.done", _module.done);
+        },
+
         file: function (file) {
 
             var from = file,
-                filters = _me.getFilters();
+                filters = _me.getFilters(),
+                to = _me.getTo();
 
             if (_me.isDisabled()) {
                 return undefined;
@@ -131,16 +139,13 @@ module.exports = _basePlugin.ext(function () {
 
         initListener: function(config) {
 
-            var toFolder,
-                fromFolder;
-
             _basePath = (config ? config.path : undefined);
             if (!_basePath) {
                 _utils.error("[Scrap Plugin] No valid base path");
             }
 
             // TODO refactor - create proper functionality in the configuration target
-            if (_me.getTo()) {
+            if (!_to) {
                 // setting 'folder name' project
                 if (_global) {
                     _targetFolderName = _global.name;
@@ -183,6 +188,7 @@ module.exports = _basePlugin.ext(function () {
                 _emitter.on("scan.init", _module.initListener);
                 _emitter.on("scan.file", _module.file);
                 _emitter.on("scan.folder", _module.folder);
+                _emitter.on("scan.done", _module.done);
             } else {
                 _log.warning("[copy action] No valid emitter, failed to assign listeners");
             }

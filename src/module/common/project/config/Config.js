@@ -150,6 +150,12 @@ module.exports = function Config(config) {
     // create target skeleton project
     _postCreation();
 
+    this.destroy = function() {
+
+    };
+
+
+
     /**
      * Get a task by key
      *
@@ -194,7 +200,7 @@ module.exports = function Config(config) {
         if (_typedas.isArray(paths)) {
             me.pluginPaths = me.pluginPaths.concat(paths);
         } else {
-            _util.error(_props.get("cat.arguments.type").format("[cat config]", "Array"));
+            _utils.error(_props.get("cat.arguments.type").format("[cat config]", "Array"));
         }
     };
 
@@ -234,14 +240,6 @@ module.exports = function Config(config) {
     this.getInfo = function () {
         return this.info;
     };
-
-    this.update = function (config) {
-
-        _utils.copyObjProps(config, this.info, true);
-
-
-    };
-
 
     return this;
 };

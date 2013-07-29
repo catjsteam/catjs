@@ -73,13 +73,14 @@ module.exports = _basePlugin.ext(function () {
                 fileContent = _generateFileContent(scraps);
                 if (fileContent) {
                     fileContent = _beautify(fileContent, { indent_size: 2 })
-                    _fs.writeFile(targetfile, fileContent, function (err) {
-                        if (err) {
-                            _utils.error(_props.get("cat.error").format("[inject ext]", err));
-                        } else {
-                            _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
-                        }
-                    });
+                    try {
+                        _fs.writeFileSync(targetfile, fileContent);
+                        _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
+                    } catch(e) {
+                        _utils.error(_props.get("cat.error").format("[inject ext]", e));
+                    }
+
+
                 }
             }
 
@@ -131,13 +132,13 @@ module.exports = _basePlugin.ext(function () {
 
                     _Scrap.apply({scraps: scraps});
 
-                    _fs.writeFile(file, lines.join(""), function (err) {
-                        if (err) {
-                            _utils.error(_props.get("cat.error").format("[inject ext]", err));
-                        } else {
-                            _log.debug(_props.get("cat.mdata.write").format("[inject ext]"));
-                        }
-                    });
+                    try {
+                        _fs.writeFileSync(file, lines.join(""));
+                        _log.debug(_props.get("cat.mdata.write").format("[inject ext]"));
+
+                    } catch(e) {
+                        _utils.error(_props.get("cat.error").format("[inject ext]", e));
+                    }
 
                 });
 

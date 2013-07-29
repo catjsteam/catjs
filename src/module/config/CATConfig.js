@@ -26,11 +26,11 @@ var _global = require("./../CATGlob.js"),
          * @private
          */
         function _extension(ext) {
-            var mode = (ext.mode || "default"),
-                supportedExt = false;
-
-
             if (ext && ext.name) {
+
+                ext.getPhase = function() {
+                    return (ext.phase || "default");
+                }
                 me._extmap[ext.name] = {externalConfig: externalConfig, ext: ext, ref: null};
             }
         };

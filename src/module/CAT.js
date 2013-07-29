@@ -270,7 +270,8 @@ var CAT = function () {
                        _emitter.on("job.done", function(obj) {
                            counter++;
                            if (counter < _targets.length) {
-                               _emitter.removeAllListeners("job.done");
+                               //_emitter.removeAllListeners("job.done");
+                               _runTask(targets[counter]);
                            }
                        });
                    }
@@ -288,6 +289,9 @@ var CAT = function () {
 
                             if (!watch) {
                                 counter = 0;
+//                                for (counter=0; counter<targets.length; counter++) {
+//                                    _runTask(targets[counter]);
+//                                }
                                 runme();
                             }
 

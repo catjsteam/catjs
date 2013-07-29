@@ -52,9 +52,10 @@ module.exports = _basePlugin.ext(function () {
          *
          */
         done: function () {
-
-//            _Scrap.apply({basePath: _basePath});
-//            _scraps = [];
+            _emitter.removeListener("scan.init", _module.initListener);
+            _emitter.removeListener("scan.file", _module.file);
+            //_emitter.removeListener("scan.folder", _module.folder);
+            _emitter.removeListener("scan.done", _module.done);
         },
 
         /**
@@ -184,7 +185,7 @@ module.exports = _basePlugin.ext(function () {
                 _emitter.on("scan.init", _module.initListener);
                 _emitter.on("scan.done", _module.done);
                 _emitter.on("scan.file", _module.file);
-                //  _emitter.on("scan.folder", _module.folder);
+                //_emitter.on("scan.folder", _module.folder);
             } else {
                 _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
             }
