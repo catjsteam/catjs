@@ -18,7 +18,7 @@ module.exports = function () {
                     // split log file if it's too long
                     if (_fs.existsSync(logfile)) {
                         logstat = _fs.statSync(logfile);
-                        if (logstat.size && logstat.size > 10000) {
+                        if (logstat.size && logstat.size > 100000) {
                             _fs.renameSync(logfile, ["CAT_", (new Date()).format("YYYY_MM_DD_mm_ss"), ".log"].join(""));
                         }
                     }

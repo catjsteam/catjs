@@ -270,8 +270,8 @@ var CAT = function () {
                        _emitter.on("job.done", function(obj) {
                            counter++;
                            if (counter < _targets.length) {
-                               //_emitter.removeAllListeners("job.done");
-                               _runTask(targets[counter]);
+                               _emitter.removeAllListeners("job.done");
+                               runme();
                            }
                        });
                    }
