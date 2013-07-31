@@ -9,7 +9,8 @@ module.exports = function() {
         init: function() {
 
              _Scrap.add({name: "code", func: function(config) {
-                 this.print(this.get("code"));
+                 console.log(this.print(this.get("code")));
+                 console.log(this.generate());
              }});
 
              _Scrap.add({name: "name", func: function(config) {

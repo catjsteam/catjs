@@ -88,19 +88,17 @@ module.exports = _basePlugin.ext(function () {
                 path = config.path = watch.get("file"),
                 stat = watch.get("stat");
 
-                if(stat) {
-                    emitter.emit("scan.init", {path: _path.dirname(path)});
+                emitter.emit("scan.init", {path: _path.dirname(path)});
 
-                    if (stat.isDirectory()) {
-                        emitter.emit("scan.folder", path);
-                        _log.debug("[SCAN] folder: " + path);
+                if (stat && stat.isDirectory()) {
+                    emitter.emit("scan.folder", path);
+                    _log.debug("[SCAN] folder: " + path);
 
-                    } else {
-                        emitter.emit("scan.file", path);
-                        _log.debug("[SCAN] file: " + path + "; ext: " + _path.extname(path));
-                    }
-
+                } else {
+                    emitter.emit("scan.file", path);
+                    _log.debug("[SCAN] file: " + path + "; ext: " + _path.extname(path));
                 }
+
 
                 emitter.emit("job.done", {status: "done"});
             },

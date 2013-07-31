@@ -16,7 +16,8 @@ var CAT = function () {
         _cache,
         _utils,
         _targets,
-        _catconfigInternal;
+        _catconfigInternal,
+        _counter=0;
 
     /**
      * Get which task to get to run from the CAT command line.
@@ -50,6 +51,17 @@ var CAT = function () {
         }
     }
 
+    function _runme(watch) {
+
+        _runTask(_targets[_counter], watch);
+        _emitter.on("job.done", function (obj) {
+            _counter++;
+            if (_counter < _targets.length) {
+                _emitter.removeAllListeners("job.done");
+                _runme(watch);
+            }
+        });
+    }
 
     (function () {
 
@@ -79,38 +91,6 @@ var CAT = function () {
                 projectDir;
 
             (function (config) {
-
-                // Map index for CAT modules
-                global["cat.config.module"] = {
-                    "cat": "src/module/CAT.js",
-                    "cat.config": "src/module/config/CATConfig.js",
-                    "cat.global": "src/module/CATGlob.js",
-                    "cat.utils": "src/module/Utils.js",
-                    "cat.project": "src/module/Project.js",
-                    "cat.props": "src/module/Properties.js",
-                    "cat.plugin.base": "src/module/common/plugin/Base.js",
-                    "cat.mdata": "src/module/fs/MetaData.js",
-                    "cat.common.scrap": "src/module/common/plugin/scrap/Scrap.js",
-                    "cat.common.parser": "src/module/common/parser/Parser.js",
-                    "cat.watch": "src/module/Watch.js",
-                    "cat.cache": "src/module/Cache.js"
-                };
-
-                /**
-                 * CAT require implementation
-                 *
-                 * @param module The module key
-                 * @returns {*}
-                 */
-                global.catrequire = function (module) {
-                    var catconfig = global["cat.config.module"],
-                        modulepath;
-                    if (catconfig) {
-                        modulepath = ( catconfig[module] || module );
-                        modulepath = _path.normalize([projectDir, modulepath].join("/"));
-                    }
-                    return require(modulepath);
-                };
 
                 basedir = _basedir(config),
                     projectDir = basedir.path;
@@ -155,11 +135,14 @@ var CAT = function () {
 
         },
 
-        watch: function(config) {
+        watch: function (config) {
             if (config) {
-                _targets.forEach(function (target) {
-                    _runTask(target, config);
-                });
+//                _targets.forEach(function (target) {
+//                    _runTask(target, config);
+//                });
+                _counter = 0;
+                _runme(config);
+
             }
         },
 
@@ -253,28 +236,19 @@ var CAT = function () {
                 }
 
 
-               if (path) {
+                if (path) {
 
-                   if (watch) {
-                       _watch = catrequire("cat.watch");
-                       _watch.init();
-                   }
-                       // load CAT project
+                    if (watch) {
+                        _watch = catrequire("cat.watch");
+                        _watch.init();
+                    }
+                    // load CAT project
                     project = _project.load({
                         path: path,
                         emitter: _emitter
                     });
 
-                   function runme() {
-                       _runTask(targets[counter]);
-                       _emitter.on("job.done", function(obj) {
-                           counter++;
-                           if (counter < _targets.length) {
-                               _emitter.removeAllListeners("job.done");
-                               runme();
-                           }
-                       });
-                   }
+
                     if (project) {
 
                         // apply project's tasks
@@ -288,11 +262,8 @@ var CAT = function () {
                             });
 
                             if (!watch) {
-                                counter = 0;
-//                                for (counter=0; counter<targets.length; counter++) {
-//                                    _runTask(targets[counter]);
-//                                }
-                                runme();
+                                _counter = 0;
+                                _runme();
                             }
 
                         }

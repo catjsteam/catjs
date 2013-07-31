@@ -6,7 +6,7 @@
   ]@
   @[scrap 
 	@@name scrap2
-	@@code console.log('sdfsd2')
+	@@code console.log('sdfsd2344455sgdsdd')
   ]@
 */
 module.exports = function() {
