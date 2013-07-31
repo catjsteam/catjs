@@ -20,7 +20,8 @@ var _typedas = require('typedas'),
  */
 module.exports = function Config(config) {
 
-    var actions = [], tasks = [], extensions = [],
+    var _cathome = _global.get("home"),
+        actions = [], tasks = [], extensions = [],
         vars = {
             actions: actions,
             tasks: tasks,
@@ -69,7 +70,7 @@ module.exports = function Config(config) {
      * @private
      */
     function _postCreation() {
-        var workpath = _global.get("home").working.path,
+        var workpath = _cathome.working.path,
             targetfolder, targetPath;
 
         // create project's src folder
@@ -142,7 +143,7 @@ module.exports = function Config(config) {
     this.actions = actions;
     this.extensions = extensions;
     this.tasks = tasks;
-    this.pluginPaths = [[_global.get("home").path, "src/module/common/plugin/"].join("/")];
+    this.pluginPaths = [[_cathome.path, "src/module/common/plugin/"].join("/")];
     this.info = {};
 
     // indexing the objects arrays [actions, tasks, etc..]

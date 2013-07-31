@@ -65,6 +65,8 @@ module.exports = function() {
                     return require(global.catmodule(module));
                 };
 
+                global.cathome = home;
+
             })();
 
             // Everything looks good. Require local grunt and run it.

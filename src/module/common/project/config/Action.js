@@ -15,7 +15,6 @@ var _log = require("../../../CATGlob.js").log(),
 module.exports = function (config) {
 
     var filters,
-        actionType,
         me = this,
         data, emitter, global, catconfig;
 
@@ -53,9 +52,9 @@ module.exports = function (config) {
 
                 // Load action per type
                 if (target) {
-                    _log.debug("[Action] Instantiating action: " + actionType);
+                    _log.debug("[Action] Instantiating action: " + target);
                     try {
-                        me.ref = catconfig.pluginLookup(target); // require(actionType);
+                        me.ref = catconfig.pluginLookup(target);
                         if (me.ref) {
                             me.action = new me.ref();
                         }

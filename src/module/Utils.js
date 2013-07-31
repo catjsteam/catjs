@@ -64,23 +64,25 @@ module.exports = function () {
             return ((file && basePath) ? file.substring(basePath.length) : undefined);
         },
 
+        /**
+         *  Check if a given object contains a value
+         *
+         * @param obj The object that might contains
+         * @param value The value to be searched
+         *
+         * @returns {boolean} If the value contains in the obj return true else return false
+         */
         contains: function (obj, value) {
-            var contain = 0,
-                ii = 0, size = 0, item;
-            if (obj && value) {
-                if (_typedas.isArray(obj)) {
-                    size = obj.length;
-                    for (; ii < size; ii++) {
-                        item = obj[ii];
-                        if (item && value == item) {
-                            contain++;
-                            break;
-                        }
+            var key;
+
+            if (obj) {
+                for (key in obj) {
+                    if (obj[key] === value) {
+                        return true;
                     }
                 }
             }
-
-            return (contain > 0 ? true : false);
+            return false;
         },
 
         /**

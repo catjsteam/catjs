@@ -119,8 +119,7 @@ module.exports = function () {
          */
         load: function (externalConfig) {
 
-            var home = _global.get("home"),
-                path = [home.path, "resources/cat.json"].join("/");
+            var path = [cathome, "resources/cat.json"].join("/");
 
             return _loadCATConfig(externalConfig, path);
         }

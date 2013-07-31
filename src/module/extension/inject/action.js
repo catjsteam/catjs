@@ -9,7 +9,14 @@ var _fs = require('fs.extra'),
     _props = catrequire("cat.props"),
     _basePlugin = require("./../Base.js"),
     _project = catrequire("cat.project"),
-    _beautify = require('js-beautify').js_beautify;
+    _beautify = require('js-beautify').js_beautify,
+    _ = require("underscore");
+
+    // underscore settings for like mustache parametrization style {{foo}}
+    _.templateSettings = {
+        interpolate : /\{\{(.+?)\}\}/g
+    };
+
 
 /**
  * Injection extension for CAT
@@ -31,13 +38,38 @@ module.exports = _basePlugin.ext(function () {
 
             function _generateFileContent(scraps) {
 
-                var output = [];
+                var output = [],
+                    funcTpl;
+
+                function _readTemplate(name) {
+                    var content,
+                        file = [cathome, "src/template/scrap", name].join("/");
+
+                    try {
+                        content = _fs.readFileSync(file, "utf8");
+
+                    } catch(e) {
+                        _log.warning(_props.get("cat.file.failed").format("[inject ext]", file, e));
+                    }
+
+                    return content;
+                }
 
                 scraps.forEach(function (scrap) {
+                    scrap.apply(scrap);
+                });
+
+
+                funcTpl = _readTemplate("_func.tpl");
+                scraps.forEach(function (scrap) {
+                    var template;
+
                     if (scrap) {
-                        output.push("function " + scrap.get("name") + "() {");
-                        output.push("       /* test content in here */");
-                        output.push("}");
+                            template = (funcTpl ? _.template(funcTpl) : undefined);
+
+                        if (template) {
+                            output.push(template({name : scrap.get("name"), output: scrap.generate()}));
+                        }
                     }
                 });
 
@@ -45,9 +77,6 @@ module.exports = _basePlugin.ext(function () {
 
             }
 
-//            var filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
-//                workpath = _global.get("home").working.path,
-//                targetfile, targetfolder, fileContent;
             var  filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
                 projectInfo,
                 targetfile, targetfolder, fileContent;

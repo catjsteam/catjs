@@ -1,6 +1,5 @@
 var _fs = require("fs"),
-    _global = catrequire("cat.global"),
-    _fileName = [_global.get("home").path, ".cat"].join("/");
+    _fileName = [cathome, ".cat"].join("/");
 
 /**
  * Persist a property style data (key=value) to a file named .cat

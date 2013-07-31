@@ -63,7 +63,7 @@ module.exports = function (config) {
         if (extConfig) {
             if (!extConfig.ref) {
                 try {
-                    path = _path.normalize([_global.get("home").path, extConfig.ext.impl].join("/"));
+                    path = _path.normalize([cathome, extConfig.ext.impl].join("/"));
                     extimp = extConfig.ref = require(path);
                     if (extimp) {
                         if (extimp.init) {

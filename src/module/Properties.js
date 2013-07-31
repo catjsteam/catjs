@@ -22,13 +22,7 @@ module.exports = function () {
     return {
 
         init: function (callback) {
-            var home, homePath;
-
-            home = _global.get("home");
-            if (home) {
-                homePath = (home.path || ".");
-            }
-            _properties.load([homePath, "resources/log.properties"].join("/"),
+            _properties.load([cathome, "resources/log.properties"].join("/"),
                 config,
                 callback);
 

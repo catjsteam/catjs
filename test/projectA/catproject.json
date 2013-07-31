@@ -115,11 +115,11 @@
         },
         {
             "name": "scrap",
-            "plugins": ["ext.scrap","init.scrap"]
+            "plugins": ["init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["target.inject", "project.install"]
+            "plugins": ["ext.scrap", "target.inject", "project.install"]
         },
         {
             "name": "clean",

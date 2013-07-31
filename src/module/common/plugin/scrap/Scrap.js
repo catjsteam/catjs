@@ -16,6 +16,7 @@ module.exports = function () {
             return obj;
         },
 
+
         _scrapBaseEnum = {
             "_info": {
                 start: {
@@ -38,7 +39,9 @@ module.exports = function () {
             name: "scrap",
 
             "injectinfo": _scrapBaseEnum["_info"],
-            "scrapinfo": _scrapBaseEnum["_info"]
+            "scrapinfo": _scrapBaseEnum["_info"],
+
+            singleTypes: ["name"]
         },
 
         _scrapId = function () {
@@ -48,6 +51,9 @@ module.exports = function () {
 
         /**
          * Scrap class
+         *
+         *   var scrap = new _Scrap.clazz({id: "testScrap", code: "console.log(':)');"});
+         *   scrap.codeApply();
          */
             _clazz = function (config) {
 
@@ -83,9 +89,30 @@ module.exports = function () {
             (function () {
                 if (me.config) {
                     _utils.forEachProp(me.config, function (key) {
+                        var value, size;
+
                         if (key) {
+                            /**
+                             * Generating a getter for each configuration that
+                             * result a value of a property according to a scrap key
+                             *
+                             * @returns {*} Array for multi line or else the single string value
+                             */
                             me[key] = function () {
-                                return this.config[key];
+
+                                value = this.config[key];
+                                if (value !== undefined && value !== null) {
+                                    if (_utils.contains(_getScrapEnum.singleTypes, key)) {
+                                        // return only the first cell since we types this key as a single scrap value (the last cell takes)
+                                        if (_typedas.isArray(value)) {
+                                            size = value.length;
+                                            return value[size - 1];
+                                        } else {
+                                            _log.warning(_props.get("cat.arguments.type").format("[scrap class]", "Array"));
+                                        }
+                                    }
+                                }
+                                return value;
                             };
                         }
                     });
@@ -111,7 +138,13 @@ module.exports = function () {
             };
 
             this.print = function (line) {
-                this.output.push(line);
+                if (line) {
+                    if (_typedas.isArray(line)) {
+                        this.output = this.output.concat(line);
+                    } else {
+                        this.output.push(line);
+                    }
+                }
             };
 
             this.apply = function () {
@@ -309,8 +342,13 @@ module.exports = function () {
                         configVal = startrow.substring(startrow.indexOf(" ") + 1);
                         config.single = true;
 
+                        // set scrap property / value
                         if (configKey) {
-                            config[configKey] = configVal;
+                            if (!config[configKey]) {
+                                config[configKey] = [configVal];
+                            } else {
+                                config[configKey].push(configVal)
+                            }
                         }
                     }
                 }
@@ -371,7 +409,6 @@ module.exports = function () {
                     delete updateobj.project;
                 }
             }
-
 
             scraps.forEach(function (scrap) {
                 _apply(scrap);
