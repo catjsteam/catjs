@@ -71,7 +71,7 @@ module.exports = function Config(config) {
      */
     function _postCreation() {
         var workpath = _cathome.working.path,
-            targetfolder, targetPath;
+            targetfolder, targetPath, tplPath, tplSrcFile, tplTargetFile;
 
         // create project's src folder
         targetfolder = _path.normalize([workpath, "src"].join("/"));
@@ -79,7 +79,7 @@ module.exports = function Config(config) {
             if (!_fs.existsSync(targetfolder)) {
                 _utils.mkdirSync(targetfolder);
             } else {
-                _log.debug(_props.get("cat.project.resource.exists").format("[cat project]", targetfolder));
+                _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", targetfolder));
             }
             me.info.srcFolder = targetfolder;
         }
@@ -90,10 +90,14 @@ module.exports = function Config(config) {
             if (!_fs.existsSync(targetPath)) {
                 _utils.mkdirSync(targetPath);
             } else {
-                _log.debug(_props.get("cat.project.resource.exists").format("[cat project]", targetfolder));
+                _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", targetfolder));
             }
             me.info.targetFolder = targetPath;
         }
+
+        // project resources
+        tplPath = _path.normalize([_cathome.path, "src/template/project/"].join("/"));
+        me.info.templates = tplPath;
     }
 
     if (!data || !(data && data.plugins)) {
@@ -240,6 +244,10 @@ module.exports = function Config(config) {
 
     this.getInfo = function () {
         return this.info;
+    };
+
+    this.setInfo = function (key, value) {
+        return this.info[key] = value;
     };
 
     return this;

@@ -6,9 +6,9 @@ var _fs = require("fs"),
     _basePlugin = require("./Base.js"),
     _to,
 
-        /**
-         * @param typeObj The reference object of type file|folder
-         */
+    /**
+     * @param typeObj The reference object of type file|folder
+     */
         _filtersFn2 = function (typeObj, filters) {
 
         var exitCondition = 0;
@@ -17,11 +17,11 @@ var _fs = require("fs"),
 
             filters.forEach(function (filter) {
                 if (filter) {
-                    filter.apply(function() {
+                    filter.apply(function () {
 
                         var extName = _path.extname(typeObj);
                         if (this.ext) {
-                            this.ext.forEach(function(item) {
+                            this.ext.forEach(function (item) {
                                 if (item === extName) {
                                     exitCondition++;
 
@@ -58,7 +58,9 @@ module.exports = _basePlugin.ext(function () {
         _data,
         _emitter,
         _module,
-        _errors;
+        _errors,
+        _internalConfig,
+        _project;
 
 
     function _getRelativeFile(file) {
@@ -137,7 +139,9 @@ module.exports = _basePlugin.ext(function () {
 
         },
 
-        initListener: function(config) {
+        initListener: function (config) {
+
+            var projectInfo;
 
             _basePath = (config ? config.path : undefined);
             if (!_basePath) {
@@ -179,6 +183,8 @@ module.exports = _basePlugin.ext(function () {
             _emitter = config.emitter;
             _global = config.global;
             _data = config.data;
+            _internalConfig = config.internalConfig;
+            _project = config.internalConfig.externalConfig.project;
 
             // initial data binding to 'this'
             _me.dataInit(_data);
@@ -195,7 +201,7 @@ module.exports = _basePlugin.ext(function () {
 
         },
 
-        getType: function() {
+        getType: function () {
             return "copy";
         }
     };

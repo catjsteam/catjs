@@ -29,29 +29,15 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-            _generateSourceProject = function (scraps, file) {
+         _generateSourceProject = function (scraps, file) {
 
             function _generateFileContent(scraps) {
 
-                var output = [],
-                    funcTpl;
+                var output = [];
 
                 scraps.forEach(function (scrap) {
                     scrap.apply(scrap);
                 });
-
-
-//                funcTpl = _tplutils.readTemplateFile("scrap/_func");
-//                scraps.forEach(function (scrap) {
-//                    var template;
-//
-//                    if (scrap) {
-//                        template = (funcTpl ? _.template(funcTpl) : undefined);
-//                        if (template) {
-//                            output.push(template({name: scrap.get("name"), output: scrap.generate()}));
-//                        }
-//                    }
-//                });
 
                 scraps.forEach(function (scrap) {
                     output.push(_tplutils.template({
@@ -62,6 +48,24 @@ module.exports = _basePlugin.ext(function () {
                 });
 
                 return output.join("");
+
+            }
+
+            function copyResources(projectInfo) {
+
+                var tplPath = projectInfo.templates,
+                    srcFolder = projectInfo.srcFolder,
+                    tplSrcFile = _path.normalize([tplPath, "Cat.js"].join("/")),
+                    tplTargetFile = _path.normalize([srcFolder, "Cat.js"].join("/")),
+                    mdata;
+
+                try {
+                    _utils.copySync(tplSrcFile, tplTargetFile);
+                    _mdata.update({project:{resources: [tplTargetFile]}});
+
+                } catch(e) {
+                    _log.error(_props.get("cat.file.copy.failed").format("[cat config]", tplFile, e));
+                }
 
             }
 
@@ -76,6 +80,10 @@ module.exports = _basePlugin.ext(function () {
 
 
             if (projectInfo) {
+
+                // copy resources
+                copyResources(projectInfo);
+
                 targetfile = _path.normalize([projectInfo.srcFolder, filepath].join("/"));
                 targetfolder = _path.dirname(targetfile);
                 if (targetfolder) {
@@ -89,15 +97,13 @@ module.exports = _basePlugin.ext(function () {
 
                 fileContent = _generateFileContent(scraps);
                 if (fileContent) {
-                    fileContent = _beautify(fileContent, { indent_size: 2 })
+                    fileContent = _beautify(fileContent, { indent_size: 2 });
                     try {
                         _fs.writeFileSync(targetfile, fileContent);
                         _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
                     } catch (e) {
                         _utils.error(_props.get("cat.error").format("[inject ext]", e));
                     }
-
-
                 }
             }
 
@@ -123,7 +129,6 @@ module.exports = _basePlugin.ext(function () {
                         line = [line.substring(0, info.col), "console.log('cat scrap: " + info.scrap.get("name") + "'); " , line.substring(info.col, line.length)].join("");
                         info.scrap.set("injectinfo", {start: {line: lineNumber, col: info.col}, end: {line: lineNumber, col: (info.col + content.length)}});
                     }
-
                 });
                 return line;
 

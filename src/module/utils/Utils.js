@@ -26,8 +26,9 @@ module.exports = function () {
         /**
          * Copy file synchronized
          */
-            _copySync = function (source, target, cb) {
-            var cbCalled = false;
+         _copySync = function (source, target, cb) {
+            var cbCalled = false,
+                me = this;
 
             var rd = _fs.createReadStream(source);
             rd.on("error", function (err) {
@@ -44,6 +45,9 @@ module.exports = function () {
 
             function done(err) {
                 if (!cbCalled) {
+                    if (err) {
+                        throw err;
+                    }
                     if (cb) {
                         cb(err);
                     }
@@ -88,6 +92,50 @@ module.exports = function () {
             return false;
         },
 
+        removeArrayItemByIdx: function(arr, idx) {
+            var newArr = [],
+                counter = 0;
+
+            if (arr && _typedas.isArray(arr)) {
+
+                arr.forEach(function(item) {
+                    if (idx !== counter) {
+                        newArr.push(item);
+                    }
+                    counter++;
+                });
+            }
+        },
+
+         removeArrayItemByValue: function(arr, value) {
+            var newArr = [],
+                counter = 0;
+
+            if (arr && _typedas.isArray(arr)) {
+
+                arr.forEach(function(item) {
+                    if (item !== value && item !== null && item !== undefined) {
+                        newArr.push(item);
+                    }
+                    counter++;
+                });
+            }
+        },
+
+        cleanupArray: function(arr) {
+            var newArr  = [];
+
+            if (arr && _typedas.isArray(arr)) {
+                arr.forEach(function(item){
+                    if (item !== null && item !== undefined) {
+                        newArr.push(item)
+                    }
+                });
+            }
+
+            return newArr;
+        },
+
         /**
          * Copy the source object's properties.
          * TODO TBD make it more robust, recursion and function support
@@ -98,7 +146,9 @@ module.exports = function () {
          */
         copyObjProps: function (srcObj, destObj, override) {
 
-            var name, obj;
+            var name, obj,
+                me = this,
+                idx= 0, size= 0, item;
 
             override = (override || false);
 
@@ -109,8 +159,22 @@ module.exports = function () {
                         if (!obj) {
                             destObj[name] = srcObj[name];
                         } else {
-                            if (srcObj[name] instanceof Object) {
-                                arguments.callee(srcObj[name], destObj[name], override);
+                            if (_typedas.isObject(srcObj[name])) {
+                                arguments.callee.call(me, srcObj[name], destObj[name], override);
+
+                            } else if (_typedas.isArray(srcObj[name])) {
+                                if (_typedas.isArray(obj)) {
+
+                                    me.cleanupArray(srcObj[name]);
+                                    size = destObj[name].length;
+                                    for (idx = 0; idx<size; idx++) {
+                                        item = obj[idx];
+                                        srcObj[name] = me.removeArrayItemByValue(srcObj[name], item);
+                                    }
+
+                                    destObj[name] = destObj[name].concat(srcObj[name]);
+                                }
+
                             } else {
                                 if (override || obj === undefined) {
                                     destObj[name] = srcObj[name];

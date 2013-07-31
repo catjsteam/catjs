@@ -7,12 +7,12 @@ var _fs = require("fs"),
 function logStreamHook(grunt) {
 
     var hooker = require('hooker');
-    _fs.writeSync(_logFileStream, [" ",new Date(),""].join("\n"));
+    _fs.writeSync(_logFileStream, [" ", new Date(), ""].join("\n"));
     _fs.writeSync(_logFileStream, ["--------------------------------------------------------------", ""].join("\n"));
 
     // Override grunt.log.header to update a per-line prefix and prevent default logging.
     var prefix;
-    hooker.hook(grunt.log, 'header', function() {
+    hooker.hook(grunt.log, 'header', function () {
         prefix = '[' + grunt.task.current.nameArgs + '] ';
         return hooker.preempt();
     });
@@ -20,7 +20,7 @@ function logStreamHook(grunt) {
     // Override process.stdout to log the name+args of the current task before
     // every logged line.
     var newline = true;
-    hooker.hook(process.stdout, 'write', function(str) {
+    hooker.hook(process.stdout, 'write', function (str) {
         var ret;
         str = String(str);
         if (newline) {
@@ -47,13 +47,13 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         project: {
-            name:"test-1",
+            name: "test-1",
             outName: "cat.test",
             deployPath: "./deploy/",
             targetPath: "./target/"
         },
 
-        pkg:grunt.file.readJSON('package.json'),
+        pkg: grunt.file.readJSON('package.json'),
 
         banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
             '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -99,7 +99,7 @@ module.exports = function (grunt) {
                 dest: '<%= project.deployPath %><%= project.outName %>.min.js'
             }
         },
-        clean:["<%= project.deployPath %>",
+        clean: ["<%= project.deployPath %>",
             _logFileName
         ]
 
@@ -112,8 +112,29 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
 
 
-    grunt.registerTask('install',function () {
-        grunt.task.run( ['jshint', 'concat', 'uglify']);
+    grunt.registerTask('install', function () {
+        grunt.task.run(['jshint', 'concat', 'uglify']);
+    });
+
+    grunt.registerTask('cat.compile', function () {
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['-pisj'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        }, function () {
+
+        });
+    });
+
+    grunt.registerTask('cat.clean', function () {
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['-pc'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        });
+
     });
 
 };

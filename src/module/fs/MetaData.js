@@ -22,7 +22,10 @@ module.exports = function () {
             var me = this;
 
             this.files = {};
-            this.project = {basepath: undefined };
+            this.project = {
+                basepath: undefined,
+                resources: []
+            };
 
             this.update = function(config) {
                 if (config.files) {
@@ -49,7 +52,10 @@ module.exports = function () {
          *          project - the project data
          *          e.g. {
          *                  files: ...
-         *                  project: { basepath }
+         *                  project: {
+         *                      basepath:
+          *                     resources:
+         *                  }
          *              }
          */
         update: function (config) {

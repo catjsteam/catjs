@@ -118,27 +118,18 @@ module.exports = function (grunt) {
 
     grunt.registerTask('cat.compile', function () {
         grunt.util.spawn({
-            cmd: 'catcli', args: ['-isp'], opts: { stdio: [ process.stdin
+            cmd: 'catcli', args: ['-pisj'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
         }, function () {
-            grunt.util.spawn({
-                cmd: 'catcli', args: ['-jp'], opts: { stdio: [ process.stdin
-                    , process.stout
-                    , process.stderr
-                ]}
-            }, function () {
-
-
-            });
 
         });
     });
 
     grunt.registerTask('cat.clean', function () {
         grunt.util.spawn({
-            cmd: 'catcli', args: ['-cp'], opts: { stdio: [ process.stdin
+            cmd: 'catcli', args: ['-pc'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
