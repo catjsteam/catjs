@@ -1,12 +1,9 @@
 var _ = require("underscore"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
-    _log = catrequire("cat.global").log();
-
-// underscore settings for like mustache parametrization style {{foo}}
-_.templateSettings = {
-    interpolate : /\{\{(.+?)\}\}/g
-};
+    _global = catrequire("cat.global"),
+    _log = _global.log(),
+    _props = catrequire("cat.props");
 
 module.exports = function () {
 
@@ -162,41 +159,6 @@ module.exports = function () {
                     }
                 });
             }
-        },
-
-        underscore: _,
-
-        /**
-         * Load template file content
-         *
-         * @param name The name of the template
-         * @param folder The subject folder
-         * @returns {*}
-         */
-        readTemplateFile: function (name, folder) {
-            var content,
-                file = [cathome, "src/template", folder, name].join("/");
-
-            try {
-                content = _fs.readFileSync([file, "tpl"].join("."), "utf8");
-
-            } catch (e) {
-                _log.warning(_props.get("cat.file.failed").format("[inject ext]", file, e));
-            }
-
-            return content;
-        },
-
-        /**
-         * Load and compile template with underscore
-         *
-         * @param config The params:
-         *      file The file path to be loaded (see underscore template)
-         *      data The data object properties (see underscore template)
-         *      settings The setting arguments (see underscore template)
-         */
-        template: function(file, data, settings){
-            //this._.template
         }
     }
 

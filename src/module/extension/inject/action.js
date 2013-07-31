@@ -6,16 +6,11 @@ var _fs = require('fs.extra'),
     _mdata = catrequire("cat.mdata"),
     _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
+    _tplutils = catrequire("cat.tpl.utils"),
     _props = catrequire("cat.props"),
     _basePlugin = require("./../Base.js"),
     _project = catrequire("cat.project"),
-    _beautify = require('js-beautify').js_beautify,
-    _ = require("underscore");
-
-    // underscore settings for like mustache parametrization style {{foo}}
-    _.templateSettings = {
-        interpolate : /\{\{(.+?)\}\}/g
-    };
+    _beautify = require('js-beautify').js_beautify;
 
 
 /**
@@ -34,7 +29,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-         _generateSourceProject = function (scraps, file) {
+            _generateSourceProject = function (scraps, file) {
 
             function _generateFileContent(scraps) {
 
@@ -46,24 +41,31 @@ module.exports = _basePlugin.ext(function () {
                 });
 
 
-                funcTpl = _utils.readTemplateFile("_func", "scrap");
+//                funcTpl = _tplutils.readTemplateFile("scrap/_func");
+//                scraps.forEach(function (scrap) {
+//                    var template;
+//
+//                    if (scrap) {
+//                        template = (funcTpl ? _.template(funcTpl) : undefined);
+//                        if (template) {
+//                            output.push(template({name: scrap.get("name"), output: scrap.generate()}));
+//                        }
+//                    }
+//                });
+
                 scraps.forEach(function (scrap) {
-                    var template;
-
-                    if (scrap) {
-                            template = (funcTpl ? _.template(funcTpl) : undefined);
-
-                        if (template) {
-                            output.push(template({name : scrap.get("name"), output: scrap.generate()}));
+                    output.push(_tplutils.template({
+                            name: "scrap/_func",
+                            data: {name: scrap.get("name"), output: scrap.generate()}
                         }
-                    }
+                    ));
                 });
 
                 return output.join("");
 
             }
 
-            var  filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
+            var filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
                 projectInfo,
                 targetfile, targetfolder, fileContent;
 
@@ -91,7 +93,7 @@ module.exports = _basePlugin.ext(function () {
                     try {
                         _fs.writeFileSync(targetfile, fileContent);
                         _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
-                    } catch(e) {
+                    } catch (e) {
                         _utils.error(_props.get("cat.error").format("[inject ext]", e));
                     }
 
@@ -107,7 +109,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param file The reference file to be processed
          */
-         _injectScrapCall = function (scraps, file) {
+            _injectScrapCall = function (scraps, file) {
 
             var lines = [] , lineNumber = 1,
                 commentinfos = [];
@@ -151,7 +153,7 @@ module.exports = _basePlugin.ext(function () {
                         _fs.writeFileSync(file, lines.join(""));
                         _log.debug(_props.get("cat.mdata.write").format("[inject ext]"));
 
-                    } catch(e) {
+                    } catch (e) {
                         _utils.error(_props.get("cat.error").format("[inject ext]", e));
                     }
 
@@ -166,7 +168,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-         _inject = function (scraps, fileName) {
+            _inject = function (scraps, fileName) {
 
             var file = fileName;
 
@@ -198,7 +200,7 @@ module.exports = _basePlugin.ext(function () {
              *
              * @param config
              */
-            watch: function(config) {
+            watch: function (config) {
                 console.log("inject");
 
                 var emitter = _me.getEmitter();

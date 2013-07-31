@@ -1,10 +1,10 @@
 // TODO When CAT will go as library change the path
-var _Scrap = require("./../../../src/module/common/plugin/scrap/Scrap.js"),
-    _utils = catrequire("cat.utils");
+var _Scrap = catrequire("cat.common.scrap"),
+    _tplutils = catrequire("cat.tpl.utils");
 
 module.exports = function () {
 
-    var funcSnippetTpl = _utils.readTemplateFile("_func", "scrap");
+    var funcSnippetTpl = _tplutils.readTemplateFile("scrap/_func_snippet");
 
     return {
 
@@ -17,7 +17,13 @@ module.exports = function () {
 
                 if (code) {
                     code.forEach(function() {
-                        me.print(code);
+                        me.print(_tplutils.template({
+                            content: funcSnippetTpl,
+                            data: {
+                                comment:" Generated code according to the scrap comment (see @@code)",
+                                code:code
+                            }
+                        }));
                     });
                 }
             }});
