@@ -41,26 +41,12 @@ module.exports = _basePlugin.ext(function () {
                 var output = [],
                     funcTpl;
 
-                function _readTemplate(name) {
-                    var content,
-                        file = [cathome, "src/template/scrap", name].join("/");
-
-                    try {
-                        content = _fs.readFileSync(file, "utf8");
-
-                    } catch(e) {
-                        _log.warning(_props.get("cat.file.failed").format("[inject ext]", file, e));
-                    }
-
-                    return content;
-                }
-
                 scraps.forEach(function (scrap) {
                     scrap.apply(scrap);
                 });
 
 
-                funcTpl = _readTemplate("_func.tpl");
+                funcTpl = _utils.readTemplateFile("_func", "scrap");
                 scraps.forEach(function (scrap) {
                     var template;
 

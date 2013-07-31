@@ -1,10 +1,10 @@
-var _global = require("./../CATGlob.js"),
-    _utils = require("./../Utils.js"),
+var _global = catrequire("cat.global"),
+    _utils = catrequire("cat.utils"),
     _log = _global.log(),
     _path = require("path"),
     _fsconfig = require("./../fs/Config.js"),
     _typedas = require("typedas"),
-    _props = require("./../Properties.js"),
+    _props = catrequire("cat.props"),
     _watch = catrequire("cat.watch"),
     _catconfig,
 

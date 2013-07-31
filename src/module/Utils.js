@@ -1,13 +1,19 @@
-module.exports = function () {
+var _ = require("underscore"),
+    _fs = require("fs.extra"),
+    _typedas = require("typedas"),
+    _log = catrequire("cat.global").log();
 
-    var _fs = require("fs.extra"),
-        _typedas = require("typedas"),
-        _log = catrequire("cat.global").log(),
+// underscore settings for like mustache parametrization style {{foo}}
+_.templateSettings = {
+    interpolate : /\{\{(.+?)\}\}/g
+};
+
+module.exports = function () {
 
         /**
          * Synchronized process for creating folder recursively
          */
-        _mkdirSync = function (folder) {
+            _mkdirSync = function (folder) {
             if (!_fs.existsSync(folder)) {
                 try {
                     _fs.mkdirRecursiveSync(folder);
@@ -23,7 +29,7 @@ module.exports = function () {
         /**
          * Copy file synchronized
          */
-        _copySync = function (source, target, cb) {
+            _copySync = function (source, target, cb) {
             var cbCalled = false;
 
             var rd = _fs.createReadStream(source);
@@ -60,7 +66,7 @@ module.exports = function () {
             throw msg;
         },
 
-        getRelativePath: function(file, basePath) {
+        getRelativePath: function (file, basePath) {
             return ((file && basePath) ? file.substring(basePath.length) : undefined);
         },
 
@@ -108,7 +114,7 @@ module.exports = function () {
                         } else {
                             if (srcObj[name] instanceof Object) {
                                 arguments.callee(srcObj[name], destObj[name], override);
-                            }	else {
+                            } else {
                                 if (override || obj === undefined) {
                                     destObj[name] = srcObj[name];
                                 }
@@ -119,7 +125,7 @@ module.exports = function () {
             }
         },
 
-        forEachProp: function(srcObj, callback) {
+        forEachProp: function (srcObj, callback) {
             var name;
 
             if (srcObj) {
@@ -136,18 +142,18 @@ module.exports = function () {
             }
         },
 
-        kill: function(pids, excludes) {
+        kill: function (pids, excludes) {
             var me = this;
 
             if (pids) {
-                pids.forEach(function(pid){
+                pids.forEach(function (pid) {
                     if (excludes) {
-                        excludes.forEach(function(exclude){
+                        excludes.forEach(function (exclude) {
                             if (pid != exclude) {
                                 try {
                                     process.kill(pid, "SIGKILL");
 
-                                } catch(e) {
+                                } catch (e) {
                                     // TODO check if the process is running
                                     _log.error("[kill process] failed to kill pid: " + pid + "; The process might not exists");
                                 }
@@ -156,6 +162,41 @@ module.exports = function () {
                     }
                 });
             }
+        },
+
+        underscore: _,
+
+        /**
+         * Load template file content
+         *
+         * @param name The name of the template
+         * @param folder The subject folder
+         * @returns {*}
+         */
+        readTemplateFile: function (name, folder) {
+            var content,
+                file = [cathome, "src/template", folder, name].join("/");
+
+            try {
+                content = _fs.readFileSync([file, "tpl"].join("."), "utf8");
+
+            } catch (e) {
+                _log.warning(_props.get("cat.file.failed").format("[inject ext]", file, e));
+            }
+
+            return content;
+        },
+
+        /**
+         * Load and compile template with underscore
+         *
+         * @param config The params:
+         *      file The file path to be loaded (see underscore template)
+         *      data The data object properties (see underscore template)
+         *      settings The setting arguments (see underscore template)
+         */
+        template: function(file, data, settings){
+            //this._.template
         }
     }
 

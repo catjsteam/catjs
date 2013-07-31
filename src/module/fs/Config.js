@@ -1,7 +1,7 @@
 var _fs = require('fs'),
-    _log = require("./../CATGlob.js").log(),
-    _utils = require("./../Utils.js"),
-    _props = require("./../Properties.js");
+    _log = catrequire("cat.global").log(),
+    _utils = catrequire("cat.utils"),
+    _props = catrequire("cat.props");
 
 
 

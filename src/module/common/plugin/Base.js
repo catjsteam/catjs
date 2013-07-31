@@ -1,5 +1,5 @@
-var _utils = require("./../../Utils.js"),
-    _log = require("./../../CATGlob.js").log(),
+var _utils = catrequire("cat.utils"),
+    _log = catrequire("cat.global").log(),
     _typedas = require("typedas"),
     _path = require("path");
 
