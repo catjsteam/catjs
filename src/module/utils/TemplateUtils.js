@@ -66,8 +66,8 @@ module.exports = function () {
                 path = config.path,
                 data = config.data,
                 content = config.content,
-                funcTpl = this.readTemplateFile(name, path),
-                template = _.template((content || funcTpl));
+                funcTpl = (content || this.readTemplateFile(name, path)),
+                template = _.template(funcTpl);
 
             if (template) {
                 return template(data);

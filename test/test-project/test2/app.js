@@ -1,12 +1,13 @@
 
 /**
 @[scrap
-	@@name scrap1
-	@@code console.log('sdfsd1')
+	@@name scrap10
+	@@code console.log('sdfsdqwqweasaasdasxzxczxcxsss1')
   ]@
-  @[scrap 
+  @[scrap
 	@@name scrap2
-	@@code console.log('sdfsd2344455sgdsdd')
+	@@code console.log('sdfsd2344455sgdscvbxcvxcvsdfdsfwwwwwwwwwcvbdd1')
+	@@code console.log('sdfsd2344455sgdscvbxcvxcvsdfdsfwwwwwwwwwcvbdd2')
   ]@
 */
 module.exports = function() {

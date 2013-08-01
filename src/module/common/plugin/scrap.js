@@ -69,7 +69,7 @@ module.exports = _basePlugin.ext(function () {
             var from = file,
                 filters = _me.getFilters(),
                 scrapComment,
-                scrap, scraps,
+                scrap, scraps, scrapObjs=[],
                 size, idx = 0;
 
             if (_me.isDisabled()) {
@@ -98,13 +98,15 @@ module.exports = _basePlugin.ext(function () {
                                     });
 
                                     if (scrap) {
+                                        scrapObjs.push(scrap);
+
                                         _Scrap.apply({
                                             basePath: _basePath,
                                             scraps: [scrap]
                                         });
                                     }
                                 }
-
+                                _Scrap.normalize(scrapObjs);
                             }
                         }
                     }});

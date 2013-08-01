@@ -27,12 +27,12 @@ module.exports = function () {
                 resources: []
             };
 
-            this.update = function(config) {
+            this.update = function(config, override) {
                 if (config.files) {
-                    _utils.copyObjProps(config.files, me.files);
+                    _utils.copyObjProps(config.files, me.files, override);
                 }
                 if (config.project) {
-                    _utils.copyObjProps(config.project, me.project);
+                    _utils.copyObjProps(config.project, me.project, override);
                 }
             };
 
@@ -42,6 +42,56 @@ module.exports = function () {
         };
 
     return {
+
+        /**
+         *  Validate the incoming and existing metadata
+         *  In case the file metadata has been stored, remove it to get the new data
+         *
+         * @param config The incoming metadata to be updated
+         * @param content The existing metadata loaded from the file (if exists, might be the first time)
+         * @private
+         */
+        normalize: function(config) {
+            var fileKey,
+                file,
+                scrapKey,
+                content = (this.exists() ? this.read() : undefined),
+                validate;
+
+            content = JSON.parse(content);
+            if (config && content) {
+
+                if (config.files && content.files) {
+
+                    // go over the files
+                    for (fileKey in config.files) {
+
+                        file = content.files[fileKey];
+                        if (file) {
+
+                            // go over the scraps
+                            for (scrapKey in file){
+
+                                if (config.files[fileKey]) {
+                                    validate = config.files[fileKey][scrapKey];
+
+                                    /*
+                                     * Delete the scrap key at the content (stored data)
+                                     * We want to set the new content from the config object
+                                     */
+                                    if (typeof(validate) == "undefined") {
+                                        delete content.files[fileKey][scrapKey];
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                this.update(content, true);
+            }
+        },
 
         /**
          * Create/Update the CAT metadata file
@@ -54,23 +104,34 @@ module.exports = function () {
          *                  files: ...
          *                  project: {
          *                      basepath:
-          *                     resources:
+         *                      resources:
          *                  }
          *              }
+         * @param override True for taking the incoming config over the existing
          */
-        update: function (config) {
+        update: function (config, override) {
 
-            var data = (this.exists() ? this.read() : undefined);
-            if (!data) {
-                data = new _MDRecord(config);
+            var data,
+                content,
+                store;
+
+            if (!override) {
+                data = (this.exists() ? this.read() : undefined)
+                if (!data) {
+                    data = new _MDRecord(config);
+
+                } else {
+                    content = JSON.parse(data);
+                    data = new _MDRecord(content);
+                    data.update(config, true);
+                }
+                store = data;
 
             } else {
-               // data = JSON.parse(data);
-                data = new _MDRecord(JSON.parse(data));
-                data.update(config);
+                store = config;
             }
 
-            this.write(JSON.stringify(data));
+            this.write(JSON.stringify(store));
 
         },
 

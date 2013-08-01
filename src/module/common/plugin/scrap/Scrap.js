@@ -102,9 +102,10 @@ module.exports = function () {
 
                                 value = this.config[key];
                                 if (value !== undefined && value !== null) {
-                                    if (_utils.contains(_getScrapEnum.singleTypes, key)) {
+                                    if (_utils.contains(_scrapEnum.singleTypes, key)) {
                                         // return only the first cell since we types this key as a single scrap value (the last cell takes)
                                         if (_typedas.isArray(value)) {
+                                            _utils.cleanupArray(value);
                                             size = value.length;
                                             return value[size - 1];
                                         } else {
@@ -129,7 +130,7 @@ module.exports = function () {
 
             this.get = function (key) {
                 if (key) {
-                    return this[key]();
+                    return (this[key] ? this[key]() : undefined);
                 }
             };
 
@@ -363,6 +364,27 @@ module.exports = function () {
             }
 
             return scrap;
+        },
+
+        normalize: function(scraps) {
+            var config = { files: {}}
+
+            if (scraps) {
+                scraps.forEach(function(scrap) {
+                    var fileName;
+                    if (scrap) {
+                        fileName = scrap.get("file");
+                        if (fileName) {
+                            if (!config.files[fileName]) {
+                                config.files[fileName] = {};
+                            }
+                            config.files[fileName][scrap.get("name")] = scrap.serialize();
+                        }
+                    }
+                });
+
+                _md.normalize(config);
+            }
         },
 
         /**

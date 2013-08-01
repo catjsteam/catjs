@@ -29,7 +29,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-         _generateSourceProject = function (scraps, file) {
+            _generateSourceProject = function (scraps, file) {
 
             function _generateFileContent(scraps) {
 
@@ -61,9 +61,9 @@ module.exports = _basePlugin.ext(function () {
 
                 try {
                     _utils.copySync(tplSrcFile, tplTargetFile);
-                    _mdata.update({project:{resources: [tplTargetFile]}});
+                    _mdata.update({project: {resources: [tplTargetFile]}});
 
-                } catch(e) {
+                } catch (e) {
                     _log.error(_props.get("cat.file.copy.failed").format("[cat config]", tplFile, e));
                 }
 
@@ -122,16 +122,64 @@ module.exports = _basePlugin.ext(function () {
 
             function _injectCodeByScrap(line) {
 
-                commentinfos.forEach(function (info) {
-                    var content;
-                    if (lineNumber == info.line) {
-                        content = "console.log('cat scrap: " + info.scrap.get("name") + "'); ";
-                        line = [line.substring(0, info.col), "console.log('cat scrap: " + info.scrap.get("name") + "'); " , line.substring(info.col, line.length)].join("");
-                        info.scrap.set("injectinfo", {start: {line: lineNumber, col: info.col}, end: {line: lineNumber, col: (info.col + content.length)}});
-                    }
-                });
-                return line;
+                /*
+                 *  In case there are more than one scrap per comment we need to store the
+                 *  Info for all the scrap related to that comment.
+                 */
+                var prevCommentInfo,
+                    size = commentinfos.length,
+                    counter = 0;
 
+                commentinfos.forEach(function (info) {
+
+                    var content,
+                        scraplcl = info.scrap,
+                        injectinfo = scraplcl.get("injectinfo");
+
+                    function removeOldCall() {
+                        var startpos, endpos;
+
+                        if (injectinfo && injectinfo.start) {
+                            startpos = [injectinfo.start.line, injectinfo.start.col];
+                            endpos = [injectinfo.end.line, injectinfo.end.col];
+
+                            if (lineNumber == startpos[0]) {
+                                line = [line.substring(0, startpos[1]), line.substring(endpos[1])].join("");
+                            }
+                        }
+                    }
+
+
+                    if (lineNumber == info.line) {
+
+                        // we need to reevaluate the injected calls
+                        if (injectinfo) {
+                            removeOldCall();
+                        }
+                        content = "console.log('cat scrap: " + scraplcl.get("name") + "'); ";
+                        if (prevCommentInfo) {
+                            line = [line.substring(0, prevCommentInfo.end.col), "console.log('cat scrap: " + scraplcl.get("name") + "'); " , line.substring(prevCommentInfo.end.col, line.length)].join("");
+                        } else {
+                            line = [line.substring(0, info.col), "console.log('cat scrap: " + scraplcl.get("name") + "'); " , line.substring(info.col, line.length)].join("");
+                        }
+
+                        /*
+                         *  In case we already injected content related to that comment.
+                         *  We can get more than one scrap per comment.
+                         *  Get the last injected call info.
+                         */
+                        if (prevCommentInfo) {
+                            prevCommentInfo = {start: {line: lineNumber, col: prevCommentInfo.end.col}, end: {line: lineNumber, col: (prevCommentInfo.end.col + content.length)}};
+                        } else {
+                            prevCommentInfo = {start: {line: lineNumber, col: info.col}, end: {line: lineNumber, col: (info.col + content.length)}};
+                        }
+                        scraplcl.set("injectinfo", prevCommentInfo);
+                    }
+
+                    counter++;
+                });
+
+                return line;
             }
 
             // get scrap info

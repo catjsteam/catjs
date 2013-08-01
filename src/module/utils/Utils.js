@@ -105,6 +105,7 @@ module.exports = function () {
                     counter++;
                 });
             }
+            return newArr;
         },
 
          removeArrayItemByValue: function(arr, value) {
@@ -120,6 +121,8 @@ module.exports = function () {
                     counter++;
                 });
             }
+
+             return newArr;
         },
 
         cleanupArray: function(arr) {
@@ -166,13 +169,17 @@ module.exports = function () {
                                 if (_typedas.isArray(obj)) {
 
                                     me.cleanupArray(srcObj[name]);
-                                    size = destObj[name].length;
-                                    for (idx = 0; idx<size; idx++) {
-                                        item = obj[idx];
-                                        srcObj[name] = me.removeArrayItemByValue(srcObj[name], item);
-                                    }
+                                    if (override) {
+                                        destObj[name] = srcObj[name];
 
-                                    destObj[name] = destObj[name].concat(srcObj[name]);
+                                    } else {
+                                        size = destObj[name].length;
+                                        for (idx = 0; idx<size; idx++) {
+                                            item = obj[idx];
+                                            srcObj[name] = me.removeArrayItemByValue(srcObj[name], item);
+                                        }
+                                        destObj[name] = destObj[name].concat(srcObj[name]);
+                                    }
                                 }
 
                             } else {

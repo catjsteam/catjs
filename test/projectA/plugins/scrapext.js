@@ -12,19 +12,34 @@ module.exports = function () {
 
 
             _Scrap.add({name: "code", func: function (config) {
-                var code = this.get("code"),
+                var codeRows = this.get("code"),
+                    code,
                     me = this;
 
-                if (code) {
-                    code.forEach(function() {
-                        me.print(_tplutils.template({
-                            content: funcSnippetTpl,
-                            data: {
-                                comment:" Generated code according to the scrap comment (see @@code)",
-                                code:code
+                function _prepare(codeRows) {
+                    var row, rowTrimmed, size = (codeRows ? codeRows.length : 0), idx = 0;
+
+                    for (; idx<size; idx++) {
+                        row = codeRows[idx];
+                        if (row) {
+                            rowTrimmed = row.trim();
+                            if (rowTrimmed.indexOf(";") !== rowTrimmed.length -1) {
+                                codeRows[idx] += ";";
                             }
-                        }));
-                    });
+                        }
+                    }
+                }
+
+                if (codeRows) {
+                    _prepare(codeRows);
+                    code = codeRows.join("\n");
+                    me.print(_tplutils.template({
+                        content: funcSnippetTpl,
+                        data: {
+                            comment:" Generated code according to the scrap comment (see @@code)",
+                            code:code
+                        }
+                    }));
                 }
             }});
 
