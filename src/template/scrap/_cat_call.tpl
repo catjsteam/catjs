@@ -1,0 +1,1 @@
+_cat.core.define({{param1}});
