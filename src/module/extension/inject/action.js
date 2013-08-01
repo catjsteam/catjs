@@ -156,11 +156,17 @@ module.exports = _basePlugin.ext(function () {
                         if (injectinfo) {
                             removeOldCall();
                         }
-                        content = "console.log('cat scrap: " + scraplcl.get("name") + "'); ";
+                        //content = "console.log('cat scrap: " + scraplcl.get("name") + "'); ";
+                        content = _tplutils.template({
+                                name: "scrap/_cat_call",
+                                data: {param1:["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")}
+                            }
+                        );
+                        content = (_utils.prepareCode(content) || "");
                         if (prevCommentInfo) {
-                            line = [line.substring(0, prevCommentInfo.end.col), "console.log('cat scrap: " + scraplcl.get("name") + "'); " , line.substring(prevCommentInfo.end.col, line.length)].join("");
+                            line = [line.substring(0, prevCommentInfo.end.col), content , line.substring(prevCommentInfo.end.col, line.length)].join("");
                         } else {
-                            line = [line.substring(0, info.col), "console.log('cat scrap: " + scraplcl.get("name") + "'); " , line.substring(info.col, line.length)].join("");
+                            line = [line.substring(0, info.col), content , line.substring(info.col, line.length)].join("");
                         }
 
                         /*

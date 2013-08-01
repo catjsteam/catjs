@@ -1,6 +1,7 @@
 // TODO When CAT will go as library change the path
 var _Scrap = catrequire("cat.common.scrap"),
-    _tplutils = catrequire("cat.tpl.utils");
+    _tplutils = catrequire("cat.tpl.utils"),
+    _utils = catrequire("cat.utils");
 
 module.exports = function () {
 
@@ -16,22 +17,8 @@ module.exports = function () {
                     code,
                     me = this;
 
-                function _prepare(codeRows) {
-                    var row, rowTrimmed, size = (codeRows ? codeRows.length : 0), idx = 0;
-
-                    for (; idx<size; idx++) {
-                        row = codeRows[idx];
-                        if (row) {
-                            rowTrimmed = row.trim();
-                            if (rowTrimmed.indexOf(";") !== rowTrimmed.length -1) {
-                                codeRows[idx] += ";";
-                            }
-                        }
-                    }
-                }
-
                 if (codeRows) {
-                    _prepare(codeRows);
+                    _utils.prepareCode(codeRows);
                     code = codeRows.join("\n");
                     me.print(_tplutils.template({
                         content: funcSnippetTpl,

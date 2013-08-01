@@ -72,6 +72,29 @@ module.exports = function () {
         },
 
         /**
+         * Prepare code based on line break.
+         * Looking for character ";" at the end if not exists it will be added
+         * and each line will be trimmed.
+         *
+         * @param codeRows
+         */
+        prepareCode: function(codeRows) {
+            var row, rowTrimmed, size = (codeRows ? codeRows.length : 0), idx = 0;
+
+            for (; idx<size; idx++) {
+                row = codeRows[idx];
+                if (row) {
+                    rowTrimmed = row.trim();
+                    if (rowTrimmed.indexOf(";") !== rowTrimmed.length -1) {
+                        codeRows[idx] += ";";
+                    }
+                }
+            }
+
+            return codeRows;
+        },
+
+        /**
          *  Check if a given object contains a value
          *
          * @param obj The object that might contains
