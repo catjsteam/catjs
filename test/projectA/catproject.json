@@ -50,19 +50,13 @@
         {
             "name": "ext.scrap",
             "type": "scrapext",
+            "dependency": "dependency.loader"
+        },
+        {
+            "name": "target.libraries",
+            "type": "libraries",
             "dependency": "dependency.loader",
-            "filters": [
-                {
-                    "type": "file",
-                    "ext": ["*", ".jpg"],
-                    "exclude": true
-                },
-                {
-                    "type": "file",
-                    "ext": [".js"],
-                    "exclude": false
-                }
-            ]
+            "imports": ["cat.core.test"]
         },
         {
             "name": "init.copy",
@@ -119,7 +113,7 @@
         },
         {
             "name": "inject",
-            "plugins": ["ext.scrap", "target.inject", "project.install"]
+            "plugins": ["target.libraries", "ext.scrap", "target.inject", "project.install"]
         },
         {
             "name": "clean",

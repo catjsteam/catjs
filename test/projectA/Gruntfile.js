@@ -50,6 +50,7 @@ module.exports = function (grunt) {
             name: "test-1",
             outName: "cat.test",
             deployPath: "./deploy/",
+            srcPath: "./src/",
             targetPath: "./target/"
         },
 
@@ -63,7 +64,7 @@ module.exports = function (grunt) {
 
         jshint: {
             all: [
-                '<%=project.targetPath%><%= project.name %>/**/*.js'
+                '<%=project.srcPath%><%= project.name %>/**/*.js'
             ],
             options: {
                 "strict": false,
@@ -79,7 +80,9 @@ module.exports = function (grunt) {
                 "eqnull": true,
                 "node": true,
                 "es5": true,
-                globals: {}
+                globals: {
+                    _cat: true
+                }
             }
         },
 
@@ -89,7 +92,7 @@ module.exports = function (grunt) {
                 stripBanners: true
             },
             dist: {
-                src: ['<%=project.targetPath%><%= project.name %>/**/*.js'],
+                src: ['./lib/**/*.js', '<%=project.srcPath%><%= project.name %>/**/*.js'],
                 dest: '<%= project.deployPath %><%= project.outName %>.js'
             }
         },

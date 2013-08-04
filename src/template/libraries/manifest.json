@@ -1,0 +1,9 @@
+{
+    "libraries": [
+        {
+            "name": "cat",
+            "prod" :"cat.core.test.min.js",
+            "dev" :"cat.core.test.js"
+        }
+    ]
+}

@@ -59,13 +59,13 @@ module.exports = _basePlugin.ext(function () {
                     tplTargetFile = _path.normalize([srcFolder, "Cat.js"].join("/")),
                     mdata;
 
-                try {
-                    _utils.copySync(tplSrcFile, tplTargetFile);
-                    _mdata.update({project: {resources: [tplTargetFile]}});
-
-                } catch (e) {
-                    _log.error(_props.get("cat.file.copy.failed").format("[cat config]", tplFile, e));
-                }
+//                try {
+//                    _utils.copySync(tplSrcFile, tplTargetFile);
+//                    _mdata.update({project: {resources: [tplTargetFile]}});
+//
+//                } catch (e) {
+//                    _log.error(_props.get("cat.file.copy.failed").format("[cat config]", tplFile, e));
+//                }
 
             }
 

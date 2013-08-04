@@ -42,7 +42,7 @@ module.exports = function() {
                     "cat.common.parser": "src/module/common/parser/Parser.js",
                     "cat.watch": "src/module/Watch.js",
                     "cat.cache": "src/module/Cache.js",
-                    "cat.worker.project": "src/module/common/worker/project.js"
+                    "cat.plugin.spawn": "src/module/common/plugin/spawn.js"
                 };
 
                 global.catmodule = function (module) {
@@ -67,6 +67,7 @@ module.exports = function() {
                 };
 
                 global.cathome = home;
+                global.catlibs = _path.normalize([home, "src/template/libraries/"].join("/"));
 
             })();
 

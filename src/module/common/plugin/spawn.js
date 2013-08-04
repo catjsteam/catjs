@@ -19,7 +19,6 @@ module.exports = _basePlugin.ext(function () {
                     command,
                     options,
                     args,
-                    chilsp,
                     extensionParams = _data.data;
 
                 if (config && extensionParams) {
@@ -29,28 +28,53 @@ module.exports = _basePlugin.ext(function () {
                     options = extensionParams.options;
                     args = extensionParams.args;
 
-                    try {
+                    _module.spawn({
+                        spawn: spawn,
+                        command: command,
+                        options: options,
+                        args: args
+                    });
 
-                        chilsp = spawn(command, args, options);
-
-                        chilsp.stdout.on('data', function (data) {
-                            _log.info("[spawn info] " + data);
-                        });
-
-                        chilsp.stderr.on('data', function (data) {
-                            _log.error('[spawn error] ' + data);
-                        });
-
-                        chilsp.on('close', function (code) {
-                            if (code !== 0) {
-                                _log.info('[spawn close] exited with code ' + code);
-                            }
-                            _emitter.emit("job.done", {status: "done"});
-                        });
-                    } catch (e) {
-                        _utils.error(_props.get("cat.error").format("[spawn]", e));
-                    }
                 }
+            },
+
+            spawn: function(config) {
+
+                if (!config) {
+                    return undefined;
+                }
+
+                var chilsp,
+                    command = config.command,
+                    args = config.args,
+                    options = config.options,
+                    spawn = (config.spawn || require('child_process').spawn);
+
+                try {
+
+                    chilsp = spawn(command, args, options);
+
+                    chilsp.stdout.on('data', function (data) {
+                        _log.info("[spawn info] " + data);
+                    });
+
+                    chilsp.stderr.on('data', function (data) {
+                        _log.error('[spawn error] ' + data);
+                    });
+
+                    chilsp.on('close', function (code) {
+                        if (code !== 0) {
+                            _log.info('[spawn close] exited with code ' + code);
+                        }
+                        if (_emitter) {
+                            _emitter.emit("job.done", {status: "done"});
+                        }
+                    });
+                } catch (e) {
+                    _utils.error(_props.get("cat.error").format("[spawn]", e));
+                }
+
+                return chilsp;
             },
 
             /**

@@ -27,6 +27,8 @@ module.exports = _basePlugin.ext(function () {
          */
           _clean = function (dirs) {
 
+            var projectWorkPath = _global.get("home").working.path;
+
             function _delete(dir) {
                 if (dir) {
                     if (_fs.existsSync(dir)) {
@@ -58,7 +60,9 @@ module.exports = _basePlugin.ext(function () {
                 _log.warning(_props.get("cat.arguments").format("[clean action]", typeof(dirs)));
             }
 
-            _delete([_global.get("home").working.path, "_cat_md.json"].join("/"));
+            // TODO consider removeing all log created files.. or copy it to an archive folder
+            _delete([projectWorkPath, "_cat_md.json"].join("/"));
+            _delete([projectWorkPath, "lib"].join("/"));
 
             emitter.emit("job.done", {status: "done"});
 
