@@ -58,6 +58,10 @@ module.exports = function () {
                 content = (this.exists() ? this.read() : undefined),
                 validate;
 
+            if (!content) {
+                return undefined;
+            }
+
             content = JSON.parse(content);
             if (config && content) {
 

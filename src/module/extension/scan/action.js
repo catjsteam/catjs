@@ -62,7 +62,6 @@ module.exports = _basePlugin.ext(function () {
             walk(dir, function (err, results) {
 
                 emitter.emit("scan.done", {results: results});
-                emitter.emit("job.done", {status: "done"});
 
                 if (err) {
                     emitter.emit("scan.error", {error: err});
@@ -133,6 +132,12 @@ module.exports = _basePlugin.ext(function () {
              */
             init: function (config, ext) {
                 _me.initialize(config, ext);
+
+                var emitter = _me.getEmitter();
+                emitter.on("job.wait", function(){
+                    emitter.emit("job.done", {status: "done"});
+                });
+
 
             }
         };

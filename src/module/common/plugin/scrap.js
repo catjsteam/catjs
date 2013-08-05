@@ -15,7 +15,8 @@ module.exports = _basePlugin.ext(function () {
         _me = this,
         _emitter,
         _module,
-        _parsers = {};
+        _parsers = {},
+        _wait = 0;
 
 
     /**
@@ -44,6 +45,13 @@ module.exports = _basePlugin.ext(function () {
         return scrap;
     }
 
+    function _jobScrapWait() {
+        if (_wait === 2) {
+            _emitter.emit("job.wait", {status: "done"});
+        }
+        _wait=0;
+    }
+
     _module = {
 
         /**
@@ -56,6 +64,14 @@ module.exports = _basePlugin.ext(function () {
             _emitter.removeListener("scan.file", _module.file);
             //_emitter.removeListener("scan.folder", _module.folder);
             _emitter.removeListener("scan.done", _module.done);
+
+            if (!_wait) {
+                _emitter.emit("job.wait", {status: "done"});
+            } else {
+                _wait=2;
+            }
+            //
+           // _emitter.removeListener("job.scrap.wait", _jobCopyWait);
         },
 
         /**
@@ -65,6 +81,8 @@ module.exports = _basePlugin.ext(function () {
          * @returns {undefined}
          */
         file: function (file) {
+
+            _wait = 1;
 
             var from = file,
                 filters = _me.getFilters(),
@@ -88,7 +106,7 @@ module.exports = _basePlugin.ext(function () {
                         if (comments && _typedas.isArray(comments)) {
 
                             scraps = _extractValidScrapRoot(comments);
-                            if (scraps) {
+                            if (scraps && _typedas.isArray(scraps) && scraps.length > 0) {
                                 size = scraps.length;
                                 for (; idx < size; idx++) {
                                     scrapComment = scraps[idx];
@@ -108,7 +126,11 @@ module.exports = _basePlugin.ext(function () {
                                 }
                                 _Scrap.normalize(scrapObjs);
                             }
+
                         }
+
+                        _emitter.emit("job.scrap.wait", {status: "wait"});
+
                     }});
                 } else {
                     _log.debug("[Copy Action] filter match, skipping file: " + from);
@@ -121,12 +143,7 @@ module.exports = _basePlugin.ext(function () {
          *
          * @param folder
          */
-        folder: function (folder) {
-//            var tmpFolder;
-//            if (_me.isDisabled()) {
-//                return undefined;
-//            }
-        },
+        folder: function (folder) {},
 
         /**
          * Get All listeners
@@ -184,10 +201,13 @@ module.exports = _basePlugin.ext(function () {
 
             // Listen to the process emitter
             if (_emitter) {
+                _emitter.removeListener("job.scrap.wait", _jobScrapWait);
                 _emitter.on("scan.init", _module.initListener);
                 _emitter.on("scan.done", _module.done);
                 _emitter.on("scan.file", _module.file);
+                _emitter.on("job.scrap.wait", _jobScrapWait);
                 //_emitter.on("scan.folder", _module.folder);
+                _wait = 0;
             } else {
                 _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
             }

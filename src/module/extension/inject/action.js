@@ -196,7 +196,7 @@ module.exports = _basePlugin.ext(function () {
                 }
             });
 
-            _lineReader.eachLine(file,function (line) {
+            _lineReader.eachLine(file, function (line) {
 
                 line = _injectCodeByScrap(line);
                 lines.push(line + "\n");

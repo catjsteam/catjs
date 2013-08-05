@@ -1,14 +1,15 @@
 var _utils = catrequire("cat.utils"),
     _log = catrequire("cat.global").log(),
     _typedas = require("typedas"),
-    _path = require("path");
+    _path = require("path"),
+    _minimatch = require("minimatch");
 
 /**
  * Abstract Base plugin functionality
  *
  * @type {module.exports}
  */
-module.exports = function() {
+module.exports = function () {
 
     // TODO consider auto generate straightforward getter / setter
     function _base(proto) {
@@ -18,30 +19,30 @@ module.exports = function() {
         proto._from = null;
         proto._data = null;
 
-        proto.dataInit = function(data) {
+        proto.dataInit = function (data) {
             if (data) {
                 this._data = data;
                 _utils.copyObjProps(data, this);
             }
         };
 
-        proto.isDisabled = function() {
+        proto.isDisabled = function () {
             return this._disabled;
         };
 
-        proto.setDisabled = function(bol) {
+        proto.setDisabled = function (bol) {
             this._disabled = bol;
         };
 
-        proto.setTo = function(to) {
+        proto.setTo = function (to) {
             this._to = to;
         };
 
-        proto.getTo = function() {
+        proto.getTo = function () {
 
             var toFolder;
             if (!this._to) {
-                toFolder = (this._data? this._data.to : undefined);
+                toFolder = (this._data ? this._data.to : undefined);
                 if (!toFolder || !(toFolder && toFolder.path)) {
                     _log.error("[copy action] copy operation disabled, No valid 'to' folder configuration, to where should I copy your source folder/files ?!");
                     this.setDisabled(true);
@@ -51,11 +52,11 @@ module.exports = function() {
             return this._to;
         };
 
-        proto.getFrom = function() {
+        proto.getFrom = function () {
             return this._from;
         };
 
-        proto.getFilters = function() {
+        proto.getFilters = function () {
             return this.filters;
         };
 
@@ -68,30 +69,61 @@ module.exports = function() {
          */
         proto.applyFileExtFilters = function (filters, typeObj) {
 
-            var exitCondition = 0;
+            var exitCondition = 0,
+                me = this;
+
+            function patternMatch() {
+                if (!this.pattern) {
+                    return false;
+                }
+                var size = this.ext.length, idx = 0, item;
+
+                for (; idx<size; idx++) {
+                    item = this.pattern[idx];
+                    if (_minimatch(typeObj, item, { matchBase: true })) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function extMatch() {
+
+                if (!this.ext) {
+                    return undefined;
+                }
+                var extName = _path.extname(typeObj),
+                    size = this.ext.length, idx = 0, item,
+                    isPattern;
+
+                for (; idx<size; idx++) {
+                    item = this.ext[idx];
+                    if ( (item === extName || item === "*") ) {
+
+                        // take the parent into the condition
+                        if (this.pattern) {
+                            isPattern = patternMatch.call(this);
+                            if (!isPattern) {
+                                continue;
+                            }
+                        }
+
+                        if (!this.exclude) {
+                            exitCondition = 0;
+                        } else {
+                            exitCondition = 1;
+                        }
+
+                    }
+                }
+            }
 
             if (typeObj && filters && _typedas.isArray(filters)) {
 
                 filters.forEach(function (filter) {
                     if (filter) {
-                        filter.apply(function() {
-
-                            var extName = _path.extname(typeObj),
-                                me = this;
-                            if (this.ext) {
-                                this.ext.forEach(function(item) {
-                                    if ((item === extName || item === "*")) {
-                                        if (me.exclude) {
-                                            exitCondition++;
-                                        } else {
-                                            exitCondition--;
-                                        }
-
-                                    }
-                                });
-                                // break;
-                            }
-
+                        filter.apply(function () {
+                            extMatch.call(this);
                         });
                     }
                 });
@@ -108,7 +140,7 @@ module.exports = function() {
     }
 
     return {
-        ext: function(fn) {
+        ext: function (fn) {
             if (fn) {
                 _base(fn.prototype);
             }

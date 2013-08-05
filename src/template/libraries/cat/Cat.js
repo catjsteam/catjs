@@ -10,7 +10,7 @@ _cat.core = function() {
          * @param config
          */
         define: function(config) {
-
+            console.log("Cat defined: ", config);
 
         }
 

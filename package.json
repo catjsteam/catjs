@@ -47,7 +47,8 @@
     "watch": "~0.8.0",
     "date-format-lite": "~0.1.5",
     "line-by-line": "~0.1.1",
-    "underscore": "~1.5.1"
+    "underscore": "~1.5.1",
+    "minimatch": "~0.2.12"
   },
   "peerDependencies": {
     "grunt": "~0.4.1"

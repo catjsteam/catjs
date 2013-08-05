@@ -60,7 +60,8 @@ module.exports = _basePlugin.ext(function () {
         _module,
         _errors,
         _internalConfig,
-        _project;
+        _project,
+        _wait = 0;
 
 
     function _getRelativeFile(file) {
@@ -70,6 +71,13 @@ module.exports = _basePlugin.ext(function () {
         return file.substring(_basePath.length);
     }
 
+    function _jobCopyWait() {
+        if (_wait === 2) {
+            _emitter.emit("job.wait", {status: "done"});
+        }
+        _wait=0;
+    }
+
     _module = {
 
         done: function () {
@@ -77,9 +85,19 @@ module.exports = _basePlugin.ext(function () {
             _emitter.removeListener("scan.file", _module.file);
             _emitter.removeListener("scan.folder", _module.folder);
             _emitter.removeListener("scan.done", _module.done);
+
+            if (!_wait) {
+                _emitter.emit("job.wait", {status: "done"});
+            } else {
+                _wait=2;
+            }
+            //_emitter.on("job.copy.wait", _jobCopyWait);
+            //_emitter.removeListener("job.copy.wait", _jobCopyWait);
+
         },
 
         file: function (file) {
+            _wait = 1;
 
             var from = file,
                 filters = _me.getFilters(),
@@ -107,9 +125,14 @@ module.exports = _basePlugin.ext(function () {
                     _log.debug("[Copy Action] filter match, skipping file: " + from);
                 }
             }
+
+            _emitter.emit("job.copy.wait", {status: "wait"});
+
         },
 
         folder: function (folder) {
+            _wait = 1;
+
             var tmpFolder;
 
             if (_me.isDisabled()) {
@@ -129,6 +152,9 @@ module.exports = _basePlugin.ext(function () {
                     _log.debug("[Copy Action] filter match, skipping file: " + tmpFolder);
                 }
             }
+
+            _emitter.emit("job.copy.wait", {status: "wait"});
+
         },
 
         getListeners: function (eventName) {
@@ -191,10 +217,13 @@ module.exports = _basePlugin.ext(function () {
 
             // Listen to the process emitter
             if (_emitter) {
+                _emitter.removeListener("job.copy.wait", _jobCopyWait);
                 _emitter.on("scan.init", _module.initListener);
                 _emitter.on("scan.file", _module.file);
                 _emitter.on("scan.folder", _module.folder);
                 _emitter.on("scan.done", _module.done);
+                _emitter.on("job.copy.wait", _jobCopyWait);
+                _wait = 0;
             } else {
                 _log.warning("[copy action] No valid emitter, failed to assign listeners");
             }

@@ -67,6 +67,38 @@ module.exports = function () {
                 }
             }
 
+            function _cleanObjectNoise(obj) {
+
+                function _cleanStringNoise(obj) {
+                    obj = obj.split("\r").join("");
+                    obj = obj.split("\n").join("");
+                    obj = obj.split("\t").join("    ");
+
+                    return obj;
+                }
+
+                var idx = 0, size = 0, item;
+
+                if (obj) {
+                    if (_typedas.isString(obj)) {
+
+                        return _cleanStringNoise(obj);
+
+                    } else if (_typedas.isArray(obj)) {
+
+                        size = obj.length;
+                        for (idx=0; idx<size; idx++) {
+                            item = obj[idx];
+                            if (item) {
+                                obj[idx] = _cleanStringNoise(item);
+                            }
+                        }
+
+                        return obj;
+                    }
+                }
+            }
+
             if (!config) {
                 _utils.error(_props.get("cat.error.config").format("[Scrap Entity]"));
             }
@@ -101,6 +133,7 @@ module.exports = function () {
                             me[key] = function () {
 
                                 value = this.config[key];
+                                value = _cleanObjectNoise(value);
                                 if (value !== undefined && value !== null) {
                                     if (_utils.contains(_scrapEnum.singleTypes, key)) {
                                         // return only the first cell since we types this key as a single scrap value (the last cell takes)
@@ -179,7 +212,8 @@ module.exports = function () {
          * @returns {Array}
          * @private
          */
-            _extractScrapBlock = function (scrapCommentBlock) {
+         _extractScrapBlock = function (scrapCommentBlock) {
+
             var idx = 0, size, comment, commentobj,
                 scrap = [-1, -1],
                 lineNumber = [0, 0],
@@ -215,7 +249,7 @@ module.exports = function () {
                                 // extract scrap name from the first block comment e.g. @[name
                                 tmpString = comment.substring(scrap[0]);
                                 tmpPos = (tmpString.indexOf(" "));
-                                tmpPos = (tmpPos === -1 ? tmpPos = tmpString.length : tmpPos);
+                                tmpPos = (tmpPos === -1 ? tmpPos = (tmpString.indexOf(_scrapEnum.name) + _scrapEnum.name.length) : tmpPos);
                                 scrapBlockName = tmpString.substring(_scrapEnum.open.length, tmpPos);
                                 lineNumber[0] = commentobj.number;
                             }
