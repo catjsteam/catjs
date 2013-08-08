@@ -167,8 +167,6 @@ module.exports = _basePlugin.ext(function () {
 
         initListener: function (config) {
 
-            var projectInfo;
-
             _basePath = (config ? config.path : undefined);
             if (!_basePath) {
                 _utils.error("[Scrap Plugin] No valid base path");
@@ -177,6 +175,7 @@ module.exports = _basePlugin.ext(function () {
             // TODO refactor - create proper functionality in the configuration target
             if (!_to) {
                 // setting 'folder name' project
+                // TODO change it to _project.getTargetFolder
                 if (_global) {
                     _targetFolderName = _global.name;
 

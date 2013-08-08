@@ -107,6 +107,10 @@ module.exports = function (config) {
         if (ext) {
             extensionConfig = (extensionConfig ? extensionConfig : catconfig.getExtension(ext));
             extConfig = internalConfig.getExtension(extensionConfig.type);
+            if (!extConfig) {
+                _log.error(_props.get("cat.config.task.ext.missing").format("[task config]", extensionConfig.type, ext));
+                return undefined;
+            }
             phase = ( extConfig.ext ? extConfig.ext.getPhase() : "default");
 
             // extensions initialization

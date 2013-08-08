@@ -62,6 +62,25 @@ module.exports = function () {
 
         copySync: _copySync,
 
+        log: function(type, msg) {
+            if (type) {
+                _log[type](msg);
+            }
+
+            if (type === "info") {
+                type = "log";
+
+            } else if (type === "warning") {
+                type = "warn";
+            }
+
+            if (console[type]) {
+                console[type](msg);
+            } else {
+                console.log("Console has no support for function: '" + type + "'");
+            }
+        },
+
         error: function (msg) {
             _log.error(msg);
             throw msg;

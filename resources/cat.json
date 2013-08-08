@@ -1,6 +1,13 @@
 {
     "extensions" : [
         {
+            "name": "webserver",
+            "impl": "src/module/extension/webserver/action.js"
+        },
+        {
+            "name": "phantomjs",
+            "impl": "src/module/extension/phantomjs/action.js"
+        },    {
             "name": "spawn",
             "impl": "src/module/extension/spawn/action.js"
         },

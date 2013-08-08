@@ -53,7 +53,6 @@ var CAT = function () {
 
     function _runme(watch) {
 
-        _runTask(_targets[_counter], watch);
         _emitter.on("job.done", function (obj) {
             _counter++;
             if (_counter < _targets.length) {
@@ -61,6 +60,7 @@ var CAT = function () {
                 _runme(watch);
             }
         });
+        _runTask(_targets[_counter], watch);
     }
 
     (function () {

@@ -1,4 +1,6 @@
 var _utils = catrequire("cat.utils"),
+    _global = catrequire("cat.global"),
+    _props = catrequire("cat.props"),
     _log = catrequire("cat.global").log(),
     _typedas = require("typedas"),
     _path = require("path"),
@@ -44,8 +46,8 @@ module.exports = function () {
             if (!this._to) {
                 toFolder = (this._data ? this._data.to : undefined);
                 if (!toFolder || !(toFolder && toFolder.path)) {
-                    _log.error("[copy action] copy operation disabled, No valid 'to' folder configuration, to where should I copy your source folder/files ?!");
-                    this.setDisabled(true);
+                    toFolder = {path: _global.get("home").working.path};
+                    _log.info(_props.get("cat.project.property.default.value").format("[base plugin]", "path", toFolder.path));
                 }
                 this.setTo(toFolder.path);
             }

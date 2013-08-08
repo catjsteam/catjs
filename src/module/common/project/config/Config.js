@@ -242,6 +242,10 @@ module.exports = function Config(config) {
         return plugin;
     };
 
+    this.getTargetFolder = function() {
+        return _path.join(_global.get("home").working.path, "target", this.name);
+    };
+
     this.getInfo = function () {
         return this.info;
     };

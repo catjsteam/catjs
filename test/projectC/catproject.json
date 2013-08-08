@@ -8,20 +8,29 @@
             "path": ["./plugins/"]
         },
         {
-            "name": "project.spawn",
+            "name": "spawn.ext",
             "type": "spawn"
-        },{
-            "name": "source.scan",
-            "type": "scan",
-            "path": "/home/arik/dev/projects/cat/test/cat-test-app"
         },
         {
-            "name": "project.scan",
+            "name": "phantomjs.ext",
+            "type": "phantomjs"
+        },
+        {
+            "name": "webserver.ext",
+            "type": "webserver"
+        },
+        {
+            "name": "scan.ext",
             "type": "scan"
         },
         {
-            "name": "project.inject",
+            "name": "inject.ext",
             "type": "inject"
+        },
+        {
+            "name": "source.scan",
+            "type": "scan",
+            "path": "/home/arik/dev/projects/cat/test/cat-test-app"
         },
         {
             "name": "target.clean",
@@ -33,7 +42,7 @@
         {
             "name": "init.scrap",
             "type": "scrap",
-            "dependency": "project.scan",
+            "dependency": "scan.ext",
             "filters": [
                 {
                     "type": "file",
@@ -90,21 +99,40 @@
         {
             "name": "target.inject",
             "type": "inject",
-            "dependency": "project.inject"
+            "dependency": "inject.ext"
         },
         {
             "name": "project.install",
             "type": "spawn",
-            "dependency": "project.spawn",
+            "dependency": "spawn.ext",
             "command": "grunt",
             "args": ["install", "--no-color"]
         },
         {
             "name": "project.clean",
             "type": "spawn",
-            "dependency": "project.spawn",
+            "dependency": "spawn.ext",
             "command": "grunt",
             "args": ["clean", "--no-color"]
+        },
+        {
+            "name": "project.phantomjs",
+            "type": "phantomjs",
+            "dependency": "phantomjs.ext",
+            "file": "phantomjs-script.js",
+            "host": "http://localhost:8089"
+        },
+        {
+            "name": "project.webserver.start",
+            "type": "webserver",
+            "dependency": "webserver.ext",
+            "action": "start"
+        },
+        {
+            "name": "project.webserver.stop",
+            "type": "webserver",
+            "dependency": "webserver.ext",
+            "action": "stop"
         }
     ],
 
@@ -124,6 +152,18 @@
         {
             "name": "clean",
             "plugins": ["target.clean", "project.clean"]
+        },
+        {
+            "name": "test",
+            "plugins": ["project.phantomjs"]
+        },
+        {
+            "name": "server.start",
+            "plugins": ["project.webserver.start"]
+        },
+        {
+            "name": "server.stop",
+            "plugins": ["project.webserver.stop"]
         }
     ]
 
