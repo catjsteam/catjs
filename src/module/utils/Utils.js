@@ -7,26 +7,26 @@ var _ = require("underscore"),
 
 module.exports = function () {
 
-        /**
-         * Synchronized process for creating folder recursively
-         */
-            _mkdirSync = function (folder) {
-            if (!_fs.existsSync(folder)) {
-                try {
-                    _fs.mkdirRecursiveSync(folder);
-                    _log.debug("[copy action] target folder was created: " + folder);
+    /**
+     * Synchronized process for creating folder recursively
+     */
+    _mkdirSync = function (folder) {
+        if (!_fs.existsSync(folder)) {
+            try {
+                _fs.mkdirRecursiveSync(folder);
+                _log.debug("[copy action] target folder was created: " + folder);
 
-                } catch (e) {
-                    _log.error("[copy action] failed to create target dir: " + folder);
-                    throw e;
-                }
+            } catch (e) {
+                _log.error("[copy action] failed to create target dir: " + folder);
+                throw e;
             }
-        },
+        }
+    },
 
-        /**
-         * Copy file synchronized
-         */
-         _copySync = function (source, target, cb) {
+    /**
+     * Copy file synchronized
+     */
+        _copySync = function (source, target, cb) {
             var cbCalled = false,
                 me = this;
 
@@ -62,7 +62,7 @@ module.exports = function () {
 
         copySync: _copySync,
 
-        log: function(type, msg) {
+        log: function (type, msg) {
             if (type) {
                 _log[type](msg);
             }
@@ -97,14 +97,14 @@ module.exports = function () {
          *
          * @param codeRows
          */
-        prepareCode: function(codeRows) {
+        prepareCode: function (codeRows) {
             var row, rowTrimmed, size = (codeRows ? codeRows.length : 0), idx = 0;
 
-            for (; idx<size; idx++) {
+            for (; idx < size; idx++) {
                 row = codeRows[idx];
                 if (row) {
                     rowTrimmed = row.trim();
-                    if (rowTrimmed.indexOf(";") !== rowTrimmed.length -1) {
+                    if (rowTrimmed.indexOf(";") !== rowTrimmed.length - 1) {
                         codeRows[idx] += ";";
                     }
                 }
@@ -134,13 +134,13 @@ module.exports = function () {
             return false;
         },
 
-        removeArrayItemByIdx: function(arr, idx) {
+        removeArrayItemByIdx: function (arr, idx) {
             var newArr = [],
                 counter = 0;
 
             if (arr && _typedas.isArray(arr)) {
 
-                arr.forEach(function(item) {
+                arr.forEach(function (item) {
                     if (idx !== counter) {
                         newArr.push(item);
                     }
@@ -150,13 +150,13 @@ module.exports = function () {
             return newArr;
         },
 
-         removeArrayItemByValue: function(arr, value) {
+        removeArrayItemByValue: function (arr, value) {
             var newArr = [],
                 counter = 0;
 
             if (arr && _typedas.isArray(arr)) {
 
-                arr.forEach(function(item) {
+                arr.forEach(function (item) {
                     if (item !== value && item !== null && item !== undefined) {
                         newArr.push(item);
                     }
@@ -164,14 +164,14 @@ module.exports = function () {
                 });
             }
 
-             return newArr;
+            return newArr;
         },
 
-        cleanupArray: function(arr) {
-            var newArr  = [];
+        cleanupArray: function (arr) {
+            var newArr = [];
 
             if (arr && _typedas.isArray(arr)) {
-                arr.forEach(function(item){
+                arr.forEach(function (item) {
                     if (item !== null && item !== undefined) {
                         newArr.push(item)
                     }
@@ -193,43 +193,48 @@ module.exports = function () {
 
             var name, obj,
                 me = this,
-                idx= 0, size= 0, item;
+                idx = 0, size = 0, item;
 
             override = (override || false);
 
             if (srcObj && destObj) {
                 for (name in srcObj) {
+
                     if (srcObj.hasOwnProperty(name)) {
+
                         obj = destObj[name];
-                        if (!obj) {
-                            destObj[name] = srcObj[name];
-                        } else {
-                            if (_typedas.isObject(srcObj[name])) {
-                                arguments.callee.call(me, srcObj[name], destObj[name], override);
 
-                            } else if (_typedas.isArray(srcObj[name])) {
-                                if (_typedas.isArray(obj)) {
+                        if (_typedas.isObject(srcObj[name])) {
+                            if (!destObj[name]) {
+                                destObj[name] = {};
+                            }
+                            arguments.callee.call(me, srcObj[name], destObj[name], override);
 
-                                    me.cleanupArray(srcObj[name]);
-                                    if (override) {
-                                        destObj[name] = srcObj[name];
+                        } else if (_typedas.isArray(srcObj[name])) {
+                            if (_typedas.isArray(obj)) {
 
-                                    } else {
-                                        size = destObj[name].length;
-                                        for (idx = 0; idx<size; idx++) {
-                                            item = obj[idx];
-                                            srcObj[name] = me.removeArrayItemByValue(srcObj[name], item);
-                                        }
-                                        destObj[name] = destObj[name].concat(srcObj[name]);
+                                me.cleanupArray(srcObj[name]);
+                                if (override) {
+                                    destObj[name] = srcObj[name];
+
+                                } else {
+                                    size = destObj[name].length;
+                                    for (idx = 0; idx < size; idx++) {
+                                        item = obj[idx];
+                                        srcObj[name] = me.removeArrayItemByValue(srcObj[name], item);
                                     }
+                                    destObj[name] = destObj[name].concat(srcObj[name]);
                                 }
+                            }
 
-                            } else {
-                                if (override || obj === undefined) {
+                        } else {
+                            if (override || obj === undefined) {
+                                if (!destObj[name] || (destObj[name] && override)) {
                                     destObj[name] = srcObj[name];
                                 }
                             }
                         }
+
                     }
                 }
             }

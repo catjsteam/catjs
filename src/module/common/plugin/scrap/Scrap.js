@@ -9,8 +9,7 @@ module.exports = function () {
 
     var __id = 0,
 
-        _getScrapEnum = function (key) {
-            var obj = {};
+        _getScrapEnum = function (key, obj) {
             _utils.copyObjProps(_scrapEnum[key], obj);
 
             return obj;
@@ -70,9 +69,12 @@ module.exports = function () {
             function _cleanObjectNoise(obj) {
 
                 function _cleanStringNoise(obj) {
-                    obj = obj.split("\r").join("");
-                    obj = obj.split("\n").join("");
-                    obj = obj.split("\t").join("    ");
+                    if (!obj) {
+                        return obj;
+                    }
+                    obj = (obj.indexOf("\r") !== -1 ? obj.split("\r").join("") : obj);
+                    obj = (obj.indexOf("\n") !== -1 ? obj.split("\n").join("") : obj);
+                    obj = (obj.indexOf("\t") !== -1 ? obj.split("\t").join("    ") : obj);
 
                     return obj;
                 }
@@ -87,7 +89,7 @@ module.exports = function () {
                     } else if (_typedas.isArray(obj)) {
 
                         size = obj.length;
-                        for (idx=0; idx<size; idx++) {
+                        for (idx = 0; idx < size; idx++) {
                             item = obj[idx];
                             if (item) {
                                 obj[idx] = _cleanStringNoise(item);
@@ -96,7 +98,10 @@ module.exports = function () {
 
                         return obj;
                     }
+
                 }
+
+                return obj;
             }
 
             if (!config) {
@@ -212,16 +217,19 @@ module.exports = function () {
          * @returns {Array}
          * @private
          */
-         _extractScrapBlock = function (scrapCommentBlock) {
+            _extractScrapBlock = function (scrapCommentBlock) {
 
             var idx = 0, size, comment, commentobj,
                 scrap = [-1, -1],
                 lineNumber = [0, 0],
-                commentBlock = _getScrapEnum("scrapinfo"),
+                commentBlock = {},
                 scraps = [],
                 currentScrap = [],
                 scrapBlockName,
                 tmpString, tmpPos;
+
+            // copy initial scrap info object template
+            _getScrapEnum("scrapinfo", commentBlock);
 
             if (scrapCommentBlock) {
                 size = scrapCommentBlock.length;
@@ -263,7 +271,14 @@ module.exports = function () {
                             currentScrap.push(comment);
                             if (scrapBlockName === _scrapEnum.name) {
                                 lineNumber[1] = commentobj.number;
-                                scraps.push({name: scrapBlockName, rows: currentScrap.splice(0), start: {line: lineNumber[0], col: scrap[0]}, end: {line: lineNumber[1], col: scrap[1]}, comment: commentBlock });
+                                scraps.push(
+                                    {
+                                        name: scrapBlockName,
+                                        rows: currentScrap.splice(0),
+                                        start: {line: lineNumber[0], col: scrap[0]},
+                                        end: {line: lineNumber[1], col: scrap[1]},
+                                        comment: commentBlock
+                                    });
                             }
                             if (scrap[0] < -1 || lineNumber[0] > lineNumber[1]) {
                                 currentScrap = [];
@@ -329,13 +344,13 @@ module.exports = function () {
 
             var scrapBlock,
                 file,
-                fileinfo,
+                fileinfo = {},
                 commentinfo;
 
             if (configArg) {
                 scrapBlock = configArg.scrapComment;
                 if (scrapBlock) {
-                    fileinfo = _getScrapEnum("scrapinfo");
+                    _getScrapEnum("scrapinfo", fileinfo);
                     fileinfo.start = scrapBlock.start;
                     fileinfo.end = scrapBlock.end;
                     commentinfo = scrapBlock.comment;
@@ -400,11 +415,11 @@ module.exports = function () {
             return scrap;
         },
 
-        normalize: function(scraps) {
+        normalize: function (scraps) {
             var config = { files: {}}
 
             if (scraps) {
-                scraps.forEach(function(scrap) {
+                scraps.forEach(function (scrap) {
                     var fileName;
                     if (scrap) {
                         fileName = scrap.get("file");

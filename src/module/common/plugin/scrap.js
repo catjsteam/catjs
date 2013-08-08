@@ -85,10 +85,7 @@ module.exports = _basePlugin.ext(function () {
             _wait = 1;
 
             var from = file,
-                filters = _me.getFilters(),
-                scrapComment,
-                scrap, scraps, scrapObjs=[],
-                size, idx = 0;
+                filters = _me.getFilters();
 
             if (_me.isDisabled()) {
                 return undefined;
@@ -103,12 +100,16 @@ module.exports = _basePlugin.ext(function () {
                     }
                     _parsers["Comment"].parse({file: file, callback: function (comments) {
 
+                        var scrapComment,
+                            scrap, scraps, scrapObjs=[],
+                            size = 0, idx = 0;
+
                         if (comments && _typedas.isArray(comments)) {
 
                             scraps = _extractValidScrapRoot(comments);
                             if (scraps && _typedas.isArray(scraps) && scraps.length > 0) {
                                 size = scraps.length;
-                                for (; idx < size; idx++) {
+                                for (idx = 0; idx < size; idx++) {
                                     scrapComment = scraps[idx];
                                     scrap = _Scrap.create({
                                         file: file,
