@@ -85,7 +85,7 @@ module.exports = function (grunt) {
                 stripBanners: true
             },
             dist: {
-                src: ['./<%=cat.env.lib.source%>/**/*.js', '<%=cat.env.source%><%= cat.env.lib.name %>/**/*.js'],
+                src: ['./<%=cat.env.lib.source%>/**/*.js', './<%=cat.env.source%>/**/*.js'],
                 dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.js'
             }
         },
@@ -109,7 +109,7 @@ module.exports = function (grunt) {
 
 
     grunt.registerTask('install', function () {
-        grunt.task.run(['jshint', 'concat', 'uglify']);
+        grunt.task.run(['clean', 'jshint', 'concat', 'uglify']);
     });
 
     grunt.registerTask('cat.compile', function () {

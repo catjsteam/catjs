@@ -45,7 +45,7 @@ module.exports = _basePlugin.ext(function () {
                 var library = libraries[slot],
                     process1, process2,
                     workPath = _path.normalize([global.catlibs, library.name].join("/")),
-                    catProjectLib = (_project ? _project.getInfo("lib.target") : undefined),
+                    catProjectLib = (_project ? _project.getInfo("lib.source") : undefined),
                     targetManifestPath = [catProjectLib, manifestFileName].join("/");
 
                 // copy the manifest file

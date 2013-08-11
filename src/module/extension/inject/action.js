@@ -10,7 +10,8 @@ var _fs = require('fs.extra'),
     _props = catrequire("cat.props"),
     _basePlugin = require("./../Base.js"),
     _project = catrequire("cat.project"),
-    _beautify = require('js-beautify').js_beautify;
+    _beautify = require('js-beautify').js_beautify,
+    _extutils = catrequire("cat.ext.utils");
 
 
 /**
@@ -31,9 +32,11 @@ module.exports = _basePlugin.ext(function () {
          */
             _generateSourceProject = function (scraps, file) {
 
-            function _generateFileContent(scraps) {
+            function _generateCATFileInfo(scraps, targetfile) {
 
-                var output = [];
+                var output = [],
+                    info,
+                    projectTarget = _me._project.getInfo("target");
 
                 scraps.forEach(function (scrap) {
                     scrap.apply(scrap);
@@ -42,12 +45,59 @@ module.exports = _basePlugin.ext(function () {
                 scraps.forEach(function (scrap) {
                     output.push(_tplutils.template({
                             name: "scrap/_func",
-                            data: {name: scrap.get("name"), output: scrap.generate()}
+                            data: {
+                                name: _extutils.getCATInfo({scrap:scrap, file:file, basepath: projectTarget}).pkgName,
+                                output: scrap.generate()}
                         }
                     ));
                 });
 
-                return output.join("");
+                return {
+                    output: output.join(""),
+                    file: _extutils.getCATInfo({file: targetfile}).file
+                };
+
+            }
+
+            function _generateUserFileInfo(scraps, targetfile) {
+
+                var output = [],
+                    projectTarget = _me._project.getInfo("target");
+
+                scraps.forEach(function (scrap) {
+                    scrap.apply(scrap);
+                });
+
+                scraps.forEach(function (scrap) {
+                    output.push(_tplutils.template({
+                            name: "scrap/_func_user",
+                            data: {name: _extutils.getUserInfo({scrap:scrap, file:file, basepath: projectTarget}).pkgName,
+                                func: "" }
+                        }
+                    ));
+                });
+
+                return {
+                    output : output.join(""),
+                    file:  _extutils.getUserInfo({file: targetfile}).file
+                };
+
+            }
+
+            function _writeContentToFile(scraps, contentFunc, targetfile) {
+
+                var info = contentFunc.call(this, scraps, targetfile),
+                    fileContent = info.output;
+
+                if (fileContent) {
+                    fileContent = _beautify(fileContent, { indent_size: 2 });
+                    try {
+                        _fs.writeFileSync(info.file, fileContent);
+                        _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
+                    } catch (e) {
+                        _utils.error(_props.get("cat.error").format("[inject ext]", e));
+                    }
+                }
 
             }
 
@@ -70,7 +120,7 @@ module.exports = _basePlugin.ext(function () {
             }
 
             var filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
-                targetfile, targetfolder, fileContent;
+                targetfile, targetfolder;
 
             // copy resources
             copyResources();
@@ -86,16 +136,8 @@ module.exports = _basePlugin.ext(function () {
                 _log.debug(_props.get("cat.source.project.file.exists").format("[inject ext]", targetfile));
             }
 
-            fileContent = _generateFileContent(scraps);
-            if (fileContent) {
-                fileContent = _beautify(fileContent, { indent_size: 2 });
-                try {
-                    _fs.writeFileSync(targetfile, fileContent);
-                    _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
-                } catch (e) {
-                    _utils.error(_props.get("cat.error").format("[inject ext]", e));
-                }
-            }
+            _writeContentToFile(scraps, _generateCATFileInfo, targetfile);
+            _writeContentToFile(scraps, _generateUserFileInfo, targetfile);
 
         },
 
@@ -149,7 +191,7 @@ module.exports = _basePlugin.ext(function () {
                         //content = "console.log('cat scrap: " + scraplcl.get("name") + "'); ";
                         content = _tplutils.template({
                                 name: "scrap/_cat_call",
-                                data: {param1:["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")}
+                                data: {param1: ["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")}
                             }
                         );
                         content = (_utils.prepareCode(content) || "");
@@ -186,7 +228,7 @@ module.exports = _basePlugin.ext(function () {
                 }
             });
 
-            _lineReader.eachLine(file, function (line) {
+            _lineReader.eachLine(file,function (line) {
 
                 line = _injectCodeByScrap(line);
                 lines.push(line + "\n");

@@ -4,12 +4,17 @@ _cat.core = function() {
 
     return {
 
+
+        define: function(key, func) {
+            _cat[key] = func;
+        },
+
         /**
-         * CAT core definition
+         * CAT core definition, used when injecting cat call
          *
          * @param config
          */
-        define: function(config) {
+        action: function(config) {
             console.log("Cat defined: ", config);
 
         }

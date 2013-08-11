@@ -105,7 +105,10 @@ module.exports = function Config(config) {
         // create target project's folder
         _mkEnvDir("target");
 
-        // create target project's folder
+        // create lib source project's folder
+        _mkEnvDir("lib.source");
+
+        // create lib target project's folder
         _mkEnvDir("lib.target");
 
 

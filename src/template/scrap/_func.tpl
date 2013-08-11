@@ -1,4 +1,5 @@
-_cat["{{name}}"] = function() {
+_cat.define("{{name}}", function() {
+
     /* test content in here */
     {{output}}
-};
+});

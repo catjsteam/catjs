@@ -34,6 +34,7 @@ module.exports = function() {
                     "cat.config": "src/module/config/CATConfig.js",
                     "cat.global": "src/module/CATGlob.js",
                     "cat.utils": "src/module/utils/Utils.js",
+                    "cat.ext.utils": "src/module/utils/ExtUtils.js",
                     "cat.tpl.utils": "src/module/utils/TemplateUtils.js",
                     "cat.project": "src/module/Project.js",
                     "cat.props": "src/module/Properties.js",
