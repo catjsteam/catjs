@@ -46,15 +46,8 @@ module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
-        project: {
-            name: "test-1",
-            outName: "cat.test",
-            deployPath: "./deploy/",
-            srcPath: "./src/",
-            targetPath: "./target/"
-        },
-
         pkg: grunt.file.readJSON('package.json'),
+        cat: grunt.file.readJSON('catproject.json'),
 
         banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
             '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -64,7 +57,7 @@ module.exports = function (grunt) {
 
         jshint: {
             all: [
-                '<%=project.srcPath%><%= project.name %>/**/*.js'
+                '<%=cat.env.source%><%= cat.name %>/**/*.js'
             ],
             options: {
                 "strict": false,
@@ -92,17 +85,17 @@ module.exports = function (grunt) {
                 stripBanners: true
             },
             dist: {
-                src: ['./lib/**/*.js', '<%=project.srcPath%><%= project.name %>/**/*.js'],
-                dest: '<%= project.deployPath %><%= project.outName %>.js'
+                src: ['./<%=cat.env.lib.source%>/**/*.js', '<%=cat.env.source%><%= cat.env.lib.name %>/**/*.js'],
+                dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.js'
             }
         },
         uglify: {
             dist: {
-                src: ['<%= project.deployPath %><%= project.outName %>.js'],
-                dest: '<%= project.deployPath %><%= project.outName %>.min.js'
+                src: ['<%= cat.env.lib.target %><%= cat.env.lib.name %>.js'],
+                dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.min.js'
             }
         },
-        clean: ["<%= project.deployPath %>",
+        clean: ["<%= cat.env.lib.target %>",
             _logFileName
         ]
 

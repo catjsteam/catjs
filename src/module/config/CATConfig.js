@@ -11,13 +11,20 @@ var _global = catrequire("cat.global"),
     /**
      * CAT Configuration class
      *
-     * @param externalConfig
+     * Loads CAT internal configuration from resources/cat.json file
+     *  and creates a configuration instance
+     *
+     * @param externalConfig The passed configuration
+     *          emitter - The emitter reference
+     *          project - Cat project
+     *          grunt - The grunt reference (if available)
+     *
      * @param data The incoming row configuration data
      */
      _CATConfig = function (externalConfig, data) {
 
         var me = this,
-            idx = 0, size;
+            idx = 0, size, project;
 
         /**
          * Extension initialization
@@ -37,26 +44,34 @@ var _global = catrequire("cat.global"),
 
         this._extmap = {};
         this._watch = {};
-
-        this.getExtension = function (key) {
-            if (key) {
-                return me._extmap[key];
-            }
-        };
-
         this.extensions = data.extensions;
         this.plugins = data.plugins;
         this.externalConfig = externalConfig;
 
-        if (this.extensions && _typedas.isArray(this.extensions)) {
+        if (this.extensions) {
 
-            // Load all CAT extensions
-
-            size = this.extensions.length;
-            for (; idx < size; idx++) {
-                _extension(this.extensions[idx]);
+            if (_typedas.isArray(this.extensions)) {
+                // Index the extensions entries
+                size = this.extensions.length;
+                for (; idx < size; idx++) {
+                    _extension(this.extensions[idx]);
+                }
             }
+
+            // load CAT environment variables and update the project class
+            this.env = data.env;
+            if (this.externalConfig) {
+                project = this.externalConfig.project;
+                if (project) {
+                    project.setInfo("template", this.env.template);
+                } else {
+                    _log.warning(_props.get("cat.project.env.failed").format("[CAT Config Loader]"));
+                }
+            }
+
         }
+
+
     };
 
     /**
@@ -76,6 +91,46 @@ var _global = catrequire("cat.global"),
     _CATConfig.prototype.isWatch = function() {
         return (this._watch.impl ? true : false);
     };
+
+    _CATConfig.prototype.getExtension = function (key) {
+        if (key && this._extmap) {
+            return this._extmap[key];
+        }
+    };
+
+    /**
+     *  TODO move any externalConfig direct access properties to use this function
+     *
+     * @returns {*}
+     */
+    _CATConfig.prototype.getProject = function () {
+        if ( this.externalConfig) {
+            return  this.externalConfig.project;
+        }
+    };
+
+    /**
+     *  TODO move any externalConfig direct access properties to use this function
+     *
+     * @returns {*}
+     */
+    _CATConfig.prototype.getGrunt = function () {
+        if ( this.externalConfig) {
+            return  this.externalConfig.grunt;
+        }
+    };
+
+    /**
+     *  TODO move any externalConfig direct access properties to use this function
+     *
+     * @returns {*}
+     */
+    _CATConfig.prototype.getEmitter = function () {
+        if ( this.externalConfig) {
+            return  this.externalConfig.emitter;
+        }
+    };
+
 
 /**
  * Load cat.json internal configuration file

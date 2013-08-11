@@ -1,6 +1,16 @@
 {
     "name": "test-1",
 
+    "env": {
+        "source": "src/",
+        "target": "target/",
+        "lib": {
+            "name": "cat.test",
+            "source": "lib/",
+            "target": "lib/target/"
+        }
+    },
+
     "dependencies": [
         {
             "name": "dependency.loader",
@@ -148,6 +158,10 @@
         {
             "name": "inject",
             "plugins": ["target.libraries", "ext.scrap", "target.inject", "project.install"]
+        },
+        {
+            "name": "install",
+            "plugins":["project.install"]
         },
         {
             "name": "clean",

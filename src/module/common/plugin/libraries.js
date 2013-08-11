@@ -13,36 +13,41 @@ module.exports = _basePlugin.ext(function () {
     var _emitter,
         _global,
         _data,
+        _internalConfig,
+        _project,
         _me = this;
 
     return {
 
-        // TODO make one file with embed dependency according to the manifest
-        // TODO grunt can call import the manifest (consider)
-        init: function (config) {
+        /**
+         *  Initial plugin function
+         *
+         * @param config The configuration:
+         *          data - The configuration data
+         *          emitter - The emitter reference
+         *          global - The global data configuration
+         *          internalConfig - CAT internal configuration
+         */
+         init: function (config) {
 
             var imports,
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"],
                 manifestFileName = "manifest.json",
                 catWorkPath = _catglobal.get("home").working.path,
-                manifestLib = [catlibs, manifestFileName].join("/"),
+                manifestLib = [global.catlibs, manifestFileName].join("/"),
                 manifest = _fs.readFileSync(manifestLib, "utf8"),
                 libraries,
-                slot = 0;                ;
+                slot = 0;
 
 
             function _exec() {
                 var library = libraries[slot],
                     process1, process2,
-                    workPath = _path.normalize([catlibs, library.name].join("/")),
-                    catProjectLib = _path.normalize([catWorkPath, "lib"].join("/")),
+                    workPath = _path.normalize([global.catlibs, library.name].join("/")),
+                    catProjectLib = (_project ? _project.getInfo("lib.target") : undefined),
                     targetManifestPath = [catProjectLib, manifestFileName].join("/");
 
-                // create cat project lib folder if !exists
-                if (!_fs.existsSync(catProjectLib)) {
-                    _fs.mkdirSync(catProjectLib);
-                }
                 // copy the manifest file
                 try {
                     _utils.copySync(manifestLib, targetManifestPath);
@@ -51,6 +56,10 @@ module.exports = _basePlugin.ext(function () {
                 }
 
                 function _copyResource() {
+                    if (!catProjectLib) {
+                        _log.error(_props.get("cat.error.config.missing").format("[libraries ext]", "lib"));
+                        return undefined;
+                    }
                     var from = _path.normalize([workPath, "target", library.prod].join("/")),
                         to = _path.normalize([catProjectLib, library.prod].join("/"));
 
@@ -102,6 +111,8 @@ module.exports = _basePlugin.ext(function () {
             _emitter = config.emitter;
             _global = config.global;
             _data = config.data;
+            _internalConfig = config.internalConfig;
+            _project = (_internalConfig ? _internalConfig.getProject() : undefined);
 
             // initial data binding to 'this'
             _me.dataInit(_data);

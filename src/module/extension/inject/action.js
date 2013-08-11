@@ -51,14 +51,14 @@ module.exports = _basePlugin.ext(function () {
 
             }
 
-            function copyResources(projectInfo) {
+            function copyResources() {
 
-                var tplPath = projectInfo.templates,
-                    srcFolder = projectInfo.srcFolder,
-                    tplSrcFile = _path.normalize([tplPath, "Cat.js"].join("/")),
-                    tplTargetFile = _path.normalize([srcFolder, "Cat.js"].join("/")),
-                    mdata;
-
+                // @not in use.. TODO delete
+//                var tplPath = _project.getInfo("templates"),
+//                    srcFolder = _project.getInfo("source"),
+//                    tplSrcFile = _path.normalize([tplPath, "Cat.js"].join("/")),
+//                    tplTargetFile = _path.normalize([srcFolder, "Cat.js"].join("/"));
+//
 //                try {
 //                    _utils.copySync(tplSrcFile, tplTargetFile);
 //                    _mdata.update({project: {resources: [tplTargetFile]}});
@@ -70,40 +70,30 @@ module.exports = _basePlugin.ext(function () {
             }
 
             var filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
-                projectInfo,
                 targetfile, targetfolder, fileContent;
 
-            projectInfo = _project.getInfo();
-            if (!projectInfo) {
-                _log.warning(_props.get(""))
+            // copy resources
+            copyResources();
+
+            targetfile = _path.normalize([_project.getInfo("source"), filepath].join("/"));
+            targetfolder = _path.dirname(targetfile);
+            if (targetfolder) {
+                if (!_fs.existsSync(targetfolder)) {
+                    _utils.mkdirSync(targetfolder);
+                }
+            }
+            if (_fs.existsSync(targetfile)) {
+                _log.debug(_props.get("cat.source.project.file.exists").format("[inject ext]", targetfile));
             }
 
-
-            if (projectInfo) {
-
-                // copy resources
-                copyResources(projectInfo);
-
-                targetfile = _path.normalize([projectInfo.srcFolder, filepath].join("/"));
-                targetfolder = _path.dirname(targetfile);
-                if (targetfolder) {
-                    if (!_fs.existsSync(targetfolder)) {
-                        _utils.mkdirSync(targetfolder);
-                    }
-                }
-                if (_fs.existsSync(targetfile)) {
-                    _log.debug(_props.get("cat.source.project.file.exists").format("[inject ext]", targetfile));
-                }
-
-                fileContent = _generateFileContent(scraps);
-                if (fileContent) {
-                    fileContent = _beautify(fileContent, { indent_size: 2 });
-                    try {
-                        _fs.writeFileSync(targetfile, fileContent);
-                        _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
-                    } catch (e) {
-                        _utils.error(_props.get("cat.error").format("[inject ext]", e));
-                    }
+            fileContent = _generateFileContent(scraps);
+            if (fileContent) {
+                fileContent = _beautify(fileContent, { indent_size: 2 });
+                try {
+                    _fs.writeFileSync(targetfile, fileContent);
+                    _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
+                } catch (e) {
+                    _utils.error(_props.get("cat.error").format("[inject ext]", e));
                 }
             }
 

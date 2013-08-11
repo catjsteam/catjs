@@ -74,14 +74,8 @@ module.exports = function () {
             return _project;
         },
 
-        getInfo: function() {
-            if (!_project || (_project && !_project.getInfo())) {
-                _log.warning(_props.get("cat.project.config.not.valid").format("[cat project]"));
-
-                return undefined;
-            }
-
-            return _project.getInfo();
+        getInfo: function(key) {
+            return _project.getInfo(key);
         },
 
         update: function(config) {

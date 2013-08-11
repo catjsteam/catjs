@@ -27,7 +27,9 @@ module.exports = _basePlugin.ext(function () {
          */
           _clean = function (dirs) {
 
-            var projectWorkPath = _global.get("home").working.path;
+            var projectWorkPath = _global.get("home").working.path,
+                project = _me.getProject(),
+                libTargetFolder;
 
             function _delete(dir) {
                 if (dir) {
@@ -62,7 +64,11 @@ module.exports = _basePlugin.ext(function () {
 
             // TODO consider removeing all log created files.. or copy it to an archive folder
             _delete([projectWorkPath, "_cat_md.json"].join("/"));
-            _delete([projectWorkPath, "lib"].join("/"));
+
+            libTargetFolder = project.getInfo("lib.target");
+            if (libTargetFolder) {
+                _delete(libTargetFolder);
+            }
 
             emitter.emit("job.done", {status: "done"});
 

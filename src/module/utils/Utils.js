@@ -91,6 +91,38 @@ module.exports = function () {
         },
 
         /**
+         * Inspect a given string and try to resolve its object
+         *
+         * @param obj The reference object
+         * @param query The query to apply over the referenced object
+         */
+        resolveObject: function(obj, query) {
+
+            if (!obj || ! query) {
+                return obj;
+            }
+
+            var keys = query.split("."),
+                size = keys.length,
+                counter = 0,
+                key;
+
+            while(counter < size) {
+                key = keys[counter];
+                if (key && obj[key]) {
+                    obj = obj[key];
+                    counter++;
+                } else {
+                    counter = size;
+                    _log.warning(_props.get("cat.utils.resolver.warn").format("[utils resolver]", query));
+                    return obj;
+                }
+            }
+
+            return obj;
+        },
+
+        /**
          * Prepare code based on line break.
          * Looking for character ";" at the end if not exists it will be added
          * and each line will be trimmed.
@@ -211,7 +243,11 @@ module.exports = function () {
                             arguments.callee.call(me, srcObj[name], destObj[name], override);
 
                         } else if (_typedas.isArray(srcObj[name])) {
-                            if (_typedas.isArray(obj)) {
+
+                            if (!obj) {
+                                destObj[name] = srcObj[name];
+
+                            } else if (_typedas.isArray(obj)) {
 
                                 me.cleanupArray(srcObj[name]);
                                 if (override) {
@@ -225,6 +261,8 @@ module.exports = function () {
                                     }
                                     destObj[name] = destObj[name].concat(srcObj[name]);
                                 }
+                            } else {
+                                _log.warning(_props.get("cat.utils.copy.object.array.warn").format("[utils copy object]", name, typeof(obj)));
                             }
 
                         } else {

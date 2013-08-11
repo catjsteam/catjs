@@ -49,7 +49,7 @@ module.exports = function (config) {
                     path,
                     project = internalConfig.externalConfig.project,
                     projectInfo = project.info,
-                    targetFolder = projectInfo.targetFolder;
+                    targetFolder = projectInfo.target;
 
                 if (me.type) {
                     extensionobj = internalConfig.getExtension(me.type);

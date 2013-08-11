@@ -59,6 +59,7 @@ module.exports = function Config(config) {
             }
         }
 
+        // Array configuration entry goes in here
         initModule("actions");
         initModule("tasks");
         initModule("extensions");
@@ -70,41 +71,79 @@ module.exports = function Config(config) {
      * @private
      */
     function _postCreation() {
+
         var workpath = _cathome.working.path,
-            targetfolder, targetPath, tplPath, tplSrcFile, tplTargetFile;
+            sourcefolder, targetFolder, tplPath,
+            sourcePath, targetPath, libPath;
+
+        function _mkEnvDir(prop) {
+            if (prop) {
+                sourcePath = _utils.resolveObject(data.env, prop);
+                sourcefolder = _path.normalize([workpath, sourcePath].join("/"));
+                if (sourcefolder) {
+                    if (!_fs.existsSync(sourcefolder)) {
+                        _utils.mkdirSync(sourcefolder);
+                    } else {
+                        _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", sourcefolder));
+                    }
+                    me.info[prop] = sourcefolder;
+                }
+
+            }
+        }
+
+        // -- setting environment info
+        // setting env data
+        if (!data.env) {
+            _utils.error(_props.get("cat.error.config.missing").format("[CAT Config]", "env"));
+
+        }
 
         // create project's src folder
-        targetfolder = _path.normalize([workpath, "src"].join("/"));
-        if (targetfolder) {
-            if (!_fs.existsSync(targetfolder)) {
-                _utils.mkdirSync(targetfolder);
-            } else {
-                _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", targetfolder));
-            }
-            me.info.srcFolder = targetfolder;
-        }
+        _mkEnvDir("source");
 
         // create target project's folder
-        targetPath = [workpath, "target"].join("/");
-        if (targetPath) {
-            if (!_fs.existsSync(targetPath)) {
-                _utils.mkdirSync(targetPath);
-            } else {
-                _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", targetfolder));
-            }
-            me.info.targetFolder = targetPath;
-        }
+        _mkEnvDir("target");
 
-        // project resources
-        tplPath = _path.normalize([_cathome.path, "src/template/project/"].join("/"));
-        me.info.templates = tplPath;
+        // create target project's folder
+        _mkEnvDir("lib.target");
+
+
+//        // create project's src folder
+//        sourcePath = data.env.source;
+//        sourcefolder = _path.normalize([workpath, sourcePath].join("/"));
+//        if (sourcefolder) {
+//            if (!_fs.existsSync(sourcefolder)) {
+//                _utils.mkdirSync(sourcefolder);
+//            } else {
+//                _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", sourcefolder));
+//            }
+//            me.info.source = sourcefolder;
+//        }
+//
+//        // create target project's folder
+//        targetPath = data.env.target;
+//        targetFolder = _path.normalize([workpath, targetFolder].join("/"));
+//        if (targetFolder) {
+//            if (!_fs.existsSync(targetFolder)) {
+//                _utils.mkdirSync(targetFolder);
+//            } else {
+//                _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", targetFolder));
+//            }
+//            me.info.target = targetFolder;
+//        }
+
+//        // project resources
+//        tplPath = _path.normalize([_cathome.path, "src/template/project/"].join("/"));
+//        me.info.templates = tplPath;
     }
 
     if (!data || !(data && data.plugins)) {
-        _log.error("[CAT Config] no valid configuration");
+        _utils.error(_props.get("cat.error.config").format("[CAT Config]"));
         return undefined;
     }
 
+    // -- setting tasks configuration
     tasksConfig = data.tasks;
     if (tasksConfig &&
         _typedas.isArray(tasksConfig)) {
@@ -117,6 +156,7 @@ module.exports = function Config(config) {
         _log.warning("[CAT Config] Missing 'tasks' configuration section");
     }
 
+    // -- setting plugins configuration
     actionsConfig = data.plugins;
     if (actionsConfig &&
         _typedas.isArray(actionsConfig)) {
@@ -129,6 +169,7 @@ module.exports = function Config(config) {
         _log.warning("[CAT Config] Missing 'actions' configuration section");
     }
 
+    // -- setting extensions dependencies configuration
     extensionsConfig = (data.extensions || data.dependencies);
     if (extensionsConfig &&
         _typedas.isArray(extensionsConfig)) {
@@ -246,8 +287,11 @@ module.exports = function Config(config) {
         return _path.join(_global.get("home").working.path, "target", this.name);
     };
 
-    this.getInfo = function () {
-        return this.info;
+    this.getInfo = function (key) {
+        if (!this.info[key]) {
+            _log.error(_props.get("cat.error.config.missing").format("[cat config]", key));
+        }
+        return this.info[key];
     };
 
     this.setInfo = function (key, value) {

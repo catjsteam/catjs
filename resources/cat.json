@@ -1,4 +1,10 @@
 {
+    "env": {
+        "template": {
+            "path": "src/template/project/"
+        }
+    },
+
     "extensions" : [
         {
             "name": "webserver",
