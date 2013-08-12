@@ -1,0 +1,1 @@
+<script>_cat.core.action({{param1}});</script>

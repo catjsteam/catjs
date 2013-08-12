@@ -23,6 +23,7 @@ module.exports = _basePlugin.ext(function () {
 
     var _me = this,
         _mdobject,
+        _scrapEnum = _Scrap.getScrapEnum(),
 
         /**
          * Generate CAT source test project files according to the metadata
@@ -34,26 +35,31 @@ module.exports = _basePlugin.ext(function () {
 
             function _generateCATFileInfo(scraps, targetfile) {
 
-                var output = [],
-                    info,
+                var outputjs = [],
                     projectTarget = _me._project.getInfo("target");
 
                 scraps.forEach(function (scrap) {
-                    scrap.apply(scrap);
-                });
+                    var out,
+                        engine = scrap.$getEngine();
 
-                scraps.forEach(function (scrap) {
-                    output.push(_tplutils.template({
-                            name: "scrap/_func",
-                            data: {
-                                name: _extutils.getCATInfo({scrap:scrap, file:file, basepath: projectTarget}).pkgName,
-                                output: scrap.generate()}
-                        }
-                    ));
+                    if (engine === _scrapEnum.engines.JS ||
+                        engine === _scrapEnum.engines.HTML_EMBED_JS) {
+
+                        out = _tplutils.template({
+                                name: "scrap/_func",
+                                data: {
+                                    name: _extutils.getCATInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName,
+                                    output: scrap.generate()}
+                            }
+                        );
+
+                        outputjs.push(out);
+
+                    }
                 });
 
                 return {
-                    output: output.join(""),
+                    output: outputjs.join(""),
                     file: _extutils.getCATInfo({file: targetfile}).file
                 };
 
@@ -61,30 +67,36 @@ module.exports = _basePlugin.ext(function () {
 
             function _generateUserFileInfo(scraps, targetfile) {
 
-                var output = [],
+                var outputjs = [],
                     projectTarget = _me._project.getInfo("target");
 
                 scraps.forEach(function (scrap) {
-                    scrap.apply(scrap);
-                });
+                    var out,
+                        engine = scrap.$getEngine();
 
-                scraps.forEach(function (scrap) {
-                    output.push(_tplutils.template({
-                            name: "scrap/_func_user",
-                            data: {name: _extutils.getUserInfo({scrap:scrap, file:file, basepath: projectTarget}).pkgName,
-                                func: "" }
-                        }
-                    ));
+                    if (engine === _scrapEnum.engines.JS ||
+                        engine === _scrapEnum.engines.HTML_EMBED_JS) {
+
+                        out = _tplutils.template({
+                                name: "scrap/_func_user",
+                                data: {name: _extutils.getUserInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName,
+                                    func: "" }
+                            }
+                        );
+
+                        outputjs.push(out);
+
+                    }
                 });
 
                 return {
-                    output : output.join(""),
-                    file:  _extutils.getUserInfo({file: targetfile}).file
+                    output: outputjs.join(""),
+                    file: _extutils.getUserInfo({file: targetfile}).file
                 };
 
             }
 
-            function _writeContentToFile(scraps, contentFunc, targetfile) {
+            function _writeJSContentToFile(scraps, contentFunc, targetfile) {
 
                 var info = contentFunc.call(this, scraps, targetfile),
                     fileContent = info.output;
@@ -101,21 +113,10 @@ module.exports = _basePlugin.ext(function () {
 
             }
 
+            /**
+             * Copy any resources to the project environment in here
+             */
             function copyResources() {
-
-                // @not in use.. TODO delete
-//                var tplPath = _project.getInfo("templates"),
-//                    srcFolder = _project.getInfo("source"),
-//                    tplSrcFile = _path.normalize([tplPath, "Cat.js"].join("/")),
-//                    tplTargetFile = _path.normalize([srcFolder, "Cat.js"].join("/"));
-//
-//                try {
-//                    _utils.copySync(tplSrcFile, tplTargetFile);
-//                    _mdata.update({project: {resources: [tplTargetFile]}});
-//
-//                } catch (e) {
-//                    _log.error(_props.get("cat.file.copy.failed").format("[cat config]", tplFile, e));
-//                }
 
             }
 
@@ -136,8 +137,17 @@ module.exports = _basePlugin.ext(function () {
                 _log.debug(_props.get("cat.source.project.file.exists").format("[inject ext]", targetfile));
             }
 
-            _writeContentToFile(scraps, _generateCATFileInfo, targetfile);
-            _writeContentToFile(scraps, _generateUserFileInfo, targetfile);
+            // TODO filter scraps arrays according to its $type (js, html, etc)
+
+            // apply all scraps
+            scraps.forEach(function (scrap) {
+                scrap.apply(scrap);
+            });
+
+            // inject and generate proper content for JS files type
+            _writeJSContentToFile(scraps, _generateCATFileInfo, targetfile);
+            _writeJSContentToFile(scraps, _generateUserFileInfo, targetfile);
+
 
         },
 
@@ -166,7 +176,8 @@ module.exports = _basePlugin.ext(function () {
 
                     var content,
                         scraplcl = info.scrap,
-                        injectinfo = scraplcl.get("injectinfo");
+                        injectinfo = scraplcl.get("injectinfo"),
+                        engine;
 
                     function removeOldCall() {
                         var startpos, endpos;
@@ -184,16 +195,34 @@ module.exports = _basePlugin.ext(function () {
 
                     if (lineNumber == info.line) {
 
+                        engine = scraplcl.$getEngine();
+
                         // we need to reevaluate the injected calls
                         if (injectinfo) {
                             removeOldCall();
                         }
-                        //content = "console.log('cat scrap: " + scraplcl.get("name") + "'); ";
-                        content = _tplutils.template({
-                                name: "scrap/_cat_call",
-                                data: {param1: ["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")}
-                            }
-                        );
+
+                        if (engine === _scrapEnum.engines.JS) {
+                            // JS file type call
+                            content = _tplutils.template({
+                                    name: "scrap/_cat_call",
+                                    data: {param1: ["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")}
+                                }
+                            );
+                        } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
+                            // Embed Javascript block for HTML file
+                            content = _tplutils.template({
+                                    name: "scrap/_cat_embed_js",
+                                    data: {param1: ["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")}
+                                }
+                            );
+
+                        } else if (engine === _scrapEnum.engines.HTML_IMPORT_JS) {
+                            // HTML import javascript file
+                            content = scraplcl.generate();
+
+                        }
+
                         content = (_utils.prepareCode(content) || "");
                         if (prevCommentInfo) {
                             line = [line.substring(0, prevCommentInfo.end.col), content , line.substring(prevCommentInfo.end.col, line.length)].join("");

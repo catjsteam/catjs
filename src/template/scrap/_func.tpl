@@ -1,4 +1,4 @@
-_cat.define("{{name}}", function() {
+_cat.core.define("{{name}}", function() {
 
     /* test content in here */
     {{output}}

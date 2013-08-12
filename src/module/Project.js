@@ -33,7 +33,6 @@ var _fsconfig = require("./fs/Config.js"),
                     } else {
                         _log.error(msg[1]);
                     }
-                    _log.debug(msg[2], data);
                 }));
             } catch (e) {
                 _console.log("[Config] error occured, probably not valid cat project [catproject.json]: ");

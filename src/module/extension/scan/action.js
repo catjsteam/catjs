@@ -40,7 +40,7 @@ module.exports = _basePlugin.ext(function () {
                             if (stat && stat.isDirectory()) {
                                 // On Directory
                                 emitter.emit("scan.folder", file);
-                                _log.debug("[SCAN] folder: " + file);
+                                //_log.debug("[SCAN] folder: " + file);
                                 walk(file, function (err, res) {
                                     //results = results.concat(res);
                                     //copyAction.folder(res);
@@ -50,7 +50,7 @@ module.exports = _basePlugin.ext(function () {
                                 // On File
                                 //copyAction.file(file);
                                 emitter.emit("scan.file", file);
-                                _log.debug("[SCAN] file: " + file + "; ext: " + _path.extname(file));
+                                //_log.debug("[SCAN] file: " + file + "; ext: " + _path.extname(file));
                                 results.push(file);
                                 next();
                             }

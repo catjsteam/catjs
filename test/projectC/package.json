@@ -22,7 +22,8 @@
     "grunt-contrib-jshint": "~0.1.1",
     "grunt-contrib-clean": "~0.4.0",
     "grunt": "~0.4.1",
-    "hooker": "~0.2.3"
+    "hooker": "~0.2.3",
+    "grunt-contrib-copy": "~0.4.1"
   },
   "peerDependencies": {}
 }

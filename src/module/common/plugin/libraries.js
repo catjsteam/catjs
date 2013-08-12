@@ -60,11 +60,20 @@ module.exports = _basePlugin.ext(function () {
                         _log.error(_props.get("cat.error.config.missing").format("[libraries ext]", "lib"));
                         return undefined;
                     }
-                    var from = _path.normalize([workPath, "target", library.prod].join("/")),
-                        to = _path.normalize([catProjectLib, library.prod].join("/"));
+                    var from,
+                        to;
 
                     // copy the library to the current cat project
+                    // TODO according to the manifest copy only the wished mode
                     try {
+//                        // copy prod
+//                        from = _path.normalize([workPath, "target", library.prod].join("/")),
+//                        to = _path.normalize([catProjectLib, library.prod].join("/"));
+//                        _utils.copySync(from, to);
+
+                        // copy dev
+                        from = _path.normalize([workPath, "target", library.dev].join("/")),
+                        to = _path.normalize([catProjectLib, library.dev].join("/"));
                         _utils.copySync(from, to);
                     } catch(e) {
                         _log.error(_props.get("cat.file.copy.failed").format("[libraries]", from, e))

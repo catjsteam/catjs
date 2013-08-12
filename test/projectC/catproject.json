@@ -61,7 +61,7 @@
                 },
                 {
                     "type": "file",
-                    "ext": [".js"],
+                    "ext": [".js", ".html"],
                     "exclude": false
                 },
                 {

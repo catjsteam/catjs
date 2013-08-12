@@ -15,7 +15,7 @@ _cat.core = function() {
          * @param config
          */
         action: function(config) {
-            console.log("Cat defined: ", config);
+            console.log("Scrap call: ",config, " scrap: " + config.scrap.name);
 
         }
 

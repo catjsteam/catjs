@@ -108,10 +108,10 @@ module.exports = _basePlugin.ext(function () {
             }
             if (file) {
                 from = _getRelativeFile(file);
-                _log.debug("[Copy Action] scan file: " + from);
+                //_log.debug("[Copy Action] scan file: " + from);
 
                 if (!_me.applyFileExtFilters(filters, file)) {
-                    _log.debug("[Copy Action] No filter match, copy to: ", _to);
+                    //_log.debug("[Copy Action] No filter match, copy to: ", _to);
 
                     _utils.copySync(file, _path.normalize(_to + "/" + from), function (err) {
                         if (err) {
@@ -140,7 +140,7 @@ module.exports = _basePlugin.ext(function () {
             }
             if (folder) {
                 tmpFolder = _path.normalize(_to + "/" + folder.substring(_basePath.length));
-                _log.debug("[Copy Action] scan folder: " + tmpFolder);
+                //_log.debug("[Copy Action] scan folder: " + tmpFolder);
 
                 if (!_fs.existsSync(tmpFolder)) {
                     _log.debug("[Copy Action] No filter match, create folder: ", _to);

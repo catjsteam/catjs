@@ -1,4 +1,4 @@
-/*! cat-library - v0.1.0 - 2013-08-11
+/*! cat-library - v0.1.0 - 2013-08-12
 * Copyright (c) 2013 arik; Licensed MIT */
 var _cat = {};
 
@@ -17,7 +17,7 @@ _cat.core = function() {
          * @param config
          */
         action: function(config) {
-            console.log("Cat defined: ", config);
+            console.log("Scrap call: ",config, " scrap: " + config.scrap.name);
 
         }
 

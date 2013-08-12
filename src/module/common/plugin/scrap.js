@@ -92,7 +92,7 @@ module.exports = _basePlugin.ext(function () {
             }
             if (file) {
                 from = _utils.getRelativePath(file, _basePath);
-                _log.debug("[scrap Action] scan file: " + from);
+                //_log.debug("[scrap Action] scan file: " + from);
 
                 if (!_me.applyFileExtFilters(filters, file)) {
                     if (!_parsers["Comment"]) {
