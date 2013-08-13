@@ -24,7 +24,7 @@ var _global = catrequire("cat.global"),
      _CATConfig = function (externalConfig, data) {
 
         var me = this,
-            idx = 0, size, project;
+            idx = 0, size, project, pluginsPath = [];
 
         /**
          * Extension initialization
@@ -64,6 +64,10 @@ var _global = catrequire("cat.global"),
                 project = this.externalConfig.project;
                 if (project) {
                     project.setInfo("template", this.env.template);
+                    this.plugins.forEach(function(path){
+                        pluginsPath.push(_path.join(cathome, path));
+                    });
+                    project.addPluginLocations(pluginsPath);
                 } else {
                     _log.warning(_props.get("cat.project.env.failed").format("[CAT Config Loader]"));
                 }

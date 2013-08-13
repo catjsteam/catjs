@@ -110,6 +110,7 @@ module.exports = function Config(config) {
 
         // create lib target project's folder
         _mkEnvDir("lib.target");
+
     }
 
     if (!data || !(data && data.plugins)) {
@@ -152,6 +153,13 @@ module.exports = function Config(config) {
                 extensions.push(new _Extension({data: item, emitter: emitter, global: data, catconfig: me}));
             }
         });
+
+        // push default manager extension
+        extensions.push(new _Extension({data: {
+            name: "manager",
+            type: "manager"
+        }, emitter: emitter, global: data, catconfig: me}));
+
     } else {
         _log.warning("[CAT Config] Missing 'actions' configuration section");
     }
@@ -162,7 +170,7 @@ module.exports = function Config(config) {
     this.actions = actions;
     this.extensions = extensions;
     this.tasks = tasks;
-    this.pluginPaths = [[_cathome.path, "src/module/common/plugin/"].join("/")];
+    this.pluginPaths = [];
     this.info = {};
 
     // indexing the objects arrays [actions, tasks, etc..]
@@ -173,8 +181,6 @@ module.exports = function Config(config) {
     this.destroy = function() {
 
     };
-
-
 
     /**
      * Get a task by key

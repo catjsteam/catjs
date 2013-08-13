@@ -5,7 +5,16 @@
         }
     },
 
+    "plugins" : [
+        "src/module/common/plugin/",
+        "src/plugins/"
+    ],
+
     "extensions" : [
+        {
+            "name": "manager",
+            "impl": "src/module/extension/manager/action.js"
+        },
         {
             "name": "webserver",
             "impl": "src/module/extension/webserver/action.js"

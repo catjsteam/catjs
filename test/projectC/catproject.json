@@ -50,6 +50,10 @@
 
     "plugins": [
         {
+            "name": "scrap.common",
+            "type": "scrap-common"
+        },
+        {
             "name": "init.scrap",
             "type": "scrap",
             "dependency": "scan.ext",
@@ -157,7 +161,7 @@
         },
         {
             "name": "inject",
-            "plugins": ["target.libraries", "ext.scrap", "target.inject", "project.install"]
+            "plugins": ["target.libraries", "scrap.common", "ext.scrap", "target.inject", "project.install"]
         },
         {
             "name": "install",

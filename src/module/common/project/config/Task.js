@@ -40,12 +40,10 @@ module.exports = function (config) {
                 actionobj = catconfig.getAction(action);
                 dependency = actionobj.dependency;
 
-//                // apply plugin
-//                if (!actionobj.apply) {
-//                    _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
-//                } else {
-//                    actionobj.apply(internalConfig);
-//                }
+                // if no dependency assigned use the manager default extension
+                if (!dependency) {
+                    dependency = "manager";
+                }
 
                 // apply default extensions
                 if (dependency) {

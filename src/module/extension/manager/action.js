@@ -6,7 +6,11 @@ var _fs = require('fs.extra'),
     _basePlugin = require("./../Base.js");
 
 /**
- * Spawn extension for CAT
+ * Manager extension for CAT
+ * A default extension for running plugins
+ *
+ * Any plugin that needs to be dependent on general extension with no special
+ *  services can hook to this implementation
  *
  * @type {module.exports}
  */
@@ -21,14 +25,14 @@ module.exports = _basePlugin.ext(function () {
             },
 
             /**
-             * Apply the spawn extension
+             * Apply the manager extension
              *
              * @param config
              *      command - command to run
              *      options - spawn options
              */
             apply: function (config) {
-                _me.getEmitter().emit("spawn.exec", {spawn: _process.spawn});
+                _me.getEmitter().emit("manager.apply", {});
             },
 
             /**
