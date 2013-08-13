@@ -100,14 +100,14 @@ _clazz = function (config) {
 
         value = _cleanObjectNoise(value);
         if (value !== undefined && value !== null) {
-            if (_utils.contains(_scrapEnum.scrapEnum.singleTypes, key)) {
+            if (me.isSingle(key) || _utils.contains(_scrapEnum.scrapEnum.singleTypes, key)) {
                 // return only the first cell since we types this key as a single scrap value (the last cell takes)
                 if (_typedas.isArray(value)) {
                     _utils.cleanupArray(value);
                     size = value.length;
                     return value[size - 1];
                 } else {
-                    _log.warning(_props.get("cat.arguments.type").format("[scrap class]", "Array"));
+                    // return value as is
                 }
             }
         }
@@ -116,7 +116,7 @@ _clazz = function (config) {
 
 
     if (!config) {
-        _utils.error(_props.get("cat.error.config").format("[Scrap Entity]"));
+        _utils.error(_props.get("cat.error.config").format("[scrap class]"));
     }
 
     this.config = config;
@@ -137,16 +137,26 @@ _clazz = function (config) {
     (function () {
 
         // set default values
-        _init("single", false);
+        _init("single", {});
         _init("id", _scrapId());
         _init("$type", _scrapEnum.scrapEnum.defaultFileType);
 
         // set/generate config values/functionality
         if (me.config) {
             _utils.forEachProp(me.config, function (key) {
-                var valid = {};
+                var valid = {},
+                    initFunc;
 
                 if (key) {
+
+                    // set default annotation value to single
+                    me.config.single[key] = true;
+
+                    // init the attribute functionality
+                    initFunc =  me[key + "Init"];
+                    if (initFunc) {
+                        initFunc.call(me);
+                    }
 
                     // validate configuration keys
                     valid = _validateConfigEntry(key, me.config);
@@ -167,8 +177,41 @@ _clazz = function (config) {
     })();
 };
 
-_clazz.prototype.isSingle = function () {
-    return this.config.single;
+_clazz.prototype.isSingle = function (key) {
+    return this.config.single[key];
+};
+
+/**
+ * Set scrap's attribute as single or multi value
+ * e.g. setSingle([{key: [attrName], value: [boolean]}])
+ *
+ * Note: Single values are store as a map, setting the same key will take the last values
+ * @param arr An array of values
+ * @returns {*}
+ */
+_clazz.prototype.addSingle = function (arr) {
+
+    if (arr && _typedas.isArray(arr)) {
+
+        arr.forEach(function(single) {
+
+            if (single && single.key && (typeof(single.value) != 'undefined')) {
+
+                this.config.single[single.key] = single.value;
+
+            } else {
+                _log.warning(_props.get("cat.scrap.single.properties").format("[scrap class (addSingle)]"));
+            }
+
+        });
+
+    } else {
+        _log.warning(_props.get("cat.arguments.type").format("[scrap class (addSingle)]", "array"));
+    }
+};
+
+_clazz.prototype.setSingle = function (key, bol) {
+    return this.config.single[key] = bol;
 };
 
 _clazz.prototype.$getType = function () {

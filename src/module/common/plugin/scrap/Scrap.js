@@ -120,10 +120,13 @@ module.exports = function () {
             }
 
             var attrName = config.name,
-                func = config.func;
+                func = config.func,
+                single = config.single;
 
-            _clazz.prototype[attrName] = function () {
-                return this.config[attrName];
+            _clazz.prototype[attrName + "Init"] = function () {
+                if (single !== undefined) {
+                    this.setSingle(attrName, single);
+                }
             };
 
             _clazz.prototype[attrName + "Apply"] = function (config) {
@@ -181,7 +184,6 @@ module.exports = function () {
                         startrow = row.substring(pos);
                         configKey = startrow.substring(single.length, startrow.indexOf(" "));
                         configVal = startrow.substring(startrow.indexOf(" ") + 1);
-                        config.single = true;
 
                         // set scrap property / value
                         if (configKey) {

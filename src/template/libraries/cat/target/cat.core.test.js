@@ -1,4 +1,4 @@
-/*! cat-library - v0.1.0 - 2013-08-12
+/*! cat-library - v0.1.0 - 2013-08-13
 * Copyright (c) 2013 arik; Licensed MIT */
 var _cat = {};
 

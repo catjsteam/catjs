@@ -13,10 +13,23 @@ module.exports = function () {
         init: function () {
 
 
-            _Scrap.add({name: "code", func: function (config) {
-                var codeRows = this.get("code"),
+            /**
+             * Annotation for javascript code
+             *
+             *  properties:
+             *  name    - code
+             *  single  - false
+             *  $type   - js
+             */
+            _Scrap.add({name: "code",
+                single: false,
+                func: function (config) {
+
+                var codeRows,
                     code,
                     me = this;
+
+                codeRows = this.get("code");
 
                 if (codeRows) {
                     _utils.prepareCode(codeRows);
@@ -31,23 +44,37 @@ module.exports = function () {
                 }
             }});
 
+            /**
+             * Annotation for importing javascript file within HTML page
+             *
+             *  properties:
+             *  name    - import
+             *  single  - true
+             *  $type   - html
+             */
             _Scrap.add({name: "import", func: function (config) {
-                var importRows = this.get("import"),
-                    item,
+                var importanno = this.get("import"),
                     me = this;
 
                 me.$setType("html");
-                if (importRows) {
-                    item = importRows.join("\n");
+                if (importanno) {
                     me.print(_tplutils.template({
                         content: importJSTpl,
                         data: {
-                            src:item
+                            src:importanno
                         }
                     }));
                 }
             }});
 
+            /**
+             * Annotation for embed javascript block code within HTML page
+             *
+             *  properties:
+             *  name    - embed
+             *  single  - false
+             *  $type   - html
+             */
             _Scrap.add({name: "embed", func: function (config) {
                 this.$setType("html");
             }});

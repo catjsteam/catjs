@@ -110,35 +110,6 @@ module.exports = function Config(config) {
 
         // create lib target project's folder
         _mkEnvDir("lib.target");
-
-
-//        // create project's src folder
-//        sourcePath = data.env.source;
-//        sourcefolder = _path.normalize([workpath, sourcePath].join("/"));
-//        if (sourcefolder) {
-//            if (!_fs.existsSync(sourcefolder)) {
-//                _utils.mkdirSync(sourcefolder);
-//            } else {
-//                _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", sourcefolder));
-//            }
-//            me.info.source = sourcefolder;
-//        }
-//
-//        // create target project's folder
-//        targetPath = data.env.target;
-//        targetFolder = _path.normalize([workpath, targetFolder].join("/"));
-//        if (targetFolder) {
-//            if (!_fs.existsSync(targetFolder)) {
-//                _utils.mkdirSync(targetFolder);
-//            } else {
-//                _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", targetFolder));
-//            }
-//            me.info.target = targetFolder;
-//        }
-
-//        // project resources
-//        tplPath = _path.normalize([_cathome.path, "src/template/project/"].join("/"));
-//        me.info.templates = tplPath;
     }
 
     if (!data || !(data && data.plugins)) {
