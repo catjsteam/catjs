@@ -40,7 +40,8 @@ module.exports = _basePlugin.ext(function () {
 
                 scraps.forEach(function (scrap) {
                     var out,
-                        engine = scrap.$getEngine();
+                        engine = scrap.$getEngine(),
+                        args = scrap.get("arguments");
 
                     if (engine === _scrapEnum.engines.JS ||
                         engine === _scrapEnum.engines.HTML_EMBED_JS) {
@@ -49,6 +50,7 @@ module.exports = _basePlugin.ext(function () {
                                 name: "scrap/_func",
                                 data: {
                                     name: _extutils.getCATInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName,
+                                    arguments: (args ? args.join(",") : undefined),
                                     output: scrap.generate()}
                             }
                         );
