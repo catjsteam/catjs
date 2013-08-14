@@ -18,29 +18,52 @@ module.exports = function () {
              *  properties:
              *  name    - code
              *  single  - false
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "context",
+                single: false,
+                singleton: 1,
+                func: function (config) {
+                    var ctx,
+                        me = this;
+
+                    ctx = this.get("context");
+
+                    if (ctx) {
+                        me.setCtxArguments(ctx);
+                    }
+            }});
+
+            /**
+             * Annotation for javascript code
+             *
+             *  properties:
+             *  name    - code
+             *  single  - false
              *  $type   - js
              */
             _Scrap.add({name: "code",
                 single: false,
                 func: function (config) {
 
-                var codeRows,
-                    code,
-                    me = this;
+                    var codeRows,
+                        code,
+                        me = this;
 
-                codeRows = this.get("code");
+                    codeRows = this.get("code");
 
-                if (codeRows) {
-                    _utils.prepareCode(codeRows);
-                    code = codeRows.join("\n");
-                    me.print(_tplutils.template({
-                        content: funcSnippetTpl,
-                        data: {
-                            comment:" Generated code according to the scrap comment (see @@code)",
-                            code:code
-                        }
-                    }));
-                }
+                    if (codeRows) {
+                        _utils.prepareCode(codeRows);
+                        code = codeRows.join("\n");
+                        me.print(_tplutils.template({
+                            content: funcSnippetTpl,
+                            data: {
+                                comment:" Generated code according to the scrap comment (see @@code)",
+                                code:code
+                            }
+                        }));
+                    }
             }});
 
             /**
@@ -51,19 +74,20 @@ module.exports = function () {
              *  single  - true
              *  $type   - html
              */
-            _Scrap.add({name: "import", func: function (config) {
-                var importanno = this.get("import"),
-                    me = this;
+            _Scrap.add({name: "import",
+                func: function (config) {
+                    var importanno = this.get("import"),
+                        me = this;
 
-                me.$setType("html");
-                if (importanno) {
-                    me.print(_tplutils.template({
-                        content: importJSTpl,
-                        data: {
-                            src:importanno
-                        }
-                    }));
-                }
+                    me.$setType("html");
+                    if (importanno) {
+                        me.print(_tplutils.template({
+                            content: importJSTpl,
+                            data: {
+                                src:importanno
+                            }
+                        }));
+                    }
             }});
 
             /**

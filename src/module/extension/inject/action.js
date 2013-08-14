@@ -31,7 +31,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-            _generateSourceProject = function (scraps, file) {
+         _generateSourceProject = function (scraps, file) {
 
             function _generateCATFileInfo(scraps, targetfile) {
 
@@ -72,10 +72,14 @@ module.exports = _basePlugin.ext(function () {
 
                 scraps.forEach(function (scrap) {
                     var out,
-                        engine = scrap.$getEngine();
+                        engine = scrap.$getEngine(),
+                        pkgName;
 
                     if (engine === _scrapEnum.engines.JS ||
                         engine === _scrapEnum.engines.HTML_EMBED_JS) {
+
+                        pkgName = _extutils.getUserInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName;
+                        scrap.set("pkgName", pkgName);
 
                         out = _tplutils.template({
                                 name: "scrap/_func_user",
@@ -177,6 +181,8 @@ module.exports = _basePlugin.ext(function () {
                     var content,
                         scraplcl = info.scrap,
                         injectinfo = scraplcl.get("injectinfo"),
+                        scrapCtxArguments,
+                        param1,
                         engine;
 
                     function removeOldCall() {
@@ -196,7 +202,13 @@ module.exports = _basePlugin.ext(function () {
                     if (lineNumber == info.line) {
 
                         engine = scraplcl.$getEngine();
+                        scrapCtxArguments = scraplcl.generateCtxArguments();
+                        param1 = [["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")];
 
+                        // add context arguments if exists
+                        if (scrapCtxArguments && scrapCtxArguments.length > 0) {
+                            param1 = param1.concat(scrapCtxArguments);
+                        }
                         // we need to reevaluate the injected calls
                         if (injectinfo) {
                             removeOldCall();
@@ -206,14 +218,14 @@ module.exports = _basePlugin.ext(function () {
                             // JS file type call
                             content = _tplutils.template({
                                     name: "scrap/_cat_call",
-                                    data: {param1: ["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")}
+                                    data: {param1: param1.join(",")}
                                 }
                             );
                         } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
                             // Embed Javascript block for HTML file
                             content = _tplutils.template({
                                     name: "scrap/_cat_embed_js",
-                                    data: {param1: ["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")}
+                                    data: {param1: param1.join(",")}
                                 }
                             );
 
@@ -288,7 +300,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-            _inject = function (scraps, fileName) {
+         _inject = function (scraps, fileName) {
 
             var file = fileName;
 

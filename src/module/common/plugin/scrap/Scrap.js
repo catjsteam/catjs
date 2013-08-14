@@ -121,11 +121,15 @@ module.exports = function () {
 
             var attrName = config.name,
                 func = config.func,
-                single = config.single;
+                single = config.single,
+                singleton = config.singleton;
 
             _clazz.prototype[attrName + "Init"] = function () {
                 if (single !== undefined) {
                     this.setSingle(attrName, single);
+                }
+                if (singleton !== undefined) {
+                    this.setSingleton(attrName, singleton);
                 }
             };
 

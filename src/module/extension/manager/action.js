@@ -21,7 +21,7 @@ module.exports = _basePlugin.ext(function () {
         _module = {
 
             watch: function(config) {
-                this.apply(config);
+
             },
 
             /**
@@ -32,7 +32,8 @@ module.exports = _basePlugin.ext(function () {
              *      options - spawn options
              */
             apply: function (config) {
-                _me.getEmitter().emit("manager.apply", {});
+
+                _me.getEmitter().emit("job.done", {status: "done"});
             },
 
             /**

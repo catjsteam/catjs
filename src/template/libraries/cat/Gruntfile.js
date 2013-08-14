@@ -55,7 +55,7 @@ module.exports = function(grunt) {
       }
     },
 
-     clean: ['target']
+     clean: ['./target']
   });
 
   // These plugins provide necessary tasks.

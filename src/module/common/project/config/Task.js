@@ -30,12 +30,11 @@ module.exports = function (config) {
     }
 
     function _actionApply(internalConfig) {
-        var actionobj, action,
-            idx, size = me.actions.length,
+        var actionobj,
+            idx=0, size = me.actions.length,
             dependency, extension;
 
-        for (idx = 0; idx < size; idx++) {
-            action = me.actions[idx];
+        function _action(action) {
             if (action) {
                 actionobj = catconfig.getAction(action);
                 dependency = actionobj.dependency;
@@ -50,9 +49,27 @@ module.exports = function (config) {
                     extension = extLoaded[dependency];
                     _extensionApply(dependency, "default", internalConfig, extension, actionobj.apply);
                 }
-
             }
         }
+
+        function _runme() {
+            emitter.on("job.done", function (obj) {
+                idx++;
+                emitter.removeAllListeners("job.done");
+                if (idx < size) {
+                    _runme();
+                } else {
+                    idx = 0;
+                    // the end of the loop go to the next task (if available)
+                    emitter.emit("task.done", {status: "done"});
+
+                }
+            });
+            _action(me.actions[idx]);
+        }
+
+        size = me.actions.length;
+        _runme();
     }
 
     function _extensionInit(extConfig) {

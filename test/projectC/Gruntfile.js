@@ -85,7 +85,7 @@ module.exports = function (grunt) {
                 stripBanners: true
             },
             dist: {
-                src: ['./<%=cat.env.lib.source%>/*.js', './<%=cat.env.source%>/**/*.js'],
+                src: ['./<%=cat.env.lib.source%>/*.js', './<%=cat.env.source%>/**/*.*'],
                 dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.js'
             }
         },
@@ -102,6 +102,7 @@ module.exports = function (grunt) {
             }
         },
         clean: ["<%= cat.env.lib.target %>",
+            '<%= cat.env.target %>/<%= cat.name %>/<%= cat.env.lib.name %>.js',
             _logFileName
         ]
 

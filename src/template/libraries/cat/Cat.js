@@ -15,7 +15,26 @@ _cat.core = function() {
          * @param config
          */
         action: function(config) {
-            console.log("Scrap call: ",config, " scrap: " + config.scrap.name);
+            var scrap = config.scrap,
+                catObj,
+                passedArguments,
+                idx = 0, size = arguments.length, arg;
+
+            if (scrap) {
+                if (scrap.pkgName) {
+                    catObj = _cat[scrap.pkgName];
+                    if (catObj && catObj.init) {
+                        if (arguments.length > 1) {
+                            passedArguments = []
+                            for (idx = 1; idx<size; idx++) {
+                                passedArguments.push(arguments[idx]);
+                            }
+                        }
+                        catObj.init.apply(scrap, passedArguments);
+                    }
+                }
+                console.log("Scrap call: ",config, " scrap: " + scrap.name);
+            }
 
         }
 

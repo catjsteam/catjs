@@ -157,7 +157,7 @@
         },
         {
             "name": "scrap",
-            "plugins": ["init.scrap"]
+            "plugins": ["scrap.common", "ext.scrap", "init.scrap"]
         },
         {
             "name": "inject",
@@ -165,7 +165,7 @@
         },
         {
             "name": "install",
-            "plugins":["project.install"]
+            "plugins":["target.libraries", "project.install"]
         },
         {
             "name": "clean",

@@ -20,6 +20,17 @@ function _validateConfigEntry(key, config) {
         validation = {},
         thisKey;
 
+    // validate singlton
+    if (key === "singleton") {
+        value = config[key];
+        if (value) {
+            if (value == 2) {
+                config[key] = 1;
+            }
+        }
+    }
+
+
     // validate file type
     if (key === "$type") {
         value = config[key];
@@ -35,6 +46,45 @@ function _validateConfigEntry(key, config) {
             }
         }
     }
+}
+
+
+function _cleanObjectNoise(obj) {
+
+    function _cleanStringNoise(obj) {
+        if (!obj) {
+            return obj;
+        }
+        obj = (obj.indexOf("\r") !== -1 ? obj.split("\r").join("") : obj);
+        obj = (obj.indexOf("\n") !== -1 ? obj.split("\n").join("") : obj);
+        obj = (obj.indexOf("\t") !== -1 ? obj.split("\t").join("    ") : obj);
+
+        return obj;
+    }
+
+    var idx = 0, size = 0, item;
+
+    if (obj) {
+        if (_typedas.isString(obj)) {
+
+            return _cleanStringNoise(obj);
+
+        } else if (_typedas.isArray(obj)) {
+
+            size = obj.length;
+            for (idx = 0; idx < size; idx++) {
+                item = obj[idx];
+                if (item) {
+                    obj[idx] = _cleanStringNoise(item);
+                }
+            }
+
+            return obj;
+        }
+
+    }
+
+    return obj;
 }
 
 /**
@@ -53,44 +103,6 @@ _clazz = function (config) {
         if (me.config[name] === undefined) {
             me.set(name, defaultValue);
         }
-    }
-
-    function _cleanObjectNoise(obj) {
-
-        function _cleanStringNoise(obj) {
-            if (!obj) {
-                return obj;
-            }
-            obj = (obj.indexOf("\r") !== -1 ? obj.split("\r").join("") : obj);
-            obj = (obj.indexOf("\n") !== -1 ? obj.split("\n").join("") : obj);
-            obj = (obj.indexOf("\t") !== -1 ? obj.split("\t").join("    ") : obj);
-
-            return obj;
-        }
-
-        var idx = 0, size = 0, item;
-
-        if (obj) {
-            if (_typedas.isString(obj)) {
-
-                return _cleanStringNoise(obj);
-
-            } else if (_typedas.isArray(obj)) {
-
-                size = obj.length;
-                for (idx = 0; idx < size; idx++) {
-                    item = obj[idx];
-                    if (item) {
-                        obj[idx] = _cleanStringNoise(item);
-                    }
-                }
-
-                return obj;
-            }
-
-        }
-
-        return obj;
     }
 
     function _getValue(key) {
@@ -121,6 +133,7 @@ _clazz = function (config) {
 
     this.config = config;
     this.output = [];
+    this.arguments = [];
 
     this.getEnum = _scrapEnum.getScrapEnum;
 
@@ -138,6 +151,8 @@ _clazz = function (config) {
 
         // set default values
         _init("single", {});
+        _init("singleton", {});
+        _init("arguments", []);
         _init("id", _scrapId());
         _init("$type", _scrapEnum.scrapEnum.defaultFileType);
 
@@ -151,6 +166,8 @@ _clazz = function (config) {
 
                     // set default annotation value to single
                     me.config.single[key] = true;
+                    // set default singleton value
+                    me.config.singleton[key] = -1;
 
                     // init the attribute functionality
                     initFunc =  me[key + "Init"];
@@ -183,21 +200,21 @@ _clazz.prototype.isSingle = function (key) {
 
 /**
  * Set scrap's attribute as single or multi value
- * e.g. setSingle([{key: [attrName], value: [boolean]}])
+ * e.g. addConfig([{key: [attrName], value: [boolean]}])
  *
  * Note: Single values are store as a map, setting the same key will take the last values
  * @param arr An array of values
  * @returns {*}
  */
-_clazz.prototype.addSingle = function (arr) {
+_clazz.prototype.addConfig = function (arr, key) {
 
     if (arr && _typedas.isArray(arr)) {
 
-        arr.forEach(function(single) {
+        arr.forEach(function(item) {
 
-            if (single && single.key && (typeof(single.value) != 'undefined')) {
+            if (item && item.key && (typeof(item.value) != 'undefined')) {
 
-                this.config.single[single.key] = single.value;
+                this.config[key][item.key] = item.value;
 
             } else {
                 _log.warning(_props.get("cat.scrap.single.properties").format("[scrap class (addSingle)]"));
@@ -208,6 +225,22 @@ _clazz.prototype.addSingle = function (arr) {
     } else {
         _log.warning(_props.get("cat.arguments.type").format("[scrap class (addSingle)]", "array"));
     }
+};
+
+_clazz.prototype.addSingleton = function (arr) {
+    this.addConfig(arr, "singleton");
+};
+
+_clazz.prototype.setSingleton = function (key, bol) {
+    this.config.singleton[key] = bol;
+};
+
+_clazz.prototype.getSingleton = function (key) {
+    return this.config.singleton[key];
+};
+
+_clazz.prototype.addSingle = function (arr) {
+    this.addConfig(arr, "single");
 };
 
 _clazz.prototype.setSingle = function (key, bol) {
@@ -245,6 +278,24 @@ _clazz.prototype.get = function (key) {
     }
 };
 
+_clazz.prototype.setCtxArguments = function (arr) {
+    if (arr) {
+        if (_typedas.isArray(arr)) {
+            this.config.arguments = [];
+            this.config.arguments = this.config.arguments.concat(arr);
+            this.set("arguments",  _cleanObjectNoise(this.config.arguments));
+
+        } else {
+            _log.warning(_props.get("cat.arguments.type").format("[scrap class (addCtxArguments)]", "array"));
+        }
+    }
+};
+
+_clazz.prototype.generateCtxArguments = function () {
+    var ctx = this.get("arguments");
+    return ( ctx && ctx.join ? ctx.join(", ") : "");
+};
+
 _clazz.prototype.generate = function () {
     return ( this.output ? this.output.join(" \n ") : "");
 };
@@ -260,14 +311,23 @@ _clazz.prototype.print = function (line) {
 };
 
 _clazz.prototype.apply = function () {
-    var me = this;
+    var me = this,
+        singleton;
 
     _utils.forEachProp(this.config, function (prop) {
         var func;
         if (prop) {
             func = me[prop + "Apply"];
             if (func) {
-                func.call(me, {});
+                singleton = me.getSingleton(prop);
+
+                if (singleton < 2) {
+                    func.call(me, {});
+                }
+                if (singleton === 1){
+                    me.setSingleton(prop, singleton++);
+                }
+
             }
         }
     });

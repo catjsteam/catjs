@@ -1,4 +1,5 @@
-var _log = catrequire("cat.global").log(),
+var _catglobal = catrequire("cat.global"),
+    _log = _catglobal.log(),
     _path = require("path"),
     _props = catrequire("cat.props"),
     _basePlugin = catrequire("cat.plugin.base"),
@@ -52,6 +53,9 @@ module.exports = _basePlugin.ext(function () {
 
                 try {
 
+                    if (!options) {
+                        options = {cwd: _catglobal.get("home").working.path}
+                    }
                     chilsp = spawn(command, args, options);
 
                     chilsp.stdout.on('data', function (data) {

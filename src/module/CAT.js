@@ -53,10 +53,10 @@ var CAT = function () {
 
     function _runme(watch) {
 
-        _emitter.on("job.done", function (obj) {
+        _emitter.on("task.done", function (obj) {
             _counter++;
             if (_counter < _targets.length) {
-                _emitter.removeAllListeners("job.done");
+                _emitter.removeAllListeners("task.done");
                 _runme(watch);
             }
         });
