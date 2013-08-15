@@ -44,9 +44,9 @@ module.exports = _basePlugin.ext(function () {
             function _exec() {
                 var library = libraries[slot],
                     process1, process2,
-                    workPath = _path.normalize([global.catlibs, library.name].join("/")),
                     catProjectLib = (_project ? _project.getInfo("lib.source") : undefined),
-                    targetManifestPath = [catProjectLib, manifestFileName].join("/");
+                    targetManifestPath = [catProjectLib, manifestFileName].join("/"),
+                    workPath = _path.join(cathome, _project.getInfo("libraries").path, "cat");
 
                 // copy the manifest file
                 try {
@@ -83,7 +83,8 @@ module.exports = _basePlugin.ext(function () {
                 process1 = _spawn().spawn({
                     command: "npm",
                     args: ["install"],
-                    options: {cwd: workPath}
+                    options: {cwd: workPath},
+                    emitter: _emitter
                 });
 
                 process1.on('close', function (code) {
@@ -94,7 +95,8 @@ module.exports = _basePlugin.ext(function () {
                     process2 = _spawn().spawn({
                         command: "grunt",
                         args: ["--no-color"],
-                        options: {cwd: workPath}
+                        options: {cwd: workPath},
+                        emitter: _emitter
                     });
 
                     process2.on('close', function (code) {
@@ -108,6 +110,10 @@ module.exports = _basePlugin.ext(function () {
                         if (slot < libraries.length) {
                             _exec();
                         }
+                        if (_emitter) {
+                            _emitter.emit("job.done", {status: "done"});
+                        }
+
                     });
                 });
             }

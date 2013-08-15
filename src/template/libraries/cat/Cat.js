@@ -19,8 +19,8 @@ _cat.core = function() {
             })();
         }
 
-        _Scrap.prototype.get = function() {
-            return me[key];
+        _Scrap.prototype.get = function(key) {
+            return this[key];
         };
 
         _Scrap.prototype.getArg = function(key) {
@@ -108,6 +108,6 @@ _cat.core = function() {
 
         }
 
-    }
+    };
 
 }();

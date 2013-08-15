@@ -3,7 +3,17 @@ var _catglobal = catrequire("cat.global"),
     _path = require("path"),
     _props = catrequire("cat.props"),
     _basePlugin = catrequire("cat.plugin.base"),
-    _utils = catrequire("cat.utils");
+    _utils = catrequire("cat.utils"),
+    _os = require("os");
+
+    function _isWindows() {
+        var type = _os.platform();
+        if (type.toLocaleLowerCase() == "win32") {
+            return true;
+        }
+
+        return false;
+    }
 
 module.exports = _basePlugin.ext(function () {
 
@@ -33,7 +43,8 @@ module.exports = _basePlugin.ext(function () {
                         spawn: spawn,
                         command: command,
                         options: options,
-                        args: args
+                        args: args,
+                        inline: true
                     });
 
                 }
@@ -49,13 +60,21 @@ module.exports = _basePlugin.ext(function () {
                     command = config.command,
                     args = config.args,
                     options = config.options,
-                    spawn = (config.spawn || require('child_process').spawn);
+                    spawn = (config.spawn || require('child_process').spawn),
+                    inline = config.inline,
+                    emitter = (_emitter || config.emitter);
 
                 try {
 
                     if (!options) {
                         options = {cwd: _catglobal.get("home").working.path}
                     }
+
+                    if (_isWindows()) {
+                        args.unshift("/c", command);
+                        command = "cmd";
+                    }
+
                     chilsp = spawn(command, args, options);
 
                     chilsp.stdout.on('data', function (data) {
@@ -70,9 +89,10 @@ module.exports = _basePlugin.ext(function () {
                         if (code !== 0) {
                             _log.info('[spawn close] exited with code ' + code);
                         }
-                        if (_emitter) {
-                            _emitter.emit("job.done", {status: "done"});
+                        if (emitter && inline) {
+                            emitter.emit("job.done", {status: "done"});
                         }
+
                     });
                 } catch (e) {
                     _utils.error(_props.get("cat.error").format("[spawn]", e));

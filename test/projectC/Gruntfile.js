@@ -65,7 +65,7 @@ module.exports = function (grunt) {
                 "eqeqeq": true,
                 "immed": false,
                 "latedef": true,
-                "newcap": true,
+                "newcap": false,
                 "noarg": true,
                 "sub": true,
                 "undef": true,
@@ -98,7 +98,7 @@ module.exports = function (grunt) {
         copy: {
             main: {
                 src:'<%= cat.env.lib.target %>/<%= cat.env.lib.name %>.js',
-                dest:'<%= cat.env.target %>/<%= cat.name %>/<%= cat.env.lib.name %>.js'
+                dest:'<%= cat.env.copyto %>/<%= cat.env.lib.name %>.js'
             }
         },
         clean: ["<%= cat.env.lib.target %>",

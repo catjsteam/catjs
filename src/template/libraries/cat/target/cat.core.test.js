@@ -1,4 +1,4 @@
-/*! cat-library - v0.1.0 - 2013-08-14
+/*! cat-library - v0.1.0 - 2013-08-15
 * Copyright (c) 2013 arik; Licensed MIT */
 var _cat = {};
 
@@ -21,8 +21,8 @@ _cat.core = function() {
             })();
         }
 
-        _Scrap.prototype.get = function() {
-            return me[key];
+        _Scrap.prototype.get = function(key) {
+            return this[key];
         };
 
         _Scrap.prototype.getArg = function(key) {
@@ -110,7 +110,7 @@ _cat.core = function() {
 
         }
 
-    }
+    };
 
 }();
 /** test manager **/

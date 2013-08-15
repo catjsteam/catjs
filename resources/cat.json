@@ -2,6 +2,9 @@
     "env": {
         "template": {
             "path": "src/template/project/"
+        },
+        "libraries" : {
+            "path": "src/template/libraries/"
         }
     },
 

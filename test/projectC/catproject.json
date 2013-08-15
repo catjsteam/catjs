@@ -7,7 +7,8 @@
         "lib": {
             "name": "cat.test",
             "source": "lib/",
-            "target": "lib/target/"
+            "target": "lib/target/",
+            "copyto": "./target/test-1/"
         }
     },
 
@@ -40,7 +41,7 @@
         {
             "name": "source.scan",
             "type": "scan",
-            "path": "/home/arik/dev/projects/cat/test/cat-test-app"
+            "path": "./../cat-test-app"
         },
         {
             "name": "target.clean",
@@ -164,8 +165,12 @@
             "plugins": ["target.libraries", "scrap.common", "ext.scrap", "target.inject", "project.install"]
         },
         {
+            "name": "lib",
+            "plugins":["target.libraries"]
+        },
+        {
             "name": "install",
-            "plugins":["target.libraries", "project.install"]
+            "plugins":["project.install"]
         },
         {
             "name": "clean",

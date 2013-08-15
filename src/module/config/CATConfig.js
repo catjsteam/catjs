@@ -64,6 +64,7 @@ var _global = catrequire("cat.global"),
                 project = this.externalConfig.project;
                 if (project) {
                     project.setInfo("template", this.env.template);
+                    project.setInfo("libraries", this.env.libraries);
                     this.plugins.forEach(function(path){
                         pluginsPath.push(_path.join(cathome, path));
                     });
