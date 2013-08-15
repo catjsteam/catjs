@@ -102,6 +102,23 @@ module.exports = function () {
                 this.$setType("html");
             }});
 
+            /**
+             * Annotation for embed javascript block code within HTML page
+             *
+             *  properties:
+             *  name    - inject
+             *  single  - true
+             *  $type   - html
+             */
+            _Scrap.add({name: "inject", func: function (config) {
+                var injectanno = this.get("inject");
+
+                this.setSingle("inject", true);
+                this.$setType("*");
+
+                this.print(injectanno);
+            }});
+
         },
 
         apply: function () {

@@ -27,7 +27,7 @@ module.exports = function () {
             singleTypes: ["name"],
 
             // supported file types
-            fileTypes: ["js", "html"],
+            fileTypes: ["js", "html", "*"],
 
             /*
              *  js      - javascript
@@ -37,7 +37,8 @@ module.exports = function () {
             engines: {
                 JS: "js",
                 HTML_IMPORT_JS: "htmlijs",
-                HTML_EMBED_JS: "htmlejs"
+                HTML_EMBED_JS: "htmlejs",
+                HTML_EMBED_INSERT: "stringinsert"
             },
 
             // default file type

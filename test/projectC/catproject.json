@@ -117,6 +117,13 @@
             "dependency": "inject.ext"
         },
         {
+            "name": "npm.install",
+            "type": "spawn",
+            "dependency": "spawn.ext",
+            "command": "npm",
+            "args": ["install", "--no-color"]
+        },
+        {
             "name": "project.install",
             "type": "spawn",
             "dependency": "spawn.ext",
@@ -154,7 +161,7 @@
     "tasks": [
         {
             "name": "init",
-            "plugins": ["init.copy"]
+            "plugins": ["npm.install", "init.copy"]
         },
         {
             "name": "scrap",

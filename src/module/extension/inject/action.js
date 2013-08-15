@@ -235,6 +235,10 @@ module.exports = _basePlugin.ext(function () {
                             // HTML import javascript file
                             content = scraplcl.generate();
 
+                        } else if (engine === _scrapEnum.engines.HTML_EMBED_INSERT) {
+                            // Inject the scrap line to the file untouched
+                            content = scraplcl.generate();
+
                         }
 
                         content = (_utils.prepareCode(content) || "");

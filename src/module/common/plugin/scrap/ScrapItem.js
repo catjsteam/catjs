@@ -264,6 +264,10 @@ _clazz.prototype.$getEngine = function () {
         } else if (this.get("embed")) {
             return _scrapEnum.scrapEnum.engines.HTML_EMBED_JS;
         }
+    } else if ($type === "*") {
+        if (this.get("inject")) {
+            return _scrapEnum.scrapEnum.engines.HTML_EMBED_INSERT;
+        }
     }
 };
 
