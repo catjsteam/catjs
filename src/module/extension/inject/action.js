@@ -163,7 +163,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param file The reference file to be processed
          */
-            _injectScrapCall = function (scraps, file) {
+         _injectScrapCall = function (scraps, file, callback) {
 
             var lines = [] , lineNumber = 1,
                 commentinfos = [];
@@ -285,8 +285,6 @@ module.exports = _basePlugin.ext(function () {
 
             }).then(function () {
 
-                    _Scrap.apply({scraps: scraps});
-
                     try {
                         _fs.writeFileSync(file, lines.join(""));
                         _log.debug(_props.get("cat.mdata.write").format("[inject ext]"));
@@ -294,6 +292,8 @@ module.exports = _basePlugin.ext(function () {
                     } catch (e) {
                         _utils.error(_props.get("cat.error").format("[inject ext]", e));
                     }
+
+                    callback.call(this);
 
                 });
 
@@ -306,16 +306,20 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-         _inject = function (scraps, fileName) {
+         _inject = function (scraps, fileName, callback) {
 
             var file = fileName;
 
             if (file) {
                 if (_fs.existsSync(file)) {
 
-                    _injectScrapCall(scraps, file);
+                    _injectScrapCall(scraps, file, function() {
 
-                    _generateSourceProject(scraps, file);
+                        _generateSourceProject(scraps, file);
+
+                        callback.call(this);
+                    });
+
                 }
 
             }
@@ -353,15 +357,47 @@ module.exports = _basePlugin.ext(function () {
             apply: function (config) {
 
                 var data,
-                    fileName, scrapName,
-                    files, scrapData, scrapDataObj,
-                    scrap, scraps = [],
+                    fileName,
+                    files, filesArr = [],
+                    counter,
                     emitter = _me.getEmitter();
 
                 _me.apply(config);
-
                 data = (_mdata ? _mdata.read() : undefined);
                 _mdobject = (data ? JSON.parse(data) : undefined);
+
+                function _apply(filename) {
+
+                    scraps = [];
+                    if (filename) {
+
+                        var scrapName,
+                            scrapData,
+                            scrap,
+                            scraps = [],
+                            scrapDataObj = files[filename];
+
+                        if (scrapDataObj) {
+                            for (scrapName in scrapDataObj) {
+                                scrapData = scrapDataObj[scrapName];
+                                if (scrapData) {
+                                    scrap = new _Scrap.clazz(scrapData);
+                                    if (scrap) {
+                                        scraps.push(scrap);
+                                    }
+                                }
+                            }
+                        }
+
+                        _Scrap.apply({scraps: scraps});
+
+                        _inject(scraps, filename, function() {
+                            counter++;
+                            _apply(filesArr[counter]);
+                        });
+                    }
+                }
+
                 if (_mdobject) {
 
                     // TODO go over the updates for the file that was changed...
@@ -369,29 +405,18 @@ module.exports = _basePlugin.ext(function () {
                     files = _mdobject.files;
                     if (files) {
                         for (fileName in files) {
-                            scraps = [];
                             if (fileName) {
-
-                                scrapDataObj = files[fileName];
-                                if (scrapDataObj) {
-                                    for (scrapName in scrapDataObj) {
-                                        scrapData = scrapDataObj[scrapName];
-                                        if (scrapData) {
-                                            scrap = new _Scrap.clazz(scrapData);
-                                            if (scrap) {
-                                                scraps.push(scrap);
-                                            }
-                                        }
-                                    }
-                                }
-                                _inject(scraps, fileName);
+                                filesArr.push(fileName);
                             }
-
                         }
+                    }
+
+                    if (filesArr && filesArr.length > 0) {
+                        counter = 0;
+                        _apply(filesArr[counter]);
                     }
                 }
 
-                emitter.emit("job.done", {status: "done"});
             }
         };
 

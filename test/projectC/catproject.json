@@ -161,7 +161,7 @@
     "tasks": [
         {
             "name": "init",
-            "plugins": ["npm.install", "init.copy"]
+            "plugins": ["npm.install", "init.copy",  "target.libraries", "project.install"]
         },
         {
             "name": "scrap",
@@ -169,7 +169,7 @@
         },
         {
             "name": "inject",
-            "plugins": ["target.libraries", "scrap.common", "ext.scrap", "target.inject", "project.install"]
+            "plugins": ["scrap.common", "ext.scrap", "target.inject", "project.install"]
         },
         {
             "name": "lib",

@@ -92,6 +92,7 @@ module.exports = _basePlugin.ext(function () {
                         if (emitter && inline) {
                             emitter.emit("job.done", {status: "done"});
                         }
+                        emitter.removeListener("spawn.exec", _module.exec);
 
                     });
                 } catch (e) {
@@ -143,6 +144,7 @@ module.exports = _basePlugin.ext(function () {
 
                 // Listen to the process emitter
                 if (_emitter) {
+                    _emitter.removeListener("spawn.exec", _module.exec);
                     _emitter.on("spawn.exec", _module.exec);
                     //  _emitter.on("scan.folder", _module.folder);
                 } else {

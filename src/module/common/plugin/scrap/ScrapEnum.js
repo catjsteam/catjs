@@ -6,43 +6,43 @@ module.exports = function () {
         "_info": {
             start: {
                 line: -1,
-                    col: -1
+                col: -1
             },
             end: {
                 line: -1,
-                    col: -1
+                col: -1
             }
         }
     }, _enum = {
 
         open: "@[",
-            close: "]@",
-            single: "@@",
-            name: "scrap",
+        close: "]@",
+        single: "@@",
+        name: "scrap",
 
-            "injectinfo": _baseEnum["_info"],
-            "scrapinfo": _baseEnum["_info"],
+        "injectinfo": _baseEnum["_info"],
+        "scrapinfo": _baseEnum["_info"],
 
-            // single type scrap item, cannot accept more than one value
-            singleTypes: ["name"],
+        // single type scrap item, cannot accept more than one value
+        singleTypes: ["name"],
 
-            // supported file types
-            fileTypes: ["js", "html", "*"],
+        // supported file types
+        fileTypes: ["js", "html", "*"],
 
-            /*
-             *  js      - javascript
-             *  htmlijs - html import javascript
-             *  htmlejs - html embed javascript
-             */
-            engines: {
-                JS: "js",
-                HTML_IMPORT_JS: "htmlijs",
-                HTML_EMBED_JS: "htmlejs",
-                HTML_EMBED_INSERT: "stringinsert"
-            },
+        /*
+         *  js      - javascript
+         *  htmlijs - html import javascript
+         *  htmlejs - html embed javascript
+         */
+        engines: {
+            JS: "js",
+            HTML_IMPORT_JS: "htmlijs",
+            HTML_EMBED_JS: "htmlejs",
+            HTML_EMBED_INSERT: "stringinsert"
+        },
 
-            // default file type
-            defaultFileType: "js"
+        // default file type
+        defaultFileType: "js"
     };
 
 
@@ -53,6 +53,17 @@ module.exports = function () {
             _utils.copyObjProps(_enum[key], obj);
 
             return obj;
+        },
+
+        /**
+         * single line scrap @@scrap[Name (optional)][.. @@[scrap property]@[scrap value]]
+         * e.g. @@scrap@@import@cat.test.js
+         *      @@scrapTest@@code@console.log('test')
+         *
+         * @returns {String} The single line scrap enum (@@scrap)
+         */
+        getSingleLineEnum: function() {
+            return [_enum.single, _enum.name].join("");
         },
 
         scrapEnum: _enum

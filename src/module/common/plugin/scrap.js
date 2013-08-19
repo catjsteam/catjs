@@ -28,7 +28,7 @@ module.exports = _basePlugin.ext(function () {
     function _extractValidScrapRoot(comments) {
 
         var gidx = 0, gsize, blockComment,
-            scrap = [];
+            scrap = [], extractedScraps;
 
         if (comments && _typedas.isArray(comments)) {
 
@@ -37,7 +37,10 @@ module.exports = _basePlugin.ext(function () {
 
                 blockComment = comments[gidx];
                 if (blockComment) {
-                    scrap = scrap.concat(_Scrap.extractScrapBlock(blockComment));
+                    extractedScraps = _Scrap.extractScrapBlock(blockComment);
+                    if (extractedScraps && extractedScraps.length > 0) {
+                        scrap = scrap.concat(extractedScraps);
+                    }
                 }
             }
         }
