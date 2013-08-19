@@ -1,4 +1,5 @@
-var _async = require("async");
+var _async = require("async"),
+    _flow;
 
 var CAT = function () {
 
@@ -38,6 +39,8 @@ var CAT = function () {
             project = _catconfigInternal.externalConfig.project;
             task = project.getTask(target);
             if (task) {
+                _flow.log({msg: [" > Open Task: ", JSON.stringify(task), ("watch: " + (watch ? true : false))].join(" ")});
+
                 if (watch) {
                     // set watch configuration
                     _catconfigInternal.watch(watch);
@@ -54,6 +57,7 @@ var CAT = function () {
     function _runme(watch) {
 
         _emitter.on("task.done", function (obj) {
+            _flow.log({msg: [" Close Task: ", _targets[_counter]].join(" ")});
             _counter++;
             if (_counter < _targets.length) {
                 _emitter.removeAllListeners("task.done");
@@ -204,6 +208,10 @@ var CAT = function () {
                 process.on('SIGINT', function () {
                     process.exit(1);
                 });
+
+                // flow logger initialization
+                _flow = catrequire("cat.flow");
+                _flow.init();
             }
 
             /**

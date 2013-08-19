@@ -3,7 +3,8 @@ var _global = catrequire("cat.global"),
     _path = require("path"),
     _typedas = require("typedas"),
     _utils = catrequire("cat.utils"),
-    _props = catrequire("cat.props");
+    _props = catrequire("cat.props"),
+    _flow;
 
 /**
  * Task configuration class
@@ -36,6 +37,8 @@ module.exports = function (config) {
 
         function _action(action) {
             if (action) {
+                _flow.log({msg: [" >> Running Plugin: ", me.actions[idx]].join(" ")});
+
                 actionobj = catconfig.getAction(action);
                 dependency = actionobj.dependency;
 
@@ -54,6 +57,8 @@ module.exports = function (config) {
 
         function _runme() {
             emitter.on("job.done", function (obj) {
+                _flow.log({msg: [" >> Plugin Done: ", me.actions[idx]].join(" ")});
+
                 idx++;
                 emitter.removeAllListeners("job.done");
                 if (idx < size) {
@@ -152,6 +157,7 @@ module.exports = function (config) {
         emitter = config.emitter;
         global = config.global;
         catconfig = config.catconfig;
+        _flow = catrequire("cat.flow")
     }
 
     if (config) {
