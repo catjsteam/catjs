@@ -168,7 +168,7 @@
     "tasks": [
         {
             "name": "init",
-            "plugins": ["npm.install", "init.copy",  "target.libraries", "project.install"]
+            "plugins": ["npm.install", "init.copy",  "target.libraries"]
         },
         {
             "name": "scrap",
