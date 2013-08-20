@@ -1,4 +1,4 @@
-var _log = require("../../../CATGlob.js").log(),
+var _log = catrequire("cat.global").log(),
     _typedas = require("typedas"),
     _Filter = require("./Filter.js");
 
