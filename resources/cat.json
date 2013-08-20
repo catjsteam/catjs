@@ -9,7 +9,7 @@
     },
 
     "plugins" : [
-        "src/module/common/plugin/",
+        "src/module/plugin/",
         "src/plugins/"
     ],
 

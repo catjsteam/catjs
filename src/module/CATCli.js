@@ -38,13 +38,13 @@ module.exports = function() {
                     "cat.tpl.utils": "src/module/utils/TemplateUtils.js",
                     "cat.project": "src/module/Project.js",
                     "cat.props": "src/module/Properties.js",
-                    "cat.plugin.base": "src/module/common/plugin/Base.js",
                     "cat.mdata": "src/module/fs/MetaData.js",
-                    "cat.common.scrap": "src/module/common/plugin/scrap/Scrap.js",
-                    "cat.common.parser": "src/module/common/parser/Parser.js",
                     "cat.watch": "src/module/Watch.js",
                     "cat.cache": "src/module/Cache.js",
-                    "cat.plugin.spawn": "src/module/common/plugin/spawn.js",
+                    "cat.plugin.base": "src/module/plugin/Base.js",
+                    "cat.plugin.spawn": "src/module/plugin/spawn.js",
+                    "cat.common.scrap": "src/module/plugin/scrap/Scrap.js",
+                    "cat.common.parser": "src/module/common/parser/Parser.js",
                     "cat.flow": "src/module/Flow.js"
                 };
 
