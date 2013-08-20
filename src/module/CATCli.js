@@ -30,22 +30,26 @@ module.exports = function() {
             (function() {
                 // Map index for CAT modules
                 global["cat.config.module"] = {
-                    "cat": "src/module/CAT.js",
                     "cat.config": "src/module/config/CATConfig.js",
+
+                    "cat": "src/module/CAT.js",
+                    "cat.flow": "src/module/Flow.js",
                     "cat.global": "src/module/CATGlob.js",
+                    "cat.project": "src/module/Project.js",
+                    "cat.props": "src/module/Properties.js",
+                    "cat.config.utils": "src/module/utils/fs/Config.js",
+                    "cat.mdata": "src/module/utils/fs/MetaData.js",
+                    "cat.watch": "src/module/Watch.js",
+                    "cat.cache": "src/module/Cache.js",
+
                     "cat.utils": "src/module/utils/Utils.js",
                     "cat.ext.utils": "src/module/utils/ExtUtils.js",
                     "cat.tpl.utils": "src/module/utils/TemplateUtils.js",
-                    "cat.project": "src/module/Project.js",
-                    "cat.props": "src/module/Properties.js",
-                    "cat.mdata": "src/module/fs/MetaData.js",
-                    "cat.watch": "src/module/Watch.js",
-                    "cat.cache": "src/module/Cache.js",
+
                     "cat.plugin.base": "src/module/plugin/Base.js",
                     "cat.plugin.spawn": "src/module/plugin/spawn.js",
                     "cat.common.scrap": "src/module/plugin/scrap/Scrap.js",
-                    "cat.common.parser": "src/module/common/parser/Parser.js",
-                    "cat.flow": "src/module/Flow.js"
+                    "cat.common.parser": "src/module/common/parser/Parser.js"
                 };
 
                 global.catmodule = function (module) {

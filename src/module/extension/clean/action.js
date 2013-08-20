@@ -32,15 +32,7 @@ module.exports = _basePlugin.ext(function () {
                 libTargetFolder;
 
             function _delete(dir) {
-                if (dir) {
-                    if (_fs.existsSync(dir)) {
-                        try {
-                            _fs.rmrfSync(dir);
-                        } catch (e) {
-                            _utils.error(_props.get("cat.error").format("[clean action]", e));
-                        }
-                    }
-                }
+                _utils.deleteSync(dir);
             }
 
             emitter = _me.getEmitter();
@@ -89,15 +81,37 @@ module.exports = _basePlugin.ext(function () {
              */
             apply: function (config) {
 
-                var dirs = (config ? config.path : undefined),
-                    error = "[Scan Ext] no valid configuration for 'apply' functionality";
+                var targetPath = (config ? config.path : undefined),
+                    error = "[Scan Ext] no valid configuration for 'apply' functionality",
+                    data,
+                    workingPath = _global.get("home").working.path,
+                    args = [];
 
                 _me.apply(config);
 
-                if (!dirs) {
+                if (!targetPath) {
                     _utils.error(error);
                 }
-                _clean(dirs);
+
+                // handle incoming target path
+                args.push(targetPath);
+
+                // handle incoming path data from the plugin
+                data = _me._data;
+                if (data && data.path) {
+                    if (_typedas.isString(data.path)) {
+                        args.push(_path.join(workingPath,data.path));
+
+                    } else if (_typedas.isArray(data.path)) {
+                        data.path.forEach(function(path){
+                            if (path) {
+                                args.push(_path.join(workingPath, path));
+                            }
+                        });
+                    }
+                }
+
+                _clean(args);
             },
 
             /**

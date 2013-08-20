@@ -28,16 +28,23 @@ module.exports = function () {
      */
         _copySync = function (source, target, cb) {
             var cbCalled = false,
-                me = this;
+                me = this,
+                rd, wr;
 
-            var rd = _fs.createReadStream(source);
+            if (!_fs.existsSync(source)) {
+                return undefined;
+            }
+
+            rd = _fs.createReadStream(source);
             rd.on("error", function (err) {
                 done(err);
             });
-            var wr = _fs.createWriteStream(target);
+
+            wr = _fs.createWriteStream(target);
             wr.on("error", function (err) {
                 done(err);
             });
+
             wr.on("close", function (ex) {
                 done();
             });
@@ -61,6 +68,18 @@ module.exports = function () {
         mkdirSync: _mkdirSync,
 
         copySync: _copySync,
+
+        deleteSync: function (dir) {
+            if (dir) {
+                if (_fs.existsSync(dir)) {
+                    try {
+                        _fs.rmrfSync(dir);
+                    } catch (e) {
+                        this.error(_props.get("cat.error").format("[utils (deleteSync)]", e));
+                    }
+                }
+            }
+        },
 
         log: function (type, msg) {
             if (type) {
@@ -96,9 +115,9 @@ module.exports = function () {
          * @param obj The reference object
          * @param query The query to apply over the referenced object
          */
-        resolveObject: function(obj, query) {
+        resolveObject: function (obj, query) {
 
-            if (!obj || ! query) {
+            if (!obj || !query) {
                 return obj;
             }
 
@@ -107,7 +126,7 @@ module.exports = function () {
                 counter = 0,
                 key;
 
-            while(counter < size) {
+            while (counter < size) {
                 key = keys[counter];
                 if (key && obj[key]) {
                     obj = obj[key];
@@ -148,7 +167,7 @@ module.exports = function () {
         /**
          *  Prepare RegExp pattern, some of the characters need to be parsed.
          */
-        prepareRegexpPattern: function(pattern) {
+        prepareRegexpPattern: function (pattern) {
             if (pattern) {
                 pattern = pattern.split("[").join("\\[");
             }
@@ -156,7 +175,7 @@ module.exports = function () {
             return pattern;
         },
 
-        getMatchedValue: function(str, pattern, flags) {
+        getMatchedValue: function (str, pattern, flags) {
 
             if (!pattern || !str) {
                 return undefined;

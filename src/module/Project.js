@@ -1,4 +1,4 @@
-var _fsconfig = require("./fs/Config.js"),
+var _fsconfig = require("./utils/fs/Config.js"),
     _Config = require("./../module/common/project/config/Config.js"),
     _global = catrequire("cat.global"),
     _utils = catrequire("cat.utils"),

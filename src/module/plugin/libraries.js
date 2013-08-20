@@ -28,30 +28,124 @@ module.exports = _basePlugin.ext(function () {
          *          global - The global data configuration
          *          internalConfig - CAT internal configuration
          */
-         init: function (config) {
+        init: function (config) {
 
             var imports,
+                action,
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"],
                 manifestFileName = "manifest.json",
-                catWorkPath = _catglobal.get("home").working.path,
-                manifestLib = [global.catlibs, manifestFileName].join("/"),
-                manifest = _fs.readFileSync(manifestLib, "utf8"),
+                manifestLib = _path.join(global.catlibs, manifestFileName),
+                manifest,
                 libraries,
                 slot = 0;
 
+            if (_fs.existsSync(manifestLib)) {
+                manifest = _fs.readFileSync(manifestLib, "utf8");
+            }
 
             function _exec() {
+
                 var library = libraries[slot],
+                    actions = {},
                     process1, process2,
                     catProjectLib = (_project ? _project.getInfo("lib.source") : undefined),
-                    targetManifestPath = [catProjectLib, manifestFileName].join("/"),
+                    targetManifestPath = _path.join(catProjectLib, manifestFileName),
                     workPath = _path.join(cathome, _project.getInfo("libraries").path, "cat");
+
+                actions.install = function () {
+
+                    process1 = _spawn().spawn({
+                        command: "npm",
+                        args: ["install"],
+                        options: {cwd: workPath},
+                        emitter: _emitter
+                    });
+
+                    process1.on('close', function (code) {
+                        if (code !== 0) {
+                            _log.info('[spawn close] exited with code ' + code);
+                        }
+
+                        process2 = _spawn().spawn({
+                            command: "grunt",
+                            args: [action, "--no-color"],
+                            options: {cwd: workPath},
+                            emitter: _emitter
+                        });
+
+                        process2.on('close', function (code) {
+                            if (code !== 0) {
+                                _log.info('[spawn close] exited with code ' + code);
+                            }
+
+                            _copyResource();
+
+                            slot++;
+                            if (slot < libraries.length) {
+                                _exec();
+                            }
+                            if (_emitter) {
+                                _emitter.emit("job.done", {status: "done"});
+                            }
+
+                        });
+                    });
+                };
+
+                actions.clean = function () {
+
+
+                    process1 = _spawn().spawn({
+                        command: "npm",
+                        args: ["install"],
+                        options: {cwd: workPath},
+                        emitter: _emitter
+                    });
+
+                    process1.on('close', function (code) {
+                        if (code !== 0) {
+                            _log.info('[spawn close] exited with code ' + code);
+                        }
+
+                        process2 = _spawn().spawn({
+                            command: "grunt",
+                            args: [action, "--no-color"],
+                            options: {cwd: workPath},
+                            emitter: _emitter
+                        });
+
+                        process2.on('close', function (code) {
+                            if (code !== 0) {
+                                _log.info('[spawn close] exited with code ' + code);
+                            }
+
+                            _copyResource();
+
+                            slot++;
+                            if (slot < libraries.length) {
+                                _exec();
+                            }
+                            if (_emitter) {
+                                _emitter.emit("job.done", {status: "done"});
+                            }
+
+                            // delete node_modules libs
+                            var nodeModulesFolders = _path.join(workPath, "node_modules");
+                            if (nodeModulesFolders) {
+                                _utils.deleteSync(nodeModulesFolders);
+                            }
+
+                        });
+                    });
+                };
 
                 // copy the manifest file
                 try {
-                    _utils.copySync(manifestLib, targetManifestPath);
-                } catch(e) {
+                    if (_fs.existsSync(manifestLib) && _fs.existsSync(targetManifestPath)) {
+                        _utils.copySync(manifestLib, targetManifestPath);
+                    }
+                } catch (e) {
                     _log.error(_props.get("cat.file.copy.failed").format("[libraries]", targetManifestPath, e))
                 }
 
@@ -72,50 +166,18 @@ module.exports = _basePlugin.ext(function () {
 //                        _utils.copySync(from, to);
 
                         // copy dev
-                        from = _path.normalize([workPath, "target", library.dev].join("/")),
-                        to = _path.normalize([catProjectLib, library.dev].join("/"));
+                        from = _path.join(workPath, "target", library.dev),
+                            to = _path.join(catProjectLib, library.dev);
                         _utils.copySync(from, to);
-                    } catch(e) {
+                    } catch (e) {
                         _log.error(_props.get("cat.file.copy.failed").format("[libraries]", from, e))
                     }
                 }
 
-                process1 = _spawn().spawn({
-                    command: "npm",
-                    args: ["install"],
-                    options: {cwd: workPath},
-                    emitter: _emitter
-                });
+                if (actions[action]) {
+                    actions[action].call(this);
+                }
 
-                process1.on('close', function (code) {
-                    if (code !== 0) {
-                        _log.info('[spawn close] exited with code ' + code);
-                    }
-
-                    process2 = _spawn().spawn({
-                        command: "grunt",
-                        args: ["--no-color"],
-                        options: {cwd: workPath},
-                        emitter: _emitter
-                    });
-
-                    process2.on('close', function (code) {
-                        if (code !== 0) {
-                            _log.info('[spawn close] exited with code ' + code);
-                        }
-
-                        _copyResource();
-
-                        slot++;
-                        if (slot < libraries.length) {
-                            _exec();
-                        }
-                        if (_emitter) {
-                            _emitter.emit("job.done", {status: "done"});
-                        }
-
-                    });
-                });
             }
 
             if (!config) {
@@ -133,6 +195,9 @@ module.exports = _basePlugin.ext(function () {
             _me.dataInit(_data);
             extensionParams = _data.data;
 
+            imports = extensionParams.imports;
+            action = extensionParams.action;
+
             if (config && extensionParams) {
 
                 // prepare libraries
@@ -148,7 +213,6 @@ module.exports = _basePlugin.ext(function () {
                         }
                     }
                 }
-                imports = extensionParams.imports;
 
             }
         }

@@ -104,10 +104,11 @@ module.exports = function (config) {
 
     function _extensionApply(ext, byPhase, internalConfig, extensionConfig, actionApply) {
 
-        function extensionApplyImpl() {
+        function extensionApplyImpl(pluginHandle) {
             if (!extensionConfig.apply) {
                 _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
             } else {
+                internalConfig.pluginHandle = pluginHandle;
                 extensionConfig.apply(internalConfig);
             }
         }
@@ -117,12 +118,13 @@ module.exports = function (config) {
             if (!actionApply) {
                 _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
             } else {
-                actionApply(internalConfig);
+                return actionApply(internalConfig);
             }
         }
 
         var phase,
-            extConfig;
+            extConfig,
+            pluginHandle;
 
         if (ext) {
             extensionConfig = (extensionConfig ? extensionConfig : catconfig.getExtension(ext));
@@ -143,10 +145,10 @@ module.exports = function (config) {
             }
 
             if (phase == "default") {
-                actionApplyImpl(actionApply);
-                extensionApplyImpl();
+                pluginHandle = actionApplyImpl(actionApply);
+                extensionApplyImpl(pluginHandle);
             } else {
-                extensionApplyImpl();
+                pluginHandle = extensionApplyImpl(pluginHandle);
                 actionApplyImpl(actionApply);
             }
         }

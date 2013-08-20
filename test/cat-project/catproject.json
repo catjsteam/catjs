@@ -86,7 +86,13 @@
             "name": "target.libraries",
             "type": "libraries",
             "dependency": "dependency.loader",
-            "imports": ["cat.core.test"]
+            "imports": ["cat.core.test"],
+            "action": "install"
+        }, {
+            "name": "target.libraries.clean",
+            "type": "libraries",
+            "dependency": "dependency.loader",
+            "action": "clean"
         },
         {
             "name": "init.copy",
@@ -109,7 +115,8 @@
         {
             "name": "target.clean",
             "type": "clean",
-            "dependency": "target.clean"
+            "dependency": "target.clean",
+            "path": ["lib", "src", "node_modules"]
         },
         {
             "name": "target.inject",
@@ -181,11 +188,11 @@
         },
         {
             "name": "clean",
-            "plugins": ["target.clean", "project.clean"]
+            "plugins": ["project.clean", "target.libraries.clean", "target.clean"]
         },
         {
             "name": "test",
-            "plugins": ["project.phantomjs"]
+            "plugins": ["project.webserver.start", "project.phantomjs", "project.webserver.stop"]
         },
         {
             "name": "server.start",

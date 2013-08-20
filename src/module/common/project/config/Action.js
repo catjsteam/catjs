@@ -66,6 +66,8 @@ module.exports = function (config) {
                         _log.error("[Action] action type not found or failed to load module ", e);
                     }
                 }
+
+                return me;
             };
 
 

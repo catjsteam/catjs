@@ -14,11 +14,19 @@ module.exports = function () {
         /**
          * Apply manager, mark as done, to occur just once
          */
-        proto.apply = function() {
+        proto.apply = function(config) {
+
+            var pluginHandle;
+
             if (this._apply) {
                 _log.warning(_props.get("cat.ext.apply.warn").format("[base extension]", "?"));
             }
             this._apply ++;
+
+            if (config.internalConfig) {
+                pluginHandle = config.internalConfig.pluginHandle;
+                this._data = (pluginHandle ? pluginHandle.data : undefined);
+            }
         };
 
         /**

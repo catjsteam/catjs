@@ -1,4 +1,3 @@
-debugger;
 var _fs = require("fs"),
     _global = catrequire("cat.global"),
     _fileName = [_global.get("home").working.path, "cat.flow.log"].join("/"),

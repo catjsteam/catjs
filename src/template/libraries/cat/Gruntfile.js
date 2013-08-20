@@ -110,6 +110,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
 
     // Default task.
-    grunt.registerTask('default', ['clean', 'jshint', 'concat', 'uglify']);
+    grunt.registerTask('install', ['clean', 'jshint', 'concat', 'uglify']);
 
 };
