@@ -2,7 +2,7 @@
 
 var _fs = require("fs"),
     _path = require("path"),
-    _logFileName = "./../../../../cat.libraries.log",
+    _logFileName = "./../../../cat.libraries.log",
     _logFileStream = _fs.openSync(_logFileName, 'a');
 
 function logStreamHook(grunt) {
