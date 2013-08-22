@@ -116,7 +116,7 @@
             "name": "target.clean",
             "type": "clean",
             "dependency": "target.clean",
-            "path": ["lib", "src", "node_modules"]
+            "path": ["lib", "src"]
         },
         {
             "name": "target.inject",
@@ -143,6 +143,13 @@
             "dependency": "spawn.ext",
             "command": "grunt",
             "args": ["clean", "--no-color"]
+        },
+        {
+            "name": "mobile.test",
+            "type": "spawn",
+            "dependency": "spawn.ext",
+            "command": "adb",
+            "args": ["shell", "am", "start", "-n", "com.phonegap.www/.CATTest"]
         },
         {
             "name": "project.phantomjs",
@@ -193,6 +200,10 @@
         {
             "name": "test",
             "plugins": ["project.webserver.start", "project.phantomjs", "project.webserver.stop"]
+        },
+        {
+            "name": "mtest",
+            "plugins": ["project.webserver.start", "mobile.test"]
         },
         {
             "name": "server.start",
