@@ -1,8 +1,17 @@
-************ Node Modules Standalone usage
-node ./src/module/CATCli.js scan "test/config"
-catcli -ip
-catcli -sp
+************ Node Modules usage
+(i) init (s) scrap (j) inject
+catcli -pisj
 
 
-************ Node Modules with Grunt usage
-grunt scan
+
+************ CAT Phantom test usage
+    cat command:  catcli -pt
+
+************ CAT Mobile test usage
+(android)
+
+    1)  Install resource CATTest.apk on your device
+    2)  Make sure that you have adb installed
+    3)  run the command:
+        *)  cat command:   catcli -p --task mtest
+        *)  grunt command: grunt cat.compile
