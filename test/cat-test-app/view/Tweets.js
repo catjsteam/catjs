@@ -28,7 +28,11 @@
             @[scrap
                 @@name tweetsInitialize
                 @@context me
-                @@code console.log('test', me);
+                @@code console.log('test2');
+                @@code[
+                    console.log('test3', me);
+                    console.log('test4', me);
+                ]
             ]@
          */
 

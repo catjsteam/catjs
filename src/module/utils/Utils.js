@@ -164,39 +164,6 @@ module.exports = function () {
             return codeRows;
         },
 
-        /**
-         *  Prepare RegExp pattern, some of the characters need to be parsed.
-         */
-        prepareRegexpPattern: function (pattern) {
-            if (pattern) {
-                pattern = pattern.split("[").join("\\[");
-            }
-
-            return pattern;
-        },
-
-        getMatchedValue: function (str, pattern, flags) {
-
-            if (!pattern || !str) {
-                return undefined;
-            }
-            var regexp = new RegExp(this.prepareRegexpPattern(pattern), (flags || "")),
-                value;
-
-            if (str) {
-                value = str.match(regexp);
-                if (value) {
-                    value = value[1];
-                    value = value.trim();
-                }
-
-                if (!value) {
-                    value = undefined;
-                }
-            }
-
-            return value;
-        },
 
         /**
          *  Check if a given object contains a value

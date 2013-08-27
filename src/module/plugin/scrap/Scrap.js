@@ -1,11 +1,13 @@
 var _utils = catrequire("cat.utils"),
+     _regutils = catrequire("cat.regexp.utils"),
     _props = catrequire("cat.props"),
     _md = catrequire("cat.mdata"),
     _typedas = require("typedas"),
     _log = catrequire("cat.global").log(),
     _clazz = require("./ScrapItem.js"),
     _parser = require("./parser/Parser.js"),
-    _scrapEnum = require("./ScrapEnum.js");
+    _scrapEnum = require("./ScrapEnum.js"),
+    _scrapUtils = require("./ScrapUtils.js");
 
 
 module.exports = function () {
@@ -20,16 +22,6 @@ module.exports = function () {
          * @private
          */
          _extractScrapBlock = function (scrapCommentBlock) {
-
-//            var idx = 0, size, comment, commentobj,
-//                scrap = [-1, -1],
-//                lineNumber = [0, 0],
-//                commentBlock = {},
-//                scraps = [],
-//                currentScrap = [],
-//                scrapBlockName,
-//                tmpString, tmpPos;
-
 
             return _parser.parse(scrapCommentBlock);
         };
@@ -94,41 +86,94 @@ module.exports = function () {
                 return undefined;
             }
             var rows = scrapBlock.rows,
-                idx = 1, size = rows.length, row, scrapRowData = [],
+                idx = 1, size = rows.length, row,
                 scrap, config = {},
                 configKey, configVal,
-                scrapBlockInfo = _scrapEnum.scrapEnum,
-                single = scrapBlockInfo.single,
-                multiOpen = scrapBlockInfo.open,
-                multiClose = scrapBlockInfo.close,
-                pos, startrow,
-                me = this;
+                multiRowOpenExp = "@@(.*)([\\[]+)(.*)([\\s].*)",
+                multiRowCloseExp = "(.*)?([\\]])([\\s]?.*)",
+                multiRowWaitForClosing = 0,
+                multiRowExp = "@@(.*)([\\[]+)(.*)([\\]]+.*?)([\\s]?.*)",
+                closeRow, singleRow, multiRowOpen, multiRow,
+                data,
+                idxi= 0, sizei= 0, itemi,
+                // 0-don't push, 1-push data, 2-push data and break
+                pushdata = 0;
 
             // scan rows (exclude the fitrs & last rows scrap block["@[scrap" .. "]@]
             for (; idx < size - 1; idx++) {
+                singleRow = null;
+                data = null;
+                idxi=0; sizei = 0;
+
                 row = rows[idx];
                 if (row) {
-                    // config.row = row;
-                    pos = row.indexOf(single);
-                    if (pos === -1) {
-                        pos = row.indexOf(multiOpen);
-                        if (pos > -1) {
-
-                        }
+                    if (multiRowOpen) {
+                        closeRow = _regutils.getMatch(row, multiRowCloseExp);
                     }
 
-                    // look for single line scrap
-                    if (pos > -1) {
-                        startrow = row.substring(pos);
-                        configKey = startrow.substring(single.length, startrow.indexOf(" "));
-                        configVal = startrow.substring(startrow.indexOf(" ") + 1);
+                    if (multiRowOpen && !closeRow) {
+                        multiRowOpen.push(row);
 
-                        // set scrap property / value
-                        if (configKey) {
-                            if (!config[configKey]) {
-                                config[configKey] = [configVal];
+                    } else {
+
+                        if (!closeRow && ! multiRowOpen) {
+                            // @@(.*)\s(.*)\s(.*)
+                            singleRow = _regutils.getMatch(row, "@@(.*?\\[[\\s]+)(.*)");
+                            if (!singleRow) {
+                                singleRow = _regutils.getMatch(row, "@@(.*?[\\s]+)(.*)");
                             } else {
-                                config[configKey].push(configVal)
+                                singleRow = null;
+                            }
+                        }
+
+                        if (singleRow) {
+                            // single row annotation expression
+                            configKey = singleRow[1];
+                            configVal = singleRow[2];
+                            // set scrap property / value
+                            _scrapUtils.putScrapConfig(config, configKey, configVal);
+                        } else {
+
+                            if (!closeRow && ! multiRowOpen) {
+                                // multi row annotation expression
+                                multiRow = _regutils.getMatch(row, multiRowExp);
+                                multiRowOpen =  _regutils.getMatch(row, multiRowOpenExp);
+                            }
+
+                            if (multiRow) {
+                                // we have all we need
+                               configKey = multiRow[1];
+                               data = _scrapUtils.collectDataConfig(multiRow);
+
+                            } else if (multiRowOpen) {
+                                // we wait for closing sign ']'
+                                if (closeRow) {
+                                    multiRowOpen = multiRowOpen.concat(_scrapUtils.normalizeData(closeRow));
+
+                                    // we have all we need
+                                    configKey = multiRowOpen[1];
+                                    data = _scrapUtils.collectDataConfig(multiRowOpen);
+                                }
+                            }
+
+                            if (data) {
+                                // try getting the data
+                                try{
+                                    data = _scrapUtils.cleanArray(data);
+                                    data = _scrapUtils.parseData(data);
+                                    if (data) {
+                                        configVal = (data ? JSON.parse(data.join("")) : undefined);
+                                        _scrapUtils.putScrapConfig(config, configKey, configVal);
+                                    }
+                                } catch(e) {
+                                    console.log(e)
+                                }
+
+
+                                // reset
+                                closeRow = null;
+                                multiRow = null;
+                                multiRowOpen = null;
                             }
                         }
                     }

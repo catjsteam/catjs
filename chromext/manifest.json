@@ -1,0 +1,16 @@
+{
+	"name": "Scrap Extension",
+	"version": "1.0",
+	"manifest_version": 2,
+	"description": "CAT extension",
+	"permissions": ["tabs", "http://127.0.0.1:8080/*"],
+	"browser_action": {
+		"default_icon": "cat-icon-16.png",
+		"default_popup": "popup.html"
+	},
+	"icons" : {
+		"16" : "cat-icon-16.png",
+		"48" : "cat-icon-48.png",
+		"128" : "cat-icon-128.png"
+	}
+}

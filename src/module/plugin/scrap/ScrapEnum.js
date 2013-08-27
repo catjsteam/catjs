@@ -15,6 +15,8 @@ module.exports = function () {
         }
     }, _enum = {
 
+        multiopen:"[",
+        multiclose:"]",
         open: "@[",
         close: "]@",
         single: "@@",

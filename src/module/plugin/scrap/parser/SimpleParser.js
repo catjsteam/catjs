@@ -2,6 +2,7 @@ var _scrapEnum = require("./../ScrapEnum.js"),
     _log = catrequire("cat.global").log(),
     _props = catrequire("cat.props"),
     _utils = catrequire("cat.utils");
+    _regutils = catrequire("cat.regexp.utils");
 
 module.exports = function () {
 
@@ -12,9 +13,10 @@ module.exports = function () {
      * @returns {*}
      * @private
      */
-    var _extractScrapName = function (line) {
+    var escapedScrapOpen = _regutils.preparePattern(_scrapEnum.scrapEnum.open),
+        _extractScrapName = function (line) {
 
-            return _utils.getMatchedValue(line, [_scrapEnum.scrapEnum.open, _scrapEnum.scrapEnum.name, "@", "(.*)"].join(""));
+            return _regutils.getMatchedValue(line, [escapedScrapOpen, _scrapEnum.scrapEnum.name, "@", "(.*)"].join(""));
         },
 
         /**
@@ -22,7 +24,7 @@ module.exports = function () {
          */
             _validScrapAnchorName = function (line) {
 
-            return _utils.getMatchedValue(line, [_scrapEnum.scrapEnum.open, "(", _scrapEnum.scrapEnum.name, ")"].join(""));
+            return _regutils.getMatchedValue(line, [escapedScrapOpen, "(", _scrapEnum.scrapEnum.name, ")"].join(""));
         };
 
     return {
