@@ -2,8 +2,13 @@
     "libraries": [
         {
             "name": "cat",
+            "address": "local",
             "prod" :"cat.core.test.min.js",
             "dev" :"cat.core.test.js"
+        },
+        {
+            "name": "chai",
+            "address": "remote"
         }
     ]
 }

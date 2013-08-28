@@ -24,8 +24,11 @@
   "engines": {
     "node": ">= 0.8.0"
   },
+  "config": {
+    "unsafe-perm": true
+  },
   "scripts": {
-    "test": "grunt test"
+    "install": "node catinstall.js"
   },
   "dependencies": {
     "grunt-contrib-uglify": "~0.2.2",
@@ -49,7 +52,8 @@
     "line-by-line": "~0.1.1",
     "underscore": "~1.5.1",
     "minimatch": "~0.2.12",
-    "phantomjs": "~1.9.1-0"
+    "phantomjs": "~1.9.1-0",
+    "sudo": "~1.0.3"
   },
   "peerDependencies": {
     "grunt": "~0.4.1"
