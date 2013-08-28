@@ -3,7 +3,7 @@ var os = require('os'),
     spawn,
     options = {
         cachePassword: true,
-        prompt: 'Additional global npm(s) about to be installed, set your root password:? ',
+        prompt: 'Additional global npm(s) about to be installed, set your root password: ',
         spawnOptions: { /* other options for spawn */ }
     },
     process,
