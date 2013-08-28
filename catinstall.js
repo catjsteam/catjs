@@ -30,14 +30,14 @@ function init() {
     if (isLinux()) {
         spawn = require('sudo');
     } else {
-        spawn = require('child_process');
+        spawn =  require('child_process').spawn;
     }
 
 }
 
 function log2file(data, option) {
     try {
-        fs.appendFileSync("catinstaller.log", data, "utf8");
+        fs.appendFileSync("catinstaller.log", (data + "\n"), "utf8");
     } catch (e) {
         log2file("Cat Installer, ERROR:", e);
     }
@@ -58,6 +58,9 @@ function install(items) {
         process = spawn(args, options);
 
     } else {
+        args.unshift(command);
+        args.unshift("/c");
+        command = "cmd";
         print = [command, args.join(" ")].join(" ");
         console.log("Running Installer command: " + print);
         process = spawn(command, args);
@@ -72,7 +75,7 @@ function install(items) {
     });
 
     process.stderr.on('data', function (data) {
-        log2file('CAT Installer, ERROR: ' + data);
+        log2file('CAT Installer : ' + data);
     });
 
     process.on('close', function (code) {
