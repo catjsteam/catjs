@@ -78,7 +78,7 @@ module.exports = function() {
                 };
 
                 global.cathome = home;
-                global.catlibs = _path.normalize([home, "src/libraries/"].join("/"));
+                global.catlibs = _path.join(home, "src/libraries/");
 
 
             })();

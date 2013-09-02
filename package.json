@@ -53,7 +53,8 @@
     "underscore": "~1.5.1",
     "minimatch": "~0.2.12",
     "phantomjs": "~1.9.1-0",
-    "sudo": "~1.0.3"
+    "package-script": "0.0.2",
+    "bower-config": "~0.5.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.1"

@@ -1,14 +1,19 @@
 {
+    "mode": "dev",
     "libraries": [
         {
             "name": "cat",
             "address": "local",
-            "prod" :"cat.core.test.min.js",
-            "dev" :"cat.core.test.js"
+            "base": "target",
+            "prod" :["cat.core.test.min.js"],
+            "dev" :["cat.core.test.js"],
+            "install" : "internal"
         },
         {
             "name": "chai",
-            "address": "remote"
+            "prod" :["chai.js"],
+            "dev" :["chai.js"],
+            "install": "bower"
         }
     ]
 }
