@@ -33,6 +33,7 @@
                     console.log('test3', me);
                     console.log('test4', me);
                 ]
+                @@assert ok(true, 'Testing true assert value');
             ]@
          */
 

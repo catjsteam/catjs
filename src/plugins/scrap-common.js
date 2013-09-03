@@ -1,10 +1,12 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _tplutils = catrequire("cat.tpl.utils"),
-    _utils = catrequire("cat.utils");
+    _utils = catrequire("cat.utils"),
+    _uglifyutils = catrequire("cat.uglify.utils");
 
 module.exports = function () {
 
     var funcSnippetTpl = _tplutils.readTemplateFile("scrap/_func_snippet"),
+        assertCallTpl = _tplutils.readTemplateFile("scrap/_assert_call"),
         importJSTpl = _tplutils.readTemplateFile("scrap/_import_js");
 
     return {
@@ -65,6 +67,48 @@ module.exports = function () {
                         }));
                     }
             }});
+
+
+            /**
+             * Annotation for chai
+             *
+             *  properties:
+             *  name    - chai
+             *  single  - false
+             *  $type   - js
+             */
+            _Scrap.add({name: "assert",
+                single: false,
+                func: function (config) {
+
+                    var codeRows,
+                        me = this,
+                        codeSnippet,
+                        codeSnippetObject;
+
+                    codeRows = this.get("assert");
+
+                    if (codeRows) {
+                        codeSnippet = codeRows[0];
+                        if (codeSnippet) {
+                            try {
+                                // try to understand the code
+                                codeSnippetObject = _uglifyutils.getCodeSnippet({code:codeSnippet});
+
+                            } catch(e) {
+                                // TODO use uglifyjs to see if there was any error in the code.
+                                // TODO throw a proper error
+                            }
+                        }
+
+                        me.print(_tplutils.template({
+                            content: assertCallTpl,
+                            data: {
+                                expression: JSON.stringify(["assert", codeSnippetObject].join("."))
+                            }
+                        }));
+                    }
+                }});
 
             /**
              * Annotation for importing javascript file within HTML page

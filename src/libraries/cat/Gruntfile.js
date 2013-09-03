@@ -66,7 +66,7 @@ module.exports = function (grunt) {
                 stripBanners: false
             },
             dist: {
-                src: ['Cat.js', 'core/test/TestManager.js'],
+                src: ['Cat.js', 'core/**/*.js'],
                 dest: 'target/cat.core.test.js'
             }
         },

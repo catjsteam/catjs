@@ -97,9 +97,22 @@ module.exports = _basePlugin.ext(function () {
 
                 var actions = {},
                     process1, process2,
-                    targetManifestPath = _path.join(catProjectLib, manifestFileName);
+                    targetManifestPath = _path.join(catProjectLib, manifestFileName),
+                    doImport = false;
 
                 library = libraries[slot];
+                if (imports){
+                    if (_typedas.isArray(imports)) {
+                        doImport = _utils.contains(imports, library.name);
+                    } else {
+                        _log.warning(_props.get("cat.arguments.type").format("[libraries ext]", "Array"));
+                    }
+                }
+
+                if (!doImport) {
+                    return undefined;
+                }
+
                 libWorkPath = _path.join(workPath, library.name);
 
                 // copy the manifest file

@@ -1,4 +1,4 @@
-var _cat = {};
+var _cat = {utils: {}};
 
 _cat.core = function() {
 
@@ -47,10 +47,12 @@ _cat.core = function() {
             }
         };
 
-    }();
+    }(),
+        _log = console;
 
     return {
 
+        log: _log,
 
         define: function(key, func) {
             _cat[key] = func;

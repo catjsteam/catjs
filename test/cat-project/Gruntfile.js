@@ -74,7 +74,8 @@ module.exports = function (grunt) {
                 "node": true,
                 "es5": true,
                 globals: {
-                    _cat: true
+                    _cat: true,
+                    assert: true
                 }
             }
         },

@@ -86,12 +86,13 @@
             "name": "target.libraries",
             "type": "libraries",
             "dependency": "dependency.loader",
-            "imports": ["cat.core.test"],
+            "imports": ["cat", "chai"],
             "action": "install"
         }, {
             "name": "target.libraries.clean",
             "type": "libraries",
             "dependency": "dependency.loader",
+            "imports": ["cat", "chai"],
             "action": "clean"
         },
         {

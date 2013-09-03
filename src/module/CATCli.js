@@ -46,6 +46,7 @@ module.exports = function() {
                     "cat.ext.utils": "src/module/utils/ExtUtils.js",
                     "cat.tpl.utils": "src/module/utils/TemplateUtils.js",
                     "cat.regexp.utils": "src/module/utils/RegExp.js",
+                    "cat.uglify.utils": "src/module/utils/Uglify.js",
 
                     "cat.plugin.base": "src/module/plugin/Base.js",
                     "cat.plugin.spawn": "src/module/plugin/spawn.js",

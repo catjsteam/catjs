@@ -154,6 +154,7 @@ module.exports = _basePlugin.ext(function () {
             _writeJSContentToFile(scraps, _generateCATFileInfo, targetfile);
             _writeJSContentToFile(scraps, _generateUserFileInfo, targetfile);
 
+            _Scrap.apply({scraps: scraps});
 
         },
 
