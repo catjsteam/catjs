@@ -171,9 +171,11 @@ module.exports = _basePlugin.ext(function () {
                         _bower.commands.install([library.name], {}, bowerConfig)
                             .on('end', function (installed) {
                                 _log.info('[bower] library ' + library.name + ' Installed');
-
+                                _copyResource();
+                                if (_emitter) {
+                                    _emitter.emit("job.done", {status: "done"});
+                                }
                             });
-                        _copyResource();
                     }
                 };
 

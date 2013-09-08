@@ -1,7 +1,7 @@
 var _scrapEnum = require("./../ScrapEnum.js"),
     _log = catrequire("cat.global").log(),
     _props = catrequire("cat.props"),
-    _utils = catrequire("cat.utils");
+    _utils = catrequire("cat.utils"),
     _regutils = catrequire("cat.regexp.utils");
 
 module.exports = function () {
@@ -83,7 +83,7 @@ module.exports = function () {
                             currentScrap.push(comment);
                             if (scrapBlockName === _scrapEnum.scrapEnum.name) {
                                 lineNumber[1] = commentobj.number;
-                                // TODO support scrap name when instantiating new Scrap
+
                                 scraps.push(
                                     {
                                         attrs: {

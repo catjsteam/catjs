@@ -1,7 +1,8 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _tplutils = catrequire("cat.tpl.utils"),
     _utils = catrequire("cat.utils"),
-    _uglifyutils = catrequire("cat.uglify.utils");
+    _uglifyutils = catrequire("cat.uglify.utils"),
+    _jshint = require("jshint").JSHINT;
 
 module.exports = function () {
 
@@ -35,7 +36,7 @@ module.exports = function () {
                     if (ctx) {
                         me.setCtxArguments(ctx);
                     }
-            }});
+                }});
 
             /**
              * Annotation for javascript code
@@ -51,22 +52,50 @@ module.exports = function () {
 
                     var codeRows,
                         code,
-                        me = this;
+                        me = this,
+                        validcode = false;
 
                     codeRows = this.get("code");
 
                     if (codeRows) {
                         _utils.prepareCode(codeRows);
                         code = codeRows.join("\n");
-                        me.print(_tplutils.template({
-                            content: funcSnippetTpl,
-                            data: {
-                                comment:" Generated code according to the scrap comment (see @@code)",
-                                code:code
-                            }
-                        }));
+
+                        if (code) {
+
+                            /*  TODO make code validation
+                                TODO Move that snippet to the end of the generated code (source project)
+                                validcode = _jshint(code, {
+                                    "strict": false,
+                                    "curly": true,
+                                    "eqeqeq": true,
+                                    "immed": false,
+                                    "latedef": true,
+                                    "newcap": false,
+                                    "noarg": true,
+                                    "sub": true,
+                                    "undef": true,
+                                    "boss": true,
+                                    "eqnull": true,
+                                    "node": true,
+                                    "es5": false
+                                },
+                                { assert:true });*/
+
+                            //if (validcode) {
+                                me.print(_tplutils.template({
+                                    content: funcSnippetTpl,
+                                    data: {
+                                        comment: " Generated code according to the scrap comment (see @@code)",
+                                        code: code
+                                    }
+                                }));
+                            //} else {
+                            //    console.log("The code is not valid: ", _jshint.errors);
+                            //}
+                        }
                     }
-            }});
+                }});
 
 
             /**
@@ -93,9 +122,9 @@ module.exports = function () {
                         if (codeSnippet) {
                             try {
                                 // try to understand the code
-                                codeSnippetObject = _uglifyutils.getCodeSnippet({code:codeSnippet});
+                                codeSnippetObject = _uglifyutils.getCodeSnippet({code: codeSnippet});
 
-                            } catch(e) {
+                            } catch (e) {
                                 // TODO use uglifyjs to see if there was any error in the code.
                                 // TODO throw a proper error
                             }
@@ -128,11 +157,11 @@ module.exports = function () {
                         me.print(_tplutils.template({
                             content: importJSTpl,
                             data: {
-                                src:importanno
+                                src: importanno
                             }
                         }));
                     }
-            }});
+                }});
 
             /**
              * Annotation for embed javascript block code within HTML page
@@ -174,4 +203,4 @@ module.exports = function () {
         }
     }
 
-}
+};

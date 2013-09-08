@@ -1,0 +1,16 @@
+{
+  "name": "cat-test-modules",
+  "description": "Cat test env",
+  "version": "0.1.0",
+  "author": {
+    "name": "arik",
+    "email": "lewin.arik@gmail.com"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "jshint": "~2.1.10"
+  },
+  "peerDependencies": {}
+}

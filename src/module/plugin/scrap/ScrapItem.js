@@ -4,6 +4,7 @@ var _utils = catrequire("cat.utils"),
     _typedas = require("typedas"),
     _log = catrequire("cat.global").log(),
     _scrapEnum = require("./ScrapEnum.js"),
+    _ScrapConfigItem = require("./ScrapConfigItem.js"),
 
     __id = 0,
 
@@ -62,7 +63,7 @@ function _cleanObjectNoise(obj) {
         return obj;
     }
 
-    var idx = 0, size = 0, item;
+    var idx = 0, size = 0, item, value;
 
     if (obj) {
         if (_typedas.isString(obj)) {
@@ -75,7 +76,13 @@ function _cleanObjectNoise(obj) {
             for (idx = 0; idx < size; idx++) {
                 item = obj[idx];
                 if (item) {
-                    obj[idx] = _cleanStringNoise(item);
+                    if (_ScrapConfigItem.instanceOf(item)) {
+                        item = _ScrapConfigItem.create(item.config);
+                        value = item.getValue();
+                    } else {
+                        value = item;
+                    }
+                    obj[idx] = _cleanStringNoise(value);
                 }
             }
 
@@ -110,16 +117,19 @@ _clazz = function (config) {
         var size,
             value = me.config[key];
 
-        value = _cleanObjectNoise(value);
-        if (value !== undefined && value !== null) {
-            if (me.isSingle(key) || _utils.contains(_scrapEnum.scrapEnum.singleTypes, key)) {
-                // return only the first cell since we types this key as a single scrap value (the last cell takes)
-                if (_typedas.isArray(value)) {
-                    _utils.cleanupArray(value);
-                    size = value.length;
-                    return value[size - 1];
-                } else {
-                    // return value as is
+        if (value) {
+
+            value = _cleanObjectNoise(value);
+            if (value !== undefined && value !== null) {
+                if (me.isSingle(key) || _utils.contains(_scrapEnum.scrapEnum.singleTypes, key)) {
+                    // return only the first cell since we types this key as a single scrap value (the last cell takes)
+                    if (_typedas.isArray(value)) {
+                        _utils.cleanupArray(value);
+                        size = value.length;
+                        return value[size - 1];
+                    } else {
+                        // return value as is
+                    }
                 }
             }
         }
@@ -277,9 +287,13 @@ _clazz.prototype.$setType = function (type) {
 };
 
 _clazz.prototype.get = function (key) {
+    var value;
     if (key) {
-        return (this[key] ? this[key]() : undefined);
+        if (this[key]) {
+            value = this[key]();
+        }
     }
+    return value;
 };
 
 _clazz.prototype.setCtxArguments = function (arr) {

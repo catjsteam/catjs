@@ -7,6 +7,8 @@ var _utils = catrequire("cat.utils"),
     _clazz = require("./ScrapItem.js"),
     _parser = require("./parser/Parser.js"),
     _scrapEnum = require("./ScrapEnum.js"),
+    _commonparser = require("./parser/CommonParser.js"),
+    _ScrapConfigItem = require("./ScrapConfigItem.js"),
     _scrapUtils = require("./ScrapUtils.js");
 
 
@@ -85,6 +87,7 @@ module.exports = function () {
             if (!scrapBlock || (scrapBlock && scrapBlock.rows && !_typedas.isArray(scrapBlock.rows))) {
                 return undefined;
             }
+
             var rows = scrapBlock.rows,
                 idx = 1, size = rows.length, row,
                 scrap, config = {},
@@ -97,7 +100,8 @@ module.exports = function () {
                 data,
                 idxi= 0, sizei= 0, itemi,
                 // 0-don't push, 1-push data, 2-push data and break
-                pushdata = 0;
+                pushdata = 0,
+                matchName, sign;
 
             // scan rows (exclude the fitrs & last rows scrap block["@[scrap" .. "]@]
             for (; idx < size - 1; idx++) {
@@ -127,11 +131,27 @@ module.exports = function () {
                         }
 
                         if (singleRow) {
+
                             // single row annotation expression
                             configKey = singleRow[1];
                             configVal = singleRow[2];
+
+                            // Interpret name (name, sign [!, =] see _commonparser.parseName)
+                            matchName = _commonparser.parseName(configKey);
+                            if (matchName
+                                && _typedas.isArray(matchName)
+                                && matchName.length > 0 ) {
+
+                                configKey = matchName[1];
+                                sign = matchName[2];
+
+                            } else {
+                                sign = undefined;
+                            }
+
                             // set scrap property / value
-                            _scrapUtils.putScrapConfig(config, configKey, configVal);
+                            _scrapUtils.putScrapConfig(config, configKey, _ScrapConfigItem.create({value: configVal, sign:sign}));
+
                         } else {
 
                             if (!closeRow && ! multiRowOpen) {
@@ -144,6 +164,9 @@ module.exports = function () {
                                 // we have all we need
                                configKey = multiRow[1];
                                data = _scrapUtils.collectDataConfig(multiRow);
+
+                                // set scrap property / value
+                                //TODO !!! support for  _ScrapConfigItem.create({value: configVal, sign:sign}));
 
                             } else if (multiRowOpen) {
                                 // we wait for closing sign ']'

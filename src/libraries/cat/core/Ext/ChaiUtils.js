@@ -1,51 +1,63 @@
-var _fs = require("fs"),
-    _global = catrequire("cat.global"),
-    _fileName = [_global.get("home").working.path, "catunit.xml"].join("/"),
-    _props = catrequire("cat.props");
+_cat.utils.chai = function() {
 
-/**
- * Persist a property style data (key=value) to a file named .cat
- *
- * @type {module.exports}
- */
-module.exports = function () {
+    var _chai,
+        assert,
+        _state = 0; // state [0/1] 0 - not evaluated / 1 - evaluated
 
-    function _store(data, option) {
-        var option = (option || "appendFileSync");
-        try {
-            if (option) {
-                _fs[option](_fileName, data, "utf8");
-            }
-        } catch (e) {
-            console.log("[catcli] ", e);
+    function _isSupported() {
+        _state = 1;
+        if (typeof chai != "undefined") {
+            _chai = chai;
+            assert = _chai.assert;
+
+        } else {
+            _cat.core.log.info("Chai library is not supported, skipping annotation 'assert', consider adding it to the .catproject dependencies");
         }
     }
-
-    function _load() {
-        try {
-            return _fs.readFileSync(_fileName, "utf8");
-
-        } catch (e) {
-            console.log("[catcli] ", e);
-        }
-    }
-
 
     return {
 
-        init: function() {
-            _store("\n --------------------------  JUnit ---------------------------------------------- \n");
+        assert: function(config) {
+
+            if (!_state) {
+                _isSupported();
+            }
+
+            var code,
+                fail;
+
+            if (_chai) {
+                if (config) {
+                    code = config.code;
+                    fail = config.fail;
+                }
+                if (assert) {
+                    // TODO well, I have to code the parsing section (uglifyjs) for getting a better impl in here (loosing the eval shit)
+                    // TODO js execusion will be replacing this code later on...
+                    if (code) {
+                        try {
+                            eval(code);
+
+                        } catch(e) {
+
+                            if (fail) {
+                                throw new Error("[CAT] Test failed, exception: ", e);
+                            }
+                        }
+                    }
+                }
+            }
         },
 
         /**
-         * Append new line comprised of the key, value [key=value\n]
+         * For the testing environment, set chai handle
          *
-         * @param key
-         * @param value
+         * @param chai
          */
-        log: function (config) {
-            _store("unit entry");
+        test: function(chaiarg) {
+            chai = chaiarg;
         }
+
     };
 
 }();
