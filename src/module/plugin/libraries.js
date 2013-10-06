@@ -1,3 +1,4 @@
+debugger;
 var _catglobal = catrequire("cat.global"),
     _log = _catglobal.log(),
     _path = require("path"),
@@ -168,14 +169,41 @@ module.exports = _basePlugin.ext(function () {
 
                     } else if (library.install === "bower") {
 
-                        _bower.commands.install([library.name], {}, bowerConfig)
-                            .on('end', function (installed) {
-                                _log.info('[bower] library ' + library.name + ' Installed');
-                                _copyResource();
-                                if (_emitter) {
-                                    _emitter.emit("job.done", {status: "done"});
-                                }
+                        function _copydone() {
+
+                            _copyResource();
+                            if (_emitter) {
+                                _emitter.emit("job.done", {status: "done"});
+                            }
+
+                        }
+
+                        if (!_utils.isWindows()) {
+                            _bower.commands.install([library.name], {}, bowerConfig)
+                                .on('end', function (installed) {
+                                    _log.info('[bower] library ' + library.name + ' Installed');
+                                    _copydone();
+                                });
+
+                        } else {
+                            /* on windows we have an issue related to git <> bower
+                               thus we are running custom spawn
+                              */
+                            process1 = _spawn().spawn({
+                                command: "bower.bat",
+                                args: [library.name],
+                                options: bowerConfig,
+                                emitter: _emitter
                             });
+
+                            process1.on('close', function (code) {
+                                if (code !== 0) {
+                                    _log.info('[spawn close] exited with code ' + code);
+                                } else {
+                                    _log.info('[bower] library ' + library.name + ' Installed');
+                                    _copydone();
+                                }
+                            });                        }
                     }
                 };
 
@@ -226,7 +254,9 @@ module.exports = _basePlugin.ext(function () {
                             });
                         });
                     } else if (library.install === "bower") {
-                        _utils.deleteSync(_path.join(workPath, library.name));
+                        if (!_utils.isWindows()) {
+                            _utils.deleteSync(_path.join(workPath, library.name));
+                        }
                     }
                 };
 
