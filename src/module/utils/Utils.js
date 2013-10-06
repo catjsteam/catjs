@@ -3,7 +3,8 @@ var _ = require("underscore"),
     _typedas = require("typedas"),
     _global = catrequire("cat.global"),
     _log = _global.log(),
-    _props = catrequire("cat.props");
+    _props = catrequire("cat.props"),
+    _os = require("os");
 
 module.exports = function () {
 
@@ -64,6 +65,17 @@ module.exports = function () {
         };
 
     return {
+
+
+
+        isWindows: function () {
+            var type = _os.platform();
+            if (type.toLocaleLowerCase() == "win32") {
+                return true;
+            }
+
+            return false;
+        },
 
         mkdirSync: _mkdirSync,
 

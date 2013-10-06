@@ -3,17 +3,7 @@ var _catglobal = catrequire("cat.global"),
     _path = require("path"),
     _props = catrequire("cat.props"),
     _basePlugin = catrequire("cat.plugin.base"),
-    _utils = catrequire("cat.utils"),
-    _os = require("os");
-
-    function _isWindows() {
-        var type = _os.platform();
-        if (type.toLocaleLowerCase() == "win32") {
-            return true;
-        }
-
-        return false;
-    }
+    _utils = catrequire("cat.utils");
 
 module.exports = _basePlugin.ext(function () {
 
@@ -70,7 +60,7 @@ module.exports = _basePlugin.ext(function () {
                         options = {cwd: _catglobal.get("home").working.path}
                     }
 
-                    if (_isWindows()) {
+                    if (_utils.isWindows()) {
                         args.unshift("/c", command);
                         command = "cmd";
                     }
