@@ -3,4 +3,6 @@ npm-debug.log
 tmp
 .idea
 CAT.log
+cat.libraries.log
+cat.flow.log
 .cat
