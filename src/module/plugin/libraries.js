@@ -1,4 +1,3 @@
-debugger;
 var _catglobal = catrequire("cat.global"),
     _log = _catglobal.log(),
     _path = require("path"),
@@ -190,8 +189,8 @@ module.exports = _basePlugin.ext(function () {
                                thus we are running custom spawn
                               */
                             process1 = _spawn().spawn({
-                                command: "bower.bat",
-                                args: [library.name],
+                                command: "bowerutils.bat",
+                                args: ["install", library.name],
                                 options: bowerConfig,
                                 emitter: _emitter
                             });
