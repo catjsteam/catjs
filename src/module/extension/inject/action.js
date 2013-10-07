@@ -145,10 +145,10 @@ module.exports = _basePlugin.ext(function () {
 
             // TODO filter scraps arrays according to its $type (js, html, etc)
 
-            // apply all scraps
-            scraps.forEach(function (scrap) {
-                scrap.apply(scrap);
-            });
+//            // apply all scraps
+//            scraps.forEach(function (scrap) {
+//                scrap.apply(scrap);
+//            });
 
             // inject and generate proper content for JS files type
             _writeJSContentToFile(scraps, _generateCATFileInfo, targetfile);
