@@ -186,8 +186,8 @@ module.exports = _basePlugin.ext(function () {
 
                         } else {
                             /* on windows we have an issue related to git <> bower
-                               thus we are running custom spawn
-                              */
+                             thus we are running custom spawn
+                             */
                             process1 = _spawn().spawn({
                                 command: "bowerutils.bat",
                                 args: ["install", library.name],
@@ -253,9 +253,7 @@ module.exports = _basePlugin.ext(function () {
                             });
                         });
                     } else if (library.install === "bower") {
-                        if (!_utils.isWindows()) {
-                            _utils.deleteSync(_path.join(workPath, library.name));
-                        }
+                        _utils.deleteSync(_path.join(workPath, library.name));
                     }
                 };
 

@@ -31,7 +31,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-         _generateSourceProject = function (scraps, file) {
+            _generateSourceProject = function (scraps, file) {
 
             function _generateCATFileInfo(scraps, targetfile) {
 
@@ -132,7 +132,7 @@ module.exports = _basePlugin.ext(function () {
             // copy resources
             copyResources();
 
-            targetfile = _path.normalize([_project.getInfo("source"), filepath].join("/"));
+            targetfile = _path.join(_project.getInfo("source"), filepath);
             targetfolder = _path.dirname(targetfile);
             if (targetfolder) {
                 if (!_fs.existsSync(targetfolder)) {
@@ -154,7 +154,7 @@ module.exports = _basePlugin.ext(function () {
             _writeJSContentToFile(scraps, _generateCATFileInfo, targetfile);
             _writeJSContentToFile(scraps, _generateUserFileInfo, targetfile);
 
-            _Scrap.apply({scraps: scraps});
+            //_Scrap.apply({scraps: scraps});
 
         },
 
@@ -164,7 +164,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param file The reference file to be processed
          */
-         _injectScrapCall = function (scraps, file, callback) {
+            _injectScrapCall = function (scraps, file, callback) {
 
             var lines = [] , lineNumber = 1,
                 commentinfos = [];
@@ -307,7 +307,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param fileName The reference file to be processed
          */
-         _inject = function (scraps, fileName, callback) {
+            _inject = function (scraps, fileName, callback) {
 
             var file = fileName;
 
@@ -360,12 +360,8 @@ module.exports = _basePlugin.ext(function () {
                 var data,
                     fileName,
                     files, filesArr = [],
-                    counter,
+                    counter = -1,
                     emitter = _me.getEmitter();
-
-                _me.apply(config);
-                data = (_mdata ? _mdata.read() : undefined);
-                _mdobject = (data ? JSON.parse(data) : undefined);
 
                 function _apply(filename) {
 
@@ -390,34 +386,48 @@ module.exports = _basePlugin.ext(function () {
                             }
                         }
 
-                        _Scrap.apply({scraps: scraps});
+                        //_Scrap.apply({scraps: scraps});
+                        // apply all scraps
+                        scraps.forEach(function (scrap) {
+                            scrap.apply(scrap);
+                        });
 
                         _inject(scraps, filename, function() {
                             counter++;
                             _apply(filesArr[counter]);
                         });
+                    } else {
+                        //  _Scrap.apply({scraps: scraps});
                     }
                 }
 
-                if (_mdobject) {
+                _me.apply(config);
+                if (_mdata) {
+                    _mdata.readAsync(function() {
+                        if (this.data) {
+                            _mdobject = JSON.parse(this.data);
 
-                    // TODO go over the updates for the file that was changed...
+                            if (_mdobject) {
 
-                    files = _mdobject.files;
-                    if (files) {
-                        for (fileName in files) {
-                            if (fileName) {
-                                filesArr.push(fileName);
+                                // TODO go over the updates for the file that was changed...
+                                files = _mdobject.files;
+                                if (files) {
+                                    for (fileName in files) {
+                                        if (fileName) {
+                                            filesArr.push(fileName);
+                                        }
+                                    }
+                                }
+
+                                if (filesArr && filesArr.length > 0) {
+                                    counter = 0;
+                                    _apply(filesArr[counter]);
+                                }
                             }
+
                         }
-                    }
-
-                    if (filesArr && filesArr.length > 0) {
-                        counter = 0;
-                        _apply(filesArr[counter]);
-                    }
+                    });
                 }
-
             }
         };
 

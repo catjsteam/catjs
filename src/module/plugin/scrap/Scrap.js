@@ -1,5 +1,5 @@
 var _utils = catrequire("cat.utils"),
-     _regutils = catrequire("cat.regexp.utils"),
+    _regutils = catrequire("cat.regexp.utils"),
     _props = catrequire("cat.props"),
     _md = catrequire("cat.mdata"),
     _typedas = require("typedas"),
@@ -23,7 +23,7 @@ module.exports = function () {
          * @returns {Array}
          * @private
          */
-         _extractScrapBlock = function (scrapCommentBlock) {
+            _extractScrapBlock = function (scrapCommentBlock) {
 
             return _parser.parse(scrapCommentBlock);
         };
@@ -99,7 +99,7 @@ module.exports = function () {
                 closeRow, singleRow, multiRowOpen, multiRow,
                 data,
                 idxi= 0, sizei= 0, itemi,
-                // 0-don't push, 1-push data, 2-push data and break
+            // 0-don't push, 1-push data, 2-push data and break
                 pushdata = 0,
                 matchName, sign;
 
@@ -162,8 +162,8 @@ module.exports = function () {
 
                             if (multiRow) {
                                 // we have all we need
-                               configKey = multiRow[1];
-                               data = _scrapUtils.collectDataConfig(multiRow);
+                                configKey = multiRow[1];
+                                data = _scrapUtils.collectDataConfig(multiRow);
 
                                 // set scrap property / value
                                 //TODO !!! support for  _ScrapConfigItem.create({value: configVal, sign:sign}));
@@ -204,6 +204,12 @@ module.exports = function () {
             }
 
             config.file = file;
+
+            if ( config.file ) {
+                config.file = config.file.split("\\").join("/");
+                config.file = config.file.split("//").join("/");
+            }
+
             config.scrapinfo = fileinfo;
             config.commentinfo = commentinfo;
             if (!config.name) {
