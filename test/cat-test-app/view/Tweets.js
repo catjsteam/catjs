@@ -24,19 +24,6 @@
         var me = this;
         this.callParent(arguments);
 
-        /*
-            @[scrap
-                @@name tweetsInitialize
-                @@context me
-                @@code console.log('test2');
-                @@code[
-                    console.log('test3', me);
-                    console.log('test4', me);
-                ]
-                @@assert ok(true, 'Testing true assert value');
-            ]@
-         */
-
         console.log("[Tweets View] Initialized.");
     },
 	
@@ -65,7 +52,14 @@
             itemCls: "listItemClass",
             store: sto
         });
-
+        debugger;
+    /*
+        @[scrap
+        @@name catSencha
+        @@context list
+        @@sencha Ext.tap(list);
+        ]@
+    */
 		this.add(list);
 	}
 });

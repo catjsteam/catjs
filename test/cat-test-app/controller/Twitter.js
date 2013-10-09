@@ -110,7 +110,9 @@
         	        hwStore.load({
         	            callback:function (records, operation, success) {
         	            	var tweetsView = Ext.createByAlias("widget.tweets", {records:records});
+                            debugger;
         	                if (tweetsView) {
+                                debugger;
         	                	tweetsView.setData(hwStore, records);
         	                	view.setTweetsView(tweetsView);
         	                }

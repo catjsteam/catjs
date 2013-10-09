@@ -38,6 +38,63 @@ module.exports = function () {
                     }
                 }});
 
+
+            /**
+             * Annotation for javascript code
+             *
+             *  properties:
+             *  name    - sencha
+             *  single  - false
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "sencha",
+                single: false,
+
+                func: function (config) {
+                    var senchaRows,
+                        sencha,
+                        me = this,
+                        validcode = false;
+
+                    senchaRows = this.get("sencha");
+                    debugger;
+                    if (senchaRows) {
+                        _utils.prepareCode(senchaRows);
+                        sencha = senchaRows.join("\n");
+
+                        if (sencha) {
+
+                            var str = (sencha).match(/Ext.tap\((.*)\);/);
+                            if (str) {
+
+                                // split the args, parseInt the args that are numbers
+                                str[1] = str[1].replace(/ /g,"");
+                                var args = str[1].split(",");
+                                var functionArg = "";
+                                for (var i = 0; i < args.length; i++) {
+                                    if (/^\d+$/.test(args[i])) {
+                                        args[i] = parseInt(args[i]);
+                                    }
+                                    functionArg += args[i] + ",";
+                                }
+                                debugger;
+                                functionArg = functionArg.substring(0, functionArg.length - 1);
+                                console.log("_extjs.actions.fireTap(" + functionArg + ");");
+                                me.print("debugger; console.log('this is a new test'); _extjs.actions.fireTap(" + functionArg + ");");
+
+
+                            }
+
+                        }
+                    }
+                }
+            });
+
+
+
+
+
             /**
              * Annotation for javascript code
              *
@@ -138,6 +195,8 @@ module.exports = function () {
                         }));
                     }
                 }});
+
+
 
             /**
              * Annotation for importing javascript file within HTML page
