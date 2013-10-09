@@ -16,7 +16,8 @@ module.exports = _basePlugin.ext(function () {
         _emitter,
         _module,
         _parsers = {},
-        _wait = 0;
+        _wait = 0,
+        _waitcounter = 0;
 
 
     /**
@@ -49,9 +50,10 @@ module.exports = _basePlugin.ext(function () {
     }
 
     function _jobScrapWait() {
-        if (_wait === 2) {
+        if (_wait === 2 && _waitcounter === 0) {
             _emitter.emit("job.wait", {status: "done"});
         }
+        _waitcounter--;
         _wait=0;
     }
 
@@ -74,7 +76,7 @@ module.exports = _basePlugin.ext(function () {
                 _wait=2;
             }
             //
-           // _emitter.removeListener("job.scrap.wait", _jobCopyWait);
+            // _emitter.removeListener("job.scrap.wait", _jobCopyWait);
         },
 
         /**
@@ -86,11 +88,13 @@ module.exports = _basePlugin.ext(function () {
         file: function (file) {
 
             _wait = 1;
+            _waitcounter++;
 
             var from = file,
                 filters = _me.getFilters();
 
             if (_me.isDisabled()) {
+                _emitter.emit("job.scrap.wait", {status: "wait"});
                 return undefined;
             }
             if (file) {
@@ -138,6 +142,7 @@ module.exports = _basePlugin.ext(function () {
                     }});
                 } else {
                     _log.debug("[Copy Action] filter match, skipping file: " + from);
+                    _emitter.emit("job.scrap.wait", {status: "wait"});
                 }
             }
         },

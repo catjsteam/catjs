@@ -1,4 +1,4 @@
-var _fs = require("fs.extra"),
+var _fs = require("fs"),
     _path = require("path"),
     _beautify = require('js-beautify').js_beautify,
     _global = catrequire("cat.global"),
@@ -151,6 +151,7 @@ module.exports = function () {
             } catch(e) {
                 _utils.error(_props.get("cat.error").format("[cat mdata]", err));
             }
+
         },
 
         read: function () {
@@ -158,7 +159,7 @@ module.exports = function () {
 
             try {
                 if (_fs.existsSync(_getMDFile())) {
-                    data = _fs.readFileSync(_getMDFile());
+                    data = _fs.readFileSync(_getMDFile(), "utf8");
                     _log.debug(_props.get("cat.mdata.read").format("[cat mdata]"));
                 } else {
                     _log.warning(_props.get("cat.mdata.file.not.exists").format("[cat mdata]"));
@@ -168,6 +169,24 @@ module.exports = function () {
             }
 
             return data;
+        },
+
+        readAsync: function (callback) {
+
+            if (_fs.existsSync(_getMDFile())) {
+                _fs.readFile(_getMDFile(), function(err, data) {
+                    if (err) {
+                        _utils.error(_props.get("cat.error").format("[cat mdata]", err));
+                    } else {
+                        _log.debug(_props.get("cat.mdata.read").format("[cat mdata]"));
+                        callback.call({data: data});
+                    }
+                });
+
+            } else {
+                _log.warning(_props.get("cat.mdata.file.not.exists").format("[cat mdata]"));
+            }
+
         }
     };
 
