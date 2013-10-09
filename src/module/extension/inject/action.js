@@ -313,11 +313,9 @@ module.exports = _basePlugin.ext(function () {
 
             if (file) {
                 if (_fs.existsSync(file)) {
+                    _generateSourceProject(scraps, file);
 
                     _injectScrapCall(scraps, file, function() {
-
-                        _generateSourceProject(scraps, file);
-
                         callback.call(this);
                     });
 
