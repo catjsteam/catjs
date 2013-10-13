@@ -3,12 +3,11 @@ var _extjs = { };
 
 var fireItemTapFunc = function(extElement, index) {
     extElement.fireEvent('itemtap',extElement, index);
-};
-
+}
 
 var fireTapFunc = function(extElement) {
     extElement.fireEvent('tap');
-};
+}
 
 var setTextHelp = function(id, str) {
 
@@ -37,7 +36,7 @@ _extjs = function () {
 
                     if ( extElement.hasListener('painted')) {
 
-                        fireTapFunc(extElement)
+                        fireTapFunc(extElement);
                     } else {
 
                         extElement.addListener('painted', fireTapFunc(extElement));
@@ -47,14 +46,18 @@ _extjs = function () {
                 } else {
                     // in case of list
                     var index = arguments[1];
-
                     if ( extElement.hasListener('painted')) {
                         fireItemTapFunc(extElement, index);
                     } else {
 
                         extElement.addListener('painted', fireItemTapFunc(extElement, index));
-                    }
 
+                        if ( Ext.getCmp(extElement).hasListener('painted')) {
+                            fireItemTapFunc(extElement, index);
+                        } else {
+                            Ext.getCmp(extElement).addListener('painted', fireItemTapFunc(extElement, index));
+                        }
+                    }
 
                 }
 
@@ -72,9 +75,6 @@ _extjs = function () {
                 } else {
                     setTextHelp(id, str);
                 }
-
-
-
             }
         }
 

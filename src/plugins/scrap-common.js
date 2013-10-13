@@ -3,7 +3,7 @@ var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _uglifyutils = catrequire("cat.uglify.utils"),
     _jshint = require("jshint").JSHINT;
-    //_senchaPlugin = require("./_senchaPlugin");
+
 
 module.exports = function () {
 
@@ -30,7 +30,7 @@ module.exports = function () {
                 singleton: 1,
                 func: function (config) {
                     var ctx,
-                        me = ttest/cat-test-app/view/Tweets.jhis;
+                        me = this;
 
                     ctx = this.get("context");
 
@@ -67,9 +67,6 @@ module.exports = function () {
                         if (sencha) {
 
                             var str = (sencha).match(/tap\((.*)\);/);
-
-                          //  var temp = _senchaPlugin.getSenchaSqript(str);
-
                             if (str) {
 
                                 // split the args, parseInt the args that are numbers
@@ -84,6 +81,7 @@ module.exports = function () {
                                 }
 
                                 functionArg = functionArg.substring(0, functionArg.length - 1);
+
 
                                 me.print("_extjs.actions.fireTap(" + functionArg + ");");
 
