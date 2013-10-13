@@ -2,7 +2,6 @@ var _extjs = { };
 
 
 var fireItemTapFunc = function(id, index) {
-    debugger;
     Ext.getCmp(id).fireEvent('itemtap',Ext.getCmp(id), index);
 };
 _extjs = function () {
@@ -25,10 +24,8 @@ _extjs = function () {
                     console.log(Ext.getCmp(id));
                     console.log("index : " + index);
                     if ( Ext.getCmp(id).hasListener('painted')) {
-                        debugger;
                         fireItemTapFunc(id, index);
                     } else {
-                        debugger;
                         Ext.getCmp(id).addListener('painted', fireItemTapFunc(id, index));
                     }
 

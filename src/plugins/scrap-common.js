@@ -58,7 +58,7 @@ module.exports = function () {
                         validcode = false;
 
                     senchaRows = this.get("sencha");
-                    debugger;
+
                     if (senchaRows) {
                         _utils.prepareCode(senchaRows);
                         sencha = senchaRows.join("\n");
@@ -78,10 +78,8 @@ module.exports = function () {
                                     }
                                     functionArg += args[i] + ",";
                                 }
-                                debugger;
                                 functionArg = functionArg.substring(0, functionArg.length - 1);
-                                console.log("_extjs.actions.fireTap(" + functionArg + ");");
-                                me.print("debugger; console.log('this is a new test'); _extjs.actions.fireTap(" + functionArg + ");");
+                                me.print("console.log('this is a new test'); _extjs.actions.fireTap(" + functionArg + ");");
 
 
                             }

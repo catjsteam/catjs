@@ -52,7 +52,6 @@
             itemCls: "listItemClass",
             store: sto
         });
-        debugger;
     /*
         @[scrap
         @@name catSencha

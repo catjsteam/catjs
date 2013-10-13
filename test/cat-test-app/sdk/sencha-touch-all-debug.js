@@ -4793,7 +4793,6 @@ var noArgs = [],
         initConfig: function(instanceConfig) {
             //<debug>
 //            if (instanceConfig && instanceConfig.breakOnInitConfig) {
-//                debugger;
 //            }
             //</debug>
             var configNameCache = Ext.Class.configNameCache,
