@@ -7,16 +7,17 @@
 
     initialize : function() {
         this.callParent();
-        var emailField = {
-            xtype : 'emailfield',
+        var emailField = Ext.create('Ext.field.Email', {
+
             label : 'Email',
             name  : 'email',
             id : 'emailId'
-        };
+        });
         /*
          @[scrap
          @@name catSenchaText
-         @@sencha setText('emailId', 'this is a check');
+         @@context emailField
+         @@sencha setText(emailField, 'this is a check');
          ]@
          */
 
@@ -30,6 +31,14 @@
             }
 
         });
+
+        /*
+         @[scrap
+         @@name catSenchaBtn
+         @@context button
+         @@sencha tap(button);
+         ]@
+         */
 
 
 

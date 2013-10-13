@@ -9,9 +9,9 @@ var fireTapFunc = function(extElement) {
     extElement.fireEvent('tap');
 };
 
-var setTextHelp = function(id, str) {
+var setTextHelp = function(extElement, str) {
 
-    var extElement = Ext.getCmp(id);
+//    var extElement = Ext.getCmp(id);
     if ( extElement.hasListener('painted')) {
 
         extElement.setValue(str);
@@ -63,18 +63,10 @@ _extjs = function () {
 
             },
 
-            setText : function(id, str) {
+            setText : function(extElement, str) {
 
-                if (!Ext.getCmp(id)) {
-                    myVar=setInterval(function(){
-                        if (Ext.getCmp(id)) {
-                            clearInterval(myVar);
-                            setTextHelp(id, str);
-                        }
-                    },10);
-                } else {
-                    setTextHelp(id, str);
-                }
+                    setTextHelp(extElement, str);
+
             }
         }
 
