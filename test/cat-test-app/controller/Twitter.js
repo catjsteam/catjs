@@ -13,8 +13,8 @@
     },
 
 
-	/** 
-	 * Default main view 
+	/**
+	 * Default main view
 	 */
     onGoToMainHW:function () {
 		var view,
@@ -54,7 +54,7 @@
 
 		this.main();
     },
-	
+
 	/**
 	 * Main application functionality
 	 * It loads the data using sencha store and then creates the view with the incoming data.
@@ -62,9 +62,9 @@
     main:function () {
         var me = this,
             hwStore;
-		
+
 		/**
-		 * Callback function for the store. 
+		 * Callback function for the store.
 		 */
         function _onLaunch(records) {
             me.initRefrencesView(records, "twitter");
@@ -85,10 +85,10 @@
 	 * and setting the title and the icon according to the incoming data.
 	 *
 	 * @param records The incoming data records
-	 * @param viewName The view that will be added to the Viewport  
+	 * @param viewName The view that will be added to the Viewport
 	 */
-    initRefrencesView:function (records, viewName) {    
-    	
+    initRefrencesView:function (records, viewName) {
+
         var view,
 			record = (records? records[0] : undefined),
             me = this,
@@ -96,7 +96,7 @@
             createView = {
 
         		"twitter": function() {
-        			
+
         			// This is how you can get a reference to your view.
         	        view = this.getHw();
         	        if (view) {
@@ -104,27 +104,25 @@
         			   view.setTitle(record.get("title"));
         			   view.setIcon(record.get("icon"));
         	        }
-        	        
+
         	        // loading the Tweets data (see the model and store classes)
         	        hwStore = Ext.getStore("Tweets");
         	        hwStore.load({
         	            callback:function (records, operation, success) {
         	            	var tweetsView = Ext.createByAlias("widget.tweets", {records:records});
-                            debugger;
         	                if (tweetsView) {
-                                debugger;
         	                	tweetsView.setData(hwStore, records);
         	                	view.setTweetsView(tweetsView);
         	                }
         	            },
         	            scope:this
-        	        });        			
+        	        });
         		}
         	};
-        
+
 		// Clean the viewport
         Ext.Viewport.removeAll();
-        
+
 		// Add a view to the viewport
         Ext.Viewport.add([
             {
@@ -135,7 +133,7 @@
         createView[viewName].call(me);
 
     }
-	
+
 	
 
 });

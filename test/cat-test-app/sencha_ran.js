@@ -1,10 +1,29 @@
 var _extjs = { };
 
 
-var fireItemTapFunc = function(id, index) {
-    debugger;
-    Ext.getCmp(id).fireEvent('itemtap',Ext.getCmp(id), index);
+var fireItemTapFunc = function(extElement, index) {
+    extElement.fireEvent('itemtap',extElement, index);
 };
+
+
+var fireTapFunc = function(extElement) {
+    extElement.fireEvent('tap');
+};
+
+var setTextHelp = function(id, str) {
+
+    var extElement = Ext.getCmp(id);
+    if ( extElement.hasListener('painted')) {
+
+        extElement.setValue(str);
+    } else {
+
+        extElement.addListener('painted', function() {
+            extElement.setValue(str);
+        });
+    }
+}
+
 _extjs = function () {
 
     return {
@@ -13,28 +32,49 @@ _extjs = function () {
 
 
             fireTap:function (extElement) {
-                console.log("sencha_ran : extElement : " + extElement);
-/*
                 // check number of args
                 if (arguments.length == 1) {
-                    Ext.getCmp(id).fireEvent('tap');
+
+                    if ( extElement.hasListener('painted')) {
+
+                        fireTapFunc(extElement)
+                    } else {
+
+                        extElement.addListener('painted', fireTapFunc(extElement));
+                    }
+
+
                 } else {
                     // in case of list
                     var index = arguments[1];
-                    console.log("try to add listener");
-                    console.log(Ext.getCmp(id));
-                    console.log("index : " + index);
-                    if ( Ext.getCmp(id).hasListener('painted')) {
-                        debugger;
-                        fireItemTapFunc(id, index);
+
+                    if ( extElement.hasListener('painted')) {
+                        fireItemTapFunc(extElement, index);
                     } else {
-                        debugger;
-                        Ext.getCmp(id).addListener('painted', fireItemTapFunc(id, index));
+
+                        extElement.addListener('painted', fireItemTapFunc(extElement, index));
                     }
 
 
                 }
- */
+
+            },
+
+            setText : function(id, str) {
+
+                if (!Ext.getCmp(id)) {
+                    myVar=setInterval(function(){
+                        if (Ext.getCmp(id)) {
+                            clearInterval(myVar);
+                            setTextHelp(id, str);
+                        }
+                    },10);
+                } else {
+                    setTextHelp(id, str);
+                }
+
+
+
             }
         }
 
