@@ -30,7 +30,7 @@ module.exports = function () {
                 singleton: 1,
                 func: function (config) {
                     var ctx,
-                        me = this;
+                        me = ttest/cat-test-app/view/Tweets.jhis;
 
                     ctx = this.get("context");
 
