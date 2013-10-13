@@ -13,7 +13,12 @@
             name  : 'email',
             id : 'emailId'
         };
-
+        /*
+         @[scrap
+         @@name catSenchaText
+         @@sencha setText('emailId', 'this is a check');
+         ]@
+         */
 
         var button = Ext.create('Ext.Button', {
             text: 'Button',
@@ -26,13 +31,7 @@
 
         });
 
-        /*
-         @[scrap
-         @@name catSenchaBtn
-         @@context button
-         @@sencha tap(button);
-         ]@
-         */
+
 
         this.setItems([{
             xtype : 'fieldset',

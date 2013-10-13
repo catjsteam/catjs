@@ -3,11 +3,11 @@ var _extjs = { };
 
 var fireItemTapFunc = function(extElement, index) {
     extElement.fireEvent('itemtap',extElement, index);
-}
+};
 
 var fireTapFunc = function(extElement) {
     extElement.fireEvent('tap');
-}
+};
 
 var setTextHelp = function(id, str) {
 
@@ -21,7 +21,7 @@ var setTextHelp = function(id, str) {
             extElement.setValue(str);
         });
     }
-}
+};
 
 _extjs = function () {
 
@@ -52,10 +52,10 @@ _extjs = function () {
 
                         extElement.addListener('painted', fireItemTapFunc(extElement, index));
 
-                        if ( Ext.getCmp(extElement).hasListener('painted')) {
+                        if (extElement.hasListener('painted')) {
                             fireItemTapFunc(extElement, index);
                         } else {
-                            Ext.getCmp(extElement).addListener('painted', fireItemTapFunc(extElement, index));
+                            extElement.addListener('painted', fireItemTapFunc(extElement, index));
                         }
                     }
 

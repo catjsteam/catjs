@@ -88,7 +88,7 @@ module.exports = function () {
 
                             } else {
 
-                                var str = (sencha).match(/setText\((.*)\);/);
+                                str = (sencha).match(/setText\((.*)\);/);
                                 if (str) {
 
                                     // split the args, parseInt the args that are numbers
