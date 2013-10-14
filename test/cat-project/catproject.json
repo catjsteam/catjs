@@ -86,7 +86,7 @@
             "name": "target.libraries",
             "type": "libraries",
             "dependency": "manager",
-            "imports": ["cat",  "chai"],
+            "imports": ["cat", "chai"],
             "action": "install"
         }, {
             "name": "target.libraries.clean",
@@ -146,11 +146,18 @@
             "args": ["clean", "--no-color"]
         },
         {
+            "name": "mobile.install",
+            "type": "spawn",
+            "dependency": "spawn.ext",
+            "command": "adb",
+            "args": ["install", "-r", "phonegap.apk"]
+        },
+        {
             "name": "mobile.test",
             "type": "spawn",
             "dependency": "spawn.ext",
             "command": "adb",
-            "args": ["shell", "am", "start", "-n", "com.phonegap.www/.CATTest"]
+            "args": ["shell", "am", "start",  "-e", "IP", "16.54.177.26", "-n", "com.hp.aamobile.cat/.example"]
         },
         {
             "name": "project.phantomjs",
@@ -204,7 +211,7 @@
         },
         {
             "name": "mtest",
-            "plugins": ["project.webserver.start", "mobile.test"]
+            "plugins": ["project.webserver.start","mobile.install",  "mobile.test"]
         },
         {
             "name": "server.start",
