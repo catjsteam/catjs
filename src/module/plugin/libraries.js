@@ -96,12 +96,14 @@ module.exports = _basePlugin.ext(function () {
             function _exec() {
 
                 var actions = {},
-                    process1, process2,
+                    process1,
                     targetManifestPath = _path.join(catProjectLib, manifestFileName),
                     doImport = false;
 
                 library = libraries[slot];
-                if (imports){
+
+
+                if (imports && library){
                     if (_typedas.isArray(imports)) {
                         doImport = _utils.contains(imports, library.name);
                     } else {
@@ -109,11 +111,7 @@ module.exports = _basePlugin.ext(function () {
                     }
                 }
 
-                if (!doImport) {
-                    return undefined;
-                }
-
-                libWorkPath = _path.join(workPath, library.name);
+                libWorkPath = (library ? _path.join(workPath, library.name) : undefined);
 
                 // copy the manifest file
                 try {
@@ -128,7 +126,19 @@ module.exports = _basePlugin.ext(function () {
 
                     var bowerConfig = {cwd: workPath};
 
-                    if (library.install === "internal") {
+                    function _copydone() {
+
+                        _copyResource();
+                        _exec();
+
+                    }
+
+                    if (library.install === "static") {
+
+                        _copydone();
+
+
+                    } else if (library.install === "internal") {
                         process1 = _spawn().spawn({
                             command: "npm",
                             args: ["install"],
@@ -141,7 +151,7 @@ module.exports = _basePlugin.ext(function () {
                                 _log.info('[spawn close] exited with code ' + code);
                             }
 
-                            process2 = _spawn().spawn({
+                            var process2 = _spawn().spawn({
                                 command: "grunt",
                                 args: [action, "--no-color"],
                                 options: {cwd: libWorkPath},
@@ -153,29 +163,12 @@ module.exports = _basePlugin.ext(function () {
                                     _log.info('[spawn close] exited with code ' + code);
                                 }
 
-                                _copyResource();
-
-                                slot++;
-                                if (slot < libraries.length) {
-                                    _exec();
-                                }
-                                if (_emitter) {
-                                    _emitter.emit("job.done", {status: "done"});
-                                }
+                                _copydone();
 
                             });
                         });
 
                     } else if (library.install === "bower") {
-
-                        function _copydone() {
-
-                            _copyResource();
-                            if (_emitter) {
-                                _emitter.emit("job.done", {status: "done"});
-                            }
-
-                        }
 
                         if (!_utils.isWindows()) {
                             _bower.commands.install([library.name], {}, bowerConfig)
@@ -202,7 +195,8 @@ module.exports = _basePlugin.ext(function () {
                                     _log.info('[bower] library ' + library.name + ' Installed');
                                     _copydone();
                                 }
-                            });                        }
+                            });
+                        }
                     }
                 };
 
@@ -222,7 +216,7 @@ module.exports = _basePlugin.ext(function () {
                                 _log.info('[spawn close] exited with code ' + code);
                             }
 
-                            process2 = _spawn().spawn({
+                            var process2 = _spawn().spawn({
                                 command: "grunt",
                                 args: [action, "--no-color"],
                                 options: {cwd: libWorkPath},
@@ -234,31 +228,34 @@ module.exports = _basePlugin.ext(function () {
                                     _log.info('[spawn close] exited with code ' + code);
                                 }
 
-                                _copyResource();
-
-                                slot++;
-                                if (slot < libraries.length) {
-                                    _exec();
-                                }
-                                if (_emitter) {
-                                    _emitter.emit("job.done", {status: "done"});
-                                }
-
                                 // delete node_modules libs
                                 var nodeModulesFolders = _path.join(libWorkPath, "node_modules");
                                 if (nodeModulesFolders) {
                                     _utils.deleteSync(nodeModulesFolders);
                                 }
 
+                                _exec();
+
                             });
                         });
                     } else if (library.install === "bower") {
                         _utils.deleteSync(_path.join(workPath, library.name));
+                        _exec();
                     }
                 };
 
-                if (actions[action]) {
+                slot++;
+                if (slot > libraries.length) {
+                    if (_emitter) {
+                        _emitter.emit("job.done", {status: "done"});
+                    }
+                    return undefined;
+                }
+
+                if ( doImport && actions[action]) {
                     actions[action].call(this);
+                } else {
+                    _exec();
                 }
 
             }

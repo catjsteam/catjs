@@ -396,6 +396,7 @@ module.exports = _basePlugin.ext(function () {
                         });
                     } else {
                         //  _Scrap.apply({scraps: scraps});
+                        emitter.emit("job.done", {status: "done"});
                     }
                 }
 

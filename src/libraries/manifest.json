@@ -10,6 +10,14 @@
             "install" : "internal"
         },
         {
+            "name": "tmr",
+            "address": "local",
+            "base": ".",
+            "prod" :["tmr-min.js"],
+            "dev" :["tmr-min.js"],
+            "install" : "static"
+        },
+        {
             "name": "chai",
             "prod" :["chai.js"],
             "dev" :["chai.js"],

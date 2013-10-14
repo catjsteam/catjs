@@ -13,7 +13,7 @@ module.exports = function () {
 
     return {
 
-        init: function () {
+        init: function (config) {
 
 
             /**
@@ -273,6 +273,8 @@ module.exports = function () {
 
                 this.print(injectanno);
             }});
+
+            config.emitter.emit("job.done", {status: "done"});
 
         },
 

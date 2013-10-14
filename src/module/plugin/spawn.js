@@ -52,7 +52,8 @@ module.exports = _basePlugin.ext(function () {
                     options = config.options,
                     spawn = (config.spawn || require('child_process').spawn),
                     inline = config.inline,
-                    emitter = (_emitter || config.emitter);
+                    emitter = (_emitter || config.emitter),
+                    callback;
 
                 try {
 
@@ -75,7 +76,7 @@ module.exports = _basePlugin.ext(function () {
                         _log.error('[spawn error] ' + data);
                     });
 
-                    chilsp.on('close', function (code) {
+                    callback = function (code) {
                         if (code !== 0) {
                             _log.info('[spawn close] exited with code ' + code);
                         }
@@ -84,9 +85,14 @@ module.exports = _basePlugin.ext(function () {
                         }
                         emitter.removeListener("spawn.exec", _module.exec);
 
-                    });
+                    };
+
+                    chilsp.on('close', callback);
                 } catch (e) {
                     _utils.error(_props.get("cat.error").format("[spawn]", e));
+                    if (emitter) {
+                        emitter.emit("job.done", {status: "done"});
+                    }
                 }
 
                 return chilsp;
