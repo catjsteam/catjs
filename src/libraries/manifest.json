@@ -10,6 +10,14 @@
             "install" : "internal"
         },
         {
+            "name": "requirejs",
+            "address": "local",
+            "base": ".",
+            "prod" :["requirejs-min.js"],
+            "dev" :["requirejs-min.js"],
+            "install" : "static"
+        },
+        {
             "name": "tmr",
             "address": "local",
             "base": ".",

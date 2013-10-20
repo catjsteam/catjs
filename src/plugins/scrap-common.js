@@ -213,7 +213,8 @@ module.exports = function () {
                         me.print(_tplutils.template({
                             content: assertCallTpl,
                             data: {
-                                expression: JSON.stringify(["assert", codeSnippetObject].join("."))
+                                expression: JSON.stringify(["assert", codeSnippetObject].join(".")),
+                                fail: true
                             }
                         }));
                     }

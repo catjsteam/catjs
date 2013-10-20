@@ -15,9 +15,9 @@
         });
         /*
          @[scrap
-         @@name catSenchaText
-         @@context emailField
-         @@sencha setText(emailField, 'this is a check');
+             @@name catSenchaText
+             @@context emailField
+             @@sencha setText(emailField, 'this is a check');
          ]@
          */
 
@@ -34,9 +34,10 @@
 
         /*
          @[scrap
-         @@name catSenchaBtn
-         @@context button
-         @@sencha tap(button);
+             @@name catSenchaBtn
+             @@context button
+             @@sencha tap(button);
+             @@assert ok(false, "@CAT Assertion test@ falsely")
          ]@
          */
 

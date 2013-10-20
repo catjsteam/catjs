@@ -1,1 +1,1 @@
-_cat.utils.chai.assert({{expression}});
+_cat.utils.chai.assert({ code:{{expression}}, fail:{{fail}} });
