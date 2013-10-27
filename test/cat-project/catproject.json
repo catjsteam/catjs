@@ -157,7 +157,7 @@
             "type": "spawn",
             "dependency": "spawn.ext",
             "command": "adb",
-            "args": ["shell", "am", "start",  "-e", "IP", "16.54.177.26", "-n", "com.hp.aamobile.cat/.example"]
+            "args": ["shell", "am", "start",  "-e", "IP", "192.168.2.3", "-n", "com.hp.aamobile.cat/.example"]
         },
         {
             "name": "project.phantomjs",
