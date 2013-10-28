@@ -40,6 +40,7 @@ module.exports = _basePlugin.ext(function () {
                 manifestLib = _path.join(global.catlibs, manifestFileName),
                 catProjectLib,
                 catProjectLibName,
+                catProjectLibTarget,
                 library, mode,
                 workPath,
                 libWorkPath,
@@ -261,7 +262,11 @@ module.exports = _basePlugin.ext(function () {
 
                     // concat artifact files
                     if (concatenated.length > 0) {
-                        _fs.writeFileSync(_path.join(catProjectLib, catProjectLibName), concatenated.join(""))
+                        catProjectLibTarget = _path.join(catProjectLib, "target");
+                        if (!_fs.existsSync(catProjectLibTarget)) {
+                            _fs.mkdirSync(catProjectLibTarget);
+                        }
+                        _fs.writeFileSync(_path.join(catProjectLibTarget, (catProjectLibName + ".js")), concatenated.join(""))
                     }
 
                     if (_emitter) {

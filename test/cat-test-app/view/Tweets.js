@@ -37,7 +37,7 @@
              @@name catSenchaBtn
              @@context button
              @@sencha tap(button);
-             @@assert ok(false, "@CAT Assertion test@ falsely")
+             @@assert ok(true, "@CAT Assertion test@ falsely")
          ]@
          */
 

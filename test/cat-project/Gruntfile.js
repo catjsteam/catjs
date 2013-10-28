@@ -87,20 +87,20 @@ module.exports = function (grunt) {
                 stripBanners: true
             },
             dist: {
-                src: ['./<%=cat.env.lib.source%>/**/*.js', './<%=cat.env.source%>/**/*.*'],
-                dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.js'
+                src: ['<%= cat.env.lib.target %><%= cat.env.lib.name %>.js', './<%=cat.env.source%>/**/*.*'],
+                dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.debug.js'
             }
         },
         uglify: {
             dist: {
-                src: ['<%= cat.env.lib.target %><%= cat.env.lib.name %>.js'],
+                src: ['<%= cat.env.lib.target %><%= cat.env.lib.name %>.debug.js'],
                 dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.min.js'
             }
         },
         copy: {
             main: {
-                src:'<%= cat.env.lib.target %><%= cat.env.lib.name %>.js',
-                dest:'<%= cat.env.lib.copyto %><%= cat.env.lib.name %>.js'
+                src:'<%= cat.env.lib.target %><%= cat.env.lib.name %>.debug.js',
+                dest:'<%= cat.env.lib.copyto %><%= cat.env.lib.name %>.debug.js'
             }
         },
         clean: ["<%= cat.env.lib.target %>",
@@ -119,7 +119,7 @@ module.exports = function (grunt) {
 
 
     grunt.registerTask('install', function () {
-        grunt.task.run(['clean', 'concat', 'jshint', 'uglify', 'copy']);
+        grunt.task.run(['concat', 'jshint', 'uglify', 'copy']);
     });
 
     grunt.registerTask('cat.compile', function () {

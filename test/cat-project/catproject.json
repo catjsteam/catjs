@@ -86,13 +86,13 @@
             "name": "target.libraries",
             "type": "libraries",
             "dependency": "manager",
-            "imports": ["cat", "chai"],
+            "imports": ["chai", "tmr", "cat"],
             "action": "install"
         }, {
             "name": "target.libraries.clean",
             "type": "libraries",
             "dependency": "manager",
-            "imports": ["cat", "chai"],
+            "imports": ["cat"],
             "action": "clean"
         },
         {
@@ -214,6 +214,9 @@
             "plugins": ["project.webserver.start","mobile.install",  "mobile.test"]
         },
         {
+            "name": "phantom",
+            "plugins": ["project.phantomjs"]
+        },{
             "name": "server.start",
             "plugins": ["project.webserver.start"]
         },
