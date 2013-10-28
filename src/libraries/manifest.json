@@ -21,8 +21,8 @@
             "name": "tmr",
             "address": "local",
             "base": ".",
-            "prod" :["tmr-min.js"],
-            "dev" :["tmr-min.js"],
+            "prod" :["tmr-min-all.js"],
+            "dev" :["tmr-min-all.js"],
             "install" : "static"
         },
         {
