@@ -29,7 +29,7 @@
             "name": "chai",
             "prod" :["chai.js"],
             "dev" :["chai.js"],
-            "install": "bower"
+            "install": "static"
         }
     ]
 }
