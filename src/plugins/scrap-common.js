@@ -44,6 +44,28 @@ module.exports = function () {
              * Annotation for javascript code
              *
              *  properties:
+             *  name    - screenshot
+             *  single  - false
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "screenshot",
+                single: false,
+                singleton: 1,
+                func: function (config) {
+                    var me = this;
+
+
+                    me.print("app.getScreenshot();");
+
+                }});
+
+
+
+            /**
+             * Annotation for javascript code
+             *
+             *  properties:
              *  name    - sencha
              *  single  - false
              *  singleton - 1[default -1]
