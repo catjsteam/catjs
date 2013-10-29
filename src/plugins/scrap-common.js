@@ -13,7 +13,7 @@ module.exports = function () {
 
     return {
 
-        init: function () {
+        init: function (config) {
 
 
             /**
@@ -235,7 +235,8 @@ module.exports = function () {
                         me.print(_tplutils.template({
                             content: assertCallTpl,
                             data: {
-                                expression: JSON.stringify(["assert", codeSnippetObject].join("."))
+                                expression: JSON.stringify(["assert", codeSnippetObject].join(".")),
+                                fail: true
                             }
                         }));
                     }
@@ -295,6 +296,8 @@ module.exports = function () {
 
                 this.print(injectanno);
             }});
+
+            config.emitter.emit("job.done", {status: "done"});
 
         },
 

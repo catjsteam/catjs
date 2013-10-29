@@ -111,6 +111,8 @@ module.exports = function Config(config) {
         // create lib target project's folder
         _mkEnvDir("lib.target");
 
+        // save all of the global evn info
+        me.info["env"] = data.env;
     }
 
     if (!data || !(data && data.plugins)) {

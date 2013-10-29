@@ -13,6 +13,10 @@ var _fs = require('fs'),
 module.exports = _basePlugin.ext(function () {
 
     var _me = this,
+        _emitter,
+        _scanJobDone = function(){
+            _emitter.emit("job.done", {status: "done"});
+        },
 
         /**
          * Walk recursively over the given directory
@@ -21,9 +25,8 @@ module.exports = _basePlugin.ext(function () {
          */
           _walk = function (dir) {
 
-            var emitter = _me.getEmitter();
 
-            emitter.emit("scan.init", {path: dir});
+            _emitter.emit("scan.init", {path: dir});
 
             var walk = function (dir, done) {
                 var results = [];
@@ -39,7 +42,7 @@ module.exports = _basePlugin.ext(function () {
                         _fs.stat(file, function (err, stat) {
                             if (stat && stat.isDirectory()) {
                                 // On Directory
-                                emitter.emit("scan.folder", file);
+                                _emitter.emit("scan.folder", file);
                                 //_log.debug("[SCAN] folder: " + file);
                                 walk(file, function (err, res) {
                                     //results = results.concat(res);
@@ -49,7 +52,7 @@ module.exports = _basePlugin.ext(function () {
                             } else {
                                 // On File
                                 //copyAction.file(file);
-                                emitter.emit("scan.file", file);
+                                _emitter.emit("scan.file", file);
                                 //_log.debug("[SCAN] file: " + file + "; ext: " + _path.extname(file));
                                 results.push(file);
                                 next();
@@ -61,11 +64,11 @@ module.exports = _basePlugin.ext(function () {
 
             walk(dir, function (err, results) {
 
-                emitter.emit("scan.done", {results: results});
+                _emitter.emit("scan.done", {results: results});
 
                 if (err) {
-                    emitter.emit("scan.error", {error: err});
-                    emitter.emit("job.done", {status: "error", error: err});
+                    _emitter.emit("scan.error", {error: err});
+                    _emitter.emit("job.done", {status: "error", error: err});
 
                     throw err;
                 }
@@ -133,10 +136,8 @@ module.exports = _basePlugin.ext(function () {
             init: function (config, ext) {
                 _me.initialize(config, ext);
 
-                var emitter = _me.getEmitter();
-                emitter.on("job.wait", function(){
-                    emitter.emit("job.done", {status: "done"});
-                });
+                _emitter = _me.getEmitter();
+                _emitter.on("job.wait", _scanJobDone);
 
 
             }

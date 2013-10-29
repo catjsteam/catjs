@@ -33,7 +33,7 @@ module.exports = _basePlugin.ext(function () {
              */
             apply: function (config) {
 
-                _me.getEmitter().emit("job.done", {status: "done"});
+                //_me.getEmitter().emit("job.done", {status: "done"});
             },
 
             /**

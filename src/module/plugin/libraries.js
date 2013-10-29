@@ -16,7 +16,8 @@ module.exports = _basePlugin.ext(function () {
         _data,
         _internalConfig,
         _project,
-        _me = this;
+        _me = this,
+        concatenated = [];
 
     return {
 
@@ -38,12 +39,15 @@ module.exports = _basePlugin.ext(function () {
                 manifestFileName = "manifest.json",
                 manifestLib = _path.join(global.catlibs, manifestFileName),
                 catProjectLib,
+                catProjectLibName,
+                catProjectLibTarget,
                 library, mode,
                 workPath,
                 libWorkPath,
                 manifest,
                 libraries,
-                slot = 0;
+                slot = 0,
+                envinfo;
 
             if (_fs.existsSync(manifestLib)) {
                 manifest = _fs.readFileSync(manifestLib, "utf8");
@@ -68,6 +72,8 @@ module.exports = _basePlugin.ext(function () {
                  * @private
                  */
                 function _copy(base, item) {
+                    var content;
+
                     // copy the library to the current cat project
                     try {
                         // copy dev
@@ -77,6 +83,13 @@ module.exports = _basePlugin.ext(function () {
                             to = _path.join(catProjectLib, item);
                             _utils.copySync(from, to);
 
+                            // concatenation
+                            content = _fs.readFileSync(from);
+                            if (content) {
+                                concatenated.push(content);
+                            }
+
+
                         } else {
                             _log.warning(_props.get("cat.plugin.libraries.config.missing").format("[libraries ext]", library.name));
                         }
@@ -85,9 +98,9 @@ module.exports = _basePlugin.ext(function () {
                     }
                 }
 
-                // copy artifacts
                 if (artifact && _typedas.isArray(artifact)) {
                     artifact.forEach(function (item) {
+                        // copy artifacts
                         _copy((library.base || undefined), item);
                     });
                 }
@@ -96,12 +109,14 @@ module.exports = _basePlugin.ext(function () {
             function _exec() {
 
                 var actions = {},
-                    process1, process2,
+                    process1,
                     targetManifestPath = _path.join(catProjectLib, manifestFileName),
                     doImport = false;
 
                 library = libraries[slot];
-                if (imports){
+
+
+                if (imports && library){
                     if (_typedas.isArray(imports)) {
                         doImport = _utils.contains(imports, library.name);
                     } else {
@@ -109,11 +124,7 @@ module.exports = _basePlugin.ext(function () {
                     }
                 }
 
-                if (!doImport) {
-                    return undefined;
-                }
-
-                libWorkPath = _path.join(workPath, library.name);
+                libWorkPath = (library ? _path.join(workPath, library.name) : undefined);
 
                 // copy the manifest file
                 try {
@@ -128,7 +139,19 @@ module.exports = _basePlugin.ext(function () {
 
                     var bowerConfig = {cwd: workPath};
 
-                    if (library.install === "internal") {
+                    function _copydone() {
+
+                        _copyResource();
+                        _exec();
+
+                    }
+
+                    if (library.install === "static") {
+
+                        _copydone();
+
+
+                    } else if (library.install === "internal") {
                         process1 = _spawn().spawn({
                             command: "npm",
                             args: ["install"],
@@ -141,7 +164,7 @@ module.exports = _basePlugin.ext(function () {
                                 _log.info('[spawn close] exited with code ' + code);
                             }
 
-                            process2 = _spawn().spawn({
+                            var process2 = _spawn().spawn({
                                 command: "grunt",
                                 args: [action, "--no-color"],
                                 options: {cwd: libWorkPath},
@@ -153,29 +176,12 @@ module.exports = _basePlugin.ext(function () {
                                     _log.info('[spawn close] exited with code ' + code);
                                 }
 
-                                _copyResource();
-
-                                slot++;
-                                if (slot < libraries.length) {
-                                    _exec();
-                                }
-                                if (_emitter) {
-                                    _emitter.emit("job.done", {status: "done"});
-                                }
+                                _copydone();
 
                             });
                         });
 
                     } else if (library.install === "bower") {
-
-                        function _copydone() {
-
-                            _copyResource();
-                            if (_emitter) {
-                                _emitter.emit("job.done", {status: "done"});
-                            }
-
-                        }
 
                         if (!_utils.isWindows()) {
                             _bower.commands.install([library.name], {}, bowerConfig)
@@ -202,7 +208,8 @@ module.exports = _basePlugin.ext(function () {
                                     _log.info('[bower] library ' + library.name + ' Installed');
                                     _copydone();
                                 }
-                            });                        }
+                            });
+                        }
                     }
                 };
 
@@ -222,7 +229,7 @@ module.exports = _basePlugin.ext(function () {
                                 _log.info('[spawn close] exited with code ' + code);
                             }
 
-                            process2 = _spawn().spawn({
+                            var process2 = _spawn().spawn({
                                 command: "grunt",
                                 args: [action, "--no-color"],
                                 options: {cwd: libWorkPath},
@@ -234,31 +241,45 @@ module.exports = _basePlugin.ext(function () {
                                     _log.info('[spawn close] exited with code ' + code);
                                 }
 
-                                _copyResource();
-
-                                slot++;
-                                if (slot < libraries.length) {
-                                    _exec();
-                                }
-                                if (_emitter) {
-                                    _emitter.emit("job.done", {status: "done"});
-                                }
-
                                 // delete node_modules libs
                                 var nodeModulesFolders = _path.join(libWorkPath, "node_modules");
                                 if (nodeModulesFolders) {
                                     _utils.deleteSync(nodeModulesFolders);
                                 }
 
+                                _exec();
+
                             });
                         });
                     } else if (library.install === "bower") {
                         _utils.deleteSync(_path.join(workPath, library.name));
+                        _exec();
                     }
                 };
 
-                if (actions[action]) {
+                slot++;
+                if (slot > libraries.length) {
+
+                    // concat artifact files
+                    if (concatenated.length > 0) {
+                        catProjectLibTarget = _path.join(catProjectLib, "target");
+                        if (!_fs.existsSync(catProjectLibTarget)) {
+                            _fs.mkdirSync(catProjectLibTarget);
+                        }
+                        _fs.writeFileSync(_path.join(catProjectLibTarget, (catProjectLibName + ".js")), concatenated.join(""))
+                    }
+
+                    if (_emitter) {
+                        _emitter.emit("job.done", {status: "done"});
+                    }
+
+                    return undefined;
+                }
+
+                if ( doImport && actions[action]) {
                     actions[action].call(this);
+                } else {
+                    _exec();
                 }
 
             }
@@ -288,10 +309,22 @@ module.exports = _basePlugin.ext(function () {
 
                     manifest = JSON.parse(manifest);
 
-                    catProjectLib = (_project ? _project.getInfo("lib.source") : undefined);
+
                     libraries = manifest.libraries;
                     mode = manifest.mode;
-                    workPath = _path.join(cathome, _project.getInfo("libraries").path);
+
+
+                    if (_project) {
+                        catProjectLib = _project.getInfo("lib.source");
+                        envinfo = _project.getInfo("env");
+                        if (envinfo) {
+                            catProjectLibName = (envinfo.lib ? envinfo.lib.name : undefined);
+                        }
+                        if (!catProjectLibName) {
+                            _log.info('[library] No valid name was found for CAT library (see catproject)');
+                        }
+                        workPath = _path.join(cathome, _project.getInfo("libraries").path);
+                    }
 
                     if (libraries &&
                         _typedas.isArray(libraries)) {

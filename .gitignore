@@ -1,3 +1,4 @@
+src/libraries/cat/target
 node_modules
 npm-debug.log
 tmp

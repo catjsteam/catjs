@@ -10,10 +10,26 @@
             "install" : "internal"
         },
         {
+            "name": "requirejs",
+            "address": "local",
+            "base": ".",
+            "prod" :["requirejs-min.js"],
+            "dev" :["requirejs-min.js"],
+            "install" : "static"
+        },
+        {
+            "name": "tmr",
+            "address": "local",
+            "base": ".",
+            "prod" :["tmr-min-all.js"],
+            "dev" :["tmr-min-all.js"],
+            "install" : "static"
+        },
+        {
             "name": "chai",
             "prod" :["chai.js"],
             "dev" :["chai.js"],
-            "install": "bower"
+            "install": "static"
         }
     ]
 }

@@ -85,14 +85,14 @@
         {
             "name": "target.libraries",
             "type": "libraries",
-            "dependency": "dependency.loader",
-            "imports": ["cat", "chai"],
+            "dependency": "manager",
+            "imports": ["chai", "tmr", "cat"],
             "action": "install"
         }, {
             "name": "target.libraries.clean",
             "type": "libraries",
-            "dependency": "dependency.loader",
-            "imports": ["cat", "chai"],
+            "dependency": "manager",
+            "imports": ["cat"],
             "action": "clean"
         },
         {
@@ -146,11 +146,18 @@
             "args": ["clean", "--no-color"]
         },
         {
+            "name": "mobile.install",
+            "type": "spawn",
+            "dependency": "spawn.ext",
+            "command": "adb",
+            "args": ["install", "-r", "phonegap.apk"]
+        },
+        {
             "name": "mobile.test",
             "type": "spawn",
             "dependency": "spawn.ext",
             "command": "adb",
-            "args": ["shell", "am", "start", "-n", "com.phonegap.www/.CATTest"]
+            "args": ["shell", "am", "start",  "-e", "IP", "192.168.2.3", "-n", "com.hp.aamobile.cat/.example"]
         },
         {
             "name": "project.phantomjs",
@@ -204,9 +211,12 @@
         },
         {
             "name": "mtest",
-            "plugins": ["project.webserver.start", "mobile.test"]
+            "plugins": ["project.webserver.start","mobile.install",  "mobile.test"]
         },
         {
+            "name": "phantom",
+            "plugins": ["project.phantomjs"]
+        },{
             "name": "server.start",
             "plugins": ["project.webserver.start"]
         },

@@ -50,11 +50,10 @@ module.exports = _basePlugin.ext(function () {
     }
 
     function _jobScrapWait() {
+        _waitcounter--;
         if (_wait === 2 && _waitcounter === 0) {
             _emitter.emit("job.wait", {status: "done"});
         }
-        _waitcounter--;
-        _wait=0;
     }
 
     _module = {
@@ -73,7 +72,7 @@ module.exports = _basePlugin.ext(function () {
             if (!_wait) {
                 _emitter.emit("job.wait", {status: "done"});
             } else {
-                _wait=2;
+                _wait = 2;
             }
             //
             // _emitter.removeListener("job.scrap.wait", _jobCopyWait);

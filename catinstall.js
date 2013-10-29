@@ -1,10 +1,18 @@
-require('package-script').spawn([
+require('package-script').install([
     {
-        command: "npm",
-        args: ["install", "-g", "grunt-cli"]
+        name: "grunt-cli"
     },
     {
-        command: "npm",
-        args: ["install", "-g", "bower"]
+        name: "bower"
     }
-]);
+], {
+    init: {
+        global:true,
+        log:false
+
+    },
+    callback: function () {
+
+        console.log("[CAT post install] done.")
+    }
+});
