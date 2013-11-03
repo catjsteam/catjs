@@ -51,6 +51,12 @@
 
     "plugins": [
         {
+            "name": "sample.plugin",
+            "type": "sample",
+            "dependency": "manager",
+            "customAttribute": "install"
+        },
+        {
             "name": "scrap.common",
             "type": "scrap-common"
         },
@@ -216,13 +222,18 @@
         {
             "name": "phantom",
             "plugins": ["project.phantomjs"]
-        },{
+        },
+        {
             "name": "server.start",
             "plugins": ["project.webserver.start"]
         },
         {
             "name": "server.stop",
             "plugins": ["project.webserver.stop"]
+        },
+        {
+            "name": "sample",
+            "plugins": ["sample.plugin"]
         }
     ]
 
