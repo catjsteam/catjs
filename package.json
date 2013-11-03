@@ -53,7 +53,8 @@
     "uglify-js": "~2.4.0",
     "jshint": "~2.1.10",
     "bower": "~1.2.7",
-    "express": "~3.4.3"
+    "express": "~3.4.3",
+    "test-model-reporter": "~0.0.6"
   },
   "peerDependencies": {
     "grunt": "~0.4.1",
