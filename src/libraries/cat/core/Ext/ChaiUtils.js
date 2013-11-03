@@ -1,4 +1,4 @@
-_cat.utils.chai = function() {
+_cat.utils.chai = function () {
 
     var _jmr,
         _report,
@@ -17,9 +17,25 @@ _cat.utils.chai = function() {
         }
     }
 
+    function sendTestResult(name, status, message) {
+        var xmlhttp = new XMLHttpRequest();
+
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                console.log("completed\n" + xmlhttp.responseText);
+            }
+            else {
+                console.log("error:" + xmlhttp.status);
+            }
+        }
+
+        xmlhttp.open("GET", "http://localhost:8089/assert?testName=" + name + "&message=" + message + "&status=" + status, true);
+        xmlhttp.send();
+    }
+
     return {
 
-        assert: function(config) {
+        assert: function (config) {
 
             if (!_state) {
                 _isSupported();
@@ -55,12 +71,14 @@ _cat.utils.chai = function() {
                 if (assert) {
                     // TODO well, I have to code the parsing section (uglifyjs) for getting a better impl in here (loosing the eval shit)
                     // TODO js execusion will be replacing this code later on...
+                    var success = true;
+                    var output;
                     if (code) {
                         try {
                             eval(code);
 
-                        } catch(e) {
-
+                        } catch (e) {
+                            success = false;
                             failure = _jmr.create({
                                 type: "model.failure",
                                 data: {
@@ -70,7 +88,8 @@ _cat.utils.chai = function() {
                             });
                             _report.add(failure);
 
-                            var output = _report.compile();
+                            output = ["[CAT] Test failed, exception: ", e].join("");
+
                             console.log("output report demo : ", output);
 
                             if (fail) {
@@ -78,6 +97,15 @@ _cat.utils.chai = function() {
                             }
                         }
                     }
+
+                    if (success) {
+
+                        output = "test succeeded";
+
+                    }
+
+                    sendTestResult("testName", success ? "success" : "failure", output);
+
                 }
             }
         },
@@ -87,7 +115,7 @@ _cat.utils.chai = function() {
          *
          * @param chai
          */
-        test: function(chaiarg) {
+        test: function (chaiarg) {
             chai = chaiarg;
         }
 
