@@ -39,7 +39,7 @@ exports.result = function (req, res) {
     testcase.add(result);
     testsuite.add(testcase);
 
-    var output = testcase.compile();
+    var output = testsuite.compile();
     console.log(output);
     jmr.write("./cattestresult.xml", output);
 
