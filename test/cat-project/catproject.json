@@ -163,7 +163,7 @@
             "type": "spawn",
             "dependency": "spawn.ext",
             "command": "adb",
-            "args": ["shell", "am", "start",  "-e", "IP", "192.168.2.3", "-n", "com.hp.aamobile.cat/.example"]
+            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.116", "-n", "com.hp.aamobile.cat/.example"]
         },
         {
             "name": "project.phantomjs",
@@ -217,7 +217,7 @@
         },
         {
             "name": "mtest",
-            "plugins": ["project.webserver.start","mobile.install",  "mobile.test"]
+            "plugins": ["mobile.install",  "mobile.test"]
         },
         {
             "name": "phantom",
