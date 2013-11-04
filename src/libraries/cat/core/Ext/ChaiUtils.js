@@ -5,7 +5,6 @@ _cat.utils.chai = function () {
         _chai,
         assert,
         _state = 0; // state [0/1] 0 - not evaluated / 1 - evaluated
-
     function _isSupported() {
         _state = 1;
         if (typeof chai != "undefined") {
@@ -29,7 +28,7 @@ _cat.utils.chai = function () {
             }
         }
 
-        xmlhttp.open("GET", "http://localhost:8089/assert?testName=" + name + "&message=" + message + "&status=" + status, true);
+        xmlhttp.open("GET", "http://192.168.1.116:8089/assert?testName=" + name + "&message=" + message + "&status=" + status, true);
         xmlhttp.send();
     }
 
