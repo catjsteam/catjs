@@ -35,12 +35,14 @@ module.exports = _basePlugin.ext(function () {
                     thiz = config.thiz,
                     basePath = _project.getTargetFolder(),
                     path = (extensionParams.path ? _path.join(basePath, extensionParams.path) : basePath),
-                    action = extensionParams.action;
+                    action = extensionParams.action,
+                    set = extensionParams.set;
 
                 try {
                     if (webserver) {
                         if (action === "start") {
                             webserver.start.call(thiz, {
+                                set: set,
                                 path: path,
                                 port: extensionParams.port
                             }, function() {

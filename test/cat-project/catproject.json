@@ -176,7 +176,8 @@
             "name": "project.webserver.start",
             "type": "webserver",
             "dependency": "webserver.ext",
-            "action": "start"
+            "action": "start",
+            "set": [{"key": "assert", "var": "result", "prop":"result"}]
         },
         {
             "name": "project.webserver.stop",
@@ -202,6 +203,10 @@
         {
             "name": "lib",
             "plugins":["target.libraries"]
+        },
+        {
+            "name": "cleanlib",
+            "plugins":["target.libraries.clean"]
         },
         {
             "name": "install",

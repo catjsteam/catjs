@@ -6,9 +6,10 @@ var _http = require("http"),
     _global = catrequire("cat.global"),
     _log = _global.log(),
     _props = catrequire("cat.props"),
-    _server;
-
-var _assert = require('./CatObjects/assert');
+    _server,
+    vars = {
+        assert: require('./CatObjects/assert')
+    }
 
 /**
  * Web Server support mainly for serving static pages
@@ -33,7 +34,10 @@ module.exports = function() {
          */
         start: function(config, callback) {
 
-            //var filename = path.join(process.cwd(), uri);
+            // TODO Path meaning? the uri?
+            var path = config.path,
+                port = (config.port || "8089"),
+                set = config.set;
 
             var allowCrossDomain = function(req, res, next) {
                 res.header('Access-Control-Allow-Origin', req.headers.origin);
@@ -43,28 +47,40 @@ module.exports = function() {
             }
             var indexPath = _path.join(process.cwd(), '/target/test-1');
 
-            var app = _express();
+            _server = _express();
 
-            app.configure(function () {
-                app.set('port', process.env.PORT || 8089);
-                app.use(_express.logger('dev')),  /* 'default', 'short', 'tiny', 'dev' */
-                app.use(_express.bodyParser()),
-                app.use(allowCrossDomain),
-                app.use(_express.bodyParser()),
-                app.use(_express.static(indexPath));
+            _server.configure(function () {
+                _server.set('port', process.env.PORT || port);
+                _server.use(_express.logger('dev')),  /* 'default', 'short', 'tiny', 'dev' */
+                _server.use(_express.bodyParser()),
+                _server.use(allowCrossDomain),
+                _server.use(_express.bodyParser()),
+                _server.use(_express.static(indexPath));
             });
 
-            app.get('/assert', _assert.result);
+            if (set) {
+                set.forEach(function(item) {
+                    var value;
+                    if (item) {
+                        if ("var" in item) {
+                            value = vars[item.var];
+                            if (value !== undefined) {
+                                if ("prop" in item) {
+                                    value = value[item.prop];
+                                    _server.get( ('/'+item.key), value);
+                                }
+                            }
+                        }
+                    }
+                });
+            }
 
-
-            app.listen(8089);
-
-            console.log('Listening on port 8089...');
-
-
-
-
-
+            _server.listen(port, function() {
+                _log.info(_props.get("cat.ext.webserver.start").format("[webserver ext]"));
+                if (callback) {
+                    callback.call(this);
+                }
+            });
         },
 
         stop: function(callback) {
