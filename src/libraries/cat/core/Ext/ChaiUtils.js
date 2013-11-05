@@ -5,6 +5,7 @@ _cat.utils.chai = function () {
         _chai,
         assert,
         _state = 0; // state [0/1] 0 - not evaluated / 1 - evaluated
+
     function _isSupported() {
         _state = 1;
         if (typeof chai != "undefined") {
@@ -21,12 +22,13 @@ _cat.utils.chai = function () {
 
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                console.log("completed\n" + xmlhttp.responseText);
+                _cat.core.log("completed\n" + xmlhttp.responseText);
             }
-            else {
-                console.log("error:" + xmlhttp.status);
-            }
-        }
+        };
+
+        xmlhttp.onerror = function(e) {
+            _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
+        };
 
         xmlhttp.open("GET", "http://192.168.1.116:8089/assert?testName=" + name + "&message=" + message + "&status=" + status, true);
         xmlhttp.send();
