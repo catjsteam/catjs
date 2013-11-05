@@ -30,6 +30,12 @@
             "prod" :["chai.js"],
             "dev" :["chai.js"],
             "install": "static"
+        },
+        {
+            "name": "sencha",
+            "prod" :["sencha.js"],
+            "dev" :["sencha.js"],
+            "install": "static"
         }
     ]
 }

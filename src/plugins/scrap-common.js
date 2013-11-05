@@ -105,7 +105,7 @@ module.exports = function () {
                                 functionArg = functionArg.substring(0, functionArg.length - 1);
 
 
-                                me.print("_extjs.actions.fireTap(" + functionArg + ");");
+                                me.print("_cat.core.plugin('sencha').actions.fireTap(" + functionArg + ");");
 
 
                             } else {
@@ -126,7 +126,7 @@ module.exports = function () {
 
                                     functionArg = functionArg.substring(0, functionArg.length - 1);
 
-                                    me.print("_extjs.actions.setText(" + functionArg + ");");
+                                    me.print("_cat.core.plugin('sencha').actions.setText(" + functionArg + ");");
                                 }
                             }
 

@@ -19,7 +19,7 @@ module.exports = function () {
             }
 
             functionArg = functionArg.substring(0, functionArg.length - 1);
-            var senchaCode = "_extjs.actions.fireTap(" + functionArg + ");"
+            var senchaCode = "_cat.core.plugin('sencha').actions.fireTap(" + functionArg + ");"
             console.log(senchaCode)
         }
     };

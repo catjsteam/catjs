@@ -1,4 +1,7 @@
-var _cat = {utils: {}};
+var _cat = {
+    utils: {},
+    plugins:{}
+};
 
 _cat.core = function() {
 
@@ -53,6 +56,16 @@ _cat.core = function() {
     return {
 
         log: _log,
+
+        plugin: function(key) {
+            var plugins;
+            if (key) {
+                plugins = _cat.plugins;
+                if (plugins[key]) {
+                    return plugins[key];
+                }
+            }
+        },
 
         define: function(key, func) {
             _cat[key] = func;
