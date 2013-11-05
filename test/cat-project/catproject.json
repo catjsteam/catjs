@@ -61,6 +61,13 @@
             "type": "scrap-common"
         },
         {
+            "name": "scrap.sencha",
+            "type": "scrap-sencha"
+        },        {
+            "name": "scrap.enyo",
+            "type": "scrap-enyo"
+        },
+        {
             "name": "init.scrap",
             "type": "scrap",
             "dependency": "scan.ext",
@@ -194,11 +201,11 @@
         },
         {
             "name": "scrap",
-            "plugins": ["scrap.common", "ext.scrap", "init.scrap"]
+            "plugins": ["scrap.common", "scrap.sencha", "ext.scrap", "init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap.common", "ext.scrap", "target.inject", "project.install"]
+            "plugins": ["scrap.common", "scrap.sencha", "ext.scrap", "target.inject", "project.install"]
         },
         {
             "name": "lib",
