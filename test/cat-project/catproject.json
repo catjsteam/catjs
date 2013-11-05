@@ -177,7 +177,7 @@
             "type": "webserver",
             "dependency": "webserver.ext",
             "action": "start",
-            "set": [{"key": "assert", "var": "result", "prop":"result"}]
+            "set": [{"key": "assert", "var": "assert", "prop":"result"}]
         },
         {
             "name": "project.webserver.stop",
