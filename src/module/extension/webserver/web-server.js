@@ -7,6 +7,7 @@ var _http = require("http"),
     _log = _global.log(),
     _props = catrequire("cat.props"),
     _server,
+    _utils  = catrequire("cat.utils"),
     vars = {
         assert: require('./CatObjects/assert')
     }
@@ -45,7 +46,11 @@ module.exports = function() {
                 next();
 
             }
-            var indexPath = _path.join(process.cwd(), '/target/test-1');
+
+            if (!path || (path && !_fs.existsSync(path))) {
+                _utils.log("warning", "[CAT WebServer] not valid location: " + path);
+                return undefined;
+            }
 
             _server = _express();
 
@@ -55,7 +60,7 @@ module.exports = function() {
                 _server.use(_express.bodyParser()),
                 _server.use(allowCrossDomain),
                 _server.use(_express.bodyParser()),
-                _server.use(_express.static(indexPath));
+                _server.use(_express.static(path));
             });
 
             if (set) {
