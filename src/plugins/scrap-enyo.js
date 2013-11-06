@@ -1,5 +1,6 @@
 var _Scrap = catrequire("cat.common.scrap"),
-    _utils = catrequire("cat.utils");
+    _utils = catrequire("cat.utils"),
+    _scraputils = require("./Utils");
 
 module.exports = function () {
 
@@ -33,47 +34,13 @@ module.exports = function () {
 
                         if (enyo) {
 
-                            var str = (enyo).match(/tap\((.*)\);/);
-                            if (str) {
+                            var match,
+                                prefix;
 
-                                // split the args, parseInt the args that are numbers
-                                str[1] = str[1].replace(/ /g, "");
-                                var args = str[1].split(",");
-                                var functionArg = "";
-                                for (var i = 0; i < args.length; i++) {
-                                    if (/^\d+$/.test(args[i])) {
-                                        args[i] = parseInt(args[i]);
-                                    }
-                                    functionArg += args[i] + ",";
-                                }
-
-                                functionArg = functionArg.substring(0, functionArg.length - 1);
-
-
-                                me.print("_cat.core.plugin('sencha').actions.fireTap(" + functionArg + ");");
-
-
-                            } else {
-
-                                str = (enyo).match(/setText\((.*)\);/);
-                                if (str) {
-
-                                    // split the args, parseInt the args that are numbers
-                                    str[1] = str[1].replace(/ /g, "");
-                                    var args = str[1].split(",");
-                                    var functionArg = "";
-                                    for (var i = 0; i < args.length; i++) {
-                                        if (/^\d+$/.test(args[i])) {
-                                            args[i] = parseInt(args[i]);
-                                        }
-                                        functionArg += args[i] + ",";
-                                    }
-
-                                    functionArg = functionArg.substring(0, functionArg.length - 1);
-
-                                    me.print("_cat.core.plugin('sencha').actions.setText(" + functionArg + ");");
-                                }
+                            if (match) {
+                                me.print("_cat.core.plugin('sencha').actions."+ match);
                             }
+
 
 
                         }
@@ -82,6 +49,7 @@ module.exports = function () {
             });
 
 
+            config.emitter.emit("job.done", {status: "done"});
         },
 
         apply: function () {
