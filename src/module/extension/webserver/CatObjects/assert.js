@@ -28,15 +28,18 @@ exports.result = function (req, res) {
     });
     testcase.set("name", testName);
 
-    var result = jmr.create({
-        type: "model.failure",
-        data: {
-            message: message,
-            type: status
-        }
-    });
+    if (status == 'failure') {
+        var result = jmr.create({
+            type: "model.failure",
+            data: {
+                message: message,
+                type: status
+            }
+        });
+        testcase.add(result);
+    }
 
-    testcase.add(result);
+
     testsuite.add(testcase);
 
     var output = testsuite.compile();
