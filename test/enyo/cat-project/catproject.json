@@ -76,7 +76,7 @@
                 {
                     "type": "file",
                     "ext": [".js"],
-                    "pattern": ["enyo"],
+                    "pattern": ["enyo", "cat"],
                     "exclude": true
                 }
             ]
@@ -168,13 +168,14 @@
             "type": "phantomjs",
             "dependency": "phantomjs.ext",
             "file": "phantomjs-script.js",
-            "host": "http://localhost:8089"
+            "host": "http://localhost:8087"
         },
         {
             "name": "project.webserver.start",
             "type": "webserver",
             "dependency": "webserver.ext",
             "action": "start",
+            "port": "8087",
             "set": [{"key": "assert", "var": "assert", "prop":"result"}]
         },
         {

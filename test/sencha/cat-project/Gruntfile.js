@@ -103,8 +103,7 @@ module.exports = function (grunt) {
                 dest:'<%= cat.env.lib.copyto %><%= cat.env.lib.name %>.debug.js'
             }
         },
-        clean: ["<%= cat.env.lib.target %>",
-            '<%= cat.env.target %>/<%= cat.name %>/<%= cat.env.lib.name %>.js',
+        clean: ["*.log",
             _logFileName
         ]
 
@@ -122,9 +121,21 @@ module.exports = function (grunt) {
         grunt.task.run(['concat', 'jshint', 'uglify', 'copy']);
     });
 
-    grunt.registerTask('cat.compile', function () {
+    grunt.registerTask('cat.install', function () {
         grunt.util.spawn({
-            cmd: 'catcli', args: ['-pisj'], opts: { stdio: [ process.stdin
+            cmd: 'catcli', args: ['-isj'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        }, function () {
+
+            grunt.task.run('install');
+        });
+    });
+
+    grunt.registerTask('cat.test', function () {
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['-t'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
@@ -135,10 +146,12 @@ module.exports = function (grunt) {
 
     grunt.registerTask('cat.clean', function () {
         grunt.util.spawn({
-            cmd: 'catcli', args: ['-pc'], opts: { stdio: [ process.stdin
+            cmd: 'catcli', args: ['-c'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
+        }, function() {
+            grunt.task.run('clean');
         });
 
     });

@@ -109,8 +109,13 @@ enyo.kind({
                  @@context pagesList
                  @@code pagesList.next()
              ]@
+
+
          */
 
+        /*
+            @@scrap@scrapManager@@manager true
+        */
 
     },
     slideHandler: function (inSender, inEvent) {
