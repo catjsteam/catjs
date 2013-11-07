@@ -94,7 +94,6 @@ module.exports = function () {
                 configKey, configVal,
                 multiRowOpenExp = "@@(.*)([\\[]+)(.*)([\\s].*)",
                 multiRowCloseExp = "(.*)?([\\]])([\\s]?.*)",
-                multiRowWaitForClosing = 0,
                 multiRowExp = "@@(.*)([\\[]+)(.*)([\\]]+.*?)([\\s]?.*)",
                 closeRow, singleRow, multiRowOpen, multiRow,
                 data,

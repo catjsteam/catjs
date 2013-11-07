@@ -1,1 +1,1 @@
-_cat.core.action({{param1}});
+_cat.core.action(this, {{param1}});

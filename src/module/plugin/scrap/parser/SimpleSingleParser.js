@@ -1,7 +1,8 @@
 var _scrapEnum = require("./../ScrapEnum.js"),
     _log = catrequire("cat.global").log(),
     _props = catrequire("cat.props"),
-    _utils = catrequire("cat.utils");
+    _utils = catrequire("cat.utils"),
+    _regutils = catrequire("cat.regexp.utils");
 
 module.exports = function () {
 
@@ -18,7 +19,7 @@ module.exports = function () {
          */
             _extractScrapName = function (line) {
 
-            return _utils.getMatchedValue(line, [_singlelineEnum, "@", "(.*)", _scrapEnum.scrapEnum.single].join(""));
+            return _regutils.getMatchedValue(line, "@@scrap@(.*)[@@]?(.*)?");
         },
 
         /**
@@ -26,7 +27,7 @@ module.exports = function () {
          */
             _validScrapAnchorName = function (line) {
 
-            return _utils.getMatchedValue(line, [_scrapEnum.scrapEnum.single, "(", _scrapEnum.scrapEnum.name, ")", "@"].join(""));
+            return _regutils.getMatchedValue(line, [_scrapEnum.scrapEnum.single, "(", _scrapEnum.scrapEnum.name, ")", "@"].join(""));
 
         };
 
@@ -43,7 +44,8 @@ module.exports = function () {
                 currentScrap = [],
                 scrapBlockName,
                 scrapAttrBlockName,
-                tmpString;
+                tmpString,
+                attrs = [];
 
             _singlelineEnum = _scrapEnum.getSingleLineEnum();
 
@@ -79,23 +81,33 @@ module.exports = function () {
                                 tmpString = comment.substring(scrap[0]);
                                 scrapBlockName = _validScrapAnchorName(tmpString);
                                 scrapAttrBlockName = _extractScrapName(tmpString);
+                                if (scrapAttrBlockName.indexOf("@@") != -1) {
+                                    attrs = scrapAttrBlockName.split("@@");
+                                    scrapAttrBlockName = attrs.shift();
+                                }
 
                                 lineNumber[0] = commentobj.number;
                             }
-                            currentScrap.push(comment);
+//                            if (currentScrap.length === 0) {
+//                                currentScrap.push(comment);
+//                            }
                         }
 
                         // closed block was found
                         if (scrap[1] > -1) {
                             scrap[1] += _scrapEnum.scrapEnum.close.length;
                             // valid comment
-                            currentScrap.push(comment);
+                            currentScrap.push("@[scrap");
+                            currentScrap.push("@@name " + scrapAttrBlockName);
+                            currentScrap.push("@@" + attrs[0]);
+                            currentScrap.push("]@");
                             if (scrapBlockName === _scrapEnum.scrapEnum.name) {
                                 lineNumber[1] = commentobj.number;
                                 scraps.push(
                                     {
                                         attrs: {
-                                            name: scrapAttrBlockName
+                                            name: scrapAttrBlockName,
+                                            attrs: attrs
                                         },
                                         name: scrapBlockName,
                                         rows: currentScrap.splice(0),

@@ -17,6 +17,23 @@ module.exports = function () {
 
 
             /**
+             * Annotation for javascript manager
+             *
+             *  properties:
+             *  name    - manager
+             *  single  - false
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "manager",
+                single: false,
+                singleton: 1,
+                func: function (config) {
+                  console.log(".. manage code");
+                }});
+
+
+            /**
              * Annotation for javascript code
              *
              *  properties:

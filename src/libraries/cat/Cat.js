@@ -76,7 +76,7 @@ _cat.core = function() {
          *
          * @param config
          */
-        action: function(config) {
+        action: function(thiz, config) {
             var scrap = config.scrap,
                 catInternalObj,
                 catObj,
@@ -88,9 +88,9 @@ _cat.core = function() {
                 if (scrap.pkgName) {
 
                     // collect arguments
-                    if (arguments.length > 1) {
+                    if (arguments.length > 2) {
                         passedArguments = [];
-                        for (idx = 1; idx<size; idx++) {
+                        for (idx = 2; idx<size; idx++) {
                             passedArguments.push(arguments[idx]);
                         }
                     }
@@ -118,7 +118,7 @@ _cat.core = function() {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                console.log("Scrap call: ",config, " scrap: " + scrap.name);
+                console.log("Scrap call: ",config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
         }
