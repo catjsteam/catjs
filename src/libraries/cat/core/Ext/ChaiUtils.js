@@ -30,7 +30,14 @@ _cat.utils.chai = function () {
             _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
         };
 
-        xmlhttp.open("GET", "http://192.168.1.116:8089/assert?testName=" + name + "&message=" + message + "&status=" + status, true);
+        var config  = _cat.core.getConfig();
+
+        var url = "http://" + config.ip +  ":" +
+            config.port + "/assert?testName=" +
+            name + "&message=" + message +
+            "&status=" + status +
+            "&type=" + config.type;
+        xmlhttp.open("GET", url, true);
         xmlhttp.send();
     }
 

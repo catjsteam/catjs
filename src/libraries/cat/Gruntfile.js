@@ -94,7 +94,9 @@ module.exports = function (grunt) {
                 "eqnull": true,
                 "node": true,
                 "es5": true,
-                globals: {}
+                globals: {
+                    XMLHttpRequest: false
+                }
             },
             all: {
                 src: ['Cat.js', 'core/test/TestManager.js']

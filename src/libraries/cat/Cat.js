@@ -51,6 +51,7 @@ _cat.core = function() {
         };
 
     }(),
+        _config,
         _log = console;
 
     return {
@@ -70,6 +71,33 @@ _cat.core = function() {
         define: function(key, func) {
             _cat[key] = func;
         },
+
+
+        getConfig: function ()
+        {
+            //try - catch
+            var x;
+
+            try
+            {
+                if (XMLHttpRequest) {
+                    var xmlhttp =  new XMLHttpRequest();
+                    xmlhttp.open("GET", "config.json", false);
+                    xmlhttp.send();
+                    var configText = xmlhttp.responseText;
+                    _config = JSON.parse(configText);
+                }
+            }
+            catch(err)
+            {
+                //todo: log error
+            }
+
+
+            //return x;
+            return _config;
+        },
+
 
         /**
          * CAT core definition, used when injecting cat call
