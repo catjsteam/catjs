@@ -40,22 +40,56 @@ module.exports = _basePlugin.ext(function () {
 
                 scraps.forEach(function (scrap) {
                     var out,
+                        runat,
+                        managerout,
+                        pkgname,
                         engine = scrap.$getEngine(),
-                        args = scrap.get("arguments");
+                        args = scrap.get("arguments"),
+                        scrapvar;
 
                     if (engine === _scrapEnum.engines.JS ||
                         engine === _scrapEnum.engines.HTML_EMBED_JS) {
 
-                        out = _tplutils.template({
+                        runat = scrap.get("run@");
+                        pkgname = _extutils.getCATInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName;
+                        scrap.set("pkgName", pkgname);
+                        scrapvar = ["{ scrap:", JSON.stringify(scrap.serialize()), "}"].join("");
+
+                        if (runat) {
+                            managerout = _tplutils.template({
+                                    name: "scrap/_func_manager",
+                                    data: {
+                                        name: pkgname,
+                                        runat: runat
+                                    }
+                                }
+                            );
+                        }
+
+                        if (managerout) {
+                            outputjs.push(managerout);
+                        }
+
+                        outputjs.push(_tplutils.template({
+                                name: "scrap/_func_declare",
+                                data: {
+                                    name: pkgname,
+                                    scrap: scrapvar,
+                                    type: "scrap"
+                                }
+                            }
+                        ));
+
+                        outputjs.push(_tplutils.template({
                                 name: "scrap/_func",
                                 data: {
-                                    name: _extutils.getCATInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName,
+                                    name: pkgname,
                                     arguments: (args ? args.join(",") : undefined),
                                     output: scrap.generate()}
                             }
-                        );
+                        ));
 
-                        outputjs.push(out);
+
 
                     }
                 });

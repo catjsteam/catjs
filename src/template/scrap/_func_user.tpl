@@ -1,5 +1,7 @@
 _cat.core.define("{{name}}", function() {
 
+    var pkgName = "{{name}}";
+
     return {
 
         /**

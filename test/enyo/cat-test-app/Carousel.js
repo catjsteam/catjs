@@ -106,15 +106,20 @@ enyo.kind({
         /*
              @[scrap
                  @@name enyoNext
+                 @@run@ scrapManager
                  @@context pagesList
                  @@code pagesList.next()
              ]@
-
-
          */
 
         /*
-            @@scrap@scrapManager@@manager true
+            @[scrap
+                @@name scrapManager
+                @@perform[
+                    @@enyoNext repeat(2)
+                ]
+                @@manager true
+            ]@
         */
 
     },

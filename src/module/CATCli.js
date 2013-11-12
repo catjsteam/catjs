@@ -52,9 +52,10 @@ module.exports = function() {
                     "cat.plugin.spawn": "src/module/plugin/spawn.js",
                     "cat.common.scrap": "src/module/plugin/scrap/Scrap.js",
 
-
                     "cat.common.config": "src/module/config/project/Config.js",
-                    "cat.common.parser": "src/module/common/parser/Parser.js"
+                    "cat.common.parser": "src/module/common/parser/Parser.js",
+
+                    "cat.scrap.utils": "src/module/plugin/scrap/ScrapUtils.js"
                 };
 
                 global.catmodule = function (module) {

@@ -245,6 +245,10 @@ _clazz.prototype.setSingleton = function (key, bol) {
     this.config.singleton[key] = bol;
 };
 
+_clazz.prototype.getRunat = function (key) {
+    return this.config["run@"];
+};
+
 _clazz.prototype.getSingleton = function (key) {
     return this.config.singleton[key];
 };

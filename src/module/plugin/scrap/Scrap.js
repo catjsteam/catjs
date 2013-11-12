@@ -15,6 +15,7 @@ var _utils = catrequire("cat.utils"),
 module.exports = function () {
 
     var _scraps = [],
+        _scrapmap,
 
         /**
          * Extract scrap block out of comment
@@ -36,6 +37,7 @@ module.exports = function () {
         },
 
         clazz: _clazz,
+
 
         /**
          * Add custom functionality to CAT's Scrap entity
@@ -155,8 +157,8 @@ module.exports = function () {
 
                             if (!closeRow && ! multiRowOpen) {
                                 // multi row annotation expression
-                                multiRow = _regutils.getMatch(row, multiRowExp);
-                                multiRowOpen =  _regutils.getMatch(row, multiRowOpenExp);
+                                multiRow = _regutils.getMatch(row + " ", multiRowExp);
+                                multiRowOpen =  _regutils.getMatch(row + " ", multiRowOpenExp);
                             }
 
                             if (multiRow) {
@@ -212,7 +214,7 @@ module.exports = function () {
             config.scrapinfo = fileinfo;
             config.commentinfo = commentinfo;
             if (!config.name) {
-                _log.error(_props.get("cat.error.scrap.property.required").format("[scrap entity]", 'name'));
+                _utils.log("error", _props.get("cat.error.scrap.property.required").format("[scrap entity]", 'name'));
                 return undefined;
             }
             scrap = new _clazz(config);
@@ -308,6 +310,21 @@ module.exports = function () {
 
         getScraps: function () {
             return _scraps;
+        },
+
+        getScrap: function(key) {
+              if (!_scrapmap && _scraps) {
+                  _scrapmap = {};
+                  _scraps.forEach(function(scrap) {
+
+                      if (scrap) {
+                        _scrapmap[scrap.id()] = scrap;
+                      }
+
+                  });
+              }
+
+            return _scrapmap[key];
         },
 
         extractScrapBlock: _extractScrapBlock

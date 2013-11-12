@@ -115,8 +115,6 @@ module.exports = function () {
             return (scraps.length > 0 ? scraps : undefined);
         }
 
-    }
-        ;
+    };
 
-}
-    ();
+}();

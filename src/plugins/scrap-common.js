@@ -2,7 +2,8 @@ var _Scrap = catrequire("cat.common.scrap"),
     _tplutils = catrequire("cat.tpl.utils"),
     _utils = catrequire("cat.utils"),
     _uglifyutils = catrequire("cat.uglify.utils"),
-    _jshint = require("jshint").JSHINT;
+    _jshint = require("jshint").JSHINT,
+    _scraputils = catrequire("cat.scrap.utils");
 
 
 module.exports = function () {
@@ -14,24 +15,6 @@ module.exports = function () {
     return {
 
         init: function (config) {
-
-
-            /**
-             * Annotation for javascript manager
-             *
-             *  properties:
-             *  name    - manager
-             *  single  - false
-             *  singleton - 1[default -1]
-             *  $type   - js
-             */
-            _Scrap.add({name: "manager",
-                single: false,
-                singleton: 1,
-                func: function (config) {
-                  console.log(".. manage code");
-                }});
-
 
             /**
              * Annotation for javascript code
@@ -133,6 +116,95 @@ module.exports = function () {
                             //    console.log("The code is not valid: ", _jshint.errors);
                             //}
                         }
+                    }
+                }});
+
+            /**
+             * Annotation for javascript run@
+             *
+             *  properties:
+             *  name    - run@
+             *  runat  - true
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "run@",
+                func: function (config) {
+
+                }});
+
+            /**
+             * Annotation for javascript manager
+             *
+             *  properties:
+             *  name    - manager
+             *  single  - false
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "manager",
+                single: false,
+                singleton: 1,
+                func: function (config) {
+
+                    var me = this,
+                        manager,
+                        runat = me.get("name");
+
+                    manager = me.get("manager");
+                    if (manager) {
+                        me.print(_tplutils.template({
+                            content: funcSnippetTpl,
+                            data: {
+                                comment: " Manager call ",
+                                code: "(function() {_cat.core.managerCall('" + runat + "'); })();"
+                            }
+                        }));
+                    }
+
+
+                }});
+
+            /**
+             * Annotation for javascript manager's scraps attributes
+             *
+             *  properties:
+             *  name    - code
+             *  single  - false
+             *  $type   - js
+             */
+            _Scrap.add({name: "perform",
+                single: false,
+                func: function (config) {
+
+                    var scrapsRows,
+                        me = this,
+                        scrapItemName, scrapItemValue,
+                        scrapItem,
+                        runat = me.get("name");
+
+                    scrapsRows = me.get("perform");
+                    if (scrapsRows) {
+
+                        scrapsRows.forEach(function(item){
+                            if (item) {
+                                scrapItem = _scraputils.extractSingle(item);
+                                if (scrapItem) {
+                                    scrapItemName = scrapItem.key;
+                                    scrapItemValue = scrapItem.value;
+
+                                    me.print(_tplutils.template({
+                                        content: funcSnippetTpl,
+                                        data: {
+                                            comment: " Add Manager behavior ",
+                                            code: "_cat.core.setManagerBehavior('" + runat + "', '"+ scrapItemName +"', '" + scrapItemValue+ "');"
+                                        }
+                                    }));
+                                }
+
+                            }
+                        });
+
                     }
                 }});
 

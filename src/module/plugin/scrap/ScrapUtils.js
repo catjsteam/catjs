@@ -1,8 +1,42 @@
-var _typedas = require("typedas");
+var _typedas = require("typedas"),
+    _log = catrequire("cat.global").log(),
+    _regutils = catrequire("cat.regexp.utils");
 
 module.exports = function() {
 
     return {
+
+        /**
+         * Extract single Scrap e.g [@@foo value]
+         *
+         * @param row
+         * @returns {{key: *, value: *}}
+         */
+        extractSingle: function(row) {
+
+            var configKey,
+                configVal,
+                singleRow;
+
+            singleRow = _regutils.getMatch(row, "@@(.*?\\[[\\s]+)(.*)");
+            if (!singleRow) {
+                singleRow = _regutils.getMatch(row, "@@(.*?[\\s]+)(.*)");
+            } else {
+                singleRow = null;
+            }
+
+            if (singleRow) {
+
+                // single row annotation expression
+                configKey = singleRow[1];
+                configVal = singleRow[2];
+
+            } else {
+                _log.warn("[SCRAP Utils] failed to parse row: '" + row + "'");
+            }
+
+            return {key: configKey, value: configVal};
+        },
 
         putScrapConfig: function(config, configKey, configVal) {
             if (configKey) {

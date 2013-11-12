@@ -25,8 +25,7 @@ module.exports = function () {
                 return undefined;
             }
 
-            var projectWorkPath = _global.get("home").working.path,
-                file = config.file,
+            var file = config.file,
                 scrap = config.scrap,
                 basepath = config.basepath,
                 fileName = _path.basename(file, ".js"),
@@ -64,8 +63,7 @@ module.exports = function () {
             if (!config) {
                 return undefined;
             }
-            var projectWorkPath = _global.get("home").working.path,
-                file = config.file,
+            var file = config.file,
                 scrap = config.scrap,
                 basepath = config.basepath,
                 fileName = _path.basename(file, ".js"),
