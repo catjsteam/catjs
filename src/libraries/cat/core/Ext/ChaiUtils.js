@@ -32,7 +32,7 @@ _cat.utils.chai = function () {
 
         var config  = _cat.core.getConfig();
 
-        var url = "http://" + config.ip +  ":" + 
+        var url = "http://" + config.ip +  ":" +
             config.port + "/assert?testName=" +
             name + "&message=" + message +
             "&status=" + status +
@@ -42,7 +42,7 @@ _cat.utils.chai = function () {
     }
 
     return {
-
+ 
         assert: function (config) {
 
             if (!_state) {
