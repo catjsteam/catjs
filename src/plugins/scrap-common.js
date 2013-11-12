@@ -134,6 +134,56 @@ module.exports = function () {
                 }});
 
             /**
+             * Annotation for javascript catui
+             *
+             *  properties:
+             *  name    - catui
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "catui",
+                func: function (config) {
+
+                    var me = this,
+                        catui = me.get("catui");
+
+                    if (catui) {
+                        me.print(_tplutils.template({
+                            content: funcSnippetTpl,
+                            data: {
+                                comment: " CAT UI call ",
+                                code: ["_cat.core.ui.", catui, "();"].join("")
+                            }
+                        }));
+                    }
+                }});
+
+           /**
+             * Annotation for javascript signal
+             *
+             *  properties:
+             *  name    - signal
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "signal",
+                func: function (config) {
+
+                    var me = this,
+                        signal = me.get("signal");
+
+                    if (signal) {
+                        me.print(_tplutils.template({
+                            content: funcSnippetTpl,
+                            data: {
+                                comment: " Signal call ",
+                                code: ["_cat.util.Signal(", signal ,");"].join("")
+                            }
+                        }));
+                    }
+                }});
+
+            /**
              * Annotation for javascript manager
              *
              *  properties:

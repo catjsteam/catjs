@@ -1,6 +1,7 @@
 var _cat = {
     utils: {},
-    plugins:{}
+    plugins:{},
+    ui:{}
 };
 
 _cat.core = function() {

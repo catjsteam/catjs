@@ -119,6 +119,7 @@ enyo.kind({
                     @@enyoNext repeat(2)
                 ]
                 @@manager true
+                @@catui on
             ]@
         */
 
