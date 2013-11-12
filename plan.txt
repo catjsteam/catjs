@@ -1,89 +1,50 @@
-Day 1 (23.6)
-	Grunt including:
-		1) learning ...
-		2) creating a basic environment
-		3) building a basic project
 
-Day 2
-	Grunt including:
-		1) Creating CAT project
-		2) Parent project which runs two subprojects (plugin, core)
-		3) I have an issue working with nodejs fs (file system) :-/
-
-Day 3
-		Grunt Issue.. still trying to figure out why I cannot work with fs.extra or pure node fs.
-		I found out that running grunt spawn - meaning running nodejs as a child process - works... so something about grunt process is wrong.
-		Trying to code standalone node module, running the module from grunt - still not working
-
-Day 4
-		Grunt Issue - I found the solution,
-		All I had to do it tell grunt that I'm working in async mode. I think that this one sucks big time!!
-
-		// Tell grunt this task is asynchronous.
-		var done = this.async();
-
-		At last moving forward to the real stuff... scanning a given project.
-		Adding filters support - currently testing excluding files out of a given scanning.
-
-Day 5
-
-	    - Log support - for external file as well.
-	    - (Maintenance) support for standalone node modules.
-	    - Event management for the actions (e.g. copy); current support file|folder events.
-	    - External configuration support - can be used anywhere
-	    - Creating test configuration for the san action
-	    - Preparing the project for production mode
-	    - Preparing a blank CAT project
+What's next OR future wishes
+===============================
 
 
-(30.6 - 3.7)
-        - Create CAT project
-        - Loading log file messages (TBD: extract embed messages)
-        - Project Configuration refactor & proper classes creation
-        - Align the code according to the new project configuration
+Next
+====
+1) Add Mock Data facilitation
 
-(4.7)
-        - VBox issues no more disk space need to resize the disk.
+2) Scrap Manager
+    2.1) Runnable for other scraps
+    2.2) Behavior of other scraps
+    2.3) TBD
 
-(7.7)
-        - Load internal configuration for loading extensions
+3) TBD
 
-(8.7)
-        - align the code according to the internal configuration
-        - scrap plugin initial support (plugin for comment scanning)
-        - tasks project support - in specific extensions dependency
 
-(9.7)
-        - project configuration
-            tie between extension plugins and internal cat configuration extensions impl.
-        - added init listener for the scan extension. Alignment for the scrap and copy plugins.
-        - basic comment block parser for multi-line
-         - Scrap class implementation
-         - Hook the comment parser to the scrap plugin
 
-(10.7)  - Base plugin Class implementation and code alignment for copy and scrap plugins
-        - Filter class implementation and code alignment
-        - Apply Filter on scrap plugin
 
-(11.7)  - clean dependency was added (-c flag  for the catcli)
-        - string format npm added
-        - log messages - startup coverage
 
-(14.7)  - External annotation plugin support
-        - Extract Scrap blocks from a given comment
+Log
+=======
 
-(15.7)  - extract scrap meta-data configuration
-        - beautify npm added
-        - meta-data file serialization support
-        - extract scrap data out of a file
+1) Improve CAT parser to be able to parse the annotation more smoothly
 
-(16.7)  - metadata read support; Scrap, file information added e.g. line number
-        - fixes for the file info, start and exnd of the scrap within a file comment
-        - fix for the file info - end column
-        - initial inject data to the new deployment according to the metadata file
+2) Add scrap behavior
+    2.1) Add Alias names - e.g. Scrap added with name "code" but the same behaviour goes to "foo" as well.
+    2.2) Scrap lifecycle printing - since the scrap attributes can be randomly ordered we need to
+        setup some kind of lifecycle for printing. Init, run...
+        A solution can be: template for the scrap which will be passed to all of the scrap behaviors (properties)
+        Each one will set its values and it will be inject as a whole.
 
-(17.7)  - utils - copy deep object support
-        - fix for multi-file scraps data extraction
-        - medata, update data support;
+3) Run Standalone functionality that are not dependent by context variables.
 
-(18.7)  - fixes for test project creation & scrap call injection
+4) Assert should "understand" a custom user functionality by name and execute it.
+
+5) Scenario methodology implementation
+
+6) Flow Manager implementation
+
+7) CAT test project implementation
+
+8) CAT runner implementation
+
+9) add package name utility from within the ScrapItem
+
+10) scrap annotations method names should not be the same as the private,
+    or we can use '_' as prefix for private methods.
+
+11) ScrapItem should be on the browser as well for instantiating Scrap class.
