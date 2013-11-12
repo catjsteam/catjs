@@ -18,6 +18,7 @@
              @@name catSenchaText
              @@context emailField
              @@sencha setText(emailField, 'this is a check');
+             @@assert ok(true, "@CAT Assertion 2");
          ]@
          */
 
@@ -37,7 +38,7 @@
              @@name catSenchaBtn
              @@context button
              @@sencha tap(button);
-             @@assert ok(true, "@CAT Assertion test@ falsely")
+             @@assert ok(true, "@CAT Assertion test@ falsely");
          ]@
          */
 

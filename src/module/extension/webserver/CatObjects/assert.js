@@ -1,47 +1,54 @@
+
+var jmr = require("test-model-reporter");
+if (jmr === undefined) {
+    console.log("Test Unit Reporter is not supported, consider adding it to the .catproject dependencies");
+}
+
+var testsuite = jmr.create({
+    type: "model.testsuite",
+    data: {
+        name: "testsuite"
+    }
+});
+
 exports.result = function (req, res) {
 
-    var testName = req.query.testName;
-    var message = req.query.message;
-    var status = req.query.status;
-    var reportType = req.query.type;
+    var testName = req.query.testName,
+         message = req.query.message,
+         status = req.query.status,
+         reportType = req.query.type,
+         testCase,
+         failure,
+         result;
+
     console.log("requesting " + testName + message + status);
     res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
     res.send({"testName": testName, "message": message, "status": status});
 
-    var jmr = require("test-model-reporter");
-    if (jmr === undefined) {
-        console.log("Test Unit Reporter is not supported, consider adding it to the .catproject dependencies");
-    }
 
-    var testcase,
-        failure,
-        testsuite = jmr.create({
-            type: "model.testsuite",
-            data: {
-                name: "testsuite"
-            }
-        });
-    testcase = jmr.create({
+
+
+    testCase = jmr.create({
         type: "model.testcase",
         data: {
-            time: "now"
+            time: (new Date()).toUTCString()
         }
     });
-    testcase.set("name", testName);
+    testCase.set("name", testName);
 
     if (status == 'failure') {
-        var result = jmr.create({
+        result = jmr.create({
             type: "model.failure",
             data: {
                 message: message,
                 type: status
             }
         });
-        testcase.add(result);
+        testCase.add(result);
     }
 
 
-    testsuite.add(testcase);
+    testsuite.add(testCase);
 
     var output = testsuite.compile();
     console.log(output);

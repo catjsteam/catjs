@@ -1,7 +1,6 @@
 _cat.utils.chai = function () {
 
     var _jmr,
-        _report,
         _chai,
         assert,
         _state = 0; // state [0/1] 0 - not evaluated / 1 - evaluated
@@ -42,34 +41,16 @@ _cat.utils.chai = function () {
     }
 
     return {
- 
+
         assert: function (config) {
 
             if (!_state) {
                 _isSupported();
             }
 
-            if (_jmr === undefined) {
-                _jmr = (typeof jmr !== "undefined" ? jmr : null);
-                if (_jmr === null) {
-                    _cat.core.log.info("Test Unit Reporter is not supported, consider adding it to the .catproject dependencies");
-                }
-            }
-
             var code,
                 fail,
                 failure;
-
-            if (_jmr) {
-                if (!_report) {
-                    _report = jmr.create({
-                        type: "model.testcase",
-                        data: {
-                            name: "testcase"
-                        }
-                    });
-                }
-            }
 
             if (_chai) {
                 if (config) {
@@ -87,14 +68,6 @@ _cat.utils.chai = function () {
 
                         } catch (e) {
                             success = false;
-                            failure = _jmr.create({
-                                type: "model.failure",
-                                data: {
-                                    message: ["[CAT] Test failed, exception: ", e].join(""),
-                                    type: "failure"
-                                }
-                            });
-                            _report.add(failure);
 
                             output = ["[CAT] Test failed, exception: ", e].join("");
 
