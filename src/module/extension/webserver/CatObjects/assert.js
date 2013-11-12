@@ -3,6 +3,7 @@ exports.result = function (req, res) {
     var testName = req.query.testName;
     var message = req.query.message;
     var status = req.query.status;
+    var reportType = req.query.type;
     console.log("requesting " + testName + message + status);
     res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
     res.send({"testName": testName, "message": message, "status": status});
@@ -28,19 +29,22 @@ exports.result = function (req, res) {
     });
     testcase.set("name", testName);
 
-    var result = jmr.create({
-        type: "model.failure",
-        data: {
-            message: message,
-            type: status
-        }
-    });
+    if (status == 'failure') {
+        var result = jmr.create({
+            type: "model.failure",
+            data: {
+                message: message,
+                type: status
+            }
+        });
+        testcase.add(result);
+    }
 
-    testcase.add(result);
+
     testsuite.add(testcase);
 
     var output = testsuite.compile();
     console.log(output);
-    jmr.write("./cattestresult.xml", output);
+    jmr.write("./cattestresult" + reportType + ".xml", output);
 
 }
