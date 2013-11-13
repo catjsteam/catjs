@@ -12,7 +12,7 @@
             label : 'Email',
             name  : 'email',
             id : 'emailId'
-        });
+        }); 
         /*
          @[scrap
              @@name catSenchaText
