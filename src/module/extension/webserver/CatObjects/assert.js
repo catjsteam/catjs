@@ -1,15 +1,18 @@
 
-var jmr = require("test-model-reporter");
-if (jmr === undefined) {
+var _jmr = require("test-model-reporter"),
+
+    _testsuite = _jmr.create({
+        type: "model.testsuite",
+        data: {
+            name: "testsuite"
+        }
+    }),
+    _fs = require("fs");
+
+if (_jmr === undefined) {
     console.log("Test Unit Reporter is not supported, consider adding it to the .catproject dependencies");
 }
 
-var testsuite = jmr.create({
-    type: "model.testsuite",
-    data: {
-        name: "testsuite"
-    }
-});
 
 exports.result = function (req, res) {
 
@@ -19,7 +22,8 @@ exports.result = function (req, res) {
          reportType = req.query.type,
          testCase,
          failure,
-         result;
+         result,
+         file;
 
     console.log("requesting " + testName + message + status);
     res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
@@ -28,7 +32,7 @@ exports.result = function (req, res) {
 
 
 
-    testCase = jmr.create({
+    testCase = _jmr.create({
         type: "model.testcase",
         data: {
             time: (new Date()).toUTCString()
@@ -37,7 +41,7 @@ exports.result = function (req, res) {
     testCase.set("name", testName);
 
     if (status == 'failure') {
-        result = jmr.create({
+        result = _jmr.create({
             type: "model.failure",
             data: {
                 message: message,
@@ -48,10 +52,16 @@ exports.result = function (req, res) {
     }
 
 
-    testsuite.add(testCase);
+    _testsuite.add(testCase);
 
-    var output = testsuite.compile();
+    var output = _testsuite.compile();
     console.log(output);
-    jmr.write("./cattestresult" + reportType + ".xml", output);
+
+    file = "./cattestresult" + reportType + ".xml";
+    if(_fs.existsSync(file))
+    {
+        _fs.unlinkSync(file);
+    }
+    _jmr.write(file, output);
 
 }

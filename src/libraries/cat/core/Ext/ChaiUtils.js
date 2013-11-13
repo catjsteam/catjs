@@ -21,12 +21,12 @@ _cat.utils.chai = function () {
 
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                _cat.core.log("completed\n" + xmlhttp.responseText);
+               // _cat.core.log("completed\n" + xmlhttp.responseText);
             }
         };
 
         xmlhttp.onerror = function(e) {
-            _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
+           // _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
         };
 
         var config  = _cat.core.getConfig();
@@ -35,7 +35,7 @@ _cat.utils.chai = function () {
             config.port + "/assert?testName=" +
             name + "&message=" + message +
             "&status=" + status +
-            "&type=" + config.type;
+            "&type=" + config.type + "&cache="+ (new Date()).toUTCString();
         xmlhttp.open("GET", url, true);
         xmlhttp.send();
     }
