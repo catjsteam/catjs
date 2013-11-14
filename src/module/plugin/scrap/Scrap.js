@@ -102,7 +102,7 @@ module.exports = function () {
                 idxi= 0, sizei= 0, itemi,
             // 0-don't push, 1-push data, 2-push data and break
                 pushdata = 0,
-                matchName, sign;
+                matchName, sign, hint;
 
             // scan rows (exclude the fitrs & last rows scrap block["@[scrap" .. "]@]
             for (; idx < size - 1; idx++) {
@@ -137,21 +137,21 @@ module.exports = function () {
                             configKey = singleRow[1];
                             configVal = singleRow[2];
 
-                            // Interpret name (name, sign [!, =] see _commonparser.parseName)
+                            // Interpret name (name, sign [!, =, @] see _commonparser.parseName)
                             matchName = _commonparser.parseName(configKey);
-                            if (matchName
-                                && _typedas.isArray(matchName)
-                                && matchName.length > 0 ) {
-
-                                configKey = matchName[1];
-                                sign = matchName[2];
+                            if (matchName) {
+                                if (hint) {
+                                    configKey = matchName.name;
+                                }
+                                sign = matchName.sign;
+                                hint = matchName.hint;
 
                             } else {
                                 sign = undefined;
                             }
 
                             // set scrap property / value
-                            _scrapUtils.putScrapConfig(config, configKey, _ScrapConfigItem.create({value: configVal, sign:sign}));
+                            _scrapUtils.putScrapConfig(config, configKey, _ScrapConfigItem.create({value: configVal, sign:sign, hint:hint}));
 
                         } else {
 
