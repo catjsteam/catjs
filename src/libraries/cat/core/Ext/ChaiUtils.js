@@ -1,7 +1,6 @@
 _cat.utils.chai = function () {
 
-    var _jmr,
-        _chai,
+    var _chai,
         assert,
         _state = 0; // state [0/1] 0 - not evaluated / 1 - evaluated
 
@@ -16,28 +15,16 @@ _cat.utils.chai = function () {
         }
     }
 
-    function sendTestResult(name, status, message) {
-        var xmlhttp = new XMLHttpRequest();
 
-        xmlhttp.onreadystatechange = function () {
-            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-               // _cat.core.log("completed\n" + xmlhttp.responseText);
-            }
-        };
-
-        xmlhttp.onerror = function(e) {
-           // _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
-        };
+    function sendTestResult(data) {
 
         var config  = _cat.core.getConfig();
 
-        var url = "http://" + config.ip +  ":" +
-            config.port + "/assert?testName=" +
-            name + "&message=" + message +
-            "&status=" + status +
-            "&type=" + config.type + "&cache="+ (new Date()).toUTCString();
-        xmlhttp.open("GET", url, true);
-        xmlhttp.send();
+        if (config) {
+            _cat.utils.AJAX.sendRequestSync({
+                url:  _cat.core.TestManager.generateAssertCall(config, data)
+            });
+        }
     }
 
     return {
@@ -50,7 +37,8 @@ _cat.utils.chai = function () {
 
             var code,
                 fail,
-                failure;
+                failure,
+                testdata;
 
             if (_chai) {
                 if (config) {
@@ -85,7 +73,13 @@ _cat.utils.chai = function () {
 
                     }
 
-                    sendTestResult("testName", success ? "success" : "failure", output);
+                    testdata = _cat.core.TestManager.addTestData({
+                        name: "testName",
+                        status: success ? "success" : "failure",
+                        message: output
+                    });
+
+                    sendTestResult(testdata);
 
                 }
             }

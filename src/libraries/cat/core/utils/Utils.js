@@ -1,8 +1,8 @@
-_cat.utils.Utils = function() {
+_cat.utils.Utils = function () {
 
     return {
 
-        getMatchValue: function(pattern, text) {
+        getMatchValue: function (pattern, text) {
 
             var regexp = new RegExp(pattern),
                 results;
@@ -18,7 +18,6 @@ _cat.utils.Utils = function() {
             return results;
 
         }
-
     }
 
 }();
