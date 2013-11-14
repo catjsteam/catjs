@@ -10,7 +10,8 @@ module.exports = function () {
 
     var funcSnippetTpl = _tplutils.readTemplateFile("scrap/_func_snippet"),
         assertCallTpl = _tplutils.readTemplateFile("scrap/_assert_call"),
-        importJSTpl = _tplutils.readTemplateFile("scrap/_import_js");
+        importJSTpl = _tplutils.readTemplateFile("scrap/_import_js"),
+        importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css");
 
     return {
 
@@ -312,18 +313,61 @@ module.exports = function () {
              *  $type   - html
              */
             _Scrap.add({name: "import",
+                single: false,
                 func: function (config) {
-                    var importanno = this.get("import"),
+
+                    /**
+                     * TODO This is a lame impl that need to be replaced
+                     * TODO for getting the type out of the import variable
+                     *
+                     */
+                    function _getType(value) {
+
+                        var values,
+                            type;
+                        if (value) {
+                            values = value.split(".");
+                            type = values[values.length-1];
+                        }
+
+                        return type;
+                    }
+
+                    function _printByType(type, value) {
+
+                        var contentByType,
+                            contents = {
+                                "js": importJSTpl,
+                                "css": importCSSTpl
+                            };
+                        if (type) {
+                            contentByType = contents[type];
+                        }
+
+                        if (contentByType && value) {
+                            me.print(_tplutils.template({
+                                content: contentByType,
+                                data: {
+                                    src: value
+                                }
+                            }));
+                        }
+                    }
+
+                    var importannos = this.get("import"),
+                        importType,
                         me = this;
 
                     me.$setType("html");
-                    if (importanno) {
-                        me.print(_tplutils.template({
-                            content: importJSTpl,
-                            data: {
-                                src: importanno
+                    if (importannos) {
+                        importannos.forEach(function(item) {
+                            if (item) {
+                                importType = _getType(item);
+                                if (importType) {
+                                    _printByType(importType, item);
+                                }
                             }
-                        }));
+                        });
                     }
                 }});
 
