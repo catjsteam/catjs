@@ -212,7 +212,7 @@
             "plugins":["target.libraries"]
         },
         {
-            "name": "cleanlib",
+            "name": "clean.lib",
             "plugins":["target.libraries.clean"]
         },
         {

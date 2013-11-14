@@ -133,7 +133,7 @@ module.exports = function (grunt) {
             ]}
         }, function () {
 
-            grunt.task.run('install', 'baz');
+            grunt.task.run('install');
         });
     });
 
@@ -154,6 +154,8 @@ module.exports = function (grunt) {
                 , process.stout
                 , process.stderr
             ]}
+        }, function() {
+            grunt.task.run('clean');
         });
 
     });
