@@ -1,1 +1,1 @@
-<script>_cat.core.action({{param1}});</script>
+<script>_cat.core.action(this, {{param1}});</script>
