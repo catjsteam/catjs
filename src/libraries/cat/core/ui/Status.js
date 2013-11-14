@@ -10,7 +10,14 @@ _cat.core.ui = function() {
             catElement.style.position = "fixed";
             catElement.style.bottom = "10px";
             catElement.style.zIndex = "10000000";
-            catElement.innerHTML = ":))))))))))))";
+            catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
+                '<div id=loading></div>' +
+                '<div id="catlogo"></div>' +
+                '<div id="cat-status-content">' +
+                    '<div class="text-top"><span style="color:green">This is a text</span></div>' +
+                    '<div class="text">this is a text</div>' +
+                '</div>' +
+            '</div>';
 
             if (document.body) {
                 document.body.appendChild(catElement);

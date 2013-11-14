@@ -5,8 +5,8 @@
             "name": "cat",
             "address": "local",
             "base": "target",
-            "prod" :["cat.core.test.min.js"],
-            "dev" :["cat.core.test.js"],
+            "prod" :["cat.core.test.min.js","cat.core.test.min.css"],
+            "dev" :["cat.core.test.js", "cat.core.test.css"],
             "install" : "internal"
         },
         {

@@ -11,13 +11,47 @@ var _catglobal = catrequire("cat.global"),
 
 module.exports = _basePlugin.ext(function () {
 
+    function _Concat() {
+
+        this.concats = {};
+
+        this.add = function(key, concat) {
+            if (!this.concats[key]) {
+                this.concats[key] = [];
+            }
+
+            this.concats[key].push(concat);
+        }
+
+        this.get = function(key) {
+            return this.concats[key];
+        }
+
+        this.all = function() {
+            var result = [],
+                key;
+
+            for (key in this.concats) {
+                if (this.concats.hasOwnProperty(key)) {
+                    result.push({
+                        key: key,
+                        value: this.get(key)
+                    });
+                }
+            }
+
+            return result;
+        }
+    }
+
     var _emitter,
         _global,
         _data,
         _internalConfig,
         _project,
         _me = this,
-        concatenated = [];
+        concatenated = new _Concat();
+
 
     return {
 
@@ -72,7 +106,13 @@ module.exports = _basePlugin.ext(function () {
                  * @private
                  */
                 function _copy(base, item) {
-                    var content;
+
+                    function _getExtension(filename) {
+                        var ext = _path.extname(filename||'').split('.');
+                        return ext[ext.length - 1];
+                    }
+
+                    var content, filetype;
 
                     // copy the library to the current cat project
                     try {
@@ -86,7 +126,11 @@ module.exports = _basePlugin.ext(function () {
                             // concatenation
                             content = _fs.readFileSync(from);
                             if (content) {
-                                concatenated.push(content);
+//                                concatenated.push(content);
+                                filetype = _getExtension(from);
+                                if (filetype) {
+                                    concatenated.add(filetype, content);
+                                }
                             }
 
 
@@ -111,7 +155,8 @@ module.exports = _basePlugin.ext(function () {
                 var actions = {},
                     process1,
                     targetManifestPath = _path.join(catProjectLib, manifestFileName),
-                    doImport = false;
+                    doImport = false,
+                    concatsByType;
 
                 library = libraries[slot];
 
@@ -261,13 +306,20 @@ module.exports = _basePlugin.ext(function () {
                 if (slot > libraries.length) {
 
                     // concat artifact files
-                    if (concatenated.length > 0) {
-                        catProjectLibTarget = _path.join(catProjectLib, "target");
-                        if (!_fs.existsSync(catProjectLibTarget)) {
-                            _fs.mkdirSync(catProjectLibTarget);
+                    concatsByType = concatenated.all();
+
+                    concatsByType.forEach(function(concatItem) {
+
+                        if (concatItem) {
+                            if (concatItem.value.length > 0) {
+                                catProjectLibTarget = _path.join(catProjectLib, "target");
+                                if (!_fs.existsSync(catProjectLibTarget)) {
+                                    _fs.mkdirSync(catProjectLibTarget);
+                                }
+                                _fs.writeFileSync(_path.join(catProjectLibTarget, (catProjectLibName + "." + concatItem.key)), concatItem.value.join(""))
+                            }
                         }
-                        _fs.writeFileSync(_path.join(catProjectLibTarget, (catProjectLibName + ".js")), concatenated.join(""))
-                    }
+                    });
 
                     if (_emitter) {
                         _emitter.emit("job.done", {status: "done"});
