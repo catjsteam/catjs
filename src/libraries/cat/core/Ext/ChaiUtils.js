@@ -16,7 +16,7 @@ _cat.utils.chai = function () {
     }
 
 
-    function sendTestResult(data) {
+    function _sendTestResult(data) {
 
         var config  = _cat.core.getConfig();
 
@@ -25,6 +25,35 @@ _cat.utils.chai = function () {
                 url:  _cat.core.TestManager.generateAssertCall(config, data)
             });
         }
+    }
+
+    function _splitCapilalise(string) {
+        if (!string) {
+            return string;
+        }
+
+        return string.split(/(?=[A-Z])/);
+    }
+
+    function _capitalise(string) {
+        if (!string) {
+            return string;
+        }
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function _getDisplayName(name) {
+        var result = [];
+
+        if (name) {
+            name = _splitCapilalise(name);
+            if (name) {
+                name.forEach(function(item) {
+                    result.push(_capitalise(item));
+                });
+            }
+        }
+        return result.join(" ");
     }
 
     return {
@@ -38,7 +67,10 @@ _cat.utils.chai = function () {
             var code,
                 fail,
                 failure,
-                testdata;
+                testdata,
+                scrap = config.scrap.config,
+                scrapName = (scrap.name ? scrap.name[0] : undefined),
+                testName = (scrapName || "NA");
 
             if (_chai) {
                 if (config) {
@@ -69,17 +101,24 @@ _cat.utils.chai = function () {
 
                     if (success) {
 
-                        output = "test succeeded";
+                        output = "Test Passed";
 
                     }
 
                     testdata = _cat.core.TestManager.addTestData({
-                        name: "testName",
+                        name: testName,
+                        displayName: _getDisplayName(testName),
                         status: success ? "success" : "failure",
                         message: output
                     });
 
-                    sendTestResult(testdata);
+                    _cat.core.ui.setContent({
+                        style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
+                        header: testdata.getDisplayName(),
+                        desc: testdata.getMessage(),
+                        tips: _cat.core.TestManager.getTestCount()
+                    });
+                    _sendTestResult(testdata);
 
                 }
             }
