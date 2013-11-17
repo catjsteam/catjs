@@ -2,7 +2,22 @@ _cat.utils.Signal = function() {
 
     var _funcmap = {
 
-        kill: function() {
+        TESTEND: function() {
+
+            setTimeout(function() {
+                var testCount = _cat.core.TestManager.getTestCount();
+                _cat.core.ui.setContent({
+                    header: [testCount, "Tests complete"].join(" "),
+                    desc: "",
+                    tips: "",
+                    style: "color:green"
+                });
+
+            }, 2000);
+
+
+        },
+        KILL: function() {
 
             // close CAT UI
             _cat.core.ui.off();
@@ -13,7 +28,7 @@ _cat.utils.Signal = function() {
 
     return {
 
-        signal: function(flag) {
+        send: function(flag) {
 
             if (flag && _funcmap[flag]) {
                 _funcmap[flag].call(this);
