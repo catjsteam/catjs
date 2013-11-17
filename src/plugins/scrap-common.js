@@ -173,12 +173,17 @@ module.exports = function () {
                     var me = this,
                         signal = me.get("signal");
 
+
+                    // TODO need to be refactored (see manager)
+                    if (me.get("manager")) {
+                        return undefined;
+                    }
                     if (signal) {
                         me.print(_tplutils.template({
                             content: funcSnippetTpl,
                             data: {
                                 comment: " Signal call ",
-                                code: ["_cat.util.Signal(", signal ,");"].join("")
+                                code: ["_cat.utils.Signal.send('", signal ,"');"].join("")
                             }
                         }));
                     }
@@ -200,18 +205,22 @@ module.exports = function () {
 
                     var me = this,
                         manager,
-                        runat = me.get("name");
+                        runat = me.get("name"),
+                        signal;
 
                     manager = me.get("manager");
                     if (manager) {
+                        // TODO need to be refactored (see signal)
+                        signal = me.get("signal");
                         me.print(_tplutils.template({
                             content: funcSnippetTpl,
                             data: {
                                 comment: " Manager call ",
-                                code: "(function() {_cat.core.managerCall('" + runat + "'); })();"
+                                code: "(function() {_cat.core.managerCall('" + runat + "', function(){_cat.utils.Signal.send('" + signal + "');}) })();"
                             }
                         }));
                     }
+
 
 
                 }});
@@ -296,7 +305,8 @@ module.exports = function () {
                             content: assertCallTpl,
                             data: {
                                 expression: JSON.stringify(["assert", codeSnippetObject].join(".")),
-                                fail: true
+                                fail: true,
+                                scrap: JSON.stringify(me)
                             }
                         }));
                     }
