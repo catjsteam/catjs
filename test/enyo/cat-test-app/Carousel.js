@@ -109,6 +109,7 @@ enyo.kind({
                  @@run@ scrapManager
                  @@context pagesList
                  @@code pagesList.next()
+                 @@assert ok(true, "Fake test")
              ]@
          */
 
@@ -118,8 +119,9 @@ enyo.kind({
                 @@perform[
                     @@enyoNext repeat(2)
                 ]
-                @@manager true
                 @@catui on
+                @@manager true
+                @@signal TESTEND
             ]@
         */
 
