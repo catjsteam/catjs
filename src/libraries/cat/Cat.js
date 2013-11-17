@@ -87,7 +87,7 @@ _cat.core = function() {
             return _managers[managerKey.trim()];
         },
 
-        managerCall: function(managerKey) {
+        managerCall: function(managerKey, callback) {
             var manager = _cat.core.getManager(managerKey),
                 scrapref, scrapname, behaviors = [], actionItems = {},
                 matchvalue = {}, matchvalues = [];
@@ -116,13 +116,18 @@ _cat.core = function() {
 
             }
 
-            function __callMatchValues(callsIdx) {
+            function __callMatchValues(callsIdx, callback) {
                 if (matchvalues[callsIdx]) {
                     matchvalues[callsIdx].callback = function() {
 
                         callsIdx++;
                         if (callsIdx < matchvalues.length+1) {
-                            __callMatchValues(callsIdx);
+                            __callMatchValues(callsIdx, callback);
+
+                        } else {
+                            if (callback) {
+                                callback.call(this);
+                            }
                         }
                     };
 
@@ -176,7 +181,7 @@ _cat.core = function() {
 //                    }
 //                });
                 var callsIdx=0;
-                __callMatchValues(callsIdx);
+                __callMatchValues(callsIdx, callback);
             }
 
         },
