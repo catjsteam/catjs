@@ -92,6 +92,14 @@ div#cat-status #cat-status-content .text-top {
     text-align: left;
 }
 
+div#cat-status #cat-status-content .text-tips {
+    color: #444444;
+    font-family:  "Trebuchet MS", Tahoma;
+    font-size: 11px;
+    position:absolute;
+    right:10;
+}
+
 div#cat-status .displayoff {
     opacity: 0;
     -webkit-transition: all .5s ;
