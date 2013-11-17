@@ -36,6 +36,10 @@ _cat.core.TestManager = function() {
         return this.get("name");
     };
 
+    _Data.prototype.getDisplayName = function() {
+        return this.get("displayName");
+    };
+
     _Data.prototype.set = function(key, value) {
         return this.config[key] = value;
     };
@@ -82,6 +86,10 @@ _cat.core.TestManager = function() {
 
         getLastTestData: function() {
             return (_testsData.length > 0 ? _testsData[_testsData.length-1] : undefined);
+        },
+
+        getTestCount: function() {
+            return (_testsData ? _testsData.length : 0);
         },
 
         /**
