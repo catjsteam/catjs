@@ -60,11 +60,11 @@ _cat.core.TestManager = function() {
 
             var config  = _cat.core.getConfig();
 
-            var url = "http://" + config.ip +  ":" +
-                config.port + "/assert?testName=" +
+            var url = "http://" + config.getIp() +  ":" +
+                config.getPort() + "/assert?testName=" +
                 name + "&message=" + message +
                 "&status=" + status +
-                "&type=" + config.type + "&cache="+ (new Date()).toUTCString();
+                "&type=" + config.getType() + "&cache="+ (new Date()).toUTCString();
             xmlhttp.open("GET", url, true);
             xmlhttp.send();
         }
@@ -107,11 +107,11 @@ _cat.core.TestManager = function() {
          */
         generateAssertCall: function(config, testdata) {
 
-            return "http://" + config.ip +  ":" +
-                config.port + "/assert?testName=" +
+            return "http://" + config.getIp() +  ":" +
+                config.getPort() + "/assert?testName=" +
                 testdata.getName() + "&message=" + testdata.getMessage() +
                 "&status=" + testdata.getStatus() +
-                "&type=" + config.type + "&cache="+ (new Date()).toUTCString();
+                "&type=" + config.getType() + "&cache="+ (new Date()).toUTCString();
 
         }
 

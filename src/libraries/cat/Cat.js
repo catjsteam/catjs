@@ -65,6 +65,34 @@ _cat.core = function() {
         }
     })();
 
+    function Config (){
+        var innerConfig;
+        try
+        {
+            if (XMLHttpRequest) {
+                var xmlhttp =  new XMLHttpRequest();
+                xmlhttp.open("GET", "config.json", false);
+                xmlhttp.send();
+                var configText = xmlhttp.responseText;
+                innerConfig = JSON.parse(configText);
+            }
+        }
+        catch(err)
+        {
+            //todo: log error
+        }
+
+
+        this.getType = function() { return innerConfig.type;};
+        this.getIp = function() {return innerConfig.ip;};
+        this.getPort = function() {return innerConfig.port;};
+
+
+        this.hasPhantom = function (){
+            return typeof phantom !== 'undefined';
+        };
+    }
+
     return {
 
         log: _log,
@@ -264,26 +292,7 @@ _cat.core = function() {
 
         getConfig: function ()
         {
-            //try - catch
-            var x;
-
-            try
-            {
-                if (XMLHttpRequest) {
-                    var xmlhttp =  new XMLHttpRequest();
-                    xmlhttp.open("GET", "config.json", false);
-                    xmlhttp.send();
-                    var configText = xmlhttp.responseText;
-                    _config = JSON.parse(configText);
-                }
-            }
-            catch(err)
-            {
-                //todo: log error
-            }
-
-
-            //return x;
+            _config = new Config();
             return _config;
         },
 
