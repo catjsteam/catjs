@@ -133,7 +133,9 @@ enyo.kind({
         }
 
         this.$.carouselIndicator.addClass('s' + inEvent.toIndex);
-
+        /*
+            @@scrap@SingleLine@@inject console.log("Single Scrap example");
+        */
 
     }
 });
