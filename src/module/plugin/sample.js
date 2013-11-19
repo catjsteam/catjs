@@ -4,10 +4,8 @@ var _catglobal = catrequire("cat.global"),
     _props = catrequire("cat.props"),
     _basePlugin = catrequire("cat.plugin.base"),
     _utils = catrequire("cat.utils"),
-    _spawn = catrequire("cat.plugin.spawn"),
     _fs = require("fs.extra"),
-    _typedas = require("typedas"),
-    _bower = require('bower');
+    _typedas = require("typedas");
 
 module.exports = _basePlugin.ext(function () {
 
