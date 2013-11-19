@@ -101,6 +101,10 @@ module.exports = function (grunt) {
             main: {
                 src:'<%= cat.env.lib.target %><%= cat.env.lib.name %>.debug.js',
                 dest:'<%= cat.env.lib.copyto %><%= cat.env.lib.name %>.debug.js'
+            },
+            css: {
+                src:'<%= cat.env.lib.target %><%= cat.env.lib.name %>.css',
+                dest:'<%= cat.env.lib.copyto %><%= cat.env.lib.name %>.debug.css'
             }
         },
         clean: ["*.log",
@@ -129,7 +133,7 @@ module.exports = function (grunt) {
             ]}
         }, function () {
 
-            grunt.task.run('install', 'baz');
+            grunt.task.run('install');
         });
     });
 
@@ -150,6 +154,8 @@ module.exports = function (grunt) {
                 , process.stout
                 , process.stderr
             ]}
+        }, function() {
+            grunt.task.run('clean');
         });
 
     });

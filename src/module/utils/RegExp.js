@@ -44,6 +44,15 @@ module.exports = function () {
             }
 
             return value;
+        },
+
+        replace: function(str, find, replace, flags) {
+            var reg = new RegExp(find, flags);
+            if (reg) {
+                return str.replace(reg, replace);
+            }
+
+            return str;
         }
 
     }

@@ -65,6 +65,34 @@ _cat.core = function() {
         }
     })();
 
+    function Config (){
+        var innerConfig;
+        try
+        {
+            if (XMLHttpRequest) {
+                var xmlhttp =  new XMLHttpRequest();
+                xmlhttp.open("GET", "config.json", false);
+                xmlhttp.send();
+                var configText = xmlhttp.responseText;
+                innerConfig = JSON.parse(configText);
+            }
+        }
+        catch(err)
+        {
+            //todo: log error
+        }
+
+
+        this.getType = function() { return innerConfig.type;};
+        this.getIp = function() {return innerConfig.ip;};
+        this.getPort = function() {return innerConfig.port;};
+
+
+        this.hasPhantom = function (){
+            return typeof phantom !== 'undefined';
+        };
+    }
+
     return {
 
         log: _log,
@@ -87,7 +115,7 @@ _cat.core = function() {
             return _managers[managerKey.trim()];
         },
 
-        managerCall: function(managerKey) {
+        managerCall: function(managerKey, callback) {
             var manager = _cat.core.getManager(managerKey),
                 scrapref, scrapname, behaviors = [], actionItems = {},
                 matchvalue = {}, matchvalues = [];
@@ -116,13 +144,18 @@ _cat.core = function() {
 
             }
 
-            function __callMatchValues(callsIdx) {
+            function __callMatchValues(callsIdx, callback) {
                 if (matchvalues[callsIdx]) {
                     matchvalues[callsIdx].callback = function() {
 
                         callsIdx++;
                         if (callsIdx < matchvalues.length+1) {
-                            __callMatchValues(callsIdx);
+                            __callMatchValues(callsIdx, callback);
+
+                        } else {
+                            if (callback) {
+                                callback.call(this);
+                            }
                         }
                     };
 
@@ -176,7 +209,7 @@ _cat.core = function() {
 //                    }
 //                });
                 var callsIdx=0;
-                __callMatchValues(callsIdx);
+                __callMatchValues(callsIdx, callback);
             }
 
         },
@@ -259,26 +292,7 @@ _cat.core = function() {
 
         getConfig: function ()
         {
-            //try - catch
-            var x;
-
-            try
-            {
-                if (XMLHttpRequest) {
-                    var xmlhttp =  new XMLHttpRequest();
-                    xmlhttp.open("GET", "config.json", false);
-                    xmlhttp.send();
-                    var configText = xmlhttp.responseText;
-                    _config = JSON.parse(configText);
-                }
-            }
-            catch(err)
-            {
-                //todo: log error
-            }
-
-
-            //return x;
+            _config = new Config();
             return _config;
         },
 

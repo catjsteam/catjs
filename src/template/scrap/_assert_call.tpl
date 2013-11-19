@@ -1,1 +1,1 @@
-_cat.utils.chai.assert({ code:{{expression}}, fail:{{fail}} });
+_cat.utils.chai.assert({ code:{{expression}}, fail:{{fail}}, scrap:{{scrap}}});

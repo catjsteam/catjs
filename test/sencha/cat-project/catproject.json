@@ -181,7 +181,7 @@
             "type": "spawn",
             "dependency": "spawn.ext",
             "command": "adb",
-            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.100", "-n", "com.hp.aamobile.cat/.example"]
+            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.103", "-n", "com.hp.aamobile.cat/.example"]
         },
         {
             "name": "project.phantomjs",
@@ -223,7 +223,7 @@
             "plugins":["target.libraries"]
         },
         {
-            "name": "cleanlib",
+            "name": "clean.lib",
             "plugins":["target.libraries.clean"]
         },
         {
@@ -240,7 +240,7 @@
         },
         {
             "name": "mtest",
-            "plugins": ["mobile.install",  "mobile.test"]
+            "plugins": ["mobile.install", "project.webserver.start", "mobile.test" ]
         },
         {
             "name": "phantom",

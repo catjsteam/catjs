@@ -7,8 +7,8 @@ require('package-script').install([
     }
 ], {
     init: {
-        global:true,
-        log:false
+        global: true,
+        log: false
 
     },
     callback: function () {

@@ -79,6 +79,29 @@ module.exports = function (grunt) {
                 dest: 'target/cat.core.test.min.js'
             }
         },
+
+        cssmin: {
+            dist: {
+                options: {
+                    banner: '<%= banner %>'
+                },
+                files: {
+                    'target/cat.core.test.min.css': ['target/cat.core.test.css']
+                }
+            }
+        },
+
+        copy: {
+            main: {
+                files: [
+                    {
+                        src: 'css/cat.css',
+                        dest: 'target/cat.core.test.css'
+                    }
+                ]
+            }
+        },
+
         jshint: {
             options: {
                 "strict": false,
@@ -95,7 +118,8 @@ module.exports = function (grunt) {
                 "node": true,
                 "es5": true,
                 globals: {
-                    XMLHttpRequest: false
+                    XMLHttpRequest: true,
+                    _cat: true
                 }
             },
             all: {
@@ -110,8 +134,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-cssmin');
 
     // Default task.
-    grunt.registerTask('install', ['clean', 'jshint', 'concat', 'uglify']);
+    grunt.registerTask('install', ['clean', 'jshint', 'concat', 'copy', 'uglify', 'cssmin']);
 
 };

@@ -51,7 +51,7 @@ module.exports = _basePlugin.ext(function () {
 
     function _jobScrapWait() {
         _waitcounter--;
-        if (_wait === 2 && _waitcounter === 0) {
+        if (_wait === 2 && _waitcounter <= 0) {
             _emitter.emit("job.wait", {status: "done"});
         }
     }

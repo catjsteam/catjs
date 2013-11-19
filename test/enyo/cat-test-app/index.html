@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Get A ROOM Demo</title>
+    <title>Get A ROOM Demo {{replace test}}</title>
 
 
 
@@ -10,8 +10,11 @@
 
 
     <!-- @[scrap
-             @@name catImport
-            @@import cat.test.debug.js
+            @@name catImport
+            @@import[
+                cat.test.debug.js
+                cat.test.debug.css
+            ]
         ]@
     -->
 
