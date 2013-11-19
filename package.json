@@ -28,7 +28,9 @@
     "unsafe-perm": true
   },
   "scripts": {
-    "install": "node catinstall.js"
+    "preinstall": "node precatinstall.js",
+    "install": "node catinstall.js",
+    "test": "node cattest.js"
   },
   "dependencies": {
     "grunt": "~0.4.1",
