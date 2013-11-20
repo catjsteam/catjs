@@ -45,29 +45,7 @@ _cat.core.TestManager = function() {
     };
 
     _Data.prototype.send = function() {
-        function sendTestResult(name, status, message) {
-            var xmlhttp = new XMLHttpRequest();
 
-            xmlhttp.onreadystatechange = function () {
-                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-                    // _cat.core.log("completed\n" + xmlhttp.responseText);
-                }
-            };
-
-            xmlhttp.onerror = function(e) {
-                // _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
-            };
-
-            var config  = _cat.core.getConfig();
-
-            var url = "http://" + config.getIp() +  ":" +
-                config.getPort() + "/assert?testName=" +
-                name + "&message=" + message +
-                "&status=" + status +
-                "&type=" + config.getType() + "&cache="+ (new Date()).toUTCString();
-            xmlhttp.open("GET", url, true);
-            xmlhttp.send();
-        }
 
     };
 
