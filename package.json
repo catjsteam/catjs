@@ -28,7 +28,9 @@
     "unsafe-perm": true
   },
   "scripts": {
-    "install": "node catinstall.js"
+    "preinstall": "node precatinstall.js",
+    "install": "node catinstall.js",
+    "test": "node cattest.js"
   },
   "dependencies": {
     "grunt": "~0.4.1",
@@ -54,7 +56,8 @@
     "jshint": "~2.1.10",
     "bower": "~1.2.7",
     "express": "~3.4.4",
-    "test-model-reporter": "~0.0.6"
+    "test-model-reporter": "~0.0.6",
+    "Faker": "~0.5.11"
   },
   "peerDependencies": {
     "grunt": "~0.4.1",

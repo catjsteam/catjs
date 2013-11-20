@@ -92,7 +92,8 @@
             "dependency": "manager",
             "imports": ["chai", "tmr", "cat"],
             "action": "install"
-        }, {
+        },
+        {
             "name": "target.libraries.clean",
             "type": "libraries",
             "dependency": "manager",
@@ -183,6 +184,15 @@
             "type": "webserver",
             "dependency": "webserver.ext",
             "action": "stop"
+        },
+        {
+            "name": "parse.test",
+            "type": "fileparse",
+            "dependency": "manager",
+            "files": ["./target/enyo-test/index.html"],
+            "pattern": "{{replace test}}",
+            "replace": "{{replaced}}",
+            "flags": "g"
         }
     ],
 
@@ -218,6 +228,10 @@
         {
             "name": "test",
             "plugins": ["project.webserver.start", "project.phantomjs", "project.webserver.stop"]
+        },
+        {
+            "name": "ptest",
+            "plugins": ["parse.test"]
         },
         {
             "name": "mtest",

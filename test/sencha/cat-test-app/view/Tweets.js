@@ -22,16 +22,47 @@
          ]@
          */
 
+
+        var testFunction = function(val) {
+            debugger;
+            return val;
+        }
+
+
+        checkTextRan = {"name" : "hello"};
+        checkTextRan2 = {"name" : "world"};
+
+
+
         var button = Ext.create('Ext.Button', {
             text: 'Button',
             id : 'btnId',
             listeners: {
                 tap: function() {
-                    Ext.Msg.alert('You clicked the button');
+                    Ext.Msg.alert(checkTextRan.name);
                 }
             }
 
         });
+
+        /*
+         @[scrap
+         @@name catMockTest
+         @@context testFunction
+         @@mock equal(testFunction(tests_db.testname), "please fail", "test success", "test fail");
+         ]@
+         */
+
+
+        /*
+         @[scrap
+         @@name catMockSet
+         @@context checkTextRan
+         @@mock set(checkTextRan.name, "I changed the test msg");
+         ]@
+         */
+
+
 
         /*
          @[scrap

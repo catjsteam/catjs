@@ -88,7 +88,7 @@ div#cat-status #cat-status-content .text {
 div#cat-status #cat-status-content .text-top {
     color: #858585;
     font-family:  "Trebuchet MS", Tahoma;
-    font-size: 16px;
+    font-size: 13px;
     text-align: left;
 }
 
@@ -97,7 +97,8 @@ div#cat-status #cat-status-content .text-tips {
     font-family:  "Trebuchet MS", Tahoma;
     font-size: 11px;
     position:absolute;
-    right:10;
+    right:10px;
+    top:10px;
 }
 
 div#cat-status .displayoff {

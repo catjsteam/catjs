@@ -5,6 +5,7 @@ var _catglobal = catrequire("cat.global"),
     _basePlugin = catrequire("cat.plugin.base"),
     _utils = catrequire("cat.utils"),
     _fs = require("fs.extra"),
+    _regexputils = catrequire("cat.regexp.utils"),
     _typedas = require("typedas");
 
 module.exports = _basePlugin.ext(function () {
@@ -29,7 +30,7 @@ module.exports = _basePlugin.ext(function () {
          */
         init: function (config) {
 
-            var customAttribute,
+            var pattern, flags, files, replace,
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"];
 
@@ -48,14 +49,29 @@ module.exports = _basePlugin.ext(function () {
             _me.dataInit(_data);
             extensionParams = _data.data;
 
-            customAttribute = extensionParams.customAttribute;
+            files = extensionParams.files;
+            pattern = extensionParams.pattern;
+            replace = extensionParams.replace;
+            flags = extensionParams.flags;
 
             if (config && extensionParams) {
 
-                // Your code in here ...
+                if (files) {
+                    files.forEach(function(file) {
+                        var content,
+                            newcontent;
 
-                console.log("[sample test Init] an external attributes named, customAttribute='" + customAttribute + "'");
-                console.log("[sample test init] Project: ", JSON.stringify(_project));
+                        if (_fs.existsSync(file)) {
+                            content = _fs.readFileSync(file, "utf8");
+                            if (content) {
+                                newcontent = _regexputils.replace(content, pattern, replace, flags);
+                                _fs.renameSync(file, [file, ".catreplace"].join(""));
+                                _fs.writeFileSync(file, newcontent);
+                            }
+                        }
+
+                    });
+                }
 
 
                 // done processing notification for the next task to take place

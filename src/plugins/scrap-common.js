@@ -134,6 +134,7 @@ module.exports = function () {
 
                 }});
 
+
             /**
              * Annotation for javascript catui
              *
@@ -216,7 +217,7 @@ module.exports = function () {
                             content: funcSnippetTpl,
                             data: {
                                 comment: " Manager call ",
-                                code: "(function() {_cat.core.managerCall('" + runat + "', function(){_cat.utils.Signal.send('" + signal + "');}) })();"
+                                code: "(function() {_cat.core.managerCall('" + runat + "', function(){_cat.utils.Signal.send('" + signal + "');}); })();"
                             }
                         }));
                     }
@@ -412,6 +413,11 @@ module.exports = function () {
 
             config.emitter.emit("job.done", {status: "done"});
 
+
+            /**
+             * Annotations for single row purpose in here -------------------
+             *
+             */
         },
 
         apply: function () {
