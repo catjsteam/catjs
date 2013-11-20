@@ -20,6 +20,7 @@ exports.result = function (req, res) {
          message = req.query.message,
          status = req.query.status,
          reportType = req.query.type,
+         hasPhantom = req.query.hasPhantom,
          testCase,
          failure,
          result,
@@ -57,7 +58,8 @@ exports.result = function (req, res) {
     var output = _testsuite.compile();
     console.log(output);
 
-    file = "./cattestresult" + reportType + ".xml";
+    var phantomStatus = hasPhantom ? "phantom" : "nophantom";
+    file = "./cattestresult" + reportType + "-" + phantomStatus + ".xml";
     if(_fs.existsSync(file))
     {
         _fs.unlinkSync(file);

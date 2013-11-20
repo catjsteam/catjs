@@ -28,15 +28,15 @@ _cat.utils.AJAX = function () {
 
             xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    // _cat.core.log("completed\n" + xmlhttp.responseText);
+                     _cat.core.log.info("completed\n" + xmlhttp.responseText);
                 }
             };
 
             xmlhttp.onerror = function (e) {
-                // _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
+                 _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
             };
 
-
+            _cat.core.log.info("Sending REST request: " + config.url);
             xmlhttp.open(("GET" || config.method), config.url, true);
             // TODO pass arguments on post
             xmlhttp.send();

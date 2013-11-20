@@ -111,7 +111,9 @@ _cat.core.TestManager = function() {
                 config.getPort() + "/assert?testName=" +
                 testdata.getName() + "&message=" + testdata.getMessage() +
                 "&status=" + testdata.getStatus() +
-                "&type=" + config.getType() + "&cache="+ (new Date()).toUTCString();
+                "&type=" + config.getType() +
+                "&hasPhantom="  + config.hasPhantom() +
+                "&cache="+ (new Date()).toUTCString();
 
         }
 
