@@ -63,7 +63,12 @@
         {
             "name": "scrap.sencha",
             "type": "scrap-sencha"
-        },        {
+        },
+        {
+            "name": "scrap.mock",
+            "type": "scrap-mock"
+        },
+        {
             "name": "scrap.enyo",
             "type": "scrap-enyo"
         },
@@ -86,6 +91,12 @@
                     "type": "file",
                     "ext": [".js"],
                     "pattern": ["*sencha*"],
+                    "exclude": true
+                },
+                {
+                    "type": "file",
+                    "ext": [".js"],
+                    "pattern": ["*mock*"],
                     "exclude": true
                 }
             ]
@@ -201,11 +212,11 @@
         },
         {
             "name": "scrap",
-            "plugins": ["scrap.common", "scrap.sencha", "ext.scrap", "init.scrap"]
+            "plugins": ["scrap.common", "scrap.sencha", "scrap.mock", "ext.scrap", "init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap.common", "scrap.sencha", "ext.scrap", "target.inject", "project.install"]
+            "plugins": ["scrap.common", "scrap.sencha", "scrap.mock", "ext.scrap", "target.inject", "project.install"]
         },
         {
             "name": "lib",

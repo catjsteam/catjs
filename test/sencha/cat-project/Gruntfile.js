@@ -75,6 +75,8 @@ module.exports = function (grunt) {
                 "es5": true,
                 globals: {
                     _extjs : true,
+                    tests_db : true,
+                    testRan : true,
                     _cat: true,
                     assert: true
                 }
