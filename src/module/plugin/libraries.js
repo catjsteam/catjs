@@ -68,6 +68,7 @@ module.exports = _basePlugin.ext(function () {
 
             var imports,
                 action,
+                wipe = false,
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"],
                 manifestFileName = "manifest.json",
@@ -282,16 +283,19 @@ module.exports = _basePlugin.ext(function () {
                             });
 
                             process2.on('close', function (code) {
+                                var nodeModulesFolders;
+
                                 if (code !== 0) {
                                     _log.info('[spawn close] exited with code ' + code);
                                 }
 
                                 // delete node_modules libs
-                                var nodeModulesFolders = _path.join(libWorkPath, "node_modules");
-                                if (nodeModulesFolders) {
-                                    _utils.deleteSync(nodeModulesFolders);
+                                if (wipe) {
+                                    nodeModulesFolders = _path.join(libWorkPath, "node_modules");
+                                    if (nodeModulesFolders) {
+                                        _utils.deleteSync(nodeModulesFolders);
+                                    }
                                 }
-
                                 _exec();
 
                             });
@@ -353,6 +357,7 @@ module.exports = _basePlugin.ext(function () {
 
             imports = extensionParams.imports;
             action = extensionParams.action;
+            wipe = ((extensionParams.wipe === "true") ? true : false);
 
             if (config && extensionParams) {
 
