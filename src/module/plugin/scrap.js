@@ -49,9 +49,11 @@ module.exports = _basePlugin.ext(function () {
         return scrap;
     }
 
-    function _jobScrapWait() {
-        _waitcounter--;
-        if (_wait === 2 && _waitcounter <= 0) {
+    function _jobScrapWait(status, validate) {
+        if (!validate) {
+            _waitcounter--;
+        }
+        if (_wait === 2 && _waitcounter === 0) {
             _emitter.emit("job.wait", {status: "done"});
         }
     }
@@ -74,6 +76,8 @@ module.exports = _basePlugin.ext(function () {
             } else {
                 _wait = 2;
             }
+
+            _jobScrapWait(null, true);
             //
             // _emitter.removeListener("job.scrap.wait", _jobCopyWait);
         },
@@ -86,7 +90,9 @@ module.exports = _basePlugin.ext(function () {
          */
         file: function (file) {
 
-            _wait = 1;
+            if (_wait !== 2) {
+                _wait = 1;
+            }
             _waitcounter++;
 
             var from = file,
@@ -215,7 +221,9 @@ module.exports = _basePlugin.ext(function () {
                 _emitter.on("scan.file", _module.file);
                 _emitter.on("job.scrap.wait", _jobScrapWait);
                 //_emitter.on("scan.folder", _module.folder);
-                _wait = 0;
+                if (_wait !== 2) {
+                    _wait = 0;
+                }
             } else {
                 _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
             }
