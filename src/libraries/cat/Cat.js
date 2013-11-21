@@ -66,15 +66,19 @@ _cat.core = function() {
     })();
 
     function Config (){
-        var innerConfig;
+        var innerConfig,
+            xmlhttp,
+            configText;
         try
         {
-            if (XMLHttpRequest) {
-                var xmlhttp =  new XMLHttpRequest();
-                xmlhttp.open("GET", "config.json", false);
-                xmlhttp.send();
-                var configText = xmlhttp.responseText;
-                innerConfig = JSON.parse(configText);
+            xmlhttp = _cat.utils.AJAX.sendRequestSync({
+                url:  "config.json"
+            });
+            if (xmlhttp) {
+                configText = xmlhttp.responseText;
+                if (configText) {
+                    innerConfig = JSON.parse(configText);
+                }
             }
         }
         catch(err)
@@ -82,14 +86,19 @@ _cat.core = function() {
             //todo: log error
         }
 
+        if (innerConfig) {
+            this.getType = function() { return innerConfig.type;};
+            this.getIp = function() {return innerConfig.ip;};
+            this.getPort = function() {return innerConfig.port;};
 
-        this.getType = function() { return innerConfig.type;};
-        this.getIp = function() {return innerConfig.ip;};
-        this.getPort = function() {return innerConfig.port;};
-
+        }
 
         this.hasPhantom = function (){
             return typeof phantom !== 'undefined';
+        };
+
+        this.available = function() {
+            return (innerConfig ? true : false);
         };
     }
 
@@ -107,8 +116,13 @@ _cat.core = function() {
         },
 
         setManagerBehavior: function(managerKey, key, value) {
-            _managers[managerKey].behaviors[key.trim()] = value;
-
+            var item = _managers[managerKey].behaviors;
+            if (item) {
+                if (!item[key.trim()]) {
+                    item[key.trim()] = [];
+                }
+                item[key.trim()].push(value);
+            }
         },
 
         getManager: function(managerKey) {
@@ -118,7 +132,8 @@ _cat.core = function() {
         managerCall: function(managerKey, callback) {
             var manager = _cat.core.getManager(managerKey),
                 scrapref, scrapname, behaviors = [], actionItems = {},
-                matchvalue = {}, matchvalues = [];
+                matchvalue = {}, matchvalues = [],
+                totalDelay = 0;
 
             /**
              * Scrap call by its manager according to its behaviors
@@ -129,17 +144,18 @@ _cat.core = function() {
              */
             function __call(config) {
 
-                var _delay = (config.delay || 2000),
-                    _repeat = (config.repeat || 1),
+                var delay = (config.delay || 2000),
+                    repeat = (config.repeat || 1),
                     idx= 0,
                     func = function() {
                         (_cat.core.getDefineImpl(config.implKey)).call(this);
                         config.callback.call(config);
-
                     };
 
-                for (idx=0; idx<_repeat; idx++) {
-                    setTimeout(func, _delay*(idx+1));
+                for (idx=0; idx<repeat; idx++) {
+                    totalDelay += delay*(idx+1);
+                    _cat.core.TestManager.updateDelay(totalDelay);
+                    setTimeout(func, totalDelay);
                 }
 
             }
@@ -147,12 +163,13 @@ _cat.core = function() {
             function __callMatchValues(callsIdx, callback) {
                 if (matchvalues[callsIdx]) {
                     matchvalues[callsIdx].callback = function() {
-
+                        callbackCounter++;
                         callsIdx++;
                         if (callsIdx < matchvalues.length+1) {
                             __callMatchValues(callsIdx, callback);
+                        }
 
-                        } else {
+                        if (callbackCounter === matchvalues.length+1) {
                             if (callback) {
                                 callback.call(this);
                             }
@@ -167,6 +184,9 @@ _cat.core = function() {
                 // Call for each Scrap assigned to this Manager
                 manager.calls.forEach(function(item) {
                     var strippedItem;
+
+                    matchvalue = {};
+
                     if (item) {
 
                             scrapref = _cat.core.getVar(item);
@@ -174,7 +194,7 @@ _cat.core = function() {
                                 scrapref = scrapref.scrap;
                                 scrapname = scrapref.name[0];
                                 if (scrapname) {
-                                    behaviors.push(manager.behaviors[scrapname]);
+                                    behaviors = manager.behaviors[scrapname];
                                     if (behaviors) {
                                         // Go over all of the manager behaviors (e.g. repeat, delay)
                                         behaviors.forEach(function(bitem) {
@@ -208,7 +228,8 @@ _cat.core = function() {
 //                        __call(matchItem);
 //                    }
 //                });
-                var callsIdx=0;
+                var callsIdx= 0,
+                    callbackCounter=0;
                 __callMatchValues(callsIdx, callback);
             }
 
@@ -293,7 +314,7 @@ _cat.core = function() {
         getConfig: function ()
         {
             _config = new Config();
-            return _config;
+            return (_config.available() ? _config : undefined);
         },
 
 
