@@ -2,7 +2,13 @@ _cat.utils.Signal = function() {
 
     var _funcmap = {
 
-        TESTEND: function() {
+        TESTEND: function(opt) {
+
+            var timeout = _cat.core.TestManager.getDelay();
+
+            if (opt) {
+                timeout = (opt["timeout"] || timeout);
+            }
 
             setTimeout(function() {
                 var testCount = _cat.core.TestManager.getTestCount();
@@ -13,7 +19,7 @@ _cat.utils.Signal = function() {
                     style: "color:green"
                 });
 
-            }, 2000);
+            }, (timeout));
 
 
         },
@@ -28,10 +34,10 @@ _cat.utils.Signal = function() {
 
     return {
 
-        send: function(flag) {
+        send: function(flag, opt) {
 
             if (flag && _funcmap[flag]) {
-                _funcmap[flag].call(this);
+                _funcmap[flag].call(this, opt);
             }
 
         }
