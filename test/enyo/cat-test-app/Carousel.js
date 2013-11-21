@@ -101,7 +101,8 @@ enyo.kind({
         this.$.CarouselItem3.applyStyle('opacity', '1');
 
         var _me = this,
-            pagesList = _me.$.pagesList;
+            pagesList = _me.$.pagesList,
+            btn = _me.$.CarouselItem3;
 
         /*
              @[scrap
@@ -114,10 +115,22 @@ enyo.kind({
          */
 
         /*
+           @[scrap
+                @@name letsGo
+                @@run@ scrapManager
+                @@context btn
+                @@code btn.waterfall('ontap', {dispatchTarget: {isDescendantOf: function(){}}})
+                @@assert ok(true, "Fake test")
+           ]@
+
+         */
+
+        /*
             @[scrap
                 @@name scrapManager
                 @@perform[
                     @@enyoNext repeat(2)
+                    @@letsGo repeat(1)
                 ]
                 @@catui on
                 @@manager true
