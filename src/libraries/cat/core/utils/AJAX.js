@@ -29,7 +29,7 @@ _cat.utils.AJAX = function () {
             _cat.core.log.info("Sending REST request: " + config.url);
 
             try {
-                xmlhttp.open(("GET" || config.method), config.url, true);
+                xmlhttp.open(("GET" || config.method), config.url, false);
                 // TODO pass arguments on post
                 xmlhttp.send();
 
@@ -73,7 +73,7 @@ _cat.utils.AJAX = function () {
             xmlhttp.onreadystatechange = (("onreadystatechange" in config) ? config.onreadystatechange : onreadystatechange);
             xmlhttp.onerror = (("onerror" in config) ? config.onerror : onerror);
 
-            xmlhttp.open(("GET" || config.method), config.url, false);
+            xmlhttp.open(("GET" || config.method), config.url, true);
 
             // TODO pass arguments on post
             xmlhttp.send();
