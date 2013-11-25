@@ -30,7 +30,7 @@ module.exports = _basePlugin.ext(function () {
          */
         init: function (config) {
 
-            var pattern, flags, files, replace,
+            var pattern, flags, files, replace, applyto,
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"];
 
@@ -49,25 +49,42 @@ module.exports = _basePlugin.ext(function () {
             _me.dataInit(_data);
             extensionParams = _data.data;
 
-            files = extensionParams.files;
-            pattern = extensionParams.pattern;
-            replace = extensionParams.replace;
-            flags = extensionParams.flags;
-
             if (config && extensionParams) {
 
+                files = extensionParams.files;
+                pattern = extensionParams.pattern;
+                replace = extensionParams.replace;
+                flags = extensionParams.flags;
+                // optional types : [filename / content]
+                applyto = extensionParams.applyto;
+
+                if (!applyto) {
+                    applyto = ["content"];
+                }
                 if (files) {
                     files.forEach(function(file) {
                         var content,
-                            newcontent;
+                            fileName;
 
                         if (_fs.existsSync(file)) {
+
                             content = _fs.readFileSync(file, "utf8");
-                            if (content) {
-                                newcontent = _regexputils.replace(content, pattern, replace, flags);
-                                _fs.renameSync(file, [file, ".catreplace"].join(""));
-                                _fs.writeFileSync(file, newcontent);
+                            if (_utils.contains(applyto, "content")) {
+                                if (content) {
+                                    content = _regexputils.replace(content, pattern, replace, flags);
+                                }
                             }
+
+                            // save backup
+                            _fs.renameSync(file, [file, ".catreplace"].join(""));
+
+                            fileName = _path.basename(file);
+                            if (_utils.contains(applyto, "filename")) {
+                                fileName = _path.basename(file);
+                                fileName = _regexputils.replace(fileName, pattern, replace, flags);
+                            }
+                            _fs.writeFileSync(_path.join(_path.dirname(file), fileName), content);
+
                         }
 
                     });
