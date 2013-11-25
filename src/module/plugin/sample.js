@@ -48,9 +48,9 @@ module.exports = _basePlugin.ext(function () {
             _me.dataInit(_data);
             extensionParams = _data.data;
 
-            customAttribute = extensionParams.customAttribute;
-
             if (config && extensionParams) {
+
+                customAttribute = extensionParams.customAttribute;
 
                 // Your code in here ...
 
@@ -59,7 +59,7 @@ module.exports = _basePlugin.ext(function () {
 
 
                 // done processing notification for the next task to take place
-                _me.getEmitter().emit("job.done", {status: "done"});
+                _emitter.emit("job.done", {status: "done"});
 
             }
         }

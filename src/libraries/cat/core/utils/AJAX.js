@@ -26,20 +26,19 @@ _cat.utils.AJAX = function () {
 
             var xmlhttp = new XMLHttpRequest();
 
-            xmlhttp.onreadystatechange = function () {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                     _cat.core.log.info("completed\n" + xmlhttp.responseText);
-                }
-            };
-
-            xmlhttp.onerror = function (e) {
-                 _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
-            };
-
             _cat.core.log.info("Sending REST request: " + config.url);
-            xmlhttp.open(("GET" || config.method), config.url, true);
-            // TODO pass arguments on post
-            xmlhttp.send();
+
+            try {
+                xmlhttp.open(("GET" || config.method), config.url, false);
+                // TODO pass arguments on post
+                xmlhttp.send();
+
+            } catch (err) {
+                _cat.core.log.warn("[CAT CHAI] error occurred: ", err, "\n");
+
+            }
+
+            return xmlhttp;
 
         },
 
@@ -74,7 +73,7 @@ _cat.utils.AJAX = function () {
             xmlhttp.onreadystatechange = (("onreadystatechange" in config) ? config.onreadystatechange : onreadystatechange);
             xmlhttp.onerror = (("onerror" in config) ? config.onerror : onerror);
 
-            xmlhttp.open(("GET" || config.method), config.url, false);
+            xmlhttp.open(("GET" || config.method), config.url, true);
 
             // TODO pass arguments on post
             xmlhttp.send();

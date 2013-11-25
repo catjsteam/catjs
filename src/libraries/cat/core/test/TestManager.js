@@ -49,7 +49,8 @@ _cat.core.TestManager = function() {
 
     };
 
-    var _testsData = [];
+    var _testsData = [],
+        _globalTestData = {};
 
 
     return {
@@ -68,6 +69,23 @@ _cat.core.TestManager = function() {
 
         getTestCount: function() {
             return (_testsData ? _testsData.length : 0);
+        },
+
+        /**
+         * Update the last total delay
+         *
+         * @param delay
+         */
+        updateDelay: function(delay) {
+            _globalTestData.delay = delay;
+        },
+
+        /**
+         * Get the total delay between tests calls
+         *
+         */
+        getDelay: function() {
+            return (_globalTestData.delay || 0);
         },
 
         /**
