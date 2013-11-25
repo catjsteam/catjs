@@ -109,7 +109,7 @@ enyo.kind({
                  @@name enyoNext
                  @@run@ scrapManager
                  @@context pagesList
-                 @@code pagesList.next()
+                 @@enyo next(pagesList)
                  @@assert ok(true, "Fake test")
              ]@
          */
@@ -119,7 +119,7 @@ enyo.kind({
                 @@name letsGo
                 @@run@ scrapManager
                 @@context btn
-                @@code btn.waterfall('ontap', {dispatchTarget: {isDescendantOf: function(){}}})
+                @@enyo waterfall(btn, 'ontap')
                 @@assert ok(true, "Fake test")
            ]@
 
