@@ -31,7 +31,7 @@ exports.result = function (req, res) {
     res.send({"testName": testName, "message": message, "status": status});
 
 
-
+    var phantomStatus = hasPhantom == "true" ? "phantom" : "";
 
     testCase = _jmr.create({
         type: "model.testcase",
@@ -39,7 +39,7 @@ exports.result = function (req, res) {
             time: (new Date()).toUTCString()
         }
     });
-    testCase.set("name", testName);
+    testCase.set("name", phantomStatus + testName);
 
     if (status == 'failure') {
         result = _jmr.create({
@@ -58,7 +58,6 @@ exports.result = function (req, res) {
     var output = _testsuite.compile();
     console.log(output);
 
-    var phantomStatus = hasPhantom == "true" ? "phantom" : "nophantom";
     file = "./cattestresult" + reportType + "-" + phantomStatus + ".xml";
     if(_fs.existsSync(file))
     {
