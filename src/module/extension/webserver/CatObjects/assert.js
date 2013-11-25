@@ -58,7 +58,7 @@ exports.result = function (req, res) {
     var output = _testsuite.compile();
     console.log(output);
 
-    var phantomStatus = hasPhantom ? "phantom" : "nophantom";
+    var phantomStatus = hasPhantom == "true" ? "phantom" : "nophantom";
     file = "./cattestresult" + reportType + "-" + phantomStatus + ".xml";
     if(_fs.existsSync(file))
     {
