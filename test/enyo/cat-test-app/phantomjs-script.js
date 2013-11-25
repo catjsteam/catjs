@@ -10,6 +10,9 @@ _page.open( _url, function (status) {
         console.log('FAIL to load the address, status:', status);
 
     } else {
+        _page.evaluate(function () {
+            hasPhantomjs = true;
+        });
 
         setTimeout(function () {
             console.log("render...");

@@ -4,9 +4,11 @@ var _cat = {
     ui:{}
 };
 
+var hasPhantomjs = false;
+
 _cat.core = function() {
 
-    var  _vars = {},
+    var _vars = {},
         _managers = {},
          _context = function() {
 
@@ -89,7 +91,7 @@ _cat.core = function() {
 
 
         this.hasPhantom = function (){
-            return typeof phantom !== 'undefined';
+           return hasPhantomjs;
         };
     }
 
