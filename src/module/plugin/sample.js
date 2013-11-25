@@ -48,9 +48,9 @@ module.exports = _basePlugin.ext(function () {
             _me.dataInit(_data);
             extensionParams = _data.data;
 
-            customAttribute = extensionParams.customAttribute;
-
             if (config && extensionParams) {
+
+                customAttribute = extensionParams.customAttribute;
 
                 // Your code in here ...
 
