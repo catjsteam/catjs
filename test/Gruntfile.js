@@ -35,6 +35,27 @@ module.exports = function (grunt) {
 
         });
     });
+    grunt.registerTask('install', function() {
+
+        this.async();
+
+        console.log("[CAT Enyo Install] Started ");
+        require('package-script').spawn([
+            new Base("enyo", ["-c"]),
+            new Base("enyo", ["-isj"])
+        ], {}, function() {
+
+            console.log("[CAT Enyo Install] Done ");
+            console.log("[CAT Sencha Install] Started ");
+            require('package-script').spawn([
+                new Base("sencha", ["-c"]),
+                new Base("sencha", ["-isj"])
+            ], {}, function() {
+                console.log("[CAT Sencha Install] Done ");
+            });
+
+        });
+    });
    grunt.registerTask('clean', function() {
 
 
