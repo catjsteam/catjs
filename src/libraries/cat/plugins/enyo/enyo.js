@@ -33,7 +33,7 @@ _cat.plugins.enyo = function () {
                 }
 
                 try {
-                    extElement.waterfall('ontap', {dispatchTarget: {isDescendantOf: function(){}}});
+                    extElement.waterfall('ontap');
                 } catch(e) {
                     // ignore
                 }
