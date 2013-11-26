@@ -7,7 +7,7 @@ _cat.utils.Signal = function() {
             var timeout = _cat.core.TestManager.getDelay();
 
             if (opt) {
-                timeout = (opt["timeout"] || timeout);
+                timeout = (opt["timeout"] || 2000);
             }
 
             setTimeout(function() {
