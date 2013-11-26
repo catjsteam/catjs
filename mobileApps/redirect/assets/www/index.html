@@ -6,10 +6,26 @@
 		
 	function getUrl()
 	{
-		var initialPage = window.location.search.slice(1).split("=")[1]; 
-		//return "0;URL=http://" + initialPage + ":8089";
-		return "http://" + initialPage + ":8089";
+		var queryString = getQueryString(window.location.search);
+		
+		return "http://" + queryString['ip'] + ":" + queryString['port'];
 	}
+	
+	function getQueryString(queryStringPart){
+		var query =queryStringPart.slice(1);
+		var queryString = {};
+		query = query.split("&");
+
+		for (var i = 0; i < query.length; i++) {
+			var pair = query[i].split("=");
+			if(typeof queryString[pair[0]] === "undefined"){
+				queryString[pair[0]] = pair[1];
+			}
+		};
+		
+		return queryString;
+	}
+	
 	</script>
 	</head>
 <body></body>

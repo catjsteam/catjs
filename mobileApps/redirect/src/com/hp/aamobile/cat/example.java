@@ -32,10 +32,12 @@ public class example extends DroidGap
     {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        String ip = intent.getExtras().getString("IP");
+        String ip = intent.getExtras().getString("IP"); 
+        String port = intent.getExtras().getString("PORT");
         Log.i("myexample", "the ip is " + ip);
+        Log.i("myexample", "the port is " + port);
         
-        String url = Config.getStartUrl() + "?ip=" + ip;
+        String url = Config.getStartUrl() + "?ip=" + ip + "&port=" + port;
         
        
        super.loadUrl(url);
