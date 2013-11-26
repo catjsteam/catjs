@@ -18,8 +18,8 @@ _cat.core.ui = function () {
                 '<div id="catlogo"></div>' +
                 '<div id="cat-status-content">' +
                 '<div class="text-tips"></div>' +
-                '<div class="text-top"><span style="color:green">This is a text</span></div>' +
-                '<div class="text">this is a text</div>' +
+                '<div class="text-top"><span style="color:green"></span></div>' +
+                '<div class="text"></div>' +
                 '</div>' +
                 '</div>';
 
@@ -67,7 +67,8 @@ _cat.core.ui = function () {
         _me.setContent({
             header: "",
             desc: "",
-            tips: ""
+            tips: "",
+            reset: true
         });
     }
 
@@ -166,6 +167,27 @@ _cat.core.ui = function () {
             return true;
         },
 
+        isContent: function() {
+
+            function _isText(elt) {
+                if (elt &&  elt.innerText && (new String(elt.innerText).trim)) {
+                    return true;
+                }
+                return false;
+            }
+
+            var catStatusContentElt = _getCATStatusContentElt(),
+                bool = 0;
+
+            bool  += (_isText(catStatusContentElt.childNodes[1]) ? 1 : 0);
+
+            if (bool === 1) {
+                return true;
+            }
+
+            return false;
+        },
+
         /**
          *  Set the displayable content for CAT status widget
          *
@@ -177,7 +199,9 @@ _cat.core.ui = function () {
         setContent: function (config) {
 
             var catStatusContentElt,
-                catElement = _getCATElt();
+                catElement = _getCATElt(),
+                isOpen = false,
+                reset = ("reset" in config ? config.reset : false);
 
             function _setText(elt, text, style) {
 
@@ -198,30 +222,35 @@ _cat.core.ui = function () {
                 catStatusContentElt = _getCATStatusContentElt();
                 if (catStatusContentElt) {
                     if (config) {
-                        if (config.header) {
+                        isOpen = _me.isOpen();
+
+                        if ("header" in config && config.header) {
                             _me.on();
-                            if (!_me.isOpen()) {
+                            if (!isOpen && !reset) {
                                 _me.toggle();
+                            }
+                        } else {
+                            if (!reset && isOpen) {
+                                setTimeout(function () {
+                                    _me.toggle();
+                                }, 300)
                             }
                         }
 
                         setTimeout(function() {
+
                             if ("header" in config) {
-                                _setText(catStatusContentElt.childNodes[1], config.header, config.style);
+                                _setText(catStatusContentElt.childNodes[1]  , config.header, config.style);
                             }
                             if ("desc" in config) {
                                 _setText(catStatusContentElt.childNodes[2], config.desc, config.style);
+
                             }
                             if ("tips" in config) {
                                 _setText(catStatusContentElt.childNodes[0], config.tips, config.style);
                             }
 
-//                            if (config.header) {
-//                                setTimeout(function () {
-//                                    _me.toggle();
-//                                }, 2000)
-//                            }
-                        }, 500);
+                        }, 300);
                     }
                 }
             }

@@ -91,11 +91,9 @@ _cat.utils.chai = function () {
 
                             output = ["[CAT] Test failed, exception: ", e].join("");
 
-                            console.log("output report demo : ", output);
+                            //console.log("output report demo : ", output);
 
-                            if (fail) {
-                                throw new Error("[CAT] Test failed, exception: ", e);
-                            }
+
                         }
                     }
 
@@ -120,6 +118,9 @@ _cat.utils.chai = function () {
                     });
                     _sendTestResult(testdata);
 
+                    if (!success) {
+                        throw new Error("[CAT] Test failed, exception: ", (fail || ""), ", " , e);
+                    }
                 }
             }
         },

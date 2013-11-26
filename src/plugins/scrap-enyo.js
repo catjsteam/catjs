@@ -37,8 +37,27 @@ module.exports = function () {
                             var match,
                                 prefix;
 
+                            var match = _scraputils.generate({
+                                api: "waterfall",
+                                exp: enyo
+                            });
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "next",
+                                    exp: enyo
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "tap",
+                                    exp: enyo
+                                });
+                            }
+
                             if (match) {
-                                me.print("_cat.core.plugin('sencha').actions."+ match);
+                                me.print("_cat.core.plugin('enyo').actions."+ match);
                             }
 
 

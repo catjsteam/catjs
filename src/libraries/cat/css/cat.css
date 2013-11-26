@@ -8,6 +8,10 @@
     to { -webkit-transform: rotate(360deg); }
 }
 
+div#cat-status {
+    opacity: .8;
+}
+
 div#cat-status div#loading {
     width: 53px;
     height: 53px;
