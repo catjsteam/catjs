@@ -150,8 +150,12 @@ _cat.core = function() {
                     repeat = (config.repeat || 1),
                     idx= 0,
                     func = function() {
-                        (_cat.core.getDefineImpl(config.implKey)).call(this);
-                        config.callback.call(config);
+                        var funcvar = (config.implKey ? _cat.core.getDefineImpl(config.implKey) : undefined);
+
+                        if (funcvar && funcvar.call) {
+                            funcvar.call(this);
+                            config.callback.call(config);
+                        }
                     };
 
                 for (idx=0; idx<repeat; idx++) {
