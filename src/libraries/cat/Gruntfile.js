@@ -119,6 +119,7 @@ module.exports = function (grunt) {
                 "es5": true,
                 globals: {
                     XMLHttpRequest: true,
+                    document: true,
                     _cat: true
                 }
             },

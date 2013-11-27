@@ -90,8 +90,20 @@ _cat.core = function() {
 
         if (innerConfig) {
             this.getType = function() { return innerConfig.type;};
-            this.getIp = function() {return innerConfig.ip;};
-            this.getPort = function() {return innerConfig.port;};
+            this.getIp = function() {
+                if(innerConfig.ip){
+                    return innerConfig.ip;
+                } else {
+                    return  document.location.hostname;
+                }
+            };
+            this.getPort = function() {
+                if(innerConfig.port){
+                    return innerConfig.port;
+                } else {
+                    return  document.location.port;
+                }
+            };
 
         }
 

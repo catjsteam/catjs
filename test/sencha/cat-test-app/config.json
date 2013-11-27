@@ -1,5 +1,5 @@
 {
     "type" : "sencha-test",
-    "ip" : "192.168.1.103",
-    "port" : "8089"
+    "ip" : null,
+    "port" : null
 }
