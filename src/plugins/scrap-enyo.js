@@ -1,8 +1,11 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
+    _tplutils = catrequire("cat.tpl.utils"),
     _scraputils = require("./Utils");
 
 module.exports = function () {
+
+    var funcSnippetTpl = _tplutils.readTemplateFile("scrap/_func_snippet");
 
     return {
 
@@ -51,13 +54,20 @@ module.exports = function () {
 
                             if (!match) {
                                 match = _scraputils.generate({
-                                    api: "tap",
+                                    api: "setSelected",
                                     exp: enyo
                                 });
                             }
 
+
                             if (match) {
-                                me.print("_cat.core.plugin('enyo').actions."+ match);
+                                me.print(_tplutils.template({
+                                    content: funcSnippetTpl,
+                                    data: {
+                                        comment: " Generated code according to the enyo scrap comment (see @@enyo)",
+                                        code: ("_cat.core.plugin('enyo').actions."+ match)
+                                    }
+                                }));
                             }
 
 
