@@ -1,0 +1,5 @@
+{
+    "type": "{{project.name}}",
+    "ip": null,
+    "port": null
+}
