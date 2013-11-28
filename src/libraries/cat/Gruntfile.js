@@ -97,6 +97,9 @@ module.exports = function (grunt) {
                     {
                         src: 'css/cat.css',
                         dest: 'target/cat.core.test.css'
+                    }, {
+                        src: 'config/catconfig.json',
+                        dest: 'target/cat.core.test.json'
                     }
                 ]
             }

@@ -5,8 +5,10 @@
             "name": "cat",
             "address": "local",
             "base": "target",
-            "prod" :["cat.core.test.min.js","cat.core.test.min.css"],
-            "dev" :["cat.core.test.js", "cat.core.test.css"],
+            "prod" :["cat.core.test.min.js","cat.core.test.min.css", "catconfig.json"],
+            "dev" :["cat.core.test.js", "cat.core.test.css", "catconfig.json"],
+            "parse": ["catconfig.json"],
+            "static-names": ["catconfig.json"],
             "install" : "internal"
         },
         {

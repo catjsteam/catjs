@@ -7,13 +7,31 @@ var _catglobal = catrequire("cat.global"),
     _spawn = catrequire("cat.plugin.spawn"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
-    _bower = require('bower');
+    _bower = require('bower'),
+    _jsutils = require("js.utils");
 
 module.exports = _basePlugin.ext(function () {
 
     function _Concat() {
 
+        // save the content per file type
         this.concats = {};
+        // map the static names
+        this.names = {};
+
+        /**
+         * Note: Only one name can be set per type
+         *
+         * @param key
+         * @param value
+         */
+        this.putName = function(key, value) {
+            this.names[key] = value;
+        };
+
+        this.getName = function(key) {
+            return this.names[key];
+        };
 
         this.add = function(key, concat) {
             if (!this.concats[key]) {
@@ -66,7 +84,8 @@ module.exports = _basePlugin.ext(function () {
          */
         init: function (config) {
 
-            var imports,
+            var project = (config.internalConfig ? config.internalConfig.getProject() : undefined),
+                imports,
                 action,
                 wipe = false,
                 extensionParams,
@@ -113,7 +132,10 @@ module.exports = _basePlugin.ext(function () {
                         return ext[ext.length - 1];
                     }
 
-                    var content, filetype;
+                    var content, filetype, basename,
+                        parse = ('parse' in library ? library.parse : undefined),
+                        staticnames = ('static-names' in library ? library["static-names"] : undefined);
+
 
                     // copy the library to the current cat project
                     try {
@@ -125,12 +147,27 @@ module.exports = _basePlugin.ext(function () {
                             _utils.copySync(from, to);
 
                             // concatenation
-                            content = _fs.readFileSync(from);
+                            content = _fs.readFileSync(from, "utf8");
                             if (content) {
 //                                concatenated.push(content);
                                 filetype = _getExtension(from);
+                                basename = _path.basename(from);
+
+                                // parse content..
+                                if (_jsutils.Object.contains(parse, basename)) {
+                                    content = _jsutils.Template.template({
+                                        content: content,
+                                        data: {
+                                            project: project
+                                        }
+                                    });
+                                }
+
                                 if (filetype) {
                                     concatenated.add(filetype, content);
+                                    if (_jsutils.Object.contains(staticnames, basename)) {
+                                        concatenated.putName(filetype, basename);
+                                    }
                                 }
                             }
 
@@ -313,6 +350,9 @@ module.exports = _basePlugin.ext(function () {
                     concatsByType = concatenated.all();
 
                     concatsByType.forEach(function(concatItem) {
+                        var contentValue,
+                            catProjectLibTarget,
+                            filename, staticname;
 
                         if (concatItem) {
                             if (concatItem.value.length > 0) {
@@ -320,7 +360,13 @@ module.exports = _basePlugin.ext(function () {
                                 if (!_fs.existsSync(catProjectLibTarget)) {
                                     _fs.mkdirSync(catProjectLibTarget);
                                 }
-                                _fs.writeFileSync(_path.join(catProjectLibTarget, (catProjectLibName + "." + concatItem.key)), concatItem.value.join(""))
+
+                                staticname = concatenated.getName(concatItem.key);
+                                contentValue = concatItem.value.join("");
+                                // set the static name if found or else generate the name according to the project env
+                                filename = (staticname ? staticname : [catProjectLibName, ".", concatItem.key].join(""));
+
+                                _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue)
                             }
                         }
                     });

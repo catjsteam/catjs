@@ -107,6 +107,10 @@ module.exports = function (grunt) {
             css: {
                 src:'<%= cat.env.lib.target %><%= cat.env.lib.name %>.css',
                 dest:'<%= cat.env.lib.copyto %><%= cat.env.lib.name %>.debug.css'
+            },
+            config: {
+                src:'<%= cat.env.lib.target %>catconfig.json',
+                dest:'<%= cat.env.lib.copyto %>catconfig.json'
             }
         },
         clean: ["*.log",
