@@ -20,7 +20,9 @@ var _fsconfig = require("./utils/fs/Config.js"),
 
 
         function _loadProject() {
+
             try {
+                // Loading catproject.json file > data
                 (new _fsconfig(path, function (data) {
                     if (data) {
                         try {
@@ -55,8 +57,7 @@ var _fsconfig = require("./utils/fs/Config.js"),
         emitter = config.emitter;
 
         if (path) {
-            path = [path, "catproject.json"].join("/");
-            path = _path.normalize(path);
+            path = _path.join(path, "catproject.json");
 
             // Load the project according to the given configuration
             _loadProject();

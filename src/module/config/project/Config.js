@@ -12,8 +12,11 @@ var _typedas = require('typedas'),
 /**
  * Configuration Class
  *
+ * Getting the incoming data from the catproject.json file
+ * and instantiating the Configuration class based on that data.
+ *
  * @param config The configuration:
- *              data - the configuration data
+ *              data - the configuration data input that is the catproject.json content
  *              emitter - the emitter reference
  * @returns {*}
  * @constructor
