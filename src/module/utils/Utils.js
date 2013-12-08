@@ -114,6 +114,9 @@ module.exports = function () {
 
         error: function (msg) {
             _log.error(msg);
+            if (console) {
+                console.error(msg);
+            }
             throw msg;
         },
 

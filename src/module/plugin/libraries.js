@@ -84,6 +84,7 @@ module.exports = _basePlugin.ext(function () {
          */
         init: function (config) {
 
+
             var project = (config.internalConfig ? config.internalConfig.getProject() : undefined),
                 imports,
                 action,

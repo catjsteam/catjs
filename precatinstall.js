@@ -84,7 +84,7 @@ if (!settingFailed) {
 
     if (_isProxy()) {
         _processIt("npm", ["config", "set", "proxy", _getProxyURL()], undefined, function() {
-            _processIt("npm", ["config", "set", "HTTPS_PROXY", _getProxyURL()], undefined, function() {
+            _processIt("npm", ["config", "set", "https-proxy", _getProxyURL()], undefined, function() {
                 _process();
             });
         });
