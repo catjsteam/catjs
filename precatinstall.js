@@ -88,9 +88,20 @@ if (!settingFailed) {
                 _process();
             });
         });
+        _processIt("git", ["config", "proxy", _getProxyURL()], undefined, function() {
+            _processIt("npm", ["config", "https-proxy", _getProxyURL()], undefined, function() {
+                _process();
+            });
+        });
     } else {
         _processIt("npm", ["config", "delete", "proxy"], undefined, function() {
-            _processIt("npm", ["config", "delete", "HTTPS_PROXY"], undefined, function() {
+            _processIt("npm", ["config", "delete", "https-proxy"], undefined, function() {
+                _process();
+            });
+        });
+
+        _processIt("npm", ["config", "unset", "proxy"], undefined, function() {
+            _processIt("npm", ["config", "unset", "https-proxy"], undefined, function() {
                 _process();
             });
         });
