@@ -63,56 +63,6 @@ module.exports = function () {
                         "cat.scrap.utils": "src/module/plugin/scrap/ScrapUtils.js"
                     }
                 });
-//                // Map index for CAT modules
-//                global["cat.config.module"] = {
-//                    "cat.config": "src/module/config/CATConfig.js",
-//
-//                    "cat": "src/module/CAT.js",
-//                    "cat.flow": "src/module/Flow.js",
-//                    "cat.global": "src/module/CATGlob.js",
-//                    "cat.project": "src/module/Project.js",
-//                    "cat.props": "src/module/Properties.js",
-//                    "cat.config.utils": "src/module/utils/fs/Config.js",
-//                    "cat.mdata": "src/module/utils/fs/MetaData.js",
-//                    "cat.watch": "src/module/Watch.js",
-//                    "cat.cache": "src/module/Cache.js",
-//
-//                    "cat.utils": "src/module/utils/Utils.js",
-//                    "cat.ext.utils": "src/module/utils/ExtUtils.js",
-//                    "cat.tpl.utils": "src/module/utils/TemplateUtils.js",
-//                    "cat.regexp.utils": "src/module/utils/RegExp.js",
-//                    "cat.uglify.utils": "src/module/utils/Uglify.js",
-//
-//                    "cat.plugin.base": "src/module/plugin/Base.js",
-//                    "cat.plugin.spawn": "src/module/plugin/spawn.js",
-//                    "cat.common.scrap": "src/module/plugin/scrap/Scrap.js",
-//
-//                    "cat.common.config": "src/module/config/project/Config.js",
-//                    "cat.common.parser": "src/module/common/parser/Parser.js",
-//
-//                    "cat.scrap.utils": "src/module/plugin/scrap/ScrapUtils.js"
-//                };
-//
-//                global.catmodule = function (module) {
-//                    var catconfig = global["cat.config.module"],
-//                        modulepath;
-//                    if (catconfig) {
-//                        modulepath = ( catconfig[module] || module );
-//                        modulepath = _path.normalize([home, modulepath].join("/"));
-//                    }
-//                    return modulepath;
-//                };
-//
-//                /**
-//                 * CAT require implementation
-//                 *
-//                 * @param module The module key
-//                 * @returns {*}
-//                 */
-//                global.catrequire = function (module) {
-//
-//                    return require(global.catmodule(module));
-//                };
 
                 global.cathome = home;
                 global.catlibs = _path.join(home, "src/libraries/");

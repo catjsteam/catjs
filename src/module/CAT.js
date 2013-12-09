@@ -1,5 +1,4 @@
-var _async = require("async"),
-    _flow;
+var _flow;
 
 var CAT = function () {
 
