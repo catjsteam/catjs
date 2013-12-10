@@ -113,9 +113,19 @@ module.exports = _basePlugin.ext(function () {
              */
             apply: function (config) {
 
-                var dir = (config ? config.path : undefined);
+                var dir,
+                    data;
 
                 _me.apply(config);
+                data = _me._data;
+
+                if (data.path) {
+                    dir = data.path;
+
+                } else {
+                    dir = config.path
+                }
+
 
                 if (!dir) {
                     _utils.error(_props.get("cat.error.config").format("[scan ext]"));

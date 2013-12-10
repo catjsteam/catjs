@@ -24,7 +24,8 @@ var _global = catrequire("cat.global"),
      _CATConfig = function (externalConfig, data) {
 
         var me = this,
-            idx = 0, size, project, pluginsPath = [];
+            idx = 0, size, project, pluginsPath = [],
+            dependencies = [];
 
         /**
          * Extension initialization
@@ -63,6 +64,20 @@ var _global = catrequire("cat.global"),
             if (this.externalConfig) {
                 project = this.externalConfig.project;
                 if (project) {
+
+                    if (data && data.extensions) {
+                        data.extensions.forEach(function(ext) {
+                            if (ext && ext.name) {
+                                dependencies.push({
+                                    name: ext.name,
+                                    type: ext.name
+                                });
+                            }
+                        });
+                        // add internal extensions info
+                        project.appendEntity("dependencies", dependencies);
+                    }
+                    // set environment info
                     project.setInfo("template", this.env.template);
                     project.setInfo("libraries", this.env.libraries);
                     this.plugins.forEach(function(path){

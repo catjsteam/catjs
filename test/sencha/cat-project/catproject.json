@@ -39,11 +39,6 @@
             "type": "inject"
         },
         {
-            "name": "source.scan",
-            "type": "scan",
-            "path": "./../cat-test-app"
-        },
-        {
             "name": "target.clean",
             "type": "clean"
         }
@@ -53,7 +48,6 @@
         {
             "name": "sample.plugin",
             "type": "sample",
-            "dependency": "manager",
             "customAttribute": "install"
         },
         {
@@ -122,7 +116,8 @@
         {
             "name": "init.copy",
             "type": "copy",
-            "dependency": "source.scan",
+            "dependency": "scan",
+            "path": "./../cat-test-app",
             "from": {
                 "path": "/"
             },

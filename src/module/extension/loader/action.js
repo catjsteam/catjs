@@ -35,12 +35,12 @@ module.exports = _basePlugin.ext(function () {
                                 _me.getProject().addPluginLocations([path]);
                             }
                         } catch (e) {
-                            _utils.error(_props.get("cat.error").format("[scrap ext]", e));
+                            _log.warning("[CAT Loader] Skip, No valid directory was found: '" + dir + "'");
                         }
                     }
                 });
             } else {
-                _log.warning(_props.get("cat.arguments.type").format("[scrap ext]", "Array"));
+                _log.warning(_props.get("cat.arguments.type").format("[CAT loader]", "Array"));
             }
         },
 
@@ -60,7 +60,7 @@ module.exports = _basePlugin.ext(function () {
                 _me.apply(config);
 
                 if (!dirs) {
-                    _utils.error(_props.get("cat.error.config").format("[scrap ext]"));
+                    _utils.error(_props.get("cat.error.config").format("[CAT loader]"));
                 }
                 _load(dirs);
 

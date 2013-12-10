@@ -36,7 +36,6 @@ module.exports = function (config) {
             this.name = data.name;
             this.type = data.type;
             this.path = data.path;
-            this.type = data.type;
             this.data = data;
 
             /**

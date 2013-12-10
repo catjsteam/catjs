@@ -31,7 +31,6 @@ var _typedas = require('typedas'),
                 extensions: extensions
             },
             map = {tasks: {}, actions: {}, extensions: {}},
-            extensionsConfig,
             actionsConfig,
             tasksConfig,
             emitter = config.emitter,
@@ -67,12 +66,28 @@ var _typedas = require('typedas'),
             return val;
         };
 
+        this._appendEntity = function(entity, data) {
+
+            if (entity === "plugins") {
+                _pluginsSetup(data);
+                _initIndexing("actions");
+
+            } else if (entity === "extensions" || entity === "dependencies") {
+                _dependenciesSetup(data);
+                _initIndexing("extensions");
+
+            } else if (entity === "tasks") {
+                _tasksSetup(data);
+                _initIndexing("tasks");
+            }
+        };
+
         /**
          * Configuration indexing
          *
          * @private
          */
-        function _initIndexing() {
+        function _initIndexing(entity) {
 
             function initModule(name) {
                 var obj = vars[name];
@@ -91,9 +106,16 @@ var _typedas = require('typedas'),
             }
 
             // Array configuration entry goes in here
-            initModule("actions");
-            initModule("tasks");
-            initModule("extensions");
+            if (entity) {
+                initModule(entity);
+
+            } else {
+                initModule("actions");
+                initModule("tasks");
+                initModule("extensions");
+            }
+
+
         }
 
         /**
@@ -146,10 +168,10 @@ var _typedas = require('typedas'),
             me.info["env"] = data.env;
         }
 
-        function _tasksSetup() {
+        function _tasksSetup(entityData) {
 
             // -- setting tasks configuration
-            tasksConfig = data.tasks;
+            tasksConfig = (entityData ? entityData : data.tasks);
             if (tasksConfig &&
                 _typedas.isArray(tasksConfig)) {
                 tasksConfig.forEach(function (item) {
@@ -162,10 +184,10 @@ var _typedas = require('typedas'),
             }
         }
 
-        function _pluginsSetup() {
+        function _pluginsSetup(entityData) {
 
             // -- setting plugins configuration
-            actionsConfig = data.plugins;
+            actionsConfig = (entityData ?  entityData : data.plugins);
             if (actionsConfig &&
                 _typedas.isArray(actionsConfig)) {
                 actionsConfig.forEach(function (item) {
@@ -178,10 +200,10 @@ var _typedas = require('typedas'),
             }
         }
 
-        function _dependenciesSetup() {
+        function _dependenciesSetup(entityData) {
 
             // -- setting extensions dependencies configuration
-            extensionsConfig = (data.extensions || data.dependencies);
+            var extensionsConfig = (entityData ? entityData : (data.extensions || data.dependencies));
             if (extensionsConfig &&
                 _typedas.isArray(extensionsConfig)) {
                 extensionsConfig.forEach(function (item) {
@@ -190,11 +212,13 @@ var _typedas = require('typedas'),
                     }
                 });
 
-                // push default manager extension
-                extensions.push(new _Extension({data: {
-                    name: "manager",
-                    type: "manager"
-                }, emitter: emitter, global: data, catconfig: me}));
+//                if (!entityData) {
+//                    // push default manager extension - only in the first init phase
+//                    extensions.push(new _Extension({data: {
+//                        name: "manager",
+//                        type: "manager"
+//                    }, emitter: emitter, global: data, catconfig: me}));
+//                }
 
             } else {
                 _log.warning("[CAT Config] Missing 'dependencies' configuration section");
@@ -211,11 +235,11 @@ var _typedas = require('typedas'),
 
             // indexing the objects arrays [actions, tasks, etc..]
             _initIndexing();
+
             // create target skeleton project
             _postCreation();
 
         }
-
 
         _main();
 
@@ -225,6 +249,14 @@ var _typedas = require('typedas'),
 
 Config.prototype.destroy = function () {
 
+};
+
+/**
+ * Append additional entries to the existing data (extensions | tasks | plugins)
+ *
+ */
+Config.prototype.appendEntity = function(entity, data) {
+    this._appendEntity(entity, data);
 };
 
 /**

@@ -36,6 +36,9 @@ module.exports = function (config) {
             dependency, extension;
 
         function _action(action) {
+            var dependencyType,
+                extension;
+
             if (action) {
                 _flow.log({msg: [" >> Running Plugin: ", me.actions[idx]].join(" ")});
 
@@ -44,7 +47,18 @@ module.exports = function (config) {
 
                 // if no dependency assigned use the manager default extension
                 if (!dependency) {
-                    dependency = "manager";
+                    dependencyType = actionobj.type;
+                    if (!dependencyType) {
+                        _log.warning("[CAT task config] missing 'type' property in plugin configuration see catproject.json plugin: " + actionobj.name);
+                    } else {
+                        extension = internalConfig.getExtension(dependencyType);
+                        if (extension) {
+                            dependency = extension.ext.name;
+                        }
+                    }
+                    if (!dependency) {
+                        dependency = "manager";
+                    }
                 }
 
                 // apply default extensions
