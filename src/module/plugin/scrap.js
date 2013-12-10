@@ -10,7 +10,6 @@ var _log = catrequire("cat.global").log(),
 module.exports = _basePlugin.ext(function () {
 
     var _basePath,
-        _data,
         _global,
         _me = this,
         _emitter,
@@ -18,7 +17,6 @@ module.exports = _basePlugin.ext(function () {
         _parsers = {},
         _wait = 0,
         _waitcounter = 0;
-
 
     /**
      * Extract valid main scrap blocks out of comments
@@ -208,10 +206,6 @@ module.exports = _basePlugin.ext(function () {
 
             _emitter = config.emitter;
             _global = config.global;
-            _data = config.data;
-
-            // initial data binding to 'this'
-            _me.dataInit(_data);
 
             // Listen to the process emitter
             if (_emitter) {

@@ -127,12 +127,18 @@ module.exports = function (config) {
             }
         }
 
-        function actionApplyImpl(actionApply) {
+        function actionApplyImpl(config) {
+            var actionApply = config.actionApply,
+                dependency = config.dependency;
+
             // apply plugin
             if (!actionApply) {
                 _log.warning(_props.get("cat.error.interface").format("[task config]", "apply"));
             } else {
-                return actionApply(internalConfig);
+                return actionApply({
+                    internalConfig:internalConfig,
+                    dependency: dependency
+                });
             }
         }
 
@@ -142,6 +148,9 @@ module.exports = function (config) {
 
         if (ext) {
             extensionConfig = (extensionConfig ? extensionConfig : catconfig.getExtension(ext));
+            if (!extensionConfig) {
+                _utils.error("[CAT task config] No dependency found named: " + ext);
+            }
             extConfig = internalConfig.getExtension(extensionConfig.type);
             if (!extConfig) {
                 _log.error(_props.get("cat.config.task.ext.missing").format("[task config]", extensionConfig.type, ext));
@@ -159,11 +168,17 @@ module.exports = function (config) {
             }
 
             if (phase == "default") {
-                pluginHandle = actionApplyImpl(actionApply);
+                pluginHandle = actionApplyImpl({
+                    actionApply: actionApply,
+                    dependency: ext
+                });
                 extensionApplyImpl(pluginHandle);
             } else {
                 pluginHandle = extensionApplyImpl(pluginHandle);
-                actionApplyImpl(actionApply);
+                actionApplyImpl({
+                    actionApply: actionApply,
+                    dependency: ext
+                });
             }
         }
     }

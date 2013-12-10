@@ -45,8 +45,12 @@ module.exports = function (config) {
              *
              * @param internalConfig The CAT internal configuration
              */
-            this.apply = function(internalConfig) {
-                var target = (me.type || me.name);
+            this.apply = function(config) {
+                var target = (me.type || me.name),
+                    internalConfig = config.internalConfig;
+
+                // actually the running dependency
+                me.dependencyTarget = config.dependency;
 
                 _log.info("[CAT] running target: " + target);
 
@@ -56,9 +60,22 @@ module.exports = function (config) {
                     try {
                         me.ref = catconfig.pluginLookup(target);
                         if (me.ref) {
+                            if (me.ref.validate) {
+                                me.ref.validate();
+                            }
                             me.action = new me.ref();
+
                         }
                         if (me.action) {
+                            // todo call dataInit
+                            // todo impl the dependencyTarget validation within the plugins; Give an array of supported
+
+                            // initial the data
+//                            if (me.ref.dataInit) {
+//                                me.ref.dataInit(me);
+//                            }
+
+
                             // Action initialization
                             me.action.init({data: me, emitter: emitter, global: global, internalConfig: internalConfig});
                         }

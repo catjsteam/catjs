@@ -62,6 +62,11 @@ module.exports = function () {
             return this.filters;
         };
 
+        proto.validate = function() {
+            _log.info("[CAT base plugin] No validation has implemented.")
+            return true;
+        };
+
         /**
          * Filters for excluding/include file extensions
          *
@@ -145,6 +150,9 @@ module.exports = function () {
         ext: function (fn) {
             if (fn) {
                 _base(fn.prototype);
+                fn.validate = fn.prototype.validate;
+
+
             }
             return fn;
         }

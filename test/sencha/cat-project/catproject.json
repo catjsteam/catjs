@@ -31,14 +31,6 @@
             "type": "webserver"
         },
         {
-            "name": "scan.ext",
-            "type": "scan"
-        },
-        {
-            "name": "inject.ext",
-            "type": "inject"
-        },
-        {
             "name": "target.clean",
             "type": "clean"
         }
@@ -59,17 +51,12 @@
             "type": "scrap-sencha"
         },
         {
-            "name": "scrap.mock",
-            "type": "scrap-mock"
-        },
-        {
             "name": "scrap.enyo",
             "type": "scrap-enyo"
         },
         {
             "name": "init.scrap",
             "type": "scrap",
-            "dependency": "scan.ext",
             "filters": [
                 {
                     "type": "file",
@@ -140,8 +127,7 @@
         },
         {
             "name": "target.inject",
-            "type": "inject",
-            "dependency": "inject.ext"
+            "type": "inject"
         },
         {
             "name": "npm.install",
@@ -207,11 +193,11 @@
         },
         {
             "name": "scrap",
-            "plugins": ["scrap.common", "scrap.sencha", "scrap.mock", "ext.scrap", "init.scrap"]
+            "plugins": ["scrap.common", "scrap.sencha", "ext.scrap", "init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap.common", "scrap.sencha", "scrap.mock", "ext.scrap", "target.inject", "project.install"]
+            "plugins": ["scrap.common", "scrap.sencha","ext.scrap", "target.inject", "project.install"]
         },
         {
             "name": "lib",
