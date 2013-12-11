@@ -279,10 +279,24 @@ Config.prototype.getTask = function (key) {
  * @returns {*}
  */
 Config.prototype.getAction = function (key) {
-    var map = this._get("map");
+    var map = this._get("map"),
+        plugin;
 
     if (key && map.actions) {
-        return map.actions[key];
+        plugin = map.actions[key];
+
+        if (!plugin) {
+            // look at the loaded libraries
+            plugin = this.pluginLookup(key);
+            if (plugin) {
+                this._appendEntity("plugins", [{
+                    name: key,
+                    type: key
+                }]);
+            }
+            plugin = map.actions[key];
+        }
+        return plugin;
     }
 };
 

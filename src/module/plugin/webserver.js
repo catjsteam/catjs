@@ -113,8 +113,17 @@ module.exports = _basePlugin.ext(function () {
                 } else {
                     _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
                 }
+            },
 
-
+            /**
+             * Validate the plugin
+             *
+             *      dependencies {Array} The array of the supported dependencies types
+             *
+             * @returns {{dependencies: Array}}
+             */
+            validate: function() {
+                return { dependencies: ["webserver"]}
             }
         };
 

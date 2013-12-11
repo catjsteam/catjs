@@ -238,6 +238,17 @@ module.exports = _basePlugin.ext(function () {
 
         getType: function () {
             return "scrap";
+        },
+
+        /**
+         * Validate the plugin
+         *
+         *      dependencies {Array} The array of the supported dependencies types
+         *
+         * @returns {{dependencies: Array}}
+         */
+        validate: function() {
+            return { dependencies: ["scan"]}
         }
     };
 

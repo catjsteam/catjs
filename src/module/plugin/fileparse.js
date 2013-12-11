@@ -92,6 +92,17 @@ module.exports = _basePlugin.ext(function () {
             }
             // done processing notification for the next task to take place
             _emitter.emit("job.done", {status: "done"});
+        },
+
+        /**
+         * Validate the plugin
+         *
+         *      dependencies {Array} The array of the supported dependencies types
+         *
+         * @returns {{dependencies: Array}}
+         */
+        validate: function() {
+            return { dependencies: ["manager"]}
         }
 
     }

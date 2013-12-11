@@ -43,6 +43,10 @@ module.exports = function (config) {
                 _flow.log({msg: [" >> Running Plugin: ", me.actions[idx]].join(" ")});
 
                 actionobj = catconfig.getAction(action);
+                if (!actionobj) {
+                    _utils.error("[CAT config task] no valid plugin was found for plugin named: " + action);
+                    return undefined;
+                }
                 dependency = actionobj.dependency;
 
                 // if no dependency assigned use the manager default extension

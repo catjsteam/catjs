@@ -47,7 +47,8 @@ module.exports = function (config) {
              */
             this.apply = function(config) {
                 var target = (me.type || me.name),
-                    internalConfig = config.internalConfig;
+                    internalConfig = config.internalConfig,
+                    bol = true;
 
                 // actually the running dependency
                 me.dependencyTarget = config.dependency;
@@ -60,27 +61,25 @@ module.exports = function (config) {
                     try {
                         me.ref = catconfig.pluginLookup(target);
                         if (me.ref) {
-                            if (me.ref.validate) {
-                                me.ref.validate();
-                            }
+
                             me.action = new me.ref();
 
+                            if (me.ref.validate) {
+                                bol = me.ref.validate(me, config);
+                                if (!bol) {
+                                    _log.warning("[CAT Action] plugin validation failed, the plugin might not function as expected ");
+                                }
+                            }
                         }
                         if (me.action) {
                             // todo call dataInit
                             // todo impl the dependencyTarget validation within the plugins; Give an array of supported
 
-                            // initial the data
-//                            if (me.ref.dataInit) {
-//                                me.ref.dataInit(me);
-//                            }
-
-
-                            // Action initialization
+                           // Action initialization
                             me.action.init({data: me, emitter: emitter, global: global, internalConfig: internalConfig});
                         }
                     } catch (e) {
-                        _log.error("[Action] action type not found or failed to load module ", e);
+                        _log.error("[CAT Action] action type not found or failed to load module ", e);
                     }
                 }
 
@@ -100,7 +99,7 @@ module.exports = function (config) {
 
 
         } else {
-            _log.warning("[Action] No valid data configuration");
+            _log.warning("[CAT Action] No valid data configuration");
         }
     }
 
