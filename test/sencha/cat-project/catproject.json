@@ -12,14 +12,6 @@
         }
     },
 
-    "dependencies": [
-        {
-            "name": "dependency.loader",
-            "type": "loader",
-            "path": ["./plugins/"]
-        }
-    ],
-
     "plugins": [
         {
             "name": "init.scrap",
@@ -147,11 +139,11 @@
         },
         {
             "name": "scrap",
-            "plugins": ["scrap-common", "scrap-sencha", "scrapext", "init.scrap"]
+            "plugins": ["scrap-common", "scrap-sencha", "custom.plugin", "init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap-common", "scrap-sencha", "scrapext", "target.inject", "project.install"]
+            "plugins": ["scrap-common", "scrap-sencha", "custom.plugin", "target.inject", "project.install"]
         },
         {
             "name": "lib",

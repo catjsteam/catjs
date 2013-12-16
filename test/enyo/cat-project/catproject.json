@@ -12,14 +12,6 @@
         }
     },
 
-    "dependencies": [
-        {
-            "name": "dependency.loader",
-            "type": "loader",
-            "path": ["./plugins/"]
-        }
-    ],
-
     "plugins": [
         {
             "name": "scrap.common",
@@ -51,11 +43,6 @@
                     "exclude": true
                 }
             ]
-        },
-        {
-            "name": "ext.scrap",
-            "type": "scrapext",
-            "dependency": "dependency.loader"
         },
         {
             "name": "target.libraries",
@@ -165,11 +152,11 @@
         },
         {
             "name": "scrap",
-            "plugins": ["scrap.common", "scrap.enyo", "ext.scrap", "init.scrap"]
+            "plugins": ["scrap.common", "scrap.enyo", "custom.plugin", "init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap.common", "scrap.enyo", "ext.scrap", "target.inject", "project.install"]
+            "plugins": ["scrap.common", "scrap.enyo", "custom.plugin", "target.inject", "project.install"]
         },
         {
             "name": "lib",

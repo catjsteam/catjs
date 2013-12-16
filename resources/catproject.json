@@ -1,0 +1,18 @@
+{
+    "dependencies": [
+        {
+            "name": "dependency.loader",
+            "type": "loader",
+            "path": ["./plugins/"]
+        }
+    ],
+
+    "plugins": [
+        {
+            "name": "custom.plugin",
+            "type": "custom-plugin",
+            "dependency": "dependency.loader"
+        }
+     ]
+
+}
