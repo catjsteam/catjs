@@ -221,10 +221,11 @@ var CAT = function () {
              */
             function _apply() {
 
-                var project,
+                var project, projectInternal,
                     pids,
                     targets = _targets, counter,
-                    wait = false;
+                    wait = false,
+                    home = _global.get("home");
 
 
                 _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
@@ -255,6 +256,10 @@ var CAT = function () {
                         emitter: _emitter
                     });
 
+
+                    _project.update({
+                        path: (_path.join(home.path, "resources"))
+                    });
 
                     if (project) {
 

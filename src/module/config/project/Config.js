@@ -374,4 +374,20 @@ Config.prototype.setInfo = function (key, value) {
     return this.info[key] = value;
 };
 
+Config.prototype.update = function (config) {
+
+    var entity, data;
+    if (config) {
+        if ("data" in config) {
+            data = config.data;
+            if (data) {
+                for (entity in data) {
+                    this._appendEntity(entity, data[entity]);
+                }
+            }
+        }
+    }
+};
+
+
 module.exports = Config;
