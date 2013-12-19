@@ -28,7 +28,6 @@ module.exports = function () {
                         me = this;
 
                     sample = this.get("sample");
-                    console.log('CAT... Custom annotation sample sample:', sample);
                     me.print("console.log('CAT... Custom annotation sample sample:', " + sample + ")");
                 }});
 
