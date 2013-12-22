@@ -30,7 +30,7 @@ _cat.utils.Signal = function() {
 
             // Additional code in here
         }
-    }
+    };
 
     return {
 
@@ -42,6 +42,6 @@ _cat.utils.Signal = function() {
 
         }
 
-    }
+    };
 
 }();

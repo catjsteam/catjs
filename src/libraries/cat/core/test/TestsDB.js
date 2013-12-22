@@ -3,7 +3,7 @@ _cat.core.TestsDB = function() {
 
     function _TestsDB() {
 
-        this._DB;
+        this._DB = undefined;
         var me = this;
 
         _cat.utils.AJAX.sendRequestAsync({url : "tests_db.json", callback : {call : function(check) {
@@ -100,6 +100,7 @@ _cat.core.TestsDB = function() {
 
 function TestDB (){
 
+    var testDBJson;
     try
     {
         if (XMLHttpRequest && !testDBJson) {

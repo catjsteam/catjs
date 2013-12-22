@@ -4,7 +4,7 @@ _cat.core.ui = function () {
 
         var catElement;
         if (typeof document !== "undefined") {
-            var catElement = document.createElement("DIV");
+            catElement = document.createElement("DIV");
 
             catElement.id = "__catelement";
             catElement.style.width = "200px";
@@ -170,7 +170,7 @@ _cat.core.ui = function () {
         isContent: function() {
 
             function _isText(elt) {
-                if (elt &&  elt.innerText && (new String(elt.innerText).trim)) {
+                if ( elt &&  elt.innerText && ((elt.innerText).trim()) ) {
                     return true;
                 }
                 return false;
@@ -233,7 +233,7 @@ _cat.core.ui = function () {
                             if (!reset && isOpen) {
                                 setTimeout(function () {
                                     _me.toggle();
-                                }, 300)
+                                }, 300);
                             }
                         }
 

@@ -18,6 +18,6 @@ _cat.utils.Utils = function () {
             return results;
 
         }
-    }
+    };
 
 }();
