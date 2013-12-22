@@ -236,34 +236,124 @@ module.exports = _basePlugin.ext(function () {
 
 
                     } else if (library.install === "internal") {
-                        process1 = _spawn().spawn({
-                            command: "npm",
-                            args: ["install"],
-                            options: {cwd: libWorkPath},
-                            emitter: _emitter
-                        });
 
-                        process1.on('close', function (code) {
-                            if (code !== 0) {
-                                _log.info('[spawn close] exited with code ' + code);
-                            }
+                        function _installLibs(lib, mode) {
 
-                            var process2 = _spawn().spawn({
-                                command: "grunt",
-                                args: [action, "--no-color"],
-                                options: {cwd: libWorkPath},
-                                emitter: _emitter
-                            });
+                            function __installLib(data) {
 
-                            process2.on('close', function (code) {
-                                if (code !== 0) {
-                                    _log.info('[spawn close] exited with code ' + code);
+                                if (!data) {
+                                    return undefined;
                                 }
 
-                                _copydone();
+                                var src = data.src,
+                                    type = data.type,
+                                    path = data.path,
+                                    name = data.name,
+                                    funcs = {
+                                        "json": function(config) {
 
-                            });
-                        });
+                                        },
+
+                                        "css": function(config) {
+
+                                            var src = config.src,
+                                                path = config.path,
+                                                name = config.name;
+
+                                            src = _utils.globmatch({src: src});
+
+                                            src.forEach(function(item) {
+                                                var basename;
+                                                if (item) {
+                                                    basename = _path.basename(item);
+                                                    _utils.copySync(item, _path.join(path, basename));
+                                                }
+                                            });
+                                        },
+
+                                        "js" : function(config) {
+
+                                            var src = config.src,
+                                                path = config.path,
+                                                name = config.name;
+
+                                            jsutils.dev({
+                                                src: src,
+                                                out:{
+                                                    name: name,
+                                                    path: path
+                                                },
+                                                jshint: {
+                                                    opt: {
+                                                        "evil": true,
+                                                        "strict": false,
+                                                        "curly": true,
+                                                        "eqeqeq": true,
+                                                        "immed": false,
+                                                        "latedef": true,
+                                                        "newcap": false,
+                                                        "noarg": true,
+                                                        "sub": true,
+                                                        "undef": true,
+                                                        "boss": true,
+                                                        "eqnull": true,
+                                                        "node": true,
+                                                        "es5": false
+                                                    },
+                                                    "globals": {
+                                                        XMLHttpRequest: true,
+                                                        document: true,
+                                                        _cat: true,
+                                                        chai: true
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    };
+
+                                if (!src || !type || !path || !name) {
+                                    _log.error("[CAT libraries install] Not valid argument(s) 'src' \ 'type' \ 'path' \ 'name' ")
+                                }
+
+                                resolvedSrcs = [];
+                                src.forEach(function(item) {
+                                    resolvedSrcs.push(_path.join(libWorkPath, item));
+                                });
+
+                                data.src = resolvedSrcs;
+                                funcs[type].call(this, data);
+                            }
+
+                            var jsutils = _jsutils.Task,
+                                src,
+                                resolvedSrcs = [],
+                                targetPath = library.base,
+                                libData;
+
+                            // init
+                            // TODO TBD ... DEV is hard coded
+                            if (mode in library && library[mode]) {
+                                libData = library[mode];
+                                targetPath = _path.join(libWorkPath, targetPath);
+
+                                if (_typedas.isArray(libData)) {
+                                    libData.forEach(function(data) {
+                                        data.path = targetPath;
+                                        __installLib(data);
+                                    });
+
+                                    _copydone();
+
+                                } else {
+                                    _log.error("[CAT libraries install] library's dev property should be of 'Array' type");
+
+                                }
+                            }
+
+                        }
+
+                         _installLibs(library, "dev");
+
 
                     } else if (library.install === "bower") {
 
@@ -299,45 +389,12 @@ module.exports = _basePlugin.ext(function () {
 
 
                 actions.clean = function () {
+                    var path = library.base;
 
                     if (library.install === "internal") {
-                        process1 = _spawn().spawn({
-                            command: "npm",
-                            args: ["install"],
-                            options: {cwd: libWorkPath},
-                            emitter: _emitter
-                        });
-
-                        process1.on('close', function (code) {
-                            if (code !== 0) {
-                                _log.info('[spawn close] exited with code ' + code);
-                            }
-
-                            var process2 = _spawn().spawn({
-                                command: "grunt",
-                                args: [action, "--no-color"],
-                                options: {cwd: libWorkPath},
-                                emitter: _emitter
-                            });
-
-                            process2.on('close', function (code) {
-                                var nodeModulesFolders;
-
-                                if (code !== 0) {
-                                    _log.info('[spawn close] exited with code ' + code);
-                                }
-
-                                // delete node_modules libs
-                                if (wipe) {
-                                    nodeModulesFolders = _path.join(libWorkPath, "node_modules");
-                                    if (nodeModulesFolders) {
-                                        _utils.deleteSync(nodeModulesFolders);
-                                    }
-                                }
-                                _exec();
-
-                            });
-                        });
+                        path = _path.join(libWorkPath, path);
+                        _utils.deleteSync(path);
+                        _exec()
                     } else if (library.install === "bower") {
                         _utils.deleteSync(_path.join(workPath, library.name));
                         _exec();

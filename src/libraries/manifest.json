@@ -5,8 +5,40 @@
             "name": "cat",
             "address": "local",
             "base": "target",
-            "prod" :["cat.core.test.min.js","cat.core.test.min.css", "catconfig.json"],
-            "dev" :["cat.core.test.js", "cat.core.test.css", "catconfig.json"],
+            "prod" :[
+                {
+                    "name": "cat.core.test.min.js",
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
+                    "type": "js"
+                },
+                {
+                    "name": "cat.core.test.min.css",
+                    "src": ["css/*.css"],
+                    "type": "css"
+                },
+                {
+                    "name": "catconfig.json",
+                    "src": ["catconfig.json"],
+                    "type": "json"
+                }
+            ],
+            "dev" :[
+                {
+                    "name":"cat.core.test.js",
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
+                    "type": "js"
+                },
+                {
+                    "name": "cat.core.test.css",
+                    "src": ["css/*.css"],
+                    "type": "css"
+                },
+                {
+                    "name": "catconfig.json",
+                    "src": ["catconfig.json"],
+                    "type": "json"
+                }
+            ],
             "parse": ["catconfig.json"],
             "static-names": ["catconfig.json"],
             "install" : "internal"
