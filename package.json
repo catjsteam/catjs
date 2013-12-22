@@ -59,7 +59,8 @@
     "test-model-reporter": "~0.0.6",
     "Faker": "~0.5.11",
     "js.utils": "~0.1.2",
-    "require-mapper": "0.0.2"
+    "require-mapper": "0.0.2",
+    "glob": "~3.2.7"
   },
   "peerDependencies": {
     "grunt": "~0.4.1",
