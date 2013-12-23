@@ -75,13 +75,25 @@
             }
         },
         {
+            "name": "project.minify",
+            "type": "minify",
+            "path": "./target/test-1/",
+            "filename": "cat.src.js",
+            "src":["./src/**/*.js"]
+        },
+        {
             "name": "target.inject",
             "type": "inject"
         },
         {
             "name": "project.clean",
             "type": "clean",
-            "src": ["target"]
+            "src": ["target", "_cat_md.json"]
+        },
+        {
+            "name": "project.wipe",
+            "type": "clean",
+            "src": ["src", "lib", "*.log"]
         },
         {
             "name": "mobile.install",
@@ -138,6 +150,14 @@
         {
             "name": "clean",
             "plugins": ["project.clean"]
+        },
+        {
+            "name": "wipe",
+            "plugins": ["project.clean", "project.wipe"]
+        },
+        {
+            "name": "minify",
+            "plugins": ["project.minify"]
         },
         {
             "name": "test",
