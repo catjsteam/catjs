@@ -1,5 +1,9 @@
 {
     "mode": "dev",
+    "out": {
+        "name": "cat",
+        "folder": "lib"
+    },
     "libraries": [
         {
             "name": "cat",
@@ -17,8 +21,8 @@
                     "type": "css"
                 },
                 {
-                    "name": "catconfig.json",
-                    "src": ["catconfig.json"],
+                    "name": "cat.core.catconfig.json",
+                    "src": ["config/catconfig.json"],
                     "type": "json"
                 }
             ],
@@ -34,12 +38,12 @@
                     "type": "css"
                 },
                 {
-                    "name": "catconfig.json",
-                    "src": ["catconfig.json"],
-                    "type": "json"
+                    "name": "cat.core.catconfig.json",
+                    "src": ["config/catconfig.json"],
+                    "type": "json",
+                    "parse": true
                 }
             ],
-            "parse": ["catconfig.json"],
             "static-names": ["catconfig.json"],
             "install" : "internal"
         },
@@ -63,12 +67,6 @@
             "name": "chai",
             "prod" :["chai.js"],
             "dev" :["chai.js"],
-            "install": "static"
-        },
-        {
-            "name": "sencha",
-            "prod" :["sencha.js"],
-            "dev" :["sencha.js"],
             "install": "static"
         }
     ]

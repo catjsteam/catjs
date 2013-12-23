@@ -12,7 +12,31 @@
             "name": "custom.plugin",
             "type": "custom-plugin",
             "dependency": "dependency.loader"
+        },
+        {
+            "name": "libraries.install",
+            "type": "libraries",
+            "dependency": "manager",
+            "action": "install"
+        },
+        {
+            "name": "libraries.clean",
+            "type": "libraries",
+            "dependency": "manager",
+            "imports": ["cat"],
+            "action": "clean"
         }
-     ]
+     ],
+
+    "tasks": [
+        {
+            "name": "libs.install",
+            "plugins":["libraries.install"]
+        },
+        {
+            "name": "libs.clean",
+            "plugins":["libraries.clean"]
+        }
+    ]
 
 }

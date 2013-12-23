@@ -95,7 +95,6 @@ module.exports = _basePlugin.ext(function () {
                 manifestLib = _path.join(global.catlibs, manifestFileName),
                 catProjectLib,
                 catProjectLibName,
-                catProjectLibTarget,
                 library, mode,
                 workPath,
                 libWorkPath,
@@ -116,7 +115,6 @@ module.exports = _basePlugin.ext(function () {
                     return undefined;
                 }
                 var from,
-                    to,
                     artifact = library[mode];
 
                 /**
@@ -134,7 +132,7 @@ module.exports = _basePlugin.ext(function () {
                     }
 
                     var content, filetype, basename,
-                        parse = ('parse' in library ? library.parse : undefined),
+                        itemName,
                         staticnames = ('static-names' in library ? library["static-names"] : undefined);
 
 
@@ -143,26 +141,19 @@ module.exports = _basePlugin.ext(function () {
                         // copy dev
                         if (item) {
 
-                            from = (base ? _path.join(libWorkPath, base, item) : _path.join(libWorkPath, item));
-                            to = _path.join(catProjectLib, item);
-                            _utils.copySync(from, to);
+                            itemName = (_typedas.isObject(item) && ("name" in item) ? item.name : item);
+                            from = (base ? _path.join(libWorkPath, base, itemName) : _path.join(libWorkPath, itemName));
+
+                            /* Copy all of the artifacts to the project's library
+                                to = _path.join(catProjectLib, item);
+                                _utils.copySync(from, to); */
 
                             // concatenation
                             content = _fs.readFileSync(from, "utf8");
                             if (content) {
-//                                concatenated.push(content);
+
                                 filetype = _getExtension(from);
                                 basename = _path.basename(from);
-
-                                // parse content..
-                                if (_jsutils.Object.contains(parse, basename)) {
-                                    content = _jsutils.Template.template({
-                                        content: content,
-                                        data: {
-                                            project: project
-                                        }
-                                    });
-                                }
 
                                 if (filetype) {
                                     concatenated.add(filetype, content);
@@ -197,6 +188,13 @@ module.exports = _basePlugin.ext(function () {
                     doImport = false,
                     concatsByType;
 
+                function _copydone() {
+
+                    _copyResource();
+                    _exec();
+
+                }
+
                 library = libraries[slot];
 
 
@@ -204,7 +202,8 @@ module.exports = _basePlugin.ext(function () {
                     if (_typedas.isArray(imports)) {
                         doImport = _utils.contains(imports, library.name);
                     } else {
-                        _log.warning(_props.get("cat.arguments.type").format("[libraries ext]", "Array"));
+                        // we are installing all libraries ignore the import stuff
+                        doImport = true;
                     }
                 }
 
@@ -222,13 +221,6 @@ module.exports = _basePlugin.ext(function () {
                 actions.install = function () {
 
                     var bowerConfig = {cwd: workPath};
-
-                    function _copydone() {
-
-                        _copyResource();
-                        _exec();
-
-                    }
 
                     if (library.install === "static") {
 
@@ -250,25 +242,66 @@ module.exports = _basePlugin.ext(function () {
                                     path = data.path,
                                     name = data.name,
                                     funcs = {
+                                        "_baseCopy": function(config) {
+                                            var src = config.src,
+                                                path = config.path,
+                                                name = config.name,
+                                                content = config.content;
+
+                                            if (src) {
+                                                src = _utils.globmatch({src: src});
+
+                                                src.forEach(function(item) {
+                                                    if (item) {
+                                                        _utils.copySync(item, _path.join(path, name));
+                                                    }
+                                                });
+                                            } else if (content) {
+                                                _fs.writeFileSync(_path.join(path, name), content);
+                                            }
+                                        },
+
                                         "json": function(config) {
 
+                                            var parse = ('parse' in config ? config.parse : undefined),
+                                                src = "src" in config && config.src,
+                                                path = config.path,
+                                                name = config.name;
+
+                                            if (src) {
+                                                src = _utils.globmatch({src: src});
+
+                                                src.forEach(function(item) {
+                                                    var content,
+                                                        lcontent;
+
+                                                    if (item) {
+                                                        content = _fs.readFileSync(item, "utf8");
+                                                        if (content) {
+                                                            // parse content..
+                                                            if (parse) {
+                                                                lcontent = _jsutils.Template.template({
+                                                                    content: content,
+                                                                    data: {
+                                                                        project: project
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            funcs._baseCopy({
+                                                                content: lcontent,
+                                                                name: name,
+                                                                path: path
+                                                            });
+                                                        }
+                                                    }
+                                                });
+                                            }
                                         },
 
                                         "css": function(config) {
 
-                                            var src = config.src,
-                                                path = config.path,
-                                                name = config.name;
-
-                                            src = _utils.globmatch({src: src});
-
-                                            src.forEach(function(item) {
-                                                var basename;
-                                                if (item) {
-                                                    basename = _path.basename(item);
-                                                    _utils.copySync(item, _path.join(path, basename));
-                                                }
-                                            });
+                                            funcs._baseCopy(config);
                                         },
 
                                         "js" : function(config) {
@@ -322,6 +355,8 @@ module.exports = _basePlugin.ext(function () {
 
                                 data.src = resolvedSrcs;
                                 funcs[type].call(this, data);
+
+
                             }
 
                             var jsutils = _jsutils.Task,
@@ -335,6 +370,12 @@ module.exports = _basePlugin.ext(function () {
                             if (mode in library && library[mode]) {
                                 libData = library[mode];
                                 targetPath = _path.join(libWorkPath, targetPath);
+                                if (targetPath) {
+                                    // create internal project library folder if not exists
+                                    if (!_fs.existsSync(targetPath)) {
+                                        _fs.mkdirpSync(targetPath);
+                                    }
+                                }
 
                                 if (_typedas.isArray(libData)) {
                                     libData.forEach(function(data) {
@@ -401,8 +442,18 @@ module.exports = _basePlugin.ext(function () {
                     }
                 };
 
+
+                actions.build = function() {
+                    _copydone();
+                };
+
                 slot++;
                 if (slot > libraries.length) {
+
+                    // create project's library folder if not exists
+                    if (!_fs.existsSync(catProjectLib)) {
+                        _fs.mkdirSync(catProjectLib);
+                    }
 
                     // concat artifact files
                     concatsByType = concatenated.all();
@@ -414,10 +465,8 @@ module.exports = _basePlugin.ext(function () {
 
                         if (concatItem) {
                             if (concatItem.value.length > 0) {
-                                catProjectLibTarget = _path.join(catProjectLib, "target");
-                                if (!_fs.existsSync(catProjectLibTarget)) {
-                                    _fs.mkdirSync(catProjectLibTarget);
-                                }
+                                catProjectLibTarget = catProjectLib;
+
 
                                 staticname = concatenated.getName(concatItem.key);
                                 contentValue = concatItem.value.join("");
@@ -459,7 +508,7 @@ module.exports = _basePlugin.ext(function () {
             _me.dataInit(_data);
             extensionParams = _data.data;
 
-            imports = extensionParams.imports;
+            imports = (extensionParams.imports || "*");
             action = extensionParams.action;
             wipe = ((extensionParams.wipe === "true") ? true : false);
 
@@ -476,14 +525,9 @@ module.exports = _basePlugin.ext(function () {
 
 
                     if (_project) {
-                        catProjectLib = _project.getInfo("lib.source");
-                        envinfo = _project.getInfo("env");
-                        if (envinfo) {
-                            catProjectLibName = (envinfo.lib ? envinfo.lib.name : undefined);
-                        }
-                        if (!catProjectLibName) {
-                            _log.info('[library] No valid name was found for CAT library (see catproject)');
-                        }
+                        catProjectLib = manifest.out.folder;
+                        catProjectLibName = manifest.out.name;
+
                         workPath = _path.join(cathome, _project.getInfo("libraries").path);
                     }
 
