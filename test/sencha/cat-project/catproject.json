@@ -3,13 +3,7 @@
 
     "env": {
         "source": "src/",
-        "target": "target/",
-        "lib": {
-            "name": "cat.test",
-            "source": "lib/",
-            "target": "lib/target/",
-            "copyto": "./target/test-1/"
-        }
+        "target": "target/"
     },
 
     "plugins": [
@@ -43,17 +37,11 @@
             ]
         },
         {
-            "name": "target.libraries",
+            "name": "libraries.build",
             "type": "libraries",
             "dependency": "manager",
             "imports": ["chai", "tmr", "cat"],
-            "action": "install"
-        }, {
-            "name": "target.libraries.clean",
-            "type": "libraries",
-            "dependency": "manager",
-            "imports": ["cat"],
-            "action": "clean"
+            "action": "build"
         },
         {
             "name": "init.copy",
@@ -64,7 +52,7 @@
                 "path": "/"
             },
             "to": {
-                "path": "./target/"
+                "path": "./target/test-1"
             },
             "filters": [
                 {
@@ -75,31 +63,25 @@
             ]
         },
         {
-            "name": "target.clean",
-            "type": "clean",
-            "path": ["lib", "src"]
+            "name": "lib.copy",
+            "type": "copy",
+            "dependency": "scan",
+            "path": "./lib",
+            "from": {
+                "path": "/"
+            },
+            "to": {
+                "path": "./target/test-1/"
+            }
         },
         {
             "name": "target.inject",
             "type": "inject"
         },
         {
-            "name": "npm.install",
-            "type": "spawn",
-            "command": "npm",
-            "args": ["install", "--no-color"]
-        },
-        {
-            "name": "project.install",
-            "type": "spawn",
-            "command": "grunt",
-            "args": ["install", "--no-color"]
-        },
-        {
             "name": "project.clean",
-            "type": "spawn",
-            "command": "grunt",
-            "args": ["clean", "--no-color"]
+            "type": "clean",
+            "src": ["target"]
         },
         {
             "name": "mobile.install",
@@ -135,7 +117,7 @@
     "tasks": [
         {
             "name": "init",
-            "plugins": ["npm.install", "init.copy",  "target.libraries"]
+            "plugins": ["init.copy", "libraries.build", "lib.copy"]
         },
         {
             "name": "scrap",
@@ -143,23 +125,19 @@
         },
         {
             "name": "inject",
-            "plugins": ["scrap-common", "scrap-sencha", "custom.plugin", "target.inject", "project.install"]
+            "plugins": ["scrap-common", "scrap-sencha", "custom.plugin", "target.inject"]
         },
         {
-            "name": "lib",
-            "plugins":["target.libraries"]
-        },
-        {
-            "name": "clean.lib",
-            "plugins":["target.libraries.clean"]
+            "name": "libs.build",
+            "plugins":["libraries.build"]
         },
         {
             "name": "install",
-            "plugins":["project.install"]
+            "plugins":["lib.copy"]
         },
         {
             "name": "clean",
-            "plugins": ["project.clean", "target.libraries.clean", "target.clean"]
+            "plugins": ["project.clean"]
         },
         {
             "name": "test",
