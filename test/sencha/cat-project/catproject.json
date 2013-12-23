@@ -93,7 +93,7 @@
         {
             "name": "project.wipe",
             "type": "clean",
-            "src": ["src", "lib", "*.log"]
+            "src": ["src", "lib", "*.log", "*.xml"]
         },
         {
             "name": "mobile.install",
@@ -137,7 +137,7 @@
         },
         {
             "name": "inject",
-            "plugins": ["scrap-common", "scrap-sencha", "custom.plugin", "target.inject"]
+            "plugins": ["scrap-common", "scrap-sencha", "custom.plugin", "target.inject", "project.minify"]
         },
         {
             "name": "libs.build",
