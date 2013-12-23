@@ -106,8 +106,10 @@ module.exports = function () {
                         if (item) {
                             try {
                                 match = __match(item, opt);
-                                if (match) {
+                                if (match  && match.length > 0) {
                                     lsrc = lsrc.concat(match);
+                                } else {
+                                    lsrc.push(item);
                                 }
 
                             } catch (e) {
@@ -121,8 +123,10 @@ module.exports = function () {
 
                     try {
                         match = __match(src, opt);
-                        if (match) {
+                        if (match && match.length > 0) {
                             lsrc = match;
+                        } else {
+                            lsrc = [src];
                         }
 
                     } catch (e) {
