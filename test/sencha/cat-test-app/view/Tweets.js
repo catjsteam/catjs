@@ -12,8 +12,15 @@
             label : 'Email',
             name  : 'email',
             id : 'emailId'
-        }); 
+        });
+
         /*
+        @[scrap
+            @@name sample
+            @@sample Custom Annotation
+        ]@
+
+
          @[scrap
              @@name catSenchaText
              @@context emailField
