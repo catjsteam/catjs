@@ -16,6 +16,7 @@ Next
 
 4) Make JSON validation for catproject.json
 
+5) Make CAT available as a module e.g. require("cat")
 
 
 
