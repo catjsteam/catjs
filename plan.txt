@@ -12,8 +12,9 @@ Next
     2.2) Behavior of other scraps
     2.3) TBD
 
-3) TBD
+3) Rename all .html files generated for the 'src' folder. Change it to .js files
 
+4) Make JSON validation for catproject.json
 
 
 
