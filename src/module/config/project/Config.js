@@ -159,10 +159,10 @@ var _typedas = require('typedas'),
             _mkEnvDir("target");
 
             // create lib source project's folder
-            _mkEnvDir("lib.source");
+            //_mkEnvDir("lib.source");
 
             // create lib target project's folder
-            _mkEnvDir("lib.target");
+            //_mkEnvDir("lib.target");
 
             // save all of the global evn info
             me.info["env"] = data.env;
