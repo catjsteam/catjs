@@ -17,19 +17,26 @@ module.exports = _basePlugin.ext(function () {
             return undefined;
         }
 
-        if (_fs.existsSync(src)) {
-            stats = _fs.lstatSync(src);
-            try {
-                if (stats.isDirectory()) {
-                    _fs.rmrfSync(src);
+        src = _utils.globmatch({src: src});
 
-                } else if (stats.isFile()) {
-                    _fs.unlinkSync(src);
+        if (src) {
+            src.forEach(function(item) {
 
+                if (item && _fs.existsSync(item)) {
+                    stats = _fs.lstatSync(item);
+                    try {
+                        if (stats.isDirectory()) {
+                            _fs.rmrfSync(item);
+
+                        } else if (stats.isFile()) {
+                            _fs.unlinkSync(item);
+
+                        }
+                    } catch(e) {
+                        _log.error("[CAT clean plugin] failed with errors: ", e)
+                    }
                 }
-            } catch(e) {
-                _log.error("[CAT clean plugin] failed with errors: ", e)
-            }
+            });
         }
     }
 
