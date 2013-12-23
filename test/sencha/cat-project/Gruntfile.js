@@ -44,27 +44,23 @@ module.exports = function (grunt) {
 
     logStreamHook(grunt);
 
+
+    /**
+     * TODO Refactor Needed - call cat by using its module require("cat")
+     */
+
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        cat: grunt.file.readJSON('catproject.json'),
-
-        clean: [
-            "*.log",
-            _logFileName
-        ]
+        cat: grunt.file.readJSON('catproject.json')
 
     });
 
-    // These plugins provide necessary tasks.
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-copy');
 
 
     grunt.registerTask('install', function () {
+
+        this.async();
         grunt.util.spawn({
             cmd: 'catcli', args: ['-isj'], opts: { stdio: [ process.stdin
                 , process.stout
@@ -77,6 +73,9 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('test', function () {
+
+        this.async();
+
         grunt.util.spawn({
             cmd: 'catcli', args: ['-t'], opts: { stdio: [ process.stdin
                 , process.stout
@@ -87,14 +86,62 @@ module.exports = function (grunt) {
         });
     });
 
+    grunt.registerTask('start', function () {
+
+        this.async();
+
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['--task', 'server.start'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        }, function() {
+
+        });
+
+    });
+
+    grunt.registerTask('stop', function () {
+
+        this.async();
+
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['--task', 'server.stop'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        }, function() {
+
+        });
+
+    });
+
     grunt.registerTask('clean', function () {
+
+        this.async();
+
         grunt.util.spawn({
             cmd: 'catcli', args: ['-c'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
         }, function() {
-            grunt.task.run('clean');
+
+        });
+
+    });
+
+    grunt.registerTask('wipe', function () {
+
+        this.async();
+
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['--task', 'wipe'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        }, function() {
+
         });
 
     });
