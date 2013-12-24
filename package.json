@@ -25,7 +25,6 @@
   },
   "scripts": {
     "preinstall": "node precatinstall.js",
-    "install": "node catinstall.js",
     "test": "node cattest.js"
   },
   "dependencies": {
