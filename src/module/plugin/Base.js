@@ -4,7 +4,8 @@ var _utils = catrequire("cat.utils"),
     _log = catrequire("cat.global").log(),
     _typedas = require("typedas"),
     _path = require("path"),
-    _minimatch = require("minimatch");
+    _minimatch = require("minimatch"),
+    _jsutilsobj = require("js.utils").Object;
 
 /**
  * Abstract Base plugin functionality
@@ -60,6 +61,48 @@ module.exports = function () {
 
         proto.getFilters = function () {
             return this.filters;
+        };
+
+        proto.validate = function(ref, data) {
+
+            var plugindata,
+                action;
+
+            if (ref) {
+                action = ref.action;
+                plugindata = ( (action && action.validate) ? action.validate() : undefined );
+
+                // validate runnable data with the plugin's data
+                if (plugindata && data) {
+                    if (("dependencies" in plugindata) && plugindata.dependencies) {
+                        if (!_typedas.isArray(plugindata.dependencies)) {
+                            _log.info("[CAT base plugin] returned property 'dependencies' of validate method should be of Array type");
+                        } else {
+                            if (("dependency" in data) ) {
+
+                                if (_jsutilsobj.contains(plugindata.dependencies, data.dependency)) {
+
+                                    // todo in case of other validation types collect the boolean values accordingly
+                                    return true;
+
+                                } else {
+
+                                    _log.warning("[CAT base plugin] The current running dependency is: " + data.dependency +
+                                        " that is not supported for the plugin named: " + ref.name +
+                                        " that supports the following: " + plugindata.dependencies
+                                    );
+                                    return false;
+                                }
+
+                            }
+                        }
+                    }
+                }
+            } else {
+                _log.info("[CAT base plugin] No plugin validation has implemented.")
+            }
+
+            return true;
         };
 
         /**
@@ -145,6 +188,9 @@ module.exports = function () {
         ext: function (fn) {
             if (fn) {
                 _base(fn.prototype);
+                fn.validate = fn.prototype.validate;
+
+
             }
             return fn;
         }

@@ -45,8 +45,13 @@ module.exports = function (config) {
              *
              * @param internalConfig The CAT internal configuration
              */
-            this.apply = function(internalConfig) {
-                var target = (me.type || me.name);
+            this.apply = function(config) {
+                var target = (me.type || me.name),
+                    internalConfig = config.internalConfig,
+                    bol = true;
+
+                // actually the running dependency
+                me.dependencyTarget = config.dependency;
 
                 _log.info("[CAT] running target: " + target);
 
@@ -56,14 +61,25 @@ module.exports = function (config) {
                     try {
                         me.ref = catconfig.pluginLookup(target);
                         if (me.ref) {
+
                             me.action = new me.ref();
+
+                            if (me.ref.validate) {
+                                bol = me.ref.validate(me, config);
+                                if (!bol) {
+                                    _log.warning("[CAT Action] plugin validation failed, the plugin might not function as expected ");
+                                }
+                            }
                         }
                         if (me.action) {
-                            // Action initialization
+                            // todo call dataInit
+                            // todo impl the dependencyTarget validation within the plugins; Give an array of supported
+
+                           // Action initialization
                             me.action.init({data: me, emitter: emitter, global: global, internalConfig: internalConfig});
                         }
                     } catch (e) {
-                        _log.error("[Action] action type not found or failed to load module ", e);
+                        _log.error("[CAT Action] action type not found or failed to load module ", e);
                     }
                 }
 
@@ -83,7 +99,7 @@ module.exports = function (config) {
 
 
         } else {
-            _log.warning("[Action] No valid data configuration");
+            _log.warning("[CAT Action] No valid data configuration");
         }
     }
 

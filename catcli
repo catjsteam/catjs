@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
 'use strict';
-
+console.log("[CAT] CAT NPM loction: " + __dirname)
 require("./src/module/CATCli.js").init(__dirname);

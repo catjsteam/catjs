@@ -5,10 +5,40 @@ var _catglobal = catrequire("cat.global"),
     _basePlugin = catrequire("cat.plugin.base"),
     _utils = catrequire("cat.utils"),
     _fs = require("fs.extra"),
-    _regexputils = catrequire("cat.regexp.utils"),
     _typedas = require("typedas");
 
 module.exports = _basePlugin.ext(function () {
+
+    function _rm(src) {
+
+        var stats;
+
+        if (!src) {
+            return undefined;
+        }
+
+        src = _utils.globmatch({src: src});
+
+        if (src) {
+            src.forEach(function(item) {
+
+                if (item && _fs.existsSync(item)) {
+                    stats = _fs.lstatSync(item);
+                    try {
+                        if (stats.isDirectory()) {
+                            _fs.rmrfSync(item);
+
+                        } else if (stats.isFile()) {
+                            _fs.unlinkSync(item);
+
+                        }
+                    } catch(e) {
+                        _log.error("[CAT clean plugin] failed with errors: ", e)
+                    }
+                }
+            });
+        }
+    }
 
     var _emitter,
         _global,
@@ -30,7 +60,7 @@ module.exports = _basePlugin.ext(function () {
          */
         init: function (config) {
 
-            var pattern, flags, files, replace, applyto,
+            var src,
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"];
 
@@ -51,49 +81,30 @@ module.exports = _basePlugin.ext(function () {
 
             if (config && extensionParams) {
 
-                files = extensionParams.files;
-                pattern = extensionParams.pattern;
-                replace = extensionParams.replace;
-                flags = extensionParams.flags;
-                // optional types : [filename / content]
-                applyto = extensionParams.applyto;
+                src = ("src" in extensionParams && extensionParams.src);
 
-                if (!applyto) {
-                    applyto = ["content"];
+                if (src) {
+                    if (_typedas.isArray(src)) {
+                        src.forEach(function(item) {
+                           _rm(item);
+                        });
+
+                    } else if(_typedas.isString(src)) {
+                        _rm(src)
+
+                    } else {
+                        _log.error("[CAT clean plugin] 'src' was found but not valid");
+                    }
+
+                } else {
+                    _log.error("[CAT clean plugin] 'src' property is required ");
                 }
-                if (files) {
-                    files.forEach(function(file) {
-                        var content,
-                            fileName;
 
-                        if (_fs.existsSync(file)) {
+                // done processing notification for the next task to take place
+                _emitter.emit("job.done", {status: "done"});
 
-                            content = _fs.readFileSync(file, "utf8");
-                            if (_utils.contains(applyto, "content")) {
-                                if (content) {
-                                    content = _regexputils.replace(content, pattern, replace, flags);
-                                }
-                            }
-
-                            // save backup
-                            _fs.renameSync(file, [file, ".catreplace"].join(""));
-
-                            fileName = _path.basename(file);
-                            if (_utils.contains(applyto, "filename")) {
-                                fileName = _path.basename(file);
-                                fileName = _regexputils.replace(fileName, pattern, replace, flags);
-                            }
-                            _fs.writeFileSync(_path.join(_path.dirname(file), fileName), content);
-
-                        }
-
-                    });
-                }
             }
-            // done processing notification for the next task to take place
-            _emitter.emit("job.done", {status: "done"});
         },
-
         /**
          * Validate the plugin
          *

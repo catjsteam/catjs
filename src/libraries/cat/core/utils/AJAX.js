@@ -61,7 +61,7 @@ _cat.utils.AJAX = function () {
                     _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
-                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         // _cat.core.log("completed\n" + xmlhttp.responseText);
                         if ("callback" in config && config.callback) {
                             config.callback.call(xmlhttp);
@@ -79,6 +79,6 @@ _cat.utils.AJAX = function () {
             xmlhttp.send();
         }
 
-    }
+    };
 
 }();

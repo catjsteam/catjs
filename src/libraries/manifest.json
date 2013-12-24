@@ -1,13 +1,49 @@
 {
     "mode": "dev",
+    "out": {
+        "name": "cat",
+        "folder": "lib"
+    },
     "libraries": [
         {
             "name": "cat",
             "address": "local",
             "base": "target",
-            "prod" :["cat.core.test.min.js","cat.core.test.min.css", "catconfig.json"],
-            "dev" :["cat.core.test.js", "cat.core.test.css", "catconfig.json"],
-            "parse": ["catconfig.json"],
+            "prod" :[
+                {
+                    "name": "cat.core.test.min.js",
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
+                    "type": "js"
+                },
+                {
+                    "name": "cat.core.test.min.css",
+                    "src": ["css/*.css"],
+                    "type": "css"
+                },
+                {
+                    "name": "cat.core.catconfig.json",
+                    "src": ["config/catconfig.json"],
+                    "type": "json"
+                }
+            ],
+            "dev" :[
+                {
+                    "name":"cat.core.test.js",
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
+                    "type": "js"
+                },
+                {
+                    "name": "cat.core.test.css",
+                    "src": ["css/*.css"],
+                    "type": "css"
+                },
+                {
+                    "name": "cat.core.catconfig.json",
+                    "src": ["config/catconfig.json"],
+                    "type": "json",
+                    "parse": true
+                }
+            ],
             "static-names": ["catconfig.json"],
             "install" : "internal"
         },
@@ -31,12 +67,6 @@
             "name": "chai",
             "prod" :["chai.js"],
             "dev" :["chai.js"],
-            "install": "static"
-        },
-        {
-            "name": "sencha",
-            "prod" :["sencha.js"],
-            "dev" :["sencha.js"],
             "install": "static"
         }
     ]

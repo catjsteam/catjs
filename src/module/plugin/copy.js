@@ -179,7 +179,7 @@ module.exports = _basePlugin.ext(function () {
                 if (_global) {
                     _targetFolderName = _global.name;
 
-                    _to = _me.getTo() + _targetFolderName;
+                    _to = _me.getTo();
                     _utils.mkdirSync(_to);
                 }
             }
@@ -231,6 +231,17 @@ module.exports = _basePlugin.ext(function () {
 
         getType: function () {
             return "copy";
+        },
+
+        /**
+         * Validate the plugin
+         *
+         *      dependencies {Array} The array of the supported dependencies types
+         *
+         * @returns {{dependencies: Array}}
+         */
+        validate: function() {
+            return { dependencies: ["scan"]}
         }
     };
 

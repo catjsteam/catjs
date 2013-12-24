@@ -12,8 +12,15 @@
             label : 'Email',
             name  : 'email',
             id : 'emailId'
-        }); 
+        });
+
         /*
+        @[scrap
+            @@name sample
+            @@sample Custom Annotation
+        ]@
+
+
          @[scrap
              @@name catSenchaText
              @@context emailField
@@ -47,18 +54,18 @@
 
         /*
          @[scrap
-         @@name catMockTest
-         @@context testFunction
-         @@mock equal(testFunction(tests_db.testname), "please fail", "test success", "test fail");
+             @@name catMockTest
+             @@context testFunction
+             @@mock equal(testFunction(tests_db.testname), "please fail", "test success", "test fail");
          ]@
          */
 
 
         /*
          @[scrap
-         @@name catMockSet
-         @@context checkTextRan
-         @@mock set(checkTextRan.name, "I changed the test msg");
+             @@name catMockSet
+             @@context checkTextRan
+             @@mock set(checkTextRan.name, "I changed the test msg");
          ]@
          */
 

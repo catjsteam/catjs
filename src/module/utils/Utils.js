@@ -4,7 +4,8 @@ var _ = require("underscore"),
     _global = catrequire("cat.global"),
     _log = _global.log(),
     _props = catrequire("cat.props"),
-    _os = require("os");
+    _os = require("os"),
+    _globmatch = require("glob");
 
 module.exports = function () {
 
@@ -81,6 +82,65 @@ module.exports = function () {
 
         copySync: _copySync,
 
+        globmatch: function(config) {
+
+            var lsrc, match,
+                src = config.src,
+                opt = ("opt" in config ? config.opt : {});
+
+            function __match(item, opt) {
+                var match = _globmatch.sync(item, opt);
+                if (!match) {
+                    console.warn("[CAT libraries install] Failed match path: ", item, " , skip");
+                }
+
+                return match;
+            }
+
+            if (src) {
+                if (_typedas.isArray(src)) {
+                    lsrc = [];
+                    src.forEach(function (item) {
+                        var match;
+
+                        if (item) {
+                            try {
+                                match = __match(item, opt);
+                                if (match  && match.length > 0) {
+                                    lsrc = lsrc.concat(match);
+                                } else {
+                                    lsrc.push(item);
+                                }
+
+                            } catch (e) {
+                                console.warn("[CAT libraries install] Failed to resolve path: ", item, "with errors: ", e);
+                                lsrc.push(item);
+                            }
+                        }
+                    });
+
+                } else if (_typedas.isString(src)) {
+
+                    try {
+                        match = __match(src, opt);
+                        if (match && match.length > 0) {
+                            lsrc = match;
+                        } else {
+                            lsrc = [src];
+                        }
+
+                    } catch (e) {
+                        console.warn(" Failed to resolve path: ", src, "with errors: ", e);
+                        lsrc = src;
+                    }
+                }
+            }
+
+            return lsrc;
+
+
+        },
+
         deleteSync: function (dir) {
             if (dir) {
                 if (_fs.existsSync(dir)) {
@@ -114,6 +174,9 @@ module.exports = function () {
 
         error: function (msg) {
             _log.error(msg);
+            if (console) {
+                console.error(msg);
+            }
             throw msg;
         },
 

@@ -17,6 +17,10 @@ function _processIt(command, args, opt, callback) {
         }
         process = childProcess.spawn(command, args, opt);
 
+        process.stderr.on('data', function (err) {
+            console.log('child process exited with errors, ' + err);
+        });
+
         process.on('close', function (code) {
             if (code !== 0) {
                 console.log('child process exited with code ' + code);
@@ -56,7 +60,7 @@ function _getProxyURL() {
     var host  = settingConfig.proxy.base.host,
         port  = settingConfig.proxy.base.port;
 
-    return (_isProxy() ? ["http://", host, ":", port].join("") : undefined);
+    return (_isProxy() ? ['"',"http://", host, ":", port, '"'].join("") : undefined);
 }
 
 settingConfig = require('fs').readFileSync("settings.json");
@@ -84,15 +88,22 @@ if (!settingFailed) {
 
     if (_isProxy()) {
         _processIt("npm", ["config", "set", "proxy", _getProxyURL()], undefined, function() {
-            _processIt("npm", ["config", "set", "HTTPS_PROXY", _getProxyURL()], undefined, function() {
-                _process();
+            _processIt("npm", ["config", "set", "https-proxy", _getProxyURL()], undefined, function() {
+                _processIt("git", ["config", "http.proxy", _getProxyURL()], undefined, function() {
+                    _process();
+                });
             });
         });
+
     } else {
         _processIt("npm", ["config", "delete", "proxy"], undefined, function() {
-            _processIt("npm", ["config", "delete", "HTTPS_PROXY"], undefined, function() {
-                _process();
+            _processIt("npm", ["config", "delete", "https-proxy"], undefined, function() {
+                _processIt("git", ["config", "--unset", "http.proxy"], undefined, function() {
+                    _process();
+                });
             });
         });
+
+
     }
 }

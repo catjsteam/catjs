@@ -6,7 +6,7 @@ _cat.utils.chai = function () {
 
     function _isSupported() {
         _state = 1;
-        if (typeof chai != "undefined") {
+        if (typeof chai !== "undefined") {
             _chai = chai;
             assert = _chai.assert;
 
@@ -119,7 +119,7 @@ _cat.utils.chai = function () {
                     _sendTestResult(testdata);
 
                     if (!success) {
-                        throw new Error("[CAT] Test failed, exception: ", (fail || ""), ", " , e);
+                        throw new Error("[CAT] Test failed, exception: ", (fail || ""));
                     }
                 }
             }

@@ -19,31 +19,38 @@ var _fsconfig = require("./utils/fs/Config.js"),
     _loader = function (config) {
 
 
-        function _loadProject() {
-            try {
-                (new _fsconfig(path, function (data) {
-                    if (data) {
-                        try {
-                            _project = new _Config({data: data, emitter: emitter});
+        function _loadProject(callback) {
 
-                        } catch (e) {
-                            throw Error(e);
-                        }
-
-                    } else {
-                        _log.error(msg[1]);
-                    }
-                }));
-            } catch (e) {
-                _console.log("[Config] error occured, probably not valid cat project [catproject.json]: ");
+            if (!callback) {
+                _console.log("[CAT Project] Missing callback for the project loader ");
             }
 
+            try {
+                // Loading catproject.json file > data
+                (new _fsconfig(path, callback));
+            } catch (e) {
+                _console.log("[CAT Project] error occured, probably not valid cat project [catproject.json]: ");
+            }
         }
 
         var msg = ["[Project] config argument is not valid",
                 "[Project] Data is not valid, expecting data of type Array",
                 "[Project] Loading project: "],
-            path, emitter;
+            path, emitter,
+            callback = (config && ("callback" in config) ? config.callback : undefined),
+            baseCallback = function (data) {
+                if (data) {
+                    try {
+                        _project = new _Config({data: data, emitter: emitter});
+
+                    } catch (e) {
+                        throw Error(e);
+                    }
+
+                } else {
+                    _log.error(msg[1]);
+                }
+            };
 
         if (!config) {
             _log.error(msg[0]);
@@ -55,18 +62,19 @@ var _fsconfig = require("./utils/fs/Config.js"),
         emitter = config.emitter;
 
         if (path) {
-            path = [path, "catproject.json"].join("/");
-            path = _path.normalize(path);
+            path = _path.join(path, "catproject.json");
 
             // Load the project according to the given configuration
-            _loadProject();
+            _loadProject((callback || baseCallback));
         }
         return _project;
     };
 
 module.exports = function () {
 
-    return {
+    var _me;
+
+    _me = {
         load: _loader,
 
         getProject: function() {
@@ -77,13 +85,38 @@ module.exports = function () {
             return _project.getInfo(key);
         },
 
+        /**
+         *
+         * @param config
+         *      path {String} The path to load the project
+         *      data {String} The data to be updated
+         */
         update: function(config) {
-            if (_project) {
-                _project.update(config);
 
-            } else {
+            var callback = function(data) {
+                if (_project) {
+                    _project.update({data:data});
+                }
+            }, data, path;
 
+            if (config) {
+                data = ("data" in config && config.data ? config.data : undefined);
+                path = ("path" in config && config.path ? config.path : undefined);
             }
+
+            if (data) {
+                callback(data);
+            } else {
+                if (callback && path) {
+                    _me.load({
+                        callback: callback,
+                        path: path
+                    });
+                }
+            }
+
         }
     };
+
+    return _me;
 }();
