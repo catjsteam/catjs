@@ -1,5 +1,5 @@
 {
-    "name": "test-1",
+    "name": "sencha-test",
 
     "env": {
         "source": "src/",
@@ -52,7 +52,7 @@
                 "path": "/"
             },
             "to": {
-                "path": "./target/test-1"
+                "path": "./target/sencha-test"
             },
             "filters": [
                 {
@@ -71,13 +71,13 @@
                 "path": "/"
             },
             "to": {
-                "path": "./target/test-1/"
+                "path": "./target/sencha-test/"
             }
         },
         {
             "name": "project.minify",
             "type": "minify",
-            "path": "./target/test-1/",
+            "path": "./target/sencha-test/",
             "filename": "cat.src.js",
             "src":["./src/**/*.js"]
         },
