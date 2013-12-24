@@ -1,18 +1,18 @@
 {
-  "name": "grunt-plugin",
-  "description": "The best Grunt plugin ever.",
-  "version": "0.1.0",
-  "homepage": "https://github.com/arik/grunt-plugin",
+  "name": "CAT",
+  "description": "CAT Testing Framework",
+  "version": "0.0.1",
+  "homepage": "TBD",
   "author": {
     "name": "arik",
-    "email": "lewin.arik@gmail.com"
+    "email": "arik.levine@hp.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/arik/grunt-plugin.git"
+    "url": "git://github.com/TBD"
   },
   "bugs": {
-    "url": "https://github.com/arik/grunt-plugin/issues"
+    "url": "TBD"
   },
   "licenses": [
     {
@@ -20,12 +20,8 @@
       "url": "https://github.com/arik/grunt-plugin/blob/master/LICENSE-MIT"
     }
   ],
-  "main": "Gruntfile.js",
   "engines": {
     "node": ">= 0.8.0"
-  },
-  "config": {
-    "unsafe-perm": true
   },
   "scripts": {
     "preinstall": "node precatinstall.js",
@@ -33,7 +29,6 @@
     "test": "node cattest.js"
   },
   "dependencies": {
-    "grunt": "~0.4.1",
     "fs.extra": "~1.2.1",
     "typedas": "~1.0.0",
     "log": "~1.4.0",
@@ -62,20 +57,13 @@
     "require-mapper": "0.0.2",
     "glob": "~3.2.7"
   },
-  "peerDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.2",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-clean": "~0.4.0",
-    "grunt-contrib-nodeunit": "~0.1.2"
-  },
   "keywords": [
     "test",
     "cat",
     "catcli",
     "annotation",
     "app",
-    "mobile"
+    "mobile",
+    "hytml5"
   ]
 }
