@@ -44,92 +44,23 @@ module.exports = function (grunt) {
 
     logStreamHook(grunt);
 
+
+    /**
+     * TODO Refactor Needed - call cat by using its module require("cat")
+     */
+
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        cat: grunt.file.readJSON('catproject.json'),
-
-        banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-            '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-            '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-            '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-            ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
-
-        jshint: {
-            all: [
-                '<%=cat.env.source%><%= cat.name %>/**/*.js'
-            ],
-            options: {
-                "strict": false,
-                "curly": true,
-                "eqeqeq": true,
-                "immed": false,
-                "latedef": true,
-                "newcap": false,
-                "noarg": true,
-                "sub": true,
-                "undef": true,
-                "boss": true,
-                "eqnull": true,
-                "node": true,
-                "es5": true,
-                globals: {
-                    _extjs : true,
-                    _cat: true,
-                    assert: true
-                }
-            }
-        },
-
-        concat: {
-            options: {
-                banner: '<%= banner %>',
-                stripBanners: true
-            },
-            dist: {
-                src: ['<%= cat.env.lib.target %><%= cat.env.lib.name %>.js', './<%=cat.env.source%>/**/*.*'],
-                dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.debug.js'
-            }
-        },
-        uglify: {
-            dist: {
-                src: ['<%= cat.env.lib.target %><%= cat.env.lib.name %>.debug.js'],
-                dest: '<%= cat.env.lib.target %><%= cat.env.lib.name %>.min.js'
-            }
-        },
-        copy: {
-            main: {
-                src:'<%= cat.env.lib.target %><%= cat.env.lib.name %>.debug.js',
-                dest:'<%= cat.env.lib.copyto %><%= cat.env.lib.name %>.debug.js'
-            },
-            css: {
-                src:'<%= cat.env.lib.target %><%= cat.env.lib.name %>.css',
-                dest:'<%= cat.env.lib.copyto %><%= cat.env.lib.name %>.debug.css'
-            },
-            config: {
-                src:'<%= cat.env.lib.target %>catconfig.json',
-                dest:'<%= cat.env.lib.copyto %>catconfig.json'
-            }
-        },
-        clean: ["*.log",
-            _logFileName
-        ]
+        cat: grunt.file.readJSON('catproject.json')
 
     });
 
-    // These plugins provide necessary tasks.
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-contrib-copy');
 
 
     grunt.registerTask('install', function () {
-        grunt.task.run(['concat', 'jshint', 'uglify', 'copy']);
-    });
 
-    grunt.registerTask('cat.install', function () {
+        this.async();
         grunt.util.spawn({
             cmd: 'catcli', args: ['-isj'], opts: { stdio: [ process.stdin
                 , process.stout
@@ -137,11 +68,14 @@ module.exports = function (grunt) {
             ]}
         }, function () {
 
-            grunt.task.run('install');
+
         });
     });
 
-    grunt.registerTask('cat.test', function () {
+    grunt.registerTask('test', function () {
+
+        this.async();
+
         grunt.util.spawn({
             cmd: 'catcli', args: ['-t'], opts: { stdio: [ process.stdin
                 , process.stout
@@ -152,14 +86,62 @@ module.exports = function (grunt) {
         });
     });
 
-    grunt.registerTask('cat.clean', function () {
+    grunt.registerTask('start', function () {
+
+        this.async();
+
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['--task', 'server.start'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        }, function() {
+
+        });
+
+    });
+
+    grunt.registerTask('stop', function () {
+
+        this.async();
+
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['--task', 'server.stop'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        }, function() {
+
+        });
+
+    });
+
+    grunt.registerTask('clean', function () {
+
+        this.async();
+
         grunt.util.spawn({
             cmd: 'catcli', args: ['-c'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
         }, function() {
-            grunt.task.run('clean');
+
+        });
+
+    });
+
+    grunt.registerTask('wipe', function () {
+
+        this.async();
+
+        grunt.util.spawn({
+            cmd: 'catcli', args: ['--task', 'wipe'], opts: { stdio: [ process.stdin
+                , process.stout
+                , process.stderr
+            ]}
+        }, function() {
+
         });
 
     });
