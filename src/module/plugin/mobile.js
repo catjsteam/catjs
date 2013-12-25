@@ -6,7 +6,8 @@ var _catglobal = catrequire("cat.global"),
     _utils = catrequire("cat.utils"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
-    _spawn = catrequire("cat.plugin.spawn");
+    _spawn = catrequire("cat.plugin.spawn"),
+    _myip = require("my-ip");
 
 module.exports = _basePlugin.ext(function () {
 
@@ -35,7 +36,7 @@ module.exports = _basePlugin.ext(function () {
                             if (!pkg) {
                                 pkg = defaults.pkg;
                             }
-                            return ["shell", "am", "start",  "-e", "IP", ip, "-n", pkg];
+                            return ["shell", "am", "start",  "-e", "IP", ip, "-e", "PORT", port, "-n", pkg];
                         }
                     },
                     "install" : {
@@ -57,6 +58,7 @@ module.exports = _basePlugin.ext(function () {
         (function() {
 
             me.host = config.host;
+            me.port = config.port;
             me.pkg = config.pkg;
             me.app = config.app;
 
@@ -65,8 +67,15 @@ module.exports = _basePlugin.ext(function () {
                 return undefined;
 
             } else if (me.host === "localhost") {
-                _utils.log("error", "[CAT mobile plugin] No valid IP was found. I cannot use localhost, please set the actual IP no.");
-                return undefined;
+                // try resolving the ip
+                me.ip = _myip();
+
+                if (!me.ip) {
+                    _utils.log("error", "[CAT mobile plugin] I cannot use localhost, please configure your ip (see catproject.json)");
+                    return undefined;
+                } else {
+                    _utils.log("warning", "[CAT mobile plugin] I cannot use localhost but your ip was resolved: '" + me.ip + "' I'll try using it...");
+                }
 
             }
         })();
@@ -91,6 +100,7 @@ module.exports = _basePlugin.ext(function () {
                 command: action.command,
                 args: action.args({
                     host: this.host,
+                    port: this.port,
                     pkg: this.pkg,
                     app: this.app
                 })
@@ -115,11 +125,10 @@ module.exports = _basePlugin.ext(function () {
                 errors = ["[libraries plugin] No valid configuration"],
                 device,
                 devices,
-                host, pkg, app,
+                host, port, pkg, app,
                 action,
                 commands,
-                process,
-                command, args;
+                process;
 
             if (!config) {
                 _log.error(errors[1]);
@@ -147,6 +156,7 @@ module.exports = _basePlugin.ext(function () {
                 }
 
                 host = ("host" in extensionParams ? extensionParams.host : undefined);
+                port = ("port" in extensionParams ? extensionParams.port : undefined);
                 pkg = ("pkg" in extensionParams ? extensionParams.pkg : undefined);
                 app = ("app" in extensionParams ? extensionParams.app : undefined);
 
@@ -156,6 +166,7 @@ module.exports = _basePlugin.ext(function () {
 
                 devices = new Devices({
                     host: host,
+                    port: port,
                     pkg: pkg,
                     app: app
                 });
