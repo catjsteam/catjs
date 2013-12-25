@@ -272,24 +272,13 @@ module.exports = _basePlugin.ext(function () {
                                                 src = _utils.globmatch({src: src});
 
                                                 src.forEach(function(item) {
-                                                    var content,
-                                                        lcontent;
+                                                    var content;
 
                                                     if (item) {
                                                         content = _fs.readFileSync(item, "utf8");
                                                         if (content) {
-                                                            // parse content..
-                                                            if (parse) {
-                                                                lcontent = _jsutils.Template.template({
-                                                                    content: content,
-                                                                    data: {
-                                                                        project: project
-                                                                    }
-                                                                });
-                                                            }
-
                                                             funcs._baseCopy({
-                                                                content: lcontent,
+                                                                content: content,
                                                                 name: name,
                                                                 path: path
                                                             });
@@ -461,7 +450,9 @@ module.exports = _basePlugin.ext(function () {
                     concatsByType.forEach(function(concatItem) {
                         var contentValue,
                             catProjectLibTarget,
-                            filename, staticname;
+                            filename, staticname,
+                            // todo reflect the parse flag from the meta data file
+                            parse = true;
 
                         if (concatItem) {
                             if (concatItem.value.length > 0) {
@@ -473,6 +464,17 @@ module.exports = _basePlugin.ext(function () {
                                 // set the static name if found or else generate the name according to the project env
                                 filename = (staticname ? staticname : [catProjectLibName, ".", concatItem.key].join(""));
 
+                                if (concatItem.key === "json") {
+                                    // parse content..
+                                    if (parse) {
+                                        contentValue = _jsutils.Template.template({
+                                            content: contentValue,
+                                            data: {
+                                                project: project
+                                            }
+                                        });
+                                    }
+                                }
                                 _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue)
                             }
                         }
