@@ -1,0 +1,182 @@
+{
+    "name": "{{name}}",
+
+    "env": {
+        "source": "{{source-folder}}/",
+        "target": "{{target-folder}}/",
+        "host": "{{host}}"
+    },
+
+    "plugins": [
+        {
+            "name": "init.scrap",
+            "type": "scrap",
+            "dependency": "scan",
+            "filters": [
+                {
+                    "type": "file",
+                    "ext": ["*"],
+                    "exclude": true
+                },
+                {
+                    "type": "file",
+                    "ext": [".js", ".html"],
+                    "exclude": false
+                },
+                {
+                    "type": "file",
+                    "ext": [".js"],
+                    "pattern": ["cat"],
+                    "exclude": true
+                }
+            ]
+        },
+        {
+            "name": "libraries.build",
+            "type": "libraries",
+            "dependency": "manager",
+            "imports": ["chai", "tmr", "cat"],
+            "action": "build"
+        },
+        {
+            "name": "init.copy",
+            "type": "copy",
+            "dependency": "scan",
+            "path": "./../cat-test-app",
+            "from": {
+                "path": "/"
+            },
+            "to": {
+                "path": "./{{target-folder}}/{{name}}"
+            }
+        },
+        {
+            "name": "lib.copy",
+            "type": "copy",
+            "dependency": "scan",
+            "path": "./lib",
+            "from": {
+                "path": "/"
+            },
+            "to": {
+                "path": "./{{target-folder}}/{{name}}/"
+            }
+        },
+        {
+            "name": "project.minify",
+            "type": "minify",
+            "path": "./{{target-folder}}/{{name}}/",
+            "filename": "cat.src.js",
+            "src":["./{{source-folder}}/**/*.js"]
+        },
+        {
+            "name": "project.clean",
+            "type": "clean",
+            "src": ["{{target-folder}}", "_cat_md.json"]
+        },
+        {
+            "name": "mobile.install",
+            "type": "spawn",
+            "command": "adb",
+            "args": ["install", "-r", "phonegap.apk"]
+        },
+        {
+            "name": "mobile.test",
+            "type": "spawn",
+            "command": "adb",
+            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.116", "-n", "com.hp.aamobile.cat/.example"]
+        },
+        {
+            "name": "project.phantomjs",
+            "type": "phantomjs",
+            "file": "phantomjs-script.js",
+            "host": "http://localhost:8087"
+        },
+        {
+            "name": "project.webserver.start",
+            "type": "webserver",
+            "action": "start",
+            "port": "8087",
+            "set": [{"key": "assert", "var": "assert", "prop":"result"}]
+        },
+        {
+            "name": "project.webserver.stop",
+            "type": "webserver",
+            "action": "stop"
+        },
+        {
+            "name": "parse.test",
+            "type": "fileparse",
+            "dependency": "manager",
+            "files": ["./{{target-folder}}/{{name}}/index.html"],
+            "pattern": "{{replace test}}",
+            "replace": "{{replaced}}",
+            "flags": "g"
+        }
+    ],
+
+    "tasks": [
+        {
+            "name": "init",
+            "plugins": ["init.copy", "libraries.build", "lib.copy"]
+        },
+        {
+            "name": "scrap",
+            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "init.scrap"]
+        },
+        {
+            "name": "inject",
+            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "target.inject", "project.minify"]
+        },
+        {
+            "name": "libs.build",
+            "plugins":["libraries.build"]
+        },
+        {
+            "name": "install",
+            "plugins":["lib.copy"]
+        },
+        {
+            "name": "clean",
+            "plugins": ["project.clean"]
+        },
+        {
+            "name": "wipe",
+            "plugins": ["project.clean", "project.wipe"]
+        },
+        {
+            "name": "minify",
+            "plugins": ["project.minify"]
+        },
+        {
+            "name": "test",
+            "plugins": ["project.webserver.start", "project.phantomjs", "project.webserver.stop"]
+        },
+        {
+            "name": "ptest",
+            "plugins": ["parse.test"]
+        },
+        {
+            "name": "mtest",
+            "plugins": ["mobile.install",  "mobile.test"]
+        },
+        {
+            "name": "phantom",
+            "plugins": ["project.phantomjs"]
+        },
+        {
+            "name": "server.start",
+            "plugins": ["project.webserver.start"]
+        },
+        {
+            "name": "server.stop",
+            "plugins": ["project.webserver.stop"]
+        },
+        {
+            "name": "sample",
+            "plugins": ["sample.plugin"]
+        }
+    ]
+
+
+}

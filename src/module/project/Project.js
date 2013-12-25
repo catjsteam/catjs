@@ -1,4 +1,4 @@
-var _fsconfig = require("./utils/fs/Config.js"),
+var _fsconfig = require("./../utils/fs/Config.js"),
     _Config = catrequire("cat.common.config"),
     _global = catrequire("cat.global"),
     _utils = catrequire("cat.utils"),
@@ -6,7 +6,7 @@ var _fsconfig = require("./utils/fs/Config.js"),
     _fs = require("fs.extra"),
     _log = _global.log(),
     _path = require("path"),
-    _console = require("./Console"),
+    _console = require("./../Console"),
     _project,
 
     /**
