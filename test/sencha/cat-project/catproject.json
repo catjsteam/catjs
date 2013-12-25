@@ -105,7 +105,7 @@
             "name": "mobile.test",
             "type": "spawn",
             "command": "adb",
-            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.103", "-n", "com.hp.aamobile.cat/.example"]
+            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.103", "-e", "PORT", "8089", "-n", "com.hp.aamobile.cat/.example"]
         },
         {
             "name": "mobile",

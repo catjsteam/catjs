@@ -95,7 +95,7 @@
             "name": "mobile.test",
             "type": "spawn",
             "command": "adb",
-            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.116", "-n", "com.hp.aamobile.cat/.example"]
+            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.116", "-e", "PORT", "8087", "-n", "com.hp.aamobile.cat/.example"]
         },
         {
             "name": "project.phantomjs",
