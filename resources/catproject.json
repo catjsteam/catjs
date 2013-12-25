@@ -25,6 +25,10 @@
             "dependency": "manager",
             "imports": ["cat"],
             "action": "clean"
+        },
+        {
+            "name": "target.inject",
+            "type": "inject"
         }
      ],
 
