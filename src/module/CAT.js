@@ -159,6 +159,7 @@ var CAT = function () {
 
             // TODO messages should be taken from resource
             var grunt, args, path, watch = false, kill = 0,
+                initProject,
                 msg = ["[CAT] Project failed to load, No valid argument path was found"];
 
             /**
@@ -181,6 +182,7 @@ var CAT = function () {
 
                 kill = (config.kill || kill);
                 watch = (config.watch || watch);
+                initProject = config.init;
                 _targets = config.task;
                 grunt = config.grunt;
                 args = config;
@@ -229,6 +231,15 @@ var CAT = function () {
 
 
                 _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
+
+                if (initProject) {
+
+                    // create initial project
+                    console.log("[CAT init project] creating project: ", initProject);
+
+                    return undefined;
+                }
+
                 if (kill) {
                     _utils = catrequire("cat.utils");
 

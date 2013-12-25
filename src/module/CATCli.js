@@ -3,9 +3,11 @@ var _nopt = require("nopt"),
     _fs = require("fs"),
     _Mapper = require("require-mapper"),
     _mapper = new _Mapper();
+
 _parsed = _nopt({
     "kill": [String, Number],
     "task": [String, Array],
+    "init": [String, String],
     "watch": [Boolean, false],
     "project": [String, null]
 }, {
@@ -40,7 +42,7 @@ module.exports = function () {
                         "cat": "src/module/CAT.js",
                         "cat.flow": "src/module/Flow.js",
                         "cat.global": "src/module/CATGlob.js",
-                        "cat.project": "src/module/Project.js",
+                        "cat.project": "src/module/project/Project.js",
                         "cat.props": "src/module/Properties.js",
                         "cat.config.utils": "src/module/utils/fs/Config.js",
                         "cat.mdata": "src/module/utils/fs/MetaData.js",
