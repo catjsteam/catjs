@@ -1,5 +1,5 @@
 {
-    "type": "test-1",
+    "type": "{{project.name}}",
     "ip": null,
     "port": null
 }
