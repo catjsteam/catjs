@@ -54,14 +54,7 @@
             },
             "to": {
                 "path": "./target/enyo-test"
-            },
-            "filters": [
-                {
-                    "type": "file",
-                    "ext": [".txt"],
-                    "exclude": true
-                }
-            ]
+            }
         },
         {
             "name": "lib.copy",
@@ -95,7 +88,7 @@
         },
         {
             "name": "inject",
-            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "target.inject", "project.minify"]
+            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "project.inject", "project.minify"]
         }
     ]
 
