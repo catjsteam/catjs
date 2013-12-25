@@ -27,7 +27,7 @@
             "action": "clean"
         },
         {
-            "name": "target.inject",
+            "name": "project.inject",
             "type": "inject"
         },
         {
