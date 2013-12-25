@@ -110,10 +110,10 @@ module.exports = _basePlugin.ext(function () {
 
             if (config && extensionParams) {
 
-                src = ("src" in extensionParams && extensionParams.src);
-                name = ("filename" in extensionParams && extensionParams.filename);
-                path = (("path" in extensionParams && extensionParams.path) || ".");
-                mode = ( ("mode" in extensionParams && extensionParams.mode) || "dev");
+                src = ("src" in extensionParams ? extensionParams.src : undefined);
+                name = ("filename" in extensionParams ? extensionParams.filename : undefined);
+                path = (("path" in extensionParams ? extensionParams.path : undefined) || ".");
+                mode = ( ("mode" in extensionParams ? extensionParams.mode : undefined) || "dev");
 
                 if (src) {
 
