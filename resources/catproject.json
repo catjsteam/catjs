@@ -29,6 +29,44 @@
         {
             "name": "target.inject",
             "type": "inject"
+        },
+        {
+            "name": "project.clean",
+            "type": "clean",
+            "src": ["target", "_cat_md.json"]
+        },
+        {
+            "name": "project.wipe",
+            "type": "clean",
+            "src": ["src", "lib", "*.log", "*.xml"]
+        },
+        {
+            "name": "mobile.start",
+            "type": "mobile",
+            "device": "android",
+            "action": "start"
+        },
+        {
+            "name": "mobile.install",
+            "type": "mobile",
+            "device": "android",
+            "action": "install"
+        },
+        {
+            "name": "project.phantomjs",
+            "type": "phantomjs",
+            "file": "phantomjs-script.js"
+        },
+        {
+            "name": "project.webserver.start",
+            "type": "webserver",
+            "action": "start",
+            "set": [{"key": "assert", "var": "assert", "prop":"result"}]
+        },
+        {
+            "name": "project.webserver.stop",
+            "type": "webserver",
+            "action": "stop"
         }
      ],
 
@@ -40,6 +78,50 @@
         {
             "name": "libs.clean",
             "plugins":["libraries.clean"]
+        },
+        {
+            "name": "clean",
+            "plugins": ["project.clean"]
+        },
+        {
+            "name": "libs.build",
+            "plugins":["libraries.build"]
+        },
+        {
+            "name": "install",
+            "plugins":["lib.copy"]
+        },
+        {
+            "name": "wipe",
+            "plugins": ["project.clean", "project.wipe"]
+        },
+        {
+            "name": "minify",
+            "plugins": ["project.minify"]
+        },
+        {
+            "name": "test",
+            "plugins": ["project.webserver.start", "project.phantomjs", "project.webserver.stop"]
+        },
+        {
+            "name": "mtest",
+            "plugins": ["mobile.install", "project.webserver.start", "mobile.start"]
+        },
+        {
+            "name": "phantom",
+            "plugins": ["project.phantomjs"]
+        },
+        {
+            "name": "server.start",
+            "plugins": ["project.webserver.start"]
+        },
+        {
+            "name": "server.stop",
+            "plugins": ["project.webserver.stop"]
+        },
+        {
+            "name": "sample",
+            "plugins": ["sample.plugin"]
         }
     ]
 
