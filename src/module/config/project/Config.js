@@ -114,8 +114,6 @@ var _typedas = require('typedas'),
                 initModule("tasks");
                 initModule("extensions");
             }
-
-
         }
 
         /**
@@ -131,7 +129,7 @@ var _typedas = require('typedas'),
 
             function _mkEnvDir(prop) {
                 if (prop) {
-                    sourcePath = _utils.resolveObject(data.env, prop);
+                    sourcePath = _utils.resolveObject(data, prop);
                     sourcefolder = _path.normalize([workpath, sourcePath].join("/"));
                     if (sourcefolder) {
                         if (!_fs.existsSync(sourcefolder)) {
@@ -145,11 +143,14 @@ var _typedas = require('typedas'),
                 }
             }
 
-            // -- setting environment info
-            // setting env data
-            if (!data.env) {
-                _utils.error(_props.get("cat.error.config.missing").format("[CAT Config]", "env"));
 
+            function _setInfoData(props) {
+
+                props.forEach(function(prop) {
+                    if (prop) {
+                        me.info[prop] = data[prop];
+                    }
+                });
             }
 
             // create project's src folder
@@ -158,14 +159,9 @@ var _typedas = require('typedas'),
             // create target project's folder
             _mkEnvDir("target");
 
-            // create lib source project's folder
-            //_mkEnvDir("lib.source");
+            // set the info properties incoming from the cat's project
+            _setInfoData(["host", "port", "appserver"]);
 
-            // create lib target project's folder
-            //_mkEnvDir("lib.target");
-
-            // save all of the global evn info
-            me.info["env"] = data.env;
         }
 
         function _tasksSetup(entityData) {
