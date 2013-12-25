@@ -35,9 +35,8 @@ module.exports = function() {
          */
         start: function(config, callback) {
 
-            // TODO Path meaning? the uri?
             var path = config.path,
-                port = (config.port || "8089"),
+                port = (config.port || "80"),
                 set = config.set;
 
             var allowCrossDomain = function(req, res, next) {

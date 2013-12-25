@@ -32,7 +32,7 @@ module.exports = _basePlugin.ext(function () {
                         command: "adb",
                         args: function(config) {
                             var defaults = data.android.default,
-                                pkg = config.pkg, ip = config.host;
+                                pkg = config.pkg, ip = (config.ip || config.host), port = config.port;
                             if (!pkg) {
                                 pkg = defaults.pkg;
                             }
@@ -45,7 +45,7 @@ module.exports = _basePlugin.ext(function () {
                             var defaults = data.android.default,
                                 app = config.app;
                             if (!app) {
-                                app = defaults.pkg;
+                                app = defaults.app;
                             }
                             return ["install", "-r", app];
                         }
@@ -61,6 +61,7 @@ module.exports = _basePlugin.ext(function () {
             me.port = config.port;
             me.pkg = config.pkg;
             me.app = config.app;
+            me.ip;
 
             if (!me.host) {
                 _utils.log("error", "[CAT mobile plugin] No valid host was found");
@@ -74,15 +75,15 @@ module.exports = _basePlugin.ext(function () {
                     _utils.log("error", "[CAT mobile plugin] I cannot use localhost, please configure your ip (see catproject.json)");
                     return undefined;
                 } else {
-                    _utils.log("warning", "[CAT mobile plugin] I cannot use localhost but your ip was resolved: '" + me.ip + "' I'll try using it...");
+                    _log.info("warning", "[CAT mobile plugin] I cannot use localhost but your ip was resolved: '" + me.ip + "' I'll try using it...");
                 }
 
             }
         })();
 
 
-        this.get = function(config) {
-            var device = data[config.device],
+        this.get = function(args) {
+            var device = data[args.device],
                 actions, action;
 
             if (!device) {
@@ -90,7 +91,7 @@ module.exports = _basePlugin.ext(function () {
             }
 
             actions = device.actions;
-            action = actions[config.action];
+            action = actions[args.action];
             if (!action) {
                 _log.warning("[CAT mobile plugin] No support for this action: ", action);
                 return undefined;
@@ -99,6 +100,7 @@ module.exports = _basePlugin.ext(function () {
             return {
                 command: action.command,
                 args: action.args({
+                    ip: this.ip,
                     host: this.host,
                     port: this.port,
                     pkg: this.pkg,
@@ -155,14 +157,10 @@ module.exports = _basePlugin.ext(function () {
                     return undefined;
                 }
 
-                host = ("host" in extensionParams ? extensionParams.host : undefined);
-                port = ("port" in extensionParams ? extensionParams.port : undefined);
+                host = ("host" in extensionParams ? extensionParams.host : _project.getInfo("host"));
+                port = ("port" in extensionParams ? extensionParams.port : _project.getInfo("port"));
                 pkg = ("pkg" in extensionParams ? extensionParams.pkg : undefined);
                 app = ("app" in extensionParams ? extensionParams.app : undefined);
-
-                if (!host) {
-                    host = _project.getInfo("host");
-                }
 
                 devices = new Devices({
                     host: host,
@@ -179,10 +177,11 @@ module.exports = _basePlugin.ext(function () {
                 }
 
                 if (commands) {
+                    _log.info("[CAT mobile plugin] running command", (commands ? (commands.command + " " + commands.args.join(" ")) : " NA "));
+
                     process = _spawn().spawn({
                         command: commands.command,
                         args: commands.args,
-                        options: {},
                         emitter: _emitter
                     });
 

@@ -32,13 +32,19 @@ module.exports = _basePlugin.ext(function () {
                     phantomjs = config.phantomjs,
                     thiz = config.thiz,
                     basePath = _project.getTargetFolder(),
-                    file = _path.join(basePath, extensionParams.file);
+                    file = _path.join(basePath, extensionParams.file),
+                    address, host, port;
+
+                address = (extensionParams.host || extensionParams.address);
+                if (!address) {
+                    address = _project.getAddress();
+                }
 
                 try {
                     if (phantomjs) {
                         phantomjs.run.call(thiz, {
                             file: file,
-                            host: extensionParams.host
+                            host: address
 
                         }, function () {
                             _emitter.emit("job.done", {status: "done"});

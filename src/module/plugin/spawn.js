@@ -73,7 +73,7 @@ module.exports = _basePlugin.ext(function () {
                     });
 
                     chilsp.stderr.on('data', function (data) {
-                        _log.error('[spawn error] ' + data);
+                        _log.info('[spawn info] ' + data);
                     });
 
                     callback = function (code) {

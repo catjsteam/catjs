@@ -360,14 +360,47 @@ Config.prototype.getTargetFolder = function () {
 };
 
 Config.prototype.getInfo = function (key) {
-    if (!this.info[key]) {
-        _log.error(_props.get("cat.error.config.missing").format("[cat config]", key));
+    var resolve = _utils.resolveObject(this.info, key);
+    if (!resolve) {
+        _log.warning(_props.get("cat.error.config.missing").format("[cat config]", key));
     }
-    return this.info[key];
+    return resolve;
 };
 
 Config.prototype.setInfo = function (key, value) {
     return this.info[key] = value;
+};
+
+Config.prototype.getPort = function () {
+    var port = this.getInfo("appserver.port") || this.getInfo("port");
+    return (port || "8089");
+};
+
+Config.prototype.getHost = function () {
+    return this.getInfo("appserver.host") || this.getInfo("host");
+};
+
+Config.prototype.getProtocol = function () {
+    var protocol = this.getInfo("appserver.protocol") || this.getInfo("protocol");
+    return (protocol || "http://");
+};
+
+Config.prototype.getAddress = function () {
+
+    var host, port, protocol;
+
+    // try getting the app server info
+    host =  this.getHost();
+    port =  this.getPort();
+    protocol =  this.getProtocol();
+
+    if (!host || !port) {
+        _log.warning("[CAT project config] Missing configuration properties: 'host' and/or 'port' (see catproject.json)");
+        return undefined;
+    }
+
+    return [protocol, "://", host, ":", port].join("");
+
 };
 
 Config.prototype.update = function (config) {
