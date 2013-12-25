@@ -76,10 +76,6 @@
             "src":["./src/**/*.js"]
         },
         {
-            "name": "target.inject",
-            "type": "inject"
-        },
-        {
             "name": "project.clean",
             "type": "clean",
             "src": ["target", "_cat_md.json"]
