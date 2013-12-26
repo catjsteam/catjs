@@ -40,6 +40,8 @@ module.exports = function () {
                         "cat.config": "src/module/config/CATConfig.js",
 
                         "cat": "src/module/CAT.js",
+                        "cat.init": "src/module/project/init/init.js",
+
                         "cat.flow": "src/module/Flow.js",
                         "cat.global": "src/module/CATGlob.js",
                         "cat.project": "src/module/project/Project.js",

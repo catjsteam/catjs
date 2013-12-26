@@ -1,4 +1,6 @@
-var _flow;
+var _flow,
+    _prompt = require('prompt'),
+    _jsutils = require("js.utils");
 
 var CAT = function () {
 
@@ -210,9 +212,6 @@ var CAT = function () {
                     process.exit(1);
                 });
 
-                // flow logger initialization
-                _flow = catrequire("cat.flow");
-                _flow.init();
             }
 
             /**
@@ -223,21 +222,92 @@ var CAT = function () {
              */
             function _apply() {
 
-                var project, projectInternal,
+                var project,
                     pids,
+                    linit,
                     targets = _targets, counter,
                     wait = false,
-                    home = _global.get("home");
+                    home = _global.get("home"),
+                    schema,
+                    Schema =  function(args) {
+                        this.type = (args.type || "string");
+                        this.pattern = args.pattern;
+                        this.message = args.message;
+                        this.required = args.required;
+                        this.default = args.default;
+                        this.description  = args.description;
+                    };
 
 
                 _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
 
+
                 if (initProject) {
+                    linit = catrequire("cat.init");
+                    if (linit) {
 
-                    // create initial project
-                    console.log("[CAT init project] creating project: ", initProject);
+                        // user prompt section
+                        _prompt.start();
 
-                    return undefined;
+                        schema = {
+                            properties: {
+                                name: new Schema({
+                                    type: "string",
+                                    pattern: /^[a-zA-Z0-9\-]+$/,
+                                    message: 'Name must be only letters, numbers or dashes',
+                                    required: true,
+                                    description: "Enter the project name"
+                                }),
+                                appath: new Schema({
+                                    type: "string",
+                                    required: true,
+                                    description: "Enter your project application path"
+                                }),
+                                host: new Schema({
+                                    type: "string",
+                                    required: false,
+                                    default: "localhost",
+                                    description: "Enter CAT server's host name"
+                                }),
+                                port: new Schema({
+                                    type: "string",
+                                    required: false,
+                                    default: "8089",
+                                    description: "Enter CAT server's port"
+                                }),
+                                protocol: new Schema({
+                                    type: "string",
+                                    required: false,
+                                    default: "http",
+                                    description: "Enter CAT server's protocol"
+                                }),
+                                appserverhost: new Schema({
+                                    type: "string",
+                                    required: false,
+                                    default: "localhost",
+                                    description: "Enter your Application server's host name"
+                                }),
+                                appserverport: new Schema({
+                                    type: "string",
+                                    required: false,
+                                    default: "8089",
+                                    description: "Enter your Application server's port"
+                                }),
+                                appserverprotocol: new Schema({
+                                    type: "string",
+                                    required: false,
+                                    default: "http",
+                                    description: "Enter your Application server's protocol"
+                                })
+                            }
+                        };
+
+                        _prompt.get(schema, function (err, args) {
+                            args.projectname = initProject,
+                            linit.create(args);
+                        });
+
+                    }
                 }
 
                 if (kill) {
@@ -254,51 +324,56 @@ var CAT = function () {
                     }
                 }
 
+                if (_targets) {
 
-                if (path) {
+                    if (path) {
 
-                    if (watch) {
-                        _watch = catrequire("cat.watch");
-                        _watch.init();
-                    }
-                    // load CAT project
-                    project = _project.load({
-                        path: path,
-                        emitter: _emitter
-                    });
+                        // flow logger initialization
+                        _flow = catrequire("cat.flow");
+                        _flow.init();
 
-
-                    _project.update({
-                        path: (_path.join(home.path, "resources"))
-                    });
-
-                    if (project) {
-
-                        // apply project's tasks
-                        if (_targets) {
-
-                            // Load CAT internal configuration (resources/cat.json)
-                            _catconfigInternal = _catconfig.load({
-                                project: project,
-                                grunt: grunt,
-                                emitter: _emitter
-                            });
-
-                            if (!watch) {
-                                _counter = 0;
-                                _runme();
-                            }
-
+                        if (watch) {
+                            _watch = catrequire("cat.watch");
+                            _watch.init();
                         }
+                        // load CAT project
+                        project = _project.load({
+                            path: path,
+                            emitter: _emitter
+                        });
+
+
+                        _project.update({
+                            path: (_path.join(home.path, "resources"))
+                        });
+
+                        if (project) {
+
+                            // apply project's tasks
+                            if (_targets) {
+
+                                // Load CAT internal configuration (resources/cat.json)
+                                _catconfigInternal = _catconfig.load({
+                                    project: project,
+                                    grunt: grunt,
+                                    emitter: _emitter
+                                });
+
+                                if (!watch) {
+                                    _counter = 0;
+                                    _runme();
+                                }
+
+                            }
+                        }
+
+                    } else {
+
+                        _log.warning(msg[0]);
+                        throw msg[0];
+
                     }
-
-                } else {
-
-                    _log.warning(msg[0]);
-                    throw msg[0];
-
                 }
-
             }
 
             _init();

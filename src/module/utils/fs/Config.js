@@ -1,7 +1,8 @@
 var _fs = require('fs'),
     _log = catrequire("cat.global").log(),
     _utils = catrequire("cat.utils"),
-    _props = catrequire("cat.props");
+    _props = catrequire("cat.props"),
+    _jsonlint = require("json-lint");
 
 
 
@@ -27,11 +28,20 @@ module.exports = function () {
 
         var get = function (file, callback) {
             var me = this,
-                json;
+                json, jsonlint;
 
             try {
-                json = _fs.readFileSync(file);
+                json = _fs.readFileSync(file, "utf8");
                 if (callback) {
+
+                    jsonlint = _jsonlint( json, {} );
+                    if ( jsonlint.error ) {
+                        _utils.log("error", ["CAT project loader] catproject.json load with errors: \n ", jsonlint.error,
+                        " \n at line: ", jsonlint.line,
+                        " \n character: ", jsonlint.character,
+                        " \n "].join(""));
+                    }
+
                     json = JSON.parse(json);
                     callback.call(me, json);
                 }
