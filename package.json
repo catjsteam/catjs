@@ -55,7 +55,9 @@
     "js.utils": "~0.1.2",
     "require-mapper": "0.0.2",
     "glob": "~3.2.7",
-    "my-ip": "~1.1.0"
+    "my-ip": "~1.1.0",
+    "json-lint": "~0.1.0",
+    "prompt": "~0.2.12"
   },
   "keywords": [
     "test",
