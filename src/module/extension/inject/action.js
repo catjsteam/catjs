@@ -141,9 +141,26 @@ module.exports = _basePlugin.ext(function () {
                 var info = contentFunc.call(this, scraps, targetfile),
                     fileContent = info.output;
 
+                function _validateFileExt(file) {
+
+                    var path, ext, name;
+                    if (file) {
+                        name = _path.basename(file);
+                        ext = _path.extname(file);
+                        name = [name.split(".")[0], "js"].join(".");
+                        if (ext !== ".js") {
+                            path = _path.dirname(file);
+                            file = _path.join(path, name);
+                        }
+                    }
+
+                    return file;
+                }
+
                 if (fileContent) {
                     fileContent = _beautify(fileContent, { indent_size: 2 });
                     try {
+                        info.file = _validateFileExt(info.file);
                         _fs.writeFileSync(info.file, fileContent);
                         _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
                     } catch (e) {
@@ -173,9 +190,9 @@ module.exports = _basePlugin.ext(function () {
                     _utils.mkdirSync(targetfolder);
                 }
             }
-            if (_fs.existsSync(targetfile)) {
-                _log.debug(_props.get("cat.source.project.file.exists").format("[inject ext]", targetfile));
-            }
+//            if (_fs.existsSync(targetfile)) {
+//                _log.debug(_props.get("cat.source.project.file.exists").format("[inject ext]", targetfile));
+//            }
 
             // TODO filter scraps arrays according to its $type (js, html, etc)
 
@@ -186,7 +203,9 @@ module.exports = _basePlugin.ext(function () {
 
             // inject and generate proper content for JS files type
             _writeJSContentToFile(scraps, _generateCATFileInfo, targetfile);
-            _writeJSContentToFile(scraps, _generateUserFileInfo, targetfile);
+            if (!_fs.existsSync(targetfile)) {
+                _writeJSContentToFile(scraps, _generateUserFileInfo, targetfile);
+            }
 
             //_Scrap.apply({scraps: scraps});
 
