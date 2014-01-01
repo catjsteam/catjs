@@ -39,7 +39,7 @@ module.exports = function () {
             if (path.indexOf("/") === 0) {
                 path = path.substring(1);
             }
-            pkgName = (scrap ? [path.split("/").join("."), fileName, [scrap.get("name"), "cat"].join("$$")].join(".") : undefined);
+            pkgName = (scrap ? [path.split("/").join("."), fileName, scrap.get("name")].join(".") : undefined);
 
             return {
                 pkgName: pkgName,

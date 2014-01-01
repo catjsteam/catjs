@@ -53,6 +53,8 @@ module.exports = _basePlugin.ext(function () {
                         runat = scrap.get("run@");
                         pkgname = _extutils.getCATInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName;
                         scrap.set("pkgName", pkgname);
+
+                        pkgname = [pkgname, "cat"].join("$$");
                         scrapvar = ["{ scrap:", JSON.stringify(scrap.serialize()), "}"].join("");
 
                         if (runat) {
