@@ -79,6 +79,14 @@ module.exports = function() {
                 });
             }
 
+            // kill the server with get request
+            _server.get('/exit', function(req, res) {
+                res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+                res.send('{"exit": 1}');
+                process.exit(1);
+
+            });
+
             _server.listen(port, function() {
                 _log.info(_props.get("cat.ext.webserver.start").format("[webserver ext]"));
                 if (callback) {
