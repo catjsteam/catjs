@@ -448,6 +448,9 @@ module.exports = _basePlugin.ext(function () {
                         _inject(scraps, filename, function() {
                             counter++;
                             _apply(filesArr[counter]);
+
+                            // update the scrap data w/o running scrap apply
+                            _Scrap.apply({scraps: scraps, apply: false});
                         });
                     } else {
                         //  _Scrap.apply({scraps: scraps});

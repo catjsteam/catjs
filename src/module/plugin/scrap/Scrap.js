@@ -263,7 +263,9 @@ module.exports = function () {
             function _apply(scrap) {
 
                 if (scrap) {
-                    scrap.apply();
+                    if (isApply) {
+                        scrap.apply();
+                    }
 
                     fileName = scrap.get("file");
                     if (!metaData.files[fileName]) {
@@ -277,7 +279,8 @@ module.exports = function () {
             var metaData = {files: {}, project: {}},
                 fileName, scrap, scraps,
                 root, baseClonedProjectPath,
-                updateobj = {files: metaData.files, project: metaData.project};
+                updateobj = {files: metaData.files, project: metaData.project},
+                isApply = true;
 
             if (config) {
                 scraps = (config.scraps || _scraps);
