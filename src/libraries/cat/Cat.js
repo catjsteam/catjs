@@ -125,18 +125,21 @@ _cat.core = function () {
                 _managers[managerKey] = {};
                 _managers[managerKey].calls = [];
                 _managers[managerKey].behaviors = {};
+                _managers[managerKey].scrapsOrder = [];
             }
             _managers[managerKey].calls.push(pkgName);
         },
 
         setManagerBehavior: function (managerKey, key, value) {
             var item = _managers[managerKey].behaviors;
+
             if (item) {
                 if (!item[key.trim()]) {
                     item[key.trim()] = [];
                 }
                 item[key.trim()].push(value);
             }
+            _managers[managerKey].scrapsOrder.push(key);
         },
 
         getManager: function (managerKey) {
@@ -199,45 +202,91 @@ _cat.core = function () {
             }
 
             if (manager) {
-                // Call for each Scrap assigned to this Manager
-                manager.calls.forEach(function (item) {
-                    var strippedItem;
+                // old
+//                // Call for each Scrap assigned to this Manager
+//                manager.calls.forEach(function (item) {
+//                    var strippedItem;
+//
+//                    matchvalue = {};
+//
+//                    if (item) {
+//
+//                        scrapref = _cat.core.getVar(item);
+//                        if (scrapref) {
+//                            scrapref = scrapref.scrap;
+//                            scrapname = scrapref.name[0];
+//                            if (scrapname) {
+//                                behaviors = manager.behaviors[scrapname];
+//                                if (behaviors) {
+//                                    // Go over all of the manager behaviors (e.g. repeat, delay)
+//                                    behaviors.forEach(function (bitem) {
+//                                        var behaviorsAPI = ["repeat", "delay"],
+//                                            behaviorPattern = "[\\(](.*)[\\)]"; //e.g. "repeat[\(](.*)[/)]"
+//                                        if (bitem) {
+//                                            // go over the APIs, looking for match (e.g. repeat, delay)
+//                                            behaviorsAPI.forEach(function (bapiitem) {
+//                                                if (bapiitem && !matchvalue[bapiitem]) {
+//                                                    matchvalue[bapiitem] = _cat.utils.Utils.getMatchValue((bapiitem + behaviorPattern), bitem);
+//                                                }
+//                                            });
+//                                        }
+//                                    });
+//                                }
+//                            }
+//                        }
+//
+////                        setTimeout(function() {
+////                            (_cat.core.getDefineImpl(item)).call(this);
+////                        }, 2000);
+//                        //__call(matchvalue);
+//                        matchvalue.implKey = item;
+//                        matchvalues.push(matchvalue);
+//                    }
+//                });
+
+                // new
+                matchvalues = [];
+                // set the scrap orders by the order of behaviors
+                var managerBehaviors = manager.behaviors;
+                var scrapCalls = manager.scrapsOrder;
+                manager.scrapsOrder.forEach(function (scrapName) {
 
                     matchvalue = {};
-
-                    if (item) {
-
-                        scrapref = _cat.core.getVar(item);
-                        if (scrapref) {
-                            scrapref = scrapref.scrap;
-                            scrapname = scrapref.name[0];
-                            if (scrapname) {
-                                behaviors = manager.behaviors[scrapname];
-                                if (behaviors) {
-                                    // Go over all of the manager behaviors (e.g. repeat, delay)
-                                    behaviors.forEach(function (bitem) {
-                                        var behaviorsAPI = ["repeat", "delay"],
-                                            behaviorPattern = "[\\(](.*)[\\)]"; //e.g. "repeat[\(](.*)[/)]"
-                                        if (bitem) {
-                                            // go over the APIs, looking for match (e.g. repeat, delay)
-                                            behaviorsAPI.forEach(function (bapiitem) {
-                                                if (bapiitem && !matchvalue[bapiitem]) {
-                                                    matchvalue[bapiitem] = _cat.utils.Utils.getMatchValue((bapiitem + behaviorPattern), bitem);
-                                                }
-                                            });
-                                        }
-                                    });
-                                }
+                    scrapref = _cat.core.getVar(scrapName);
+                    if (scrapref) {
+                        scrapref = scrapref.scrap;
+                        scrapname = scrapref.name[0];
+                        if (scrapname) {
+                            behaviors = manager.behaviors[scrapname];
+                            if (behaviors) {
+                                // Go over all of the manager behaviors (e.g. repeat, delay)
+                                behaviors.forEach(function (bitem) {
+                                    var behaviorsAPI = ["repeat", "delay"],
+                                        behaviorPattern = "[\\(](.*)[\\)]"; //e.g. "repeat[\(](.*)[/)]"
+                                    if (bitem) {
+                                        // go over the APIs, looking for match (e.g. repeat, delay)
+                                        behaviorsAPI.forEach(function (bapiitem) {
+                                            if (bapiitem && !matchvalue[bapiitem]) {
+                                                matchvalue[bapiitem] = _cat.utils.Utils.getMatchValue((bapiitem + behaviorPattern), bitem);
+                                            }
+                                        });
+                                    }
+                                });
                             }
                         }
-
-//                        setTimeout(function() {
-//                            (_cat.core.getDefineImpl(item)).call(this);
-//                        }, 2000);
-                        //__call(matchvalue);
-                        matchvalue.implKey = item;
-                        matchvalues.push(matchvalue);
                     }
+                    var packageName = "";
+                    for(var i = 0; i < manager.calls.length; i++) {
+                        if (manager.calls[i].indexOf((scrapName + "$$cat"), manager.calls[i].length - (scrapName + "$$cat").length) !== -1) {
+                            packageName = manager.calls[i];
+                            break;
+                        }
+                    }
+                    matchvalue.implKey = packageName;
+                    matchvalues.push(matchvalue);
+
+
+
                 });
 
 //                matchvalues.forEach(function(matchItem) {
