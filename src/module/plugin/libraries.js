@@ -326,8 +326,6 @@ module.exports = _basePlugin.ext(function () {
                                                         XMLHttpRequest: true,
                                                         document: true,
                                                         _cat: true,
-                                                        $ : true,
-                                                        window : true,
                                                         chai: true
                                                     }
                                                 }

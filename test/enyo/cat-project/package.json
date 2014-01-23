@@ -1,0 +1,18 @@
+{
+  "name": "cat-test",
+  "description": "Cat test project",
+  "version": "0.1.0",
+  "author": {
+    "name": "arik",
+    "email": "lewin.arik@gmail.com"
+  },
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "grunt": "~0.4.1",
+    "hooker": "~0.2.3"
+  },
+  "peerDependencies": {}
+}
