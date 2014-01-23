@@ -439,11 +439,8 @@ module.exports = _basePlugin.ext(function () {
                             }
                         }
 
-                        //_Scrap.apply({scraps: scraps});
                         // apply all scraps
-                        scraps.forEach(function (scrap) {
-                            scrap.apply(scrap);
-                        });
+                        _Scrap.apply({scraps: scraps});
 
                         _inject(scraps, filename, function() {
                             counter++;
