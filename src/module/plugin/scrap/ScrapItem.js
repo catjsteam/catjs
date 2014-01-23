@@ -5,7 +5,7 @@ var _utils = catrequire("cat.utils"),
     _log = catrequire("cat.global").log(),
     _scrapEnum = require("./ScrapEnum.js"),
     _ScrapConfigItem = require("./ScrapConfigItem.js"),
-
+    _ScrapContext = require("./Context.js"),
     __id = 0,
 
     _scrapId = function () {
@@ -144,6 +144,7 @@ _clazz = function (config) {
     this.config = config;
     this.output = [];
     this.arguments = [];
+    this.$$context = new _ScrapContext();
 
     this.getEnum = _scrapEnum.getScrapEnum;
 
@@ -376,6 +377,20 @@ _clazz.prototype.update = function (key, config) {
 
 };
 
+_clazz.prototype.getContextItem = function(key) {
+    return this.$$context.get(key);
+}
 
+_clazz.prototype.buildContext = function(scrapNames) {
+    var me = this;
+    this.$$context.destroy();
+    scrapNames.forEach(function(key){
+        var value = me.get(key);
+        if (value !== undefined) {
+            me.$$context.set(key, me.get(key));
+        }
+    });
+
+};
 
 module.exports = _clazz;
