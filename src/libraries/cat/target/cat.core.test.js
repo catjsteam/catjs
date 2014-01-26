@@ -105,6 +105,7 @@ _cat.core = function () {
                 }
             };
 
+
         }
 
         this.hasPhantom = function () {
@@ -644,7 +645,7 @@ _cat.core.TestManager = function() {
          *
          */
         getDelay: function() {
-            return (_globalTestData.delay || 0);
+                return (_globalTestData.delay || 0);
         },
 
         /**
@@ -1181,11 +1182,11 @@ _cat.utils.AJAX = function () {
     };
 
 }();
-_cat.utils.Signal = function() {
+_cat.utils.Signal = function () {
 
     var _funcmap = {
 
-        TESTEND: function(opt) {
+        TESTEND: function (opt) {
 
             var timeout = _cat.core.TestManager.getDelay();
 
@@ -1193,7 +1194,7 @@ _cat.utils.Signal = function() {
                 timeout = (opt["timeout"] || 2000);
             }
 
-            setTimeout(function() {
+            setTimeout(function () {
                 var testCount = _cat.core.TestManager.getTestCount();
                 _cat.core.ui.setContent({
                     header: [testCount, "Tests complete"].join(" "),
@@ -1205,8 +1206,24 @@ _cat.utils.Signal = function() {
             }, (timeout));
 
 
+            var config = _cat.core.getConfig();
+
+            var testdata = _cat.core.TestManager.addTestData({
+                name: "End",
+                displayName: "End",
+                status: "End",
+                message: "End"
+            });
+
+            if (config) {
+                _cat.utils.AJAX.sendRequestSync({
+                    url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                });
+            }
+
+
         },
-        KILL: function() {
+        KILL: function () {
 
             // close CAT UI
             _cat.core.ui.off();
@@ -1217,7 +1234,7 @@ _cat.utils.Signal = function() {
 
     return {
 
-        send: function(flag, opt) {
+        send: function (flag, opt) {
 
             if (flag && _funcmap[flag]) {
                 _funcmap[flag].call(this, opt);
