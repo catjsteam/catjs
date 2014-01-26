@@ -6,15 +6,15 @@ var test = function() {
 
             /*
                 @[scrap
-                    @@name
-                    @@replace after:1
-                    @@behavior [
-                     @@inject comment
-                     @@replace
+                    @@name test
+                    @@replace after:2
+                    @@behavior[
+                        @@replace comment
                     ]
                 ]@
              */
-            console.log("This is a test");
+            console.log("This is a test line:1");
+            console.log("This is a test line:2");
 
         }
 

@@ -2,6 +2,8 @@ var _Scrap = catrequire("cat.common.scrap"),
     _tplutils = catrequire("cat.tpl.utils"),
     _utils = catrequire("cat.utils"),
     _uglifyutils = catrequire("cat.uglify.utils"),
+    _typedas = require("typedas"),
+    _behavior = require("./Behavior.js"),
     _jshint = require("jshint").JSHINT,
     _scraputils = catrequire("cat.scrap.utils");
 
@@ -87,32 +89,32 @@ module.exports = function () {
                         if (code) {
 
                             /*  TODO make code validation
-                                TODO Move that snippet to the end of the generated code (source project)
-                                validcode = _jshint(code, {
-                                    "strict": false,
-                                    "curly": true,
-                                    "eqeqeq": true,
-                                    "immed": false,
-                                    "latedef": true,
-                                    "newcap": false,
-                                    "noarg": true,
-                                    "sub": true,
-                                    "undef": true,
-                                    "boss": true,
-                                    "eqnull": true,
-                                    "node": true,
-                                    "es5": false
-                                },
-                                { assert:true });*/
+                             TODO Move that snippet to the end of the generated code (source project)
+                             validcode = _jshint(code, {
+                             "strict": false,
+                             "curly": true,
+                             "eqeqeq": true,
+                             "immed": false,
+                             "latedef": true,
+                             "newcap": false,
+                             "noarg": true,
+                             "sub": true,
+                             "undef": true,
+                             "boss": true,
+                             "eqnull": true,
+                             "node": true,
+                             "es5": false
+                             },
+                             { assert:true });*/
 
                             //if (validcode) {
-                                me.print(_tplutils.template({
-                                    content: funcSnippetTpl,
-                                    data: {
-                                        comment: " Generated code according to the scrap comment (see @@code)",
-                                        code: code
-                                    }
-                                }));
+                            me.print(_tplutils.template({
+                                content: funcSnippetTpl,
+                                data: {
+                                    comment: " Generated code according to the scrap comment (see @@code)",
+                                    code: code
+                                }
+                            }));
                             //} else {
                             //    console.log("The code is not valid: ", _jshint.errors);
                             //}
@@ -160,7 +162,7 @@ module.exports = function () {
                     }
                 }});
 
-           /**
+            /**
              * Annotation for javascript signal
              *
              *  properties:
@@ -184,7 +186,7 @@ module.exports = function () {
                             content: funcSnippetTpl,
                             data: {
                                 comment: " Signal call ",
-                                code: ["_cat.utils.Signal.send('", signal ,"');"].join("")
+                                code: ["_cat.utils.Signal.send('", signal , "');"].join("")
                             }
                         }));
                     }
@@ -223,7 +225,6 @@ module.exports = function () {
                     }
 
 
-
                 }});
 
             /**
@@ -242,30 +243,25 @@ module.exports = function () {
                         me = this,
                         scrapItemName, scrapItemValue,
                         scrapItem,
-                        runat = me.get("name");
+                        runat = me.get("name"),
+                        innerscraps;
 
                     scrapsRows = me.get("perform");
                     if (scrapsRows) {
 
-                        scrapsRows.forEach(function(item){
-                            if (item) {
-                                scrapItem = _scraputils.extractSingle(item);
-                                if (scrapItem) {
-                                    scrapItemName = scrapItem.key;
-                                    scrapItemValue = scrapItem.value;
+                        innerscraps = me.extractAnnotations(scrapsRows);
 
-                                    me.print(_tplutils.template({
-                                        content: funcSnippetTpl,
-                                        data: {
-                                            comment: " Add Manager behavior ",
-                                            code: "_cat.core.setManagerBehavior('" + runat + "', '"+ scrapItemName +"', '" + scrapItemValue+ "');"
-                                        }
-                                    }));
+                        // extract nested annotations
+                        for (scrapItemName in innerscraps) {
+                            scrapItemValue = innerscraps[scrapItemName];
+                            me.print(_tplutils.template({
+                                content: funcSnippetTpl,
+                                data: {
+                                    comment: " Add Manager behavior ",
+                                    code: "_cat.core.setManagerBehavior('" + runat + "', '" + scrapItemName + "', '" + scrapItemValue + "');"
                                 }
-
-                            }
-                        });
-
+                            }));
+                        }
                     }
                 }});
 
@@ -314,7 +310,6 @@ module.exports = function () {
                 }});
 
 
-
             /**
              * Annotation for importing javascript file within HTML page
              *
@@ -338,7 +333,7 @@ module.exports = function () {
                             type;
                         if (value) {
                             values = value.split(".");
-                            type = values[values.length-1];
+                            type = values[values.length - 1];
                         }
 
                         return type;
@@ -371,7 +366,7 @@ module.exports = function () {
 
                     me.$setType("html");
                     if (importannos) {
-                        importannos.forEach(function(item) {
+                        importannos.forEach(function (item) {
                             if (item) {
                                 importType = _getType(item);
                                 if (importType) {
@@ -410,6 +405,73 @@ module.exports = function () {
 
                 this.print(injectanno);
             }});
+
+            /**
+             *
+             *  properties:
+             *  name    - inject
+             *  single  - true
+             *  $type   - html
+             */
+            _Scrap.add({name: "replace", func: function (config) {
+                var me = this,
+                    innerscraps,
+                    scrapsRows = this.getContextItem("behavior"),
+                    replace = this.get("replace"),
+                    scrapName, scrapValue,
+                    behave = {};
+
+                //this.$setType("*");
+
+                if (_typedas.isArray(scrapsRows)) {
+                    // in case we have specified the behaviors within the annotation
+
+                    // extract nested annotations
+                    innerscraps = me.extractAnnotations(scrapsRows);
+                    for (scrapName in innerscraps) {
+                        if (scrapName) {
+                            if (scrapName === "replace") {
+                                scrapValue = innerscraps[scrapName];
+
+                                if (_behavior[scrapValue]) {
+                                    behave.inject = _behavior[scrapValue];
+                                }
+                            }
+                        }
+                    }
+                } else if (_typedas.isString(scrapsRows)) {
+                    // or else we supplied an object with the behaviors implemented as an object
+
+                    scrapValue = scrapsRows;
+                    behave.inject = scrapValue;
+
+                }
+
+                // insert the behavior
+                this.$setBehavior(behave);
+
+                // set the replace data info
+                this.$setReplaceData({action: behave.inject});
+
+            }});
+
+
+            /**
+             *
+             *  properties:
+             *  name    - inject
+             *  single  - true
+             *  $type   - html
+             */
+            _Scrap.add({name: "behavior",
+                single: false,
+                func: function (config) {
+                    var me = this;
+
+
+                }
+            });
+
 
             config.emitter.emit("job.done", {status: "done"});
 

@@ -241,7 +241,9 @@ module.exports = _basePlugin.ext(function () {
                         injectinfo = scraplcl.get("injectinfo"),
                         scrapCtxArguments,
                         param1,
-                        engine;
+                        engine,
+                        replaceinfo,
+                        isLineNumber = false;
 
                     function removeOldCall() {
                         var startpos, endpos;
@@ -256,10 +258,11 @@ module.exports = _basePlugin.ext(function () {
                         }
                     }
 
+                    /**
+                     * Process a single line according to a given info by line.
+                     */
+                    function processSingleLine() {
 
-                    if (lineNumber == info.line) {
-
-                        engine = scraplcl.$getEngine();
                         scrapCtxArguments = scraplcl.generateCtxArguments();
                         param1 = [["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")];
 
@@ -271,6 +274,12 @@ module.exports = _basePlugin.ext(function () {
                         if (injectinfo) {
                             removeOldCall();
                         }
+
+                        if (replaceinfo) {
+                            return line;
+                        }
+
+
 
                         if (engine === _scrapEnum.engines.JS) {
                             // JS file type call
@@ -291,7 +300,9 @@ module.exports = _basePlugin.ext(function () {
                             // HTML import javascript file
                             content = scraplcl.generate();
 
+
                         } else if (engine === _scrapEnum.engines.HTML_EMBED_INSERT) {
+
                             // Inject the scrap line to the file untouched
                             content = scraplcl.generate();
 
@@ -315,6 +326,52 @@ module.exports = _basePlugin.ext(function () {
                             prevCommentInfo = {start: {line: lineNumber, col: info.col}, end: {line: lineNumber, col: (info.col + content.length)}};
                         }
                         scraplcl.set("injectinfo", prevCommentInfo);
+                    }
+
+                    /**
+                     * Process replace info
+                     */
+                    function processReplaceInfo() {
+                        var markDefault = {
+                            prefix: "/*",
+                            suffix: "*/"
+                            }, mark;
+
+                        if (scraplcl.$getBehavior()) {
+
+                            if (engine === _scrapEnum.engines.JS) {
+                                // JS file type call
+                                mark = markDefault;
+
+                            } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
+                                // Embed Javascript block for HTML file
+                                mark = markDefault;
+
+                            }
+
+                            return replaceinfo.apply({lines: lines, line: line, row: lineNumber, mark: mark});
+                        }
+
+                        return undefined;
+                    }
+
+
+                    if (scraplcl) {
+                        replaceinfo = scraplcl.get("replaceinfo");
+                    }
+
+
+                    if (lineNumber == info.line || replaceinfo) {
+
+                        isLineNumber = (lineNumber == info.line);
+                        engine = scraplcl.$getEngine();
+
+                        processReplaceInfo();
+
+                        if (isLineNumber) {
+                            processSingleLine();
+                        }
+
                     }
 
                     counter++;

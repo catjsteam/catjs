@@ -6,6 +6,8 @@ var _utils = catrequire("cat.utils"),
     _scrapEnum = require("./ScrapEnum.js"),
     _ScrapConfigItem = require("./ScrapConfigItem.js"),
     _ScrapContext = require("./Context.js"),
+    _scraputils = catrequire("cat.scrap.utils"),
+    _jsutils = require("js.utils"),
     __id = 0,
 
     _scrapId = function () {
@@ -266,6 +268,10 @@ _clazz.prototype.$getType = function () {
     return this.config["$type"];
 };
 
+_clazz.prototype.$getBehavior = function () {
+    return this.config["$behavior"];
+};
+
 _clazz.prototype.$getEngine = function () {
 
     var $type = this.config["$type"];
@@ -289,6 +295,10 @@ _clazz.prototype.$getEngine = function () {
 _clazz.prototype.$setType = function (type) {
     var valid = _validateConfigEntry(type, this.config);
     this.config["$type"] = type;
+};
+
+_clazz.prototype.$setBehavior = function (behavior) {
+    this.config["$behavior"] = behavior;
 };
 
 _clazz.prototype.get = function (key) {
@@ -390,7 +400,138 @@ _clazz.prototype.buildContext = function(scrapNames) {
             me.$$context.set(key, me.get(key));
         }
     });
+};
+
+_clazz.prototype.extractAnnotations = function(scrapsRows) {
+    var map = {};
+
+    // extract nested annotations
+    scrapsRows.forEach(function(item){
+        var scrapItem,
+            scrapItemName, scrapItemValue;
+
+        if (item) {
+            scrapItem = _scraputils.extractSingle(item);
+            if (scrapItem) {
+                scrapItemName = scrapItem.key.trim();
+                scrapItemValue = scrapItem.value.trim();
+                map[scrapItemName] = scrapItemValue;
+            }
+        }
+    });
+
+    return map;
+};
+
+/**
+ * Replace data collector
+ * Collect the relevant data to the replace action (see @@replace annotation)
+ *
+ * String the data using the 'replaceinfo' configuration key.
+ * The data:
+ *      - rows      - The rows line numbers to be replaced
+ *      - action    - The action to be performed, by default set to comment (comment out the given lines)
+ *      - apply     - The functionality to apply the action over the rows
+ *      - content   - The output content
+ *
+ * @param config
+ */
+_clazz.prototype.$setReplaceData = function (config) {
+
+    //parse pattern
+    var info = this.get("commentinfo"),
+        replaceRowsData = this.get("replace"),
+        replaceRows = [],
+        lvalue, rvalue,
+        row,
+        idx = 0, size = 0,
+        action,
+        value;
+
+    function _init() {
+        if (config) {
+            action = (config.action || "comment");
+        } else {
+            action = "comment";
+        }
+    }
+
+    if (info) {
+        row = (info.end ? info.end.line : undefined);
+        if (row && replaceRowsData && replaceRowsData[0]) {
+
+            _init();
+
+            replaceRowsData = replaceRowsData.split(":");
+            if (replaceRowsData) {
+                lvalue = (replaceRowsData[0] ? replaceRowsData[0].trim() : undefined);
+                rvalue = (replaceRowsData[1] ? replaceRowsData[1].trim() : undefined);
+                if (lvalue && rvalue != undefined) {
+                    if (lvalue === "after") {
+                        idx = row + 1;
+                        size = (idx + Number(rvalue));
+                        for (; idx < size; idx++) {
+                            replaceRows.push(idx);
+                        }
+                    }
+                }
+
+                if (replaceRows.length > 0) {
+                    value = {
+                        lines:[],
+                        $linesmap:{},
+                        rows: replaceRows,
+                        action: (action || undefined),
+                        $ready: 0,
+                        newlines: [],
+                        /**
+                         * Apply the action functionality over the rows
+                         *
+                         * @param {Object}line The lines to be replaced
+                         * @returns {Object}
+                         */
+                        apply: function (line) {
+                            var me = this,
+                                currentLine,
+                                counter=0;
+
+                            if (action && line) {
+
+                                // if the line registered add it
+                                if (_jsutils.Object.contains(this.rows, line.row)) {
+                                    this.lines.push(line.line);
+                                    //this.$linesmap[line.row] = this.lines[this.lines.length-1];
+
+                                    if (this.rows.indexOf(line.row) === this.rows.length-1) {
+                                        // if this is the last cell...
+                                        this.newlines =  action.call({}, this.lines, line.mark);
+                                        this.newlines.forEach(function(newline) {
+
+                                            me.$linesmap[me.rows[counter]] = newline;
+                                            counter++;
+                                        });
+                                        this.$ready = 1;
+
+                                    }
+                                }
+
+                                if (this.$ready === 1) {
+                                    // if we have processed all rows...
+                                    currentLine = line.row-1;
+                                    if ( (currentLine) === (line.lines.length) && this.$linesmap[currentLine]) {
+                                        line.lines[currentLine-1] =  this.$linesmap[currentLine];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    this.set("replaceinfo", value);
+                }
+            }
+        }
+    }
 
 };
+
 
 module.exports = _clazz;
