@@ -241,26 +241,7 @@
       -->
 
 
-        <!--
-       @[scrap
-           @@name scrapCheckboxManager
-           @@perform[
-               @@checkboxVerticalScroll repeat(1)
-               @@checkboxVerticalGroupScroll repeat(1)
-               @@setCheckC repeat(1)
-               @@setCheckB repeat(1)
-               @@checkboxHorizontalScroll repeat(1)
-               @@setHCheckC repeat(1)
-               @@setHCheckB repeat(1)
-               @@scrollTopCheckbox repeat(1)
-               @@appMenuClick repeat(1)
-           ]
-           @@catui on
-           @@embed true
-           @@manager true
-           @@signal TESTEND
-       ]@
-       -->
+
 	</div><!-- /content -->
 	    <div data-role="panel" class="jqm-navmenu-panel" data-position="left" data-display="overlay" data-theme="a">
 	    	<ul class="jqm-list ui-alt-icon ui-nodisc-icon">
@@ -394,13 +375,81 @@
 	</ul>
 </li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Slider widget</h3>
+
+    <!--
+                   @[scrap
+                      @@name sliderScroll1
+                      @@run@ scrapCheckboxManager
+                      @@embed true
+                      @@jqm scrollTo("sliderWidget");
+                   ]@
+              -->
+    <!--
+                      @[scrap
+                         @@name sliderMenuClick
+                         @@run@ scrapCheckboxManager
+                         @@embed true
+                         @@jqm click("sliderWidget");
+                      ]@
+                    -->
+
+    <!--
+                   @[scrap
+                      @@name sliderScroll2
+                      @@run@ scrapCheckboxManager
+                      @@embed true
+                      @@jqm scrollTo("sliderWidget");
+                   ]@
+              -->
+
+    <!--
+                  @[scrap
+                     @@name sliderRef
+                     @@run@ scrapCheckboxManager
+                     @@embed true
+                     @@jqm clickRef("sliderRef");
+                  ]@
+                -->
+
+
+
+	<h3 id="sliderWidget" >Slider widget</h3>
 	<ul>
-		<li data-filtertext="form slider widget range input single sliders"><a href="../slider/" data-ajax="false">Slider</a></li>
+		<li data-filtertext="form slider widget range input single sliders"><a id="sliderRef" href="../slider/" data-ajax="false">Slider</a></li>
 		<li data-filtertext="form slider widget flipswitch slider binary select flip toggle switch"><a href="../slider-flipswitch/" data-ajax="false">Slider flip toggle switch</a></li>
 		<li data-filtertext="form slider tooltip handle value input range sliders"><a href="../slider-tooltip/" data-ajax="false">Slider tooltip</a></li>
 	</ul>
 </li>
+
+<!--
+   @[scrap
+       @@name scrapCheckboxManager
+       @@perform[
+       @@checkboxVerticalScroll repeat(1)
+           @@checkboxVerticalGroupScroll repeat(1)
+           @@setCheckC repeat(1)
+           @@setCheckB repeat(1)
+           @@checkboxHorizontalScroll repeat(1)
+           @@setHCheckC repeat(1)
+           @@setHCheckB repeat(1)
+           @@scrollTopCheckbox repeat(1)
+            @@appMenuClick repeat(1)
+           @@sliderScroll1 repeat(1)
+           @@sliderMenuClick repeat(1)
+           @@sliderScroll2 repeat(1)
+           @@sliderRef repeat(1)
+       ]
+       @@embed true
+       @@manager true
+       @@signal TESTEND
+   ]@
+   -->
+
+<!--
+
+
+           -->
+
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
 	<h3>Table widget</h3>
 	<ul>
@@ -498,7 +547,9 @@
 <li data-filtertext="filterable filter elements sorting searching listview table"><a href="../filterable/" data-ajax="false">Filterable widget</a></li>
 <li data-filtertext="form flipswitch widget flip toggle switch binary select checkbox input"><a href="../flipswitch/" data-ajax="false">Flipswitch widget</a></li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Forms</h3>
+
+
+    <h3>Forms</h3>
 	<ul>
 		<li data-filtertext="forms text checkbox radio range button submit reset inputs selects textarea slider flipswitch label form elements"><a href="../forms/" data-ajax="false">Forms</a></li>
 		<li data-filtertext="form hide labels hidden accessible ui-hidden-accessible forms"><a href="../forms-label-hidden-accessible/" data-ajax="false">Hide labels</a></li>
@@ -590,7 +641,7 @@
 		<li data-filtertext="filterable select filter popup dialog"><a href="../selectmenu-custom-filter/" data-ajax="false">Custom select menu with filter</a></li>
 	</ul>
 </li>
-<li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
+<li id="sliderWidget1" data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
 	<h3>Slider widget</h3>
 	<ul>
 		<li data-filtertext="form slider widget range input single sliders"><a href="../slider/" data-ajax="false">Slider</a></li>

@@ -297,7 +297,7 @@
 
         <!--
                   @[scrap
-                     @@name setText
+                     @@name setTextForm
                      @@run@ scrapFormManager
                      @@embed true
                      @@jqm setText("text-basic", "hello world");
@@ -423,7 +423,7 @@
             @@name scrapFormManager
             @@perform[
                 @@formTextScroll repeat(1)
-                @@setTextScroll repeat(1)
+                @@setTextForm repeat(1)
                 @@formDateScroll repeat(1)
                 @@setDate repeat(1)
                 @@checkbox-radioHScroll repeat(1)
@@ -432,7 +432,7 @@
                 @@scrollTopForm repeat(1)
 
             ]
-            @@catui on
+
             @@embed true
             @@manager true
             @@signal TESTEND

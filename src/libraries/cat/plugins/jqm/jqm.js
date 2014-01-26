@@ -37,6 +37,16 @@ _cat.plugins.jqm = function () {
             },
 
 
+            click: function (idName) {
+                $(document).ready(function(){
+
+                    $('#' + idName).trigger('click');
+
+                });
+
+            },
+
+
 
             setCheck: function (idName) {
                 $(document).ready(function(){

@@ -51,6 +51,15 @@ module.exports = function () {
 
                             if (!match) {
                                 match = _scraputils.generate({
+                                    api: "click",
+                                    apiname: "click",
+                                    exp: jqm
+                                });
+                            }
+
+
+                            if (!match) {
+                                match = _scraputils.generate({
                                     api: "setCheck",
                                     apiname: "setCheck",
                                     exp: jqm

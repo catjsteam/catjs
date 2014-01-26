@@ -16,6 +16,7 @@
     @@name catImport
     @@import[
         cat.js
+        cat.css
         cat.src.js
     ]
  ]@
@@ -86,6 +87,7 @@
                      @@name formWidgetsScroll
                      @@run@ mainPageManager
                      @@embed true
+                     @@assert ok(true, "Fake test")
                      @@jqm scrollTo("formWidgets");
                   ]@
              -->
@@ -93,10 +95,11 @@
                 <div class="jqm-block-content">
         			<h3 id="formWidgets">Form widgets</h3>
                     <!--
-                      @[scrap
+                      [scrap
                          @@name checkboxradioClick
                          @@run@ mainPageManager
                          @@embed true
+                         @@assert ok(true, "Fake test")
                          @@jqm clickRef("checkboxradioPage");
                       ]@
                     -->
@@ -116,7 +119,9 @@
           @@name mainPageManager
           @@perform[
               @@formWidgetsScroll repeat(1)
-              @@checkboxradioClick repeat(1)
+              @@formWidgetsScroll delay(10000)
+
+
 
           ]
           @@catui on

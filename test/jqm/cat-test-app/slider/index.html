@@ -37,7 +37,15 @@
 	<div data-role="header" class="jqm-header">
 		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
-		<a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
+        <!--
+                      @[scrap
+                         @@name appMenuSliderClick
+                         @@run@ sliderManager
+                         @@embed true
+                         @@jqm clickRef("appMenuSlider");
+                      ]@
+                    -->
+		<a id="appMenuSlider" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
 		<a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
 	</div><!-- /header -->
 
@@ -124,22 +132,7 @@
       -->
 
 
-                <!--
-                @[scrap
-                  @@name sliderManager
-                  @@perform[
-                      @@basicSliderScroll repeat(1)
-                      @@slider25 repeat(1)
-                      @@HighlightScroll repeat(1)
-                      @@sliderHighlight77 repeat(1)
-                      @@scrollTopSlider repeat(1)
-                  ]
-                  @@catui on
-                  @@embed true
-                  @@manager true
-                  @@signal TESTEND
-                ]@
-                -->
+
 
 
                 <h2>Theme</h2>
@@ -251,15 +244,83 @@
 <li data-filtertext="filterable filter elements sorting searching listview table"><a href="../filterable/" data-ajax="false">Filterable widget</a></li>
 <li data-filtertext="form flipswitch widget flip toggle switch binary select checkbox input"><a href="../flipswitch/" data-ajax="false">Flipswitch widget</a></li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Forms</h3>
+
+
+    <!--
+                  @[scrap
+                     @@name formsMenuScroll
+                     @@run@ sliderManager
+                     @@embed true
+                     @@jqm scrollTo("formsMenu");
+                  ]@
+             -->
+
+    <!--
+                     @[scrap
+                        @@name formsMenuClick
+                        @@run@ sliderManager
+                        @@embed true
+                        @@jqm click("formsMenu");
+                     ]@
+                   -->
+
+    <!--
+                   @[scrap
+                      @@name formsMenu2
+                      @@run@ sliderManager
+                      @@embed true
+                      @@jqm scrollTo("formsMenu");
+                   ]@
+              -->
+
+    <!--
+                  @[scrap
+                     @@name formRef
+                     @@run@ sliderManager
+                     @@embed true
+                     @@jqm clickRef("formRef");
+                  ]@
+                -->
+
+
+    <h3 id="formsMenu">Forms</h3>
 	<ul>
-		<li data-filtertext="forms text checkbox radio range button submit reset inputs selects textarea slider flipswitch label form elements"><a href="../forms/" data-ajax="false">Forms</a></li>
+		<li data-filtertext="forms text checkbox radio range button submit reset inputs selects textarea slider flipswitch label form elements">
+            <a id="formRef" href="../forms/" data-ajax="false">Forms</a></li>
 		<li data-filtertext="form hide labels hidden accessible ui-hidden-accessible forms"><a href="../forms-label-hidden-accessible/" data-ajax="false">Hide labels</a></li>
 		<li data-filtertext="form field containers fieldcontain ui-field-contain forms"><a href="../forms-field-contain/" data-ajax="false">Field containers</a></li>
 		<li data-filtertext="forms disabled form elements"><a href="../forms-disabled/" data-ajax="false">Forms disabled</a></li>
 		<li data-filtertext="forms gallery examples overview forms text checkbox radio range button submit reset inputs selects textarea slider flipswitch label form elements"><a href="../forms-gallery/" data-ajax="false">Forms gallery</a></li>
 	</ul>
 </li>
+
+
+<!--
+                @[scrap
+                  @@name sliderManager
+                  @@perform[
+                  @@basicSliderScroll repeat(1)
+                      @@slider25 repeat(1)
+                      @@HighlightScroll repeat(1)
+                      @@sliderHighlight77 repeat(1)
+                      @@scrollTopSlider repeat(1)
+                    @@appMenuSliderClick repeat(1)
+                   @@formsMenuScroll repeat(1)
+                   @@formsMenuClick repeat(1)
+                   @@formsMenu2 repeat(1)
+                   @@formRef repeat(1)
+                  ]
+
+                  @@embed true
+                  @@manager true
+                  @@signal TESTEND
+                ]@
+                -->
+
+<!--
+
+                      -->
+
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
 	<h3>Grids</h3>
 	<ul>

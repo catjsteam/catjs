@@ -105,7 +105,6 @@ _cat.core = function () {
                 }
             };
 
-
         }
 
         this.hasPhantom = function () {
@@ -161,7 +160,7 @@ _cat.core = function () {
              * @private
              */
             function __call(config) {
-
+                totalDelay = 0;
                 var delay = (config.delay || 2000),
                     repeat = (config.repeat || 1),
                     idx = 0,
@@ -254,7 +253,7 @@ _cat.core = function () {
                 manager.scrapsOrder.forEach(function (scrapName) {
                     matchvalue = {};
                     var packageName = "";
-                    for(var i = 0; i < manager.calls.length; i++) {
+                    for(var i = 0; i < matchValuesCalls.length; i++) {
                         if (matchValuesCalls[i].implKey.indexOf((scrapName + "$$cat"), matchValuesCalls[i].implKey.length - (scrapName + "$$cat").length) !== -1) {
                             matchvalue = matchValuesCalls[i];
                             break;
@@ -645,7 +644,7 @@ _cat.core.TestManager = function() {
          *
          */
         getDelay: function() {
-                return (_globalTestData.delay || 0);
+            return (_globalTestData.delay || 0);
         },
 
         /**
@@ -1365,6 +1364,16 @@ _cat.plugins.jqm = function () {
                     $('#' + idName).trigger('click');
                     $.mobile.activePage.find('#' + idName).click();
                     window.location = $('#' + idName).attr('href');
+                });
+
+            },
+
+
+            click: function (idName) {
+                $(document).ready(function(){
+
+                    $('#' + idName).trigger('click');
+
                 });
 
             },
