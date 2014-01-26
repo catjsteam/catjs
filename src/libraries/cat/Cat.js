@@ -125,18 +125,21 @@ _cat.core = function () {
                 _managers[managerKey] = {};
                 _managers[managerKey].calls = [];
                 _managers[managerKey].behaviors = {};
+                _managers[managerKey].scrapsOrder = [];
             }
             _managers[managerKey].calls.push(pkgName);
         },
 
         setManagerBehavior: function (managerKey, key, value) {
             var item = _managers[managerKey].behaviors;
+
             if (item) {
                 if (!item[key.trim()]) {
                     item[key.trim()] = [];
                 }
                 item[key.trim()].push(value);
             }
+            _managers[managerKey].scrapsOrder.push(key.trim());
         },
 
         getManager: function (managerKey) {
@@ -199,6 +202,8 @@ _cat.core = function () {
             }
 
             if (manager) {
+                // old
+                var matchValuesCalls = [];
                 // Call for each Scrap assigned to this Manager
                 manager.calls.forEach(function (item) {
                     var strippedItem;
@@ -236,8 +241,26 @@ _cat.core = function () {
 //                        }, 2000);
                         //__call(matchvalue);
                         matchvalue.implKey = item;
-                        matchvalues.push(matchvalue);
+                        matchValuesCalls.push(matchvalue);
                     }
+                });
+
+                // new
+                matchvalues = [];
+                // set the scrap orders by the order of behaviors
+                var managerBehaviors = manager.behaviors;
+
+                manager.scrapsOrder.forEach(function (scrapName) {
+                    matchvalue = {};
+                    var packageName = "";
+                    for(var i = 0; i < manager.calls.length; i++) {
+                        if (matchValuesCalls[i].implKey.indexOf((scrapName + "$$cat"), matchValuesCalls[i].implKey.length - (scrapName + "$$cat").length) !== -1) {
+                            matchvalue = matchValuesCalls[i];
+                            break;
+                        }
+                    }
+
+                    matchvalues.push(matchvalue);
                 });
 
 //                matchvalues.forEach(function(matchItem) {
