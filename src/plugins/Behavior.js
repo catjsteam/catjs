@@ -1,47 +1,49 @@
-
 module.exports = {
 
-    comment: function(lines, mark) {
+    cat: {
 
-        var newlines = [], counter=0;
+        comment: function (lines, mark) {
 
-        function _getValue(obj, key) {
-            if (key in obj && obj[key]) {
-                return obj[key];
+            var newlines = [], counter = 0;
+
+            function _getValue(obj, key) {
+                if (key in obj && obj[key]) {
+                    return obj[key];
+                }
+                return;
             }
-            return;
-        }
 
-        if (lines) {
+            if (lines) {
 
-            if (mark) {
+                if (mark) {
 
-                lines.forEach(function(line) {
+                    lines.forEach(function (line) {
 
-                    if (counter === 0) {
-                        newlines[counter] = _getValue(mark, "prefix") + lines[counter];
+                        if (counter === 0) {
+                            newlines[counter] = _getValue(mark, "prefix") + lines[counter];
 
-                    }
+                        }
 
-                    if (counter === lines.length-1) {
-                        newlines[counter] =  lines[counter] + _getValue(mark, "suffix");
+                        if (counter === lines.length - 1) {
+                            newlines[counter] = lines[counter] + _getValue(mark, "suffix");
 
-                    }
+                        }
 
-                    if (counter > 0 && counter <  lines.length-1) {
-                        newlines[counter] = lines[counter];
-                    }
+                        if (counter > 0 && counter < lines.length - 1) {
+                            newlines[counter] = lines[counter];
+                        }
 
-                    newlines[counter] += "\n";
-                    counter++;
-                });
+                        newlines[counter] += "\n";
+                        counter++;
+                    });
 
-            } else {
-                newlines = newlines.concat(lines);
+                } else {
+                    newlines = newlines.concat(lines);
 
+                }
             }
-        }
 
-        return newlines;
+            return newlines;
+        }
     }
 }
