@@ -128,6 +128,8 @@ var _typedas = require('typedas'),
                 sourcePath;
 
             function _mkEnvDir(prop) {
+                var commonpath,
+                    readmefile;
                 if (prop) {
                     sourcePath = _utils.resolveObject(data, prop);
                     sourcefolder = _path.normalize([workpath, sourcePath].join("/"));
@@ -137,6 +139,17 @@ var _typedas = require('typedas'),
                         } else {
                             _log.debug(_props.get("cat.project.resource.exists").format("[cat config]", sourcefolder));
                         }
+
+                        // add common folder for the custom user classes
+                        if (prop === "source") {
+                            commonpath = _path.join(sourcefolder, "common");
+                            if (!_fs.existsSync(commonpath)) {
+                                _utils.mkdirSync(commonpath);
+                                readmefile = _path.join(commonpath, "README.txt");
+                                _fs.writeFileSync(readmefile, "In this folder any JavaScript files will be included for CAT's node and/or application logic layer.");
+                            }
+                        }
+
                         me.info[prop] = sourcefolder;
                     }
 
