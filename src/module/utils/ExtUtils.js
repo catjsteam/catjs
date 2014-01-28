@@ -46,7 +46,7 @@ module.exports = function () {
                 path = path.substring(1);
             }
 
-            newFile = [_path.dirname(file), fileName.replace(fileName, ["_cat", fileName].join("_"))].join("");
+            newFile = _path.join(_path.dirname(file), fileName.replace(fileName, ["_cat", fileName].join("_")));
             pkgName = (scrap ? [path.split("/").join("."), fileName, scrap.get("name")].join(".") : undefined);
 
             return {
