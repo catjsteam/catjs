@@ -209,7 +209,7 @@ module.exports = function () {
                 } else {
                     counter = size;
                     _log.warning(_props.get("cat.utils.resolver.warn").format("[utils resolver]", query));
-                    return obj;
+                    return null;
                 }
             }
 
