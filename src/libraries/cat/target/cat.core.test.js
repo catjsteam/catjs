@@ -1050,7 +1050,11 @@ _cat.core.ui = function () {
                             elt.style[value[0]] = value[1];
                         }
                     });
-                    elt.innerText = text;
+
+                        elt.textContent = text;
+
+
+
                 }
             }
 
@@ -1343,9 +1347,9 @@ _cat.plugins.jqm = function () {
             scrollTo: function (idName) {
 
                 $(document).ready(function(){
-                    $(document.body).animate({
-                        'scrollTop':   $('#' + idName).offset().top
-                    }, 1000);
+                    var stop = $('#' + idName).offset().top;
+                    var delay = 1000;
+                    $('body,html').animate({scrollTop: stop}, delay);
                 });
 
             },
@@ -1353,6 +1357,9 @@ _cat.plugins.jqm = function () {
             scrollTop: function () {
 
                 $(document).ready(function(){
+
+
+
                     $('html, body').animate({scrollTop : 0},1000);
                 });
 
@@ -1360,7 +1367,7 @@ _cat.plugins.jqm = function () {
 
             clickRef: function (idName) {
                 $(document).ready(function(){
-                    $('.ui-btn').removeClass('ui-focus');
+
                     $('#' + idName).trigger('click');
                     window.location = $('#' + idName).attr('href');
                 });

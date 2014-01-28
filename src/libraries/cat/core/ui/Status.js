@@ -214,7 +214,11 @@ _cat.core.ui = function () {
                             elt.style[value[0]] = value[1];
                         }
                     });
-                    elt.innerText = text;
+
+                        elt.textContent = text;
+
+
+
                 }
             }
 
