@@ -5,7 +5,10 @@ var _Scrap = catrequire("cat.common.scrap"),
     _typedas = require("typedas"),
     _behavior = require("./Behavior.js"),
     _jshint = require("jshint").JSHINT,
-    _scraputils = catrequire("cat.scrap.utils");
+    _scraputils = catrequire("cat.scrap.utils"),
+    _path = require("path"),
+    _global = catrequire("cat.global"),
+    _log = _global.log();
 
 
 module.exports = function () {
@@ -419,7 +422,9 @@ module.exports = function () {
                     scrapsRows = this.getContextItem("behavior"),
                     replace = this.get("replace"),
                     scrapName, scrapValue,
-                    behave = {};
+                    behave = {},
+                    behaviorLoad,
+                    requireName;
 
                 //this.$setType("*");
 
@@ -432,9 +437,26 @@ module.exports = function () {
                         if (scrapName) {
                             if (scrapName === "replace") {
                                 scrapValue = innerscraps[scrapName];
+                                scrapValue = scrapValue.trim();
 
-                                if (_behavior[scrapValue]) {
-                                    behave.inject = _behavior[scrapValue];
+                                // look inside the OOTB functionality
+                                behaviorLoad = _utils.resolveObject(_behavior, scrapValue);
+                                if (behaviorLoad) {
+                                    behave.inject = behaviorLoad;
+
+                                } else {
+                                    // try resolving user's custom object
+                                    try {
+                                        requireName = _path.join(_path.resolve("."), scrapValue);
+                                        behaviorLoad = require(requireName);
+                                        if (behaviorLoad) {
+                                            behave.inject = behaviorLoad[scrapName];
+                                            _log.warn("[CAT scrap-common] Module load successfuly but with missing method for scrap behavior:  '" + scrapName + "'");
+                                        }
+
+                                    } catch (e) {
+                                        // failed to load user behavior
+                                    }
                                 }
                             }
                         }

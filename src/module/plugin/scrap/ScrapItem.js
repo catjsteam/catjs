@@ -493,7 +493,8 @@ _clazz.prototype.$setReplaceData = function (config) {
                         apply: function (line) {
                             var me = this,
                                 currentLine,
-                                counter=0;
+                                counter= 0,
+                                delta, idx=0, test;
 
                             if (action && line) {
 
@@ -505,21 +506,37 @@ _clazz.prototype.$setReplaceData = function (config) {
                                     if (this.rows.indexOf(line.row) === this.rows.length-1) {
                                         // if this is the last cell...
                                         this.newlines =  action.call({}, this.lines, line.mark);
-                                        this.newlines.forEach(function(newline) {
+                                        if (this.newlines && _typedas.isArray(this.newlines)) {
 
-                                            me.$linesmap[me.rows[counter]] = newline;
-                                            counter++;
-                                        });
+                                            this.newlines.forEach(function(newline) {
+                                                me.$linesmap[me.rows[counter]] = newline;
+                                                counter++;
+                                            });
+
+                                            delta =  (this.rows.length - this.newlines.length);
+                                            if (delta !== 0) {
+                                                for (idx=counter; idx<delta; idx++) {
+                                                    me.$linesmap[me.rows[idx]] = "\r\n";
+                                                }
+                                            }
+
+                                        } else {
+                                            _log.warning("[CAT ScrapItem] While invoking 'replace' implementation: '" + action + "', No valid return value of type Array was found");
+                                        }
                                         this.$ready = 1;
 
                                     }
                                 }
 
+                                // after done processing the lines, replace the involved lines.
                                 if (this.$ready === 1) {
                                     // if we have processed all rows...
                                     currentLine = line.row-1;
-                                    if ( (currentLine) === (line.lines.length) && this.$linesmap[currentLine]) {
-                                        line.lines[currentLine-1] =  this.$linesmap[currentLine];
+                                    if ( (currentLine) === (line.lines.length)) {
+                                        test = this.$linesmap[currentLine]
+                                        if (test || test === null) {
+                                            line.lines[currentLine-1] =  ( (test || "") + ( (test && test.indexOf("\n") === -1) ? "\n" : "") );
+                                        }
                                     }
                                 }
                             }
