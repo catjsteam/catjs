@@ -11,6 +11,18 @@
 	<script src="../js/jquery.js"></script>
 	<script src="../_assets/js/index.js"></script>
 	<script src="../js/jquery.mobile-1.4.0.min.js"></script>
+
+    <!--
+@[scrap
+@@name catImport
+@@import[
+../cat.css
+../cat.js
+../cat.src.js
+]
+]@
+-->
+
 </head>
 <div data-role="page" class="jqm-demos" data-quicklinks="true">
 
@@ -49,17 +61,53 @@
 
 		<p>To visually integrate multiple radio buttons into a vertically grouped button set, the framework will automatically remove all margins between buttons and round only the top and bottom corners of the set if there is a <code> data-role="controlgroup"</code> attribute on the container.</p>
 
-		<div data-demo-html="true">
+        <!--
+                @[scrap
+                   @@name verDivScroll
+                   @@run@ radioManager
+                   @@embed true
+                   @@jqm scrollTo("verDiv");
+
+                ]@
+           -->
+        <!--
+                      @[scrap
+                         @@name verGroupRadio
+                         @@run@ radioManager
+                         @@embed true
+                         @@jqm checkRadio("verRadioGroup", "radio-choice-v-2c");
+                      ]@
+                    -->
+
+        <!--
+                      @[scrap
+                         @@name verGroupRadio2
+                         @@run@ radioManager
+                         @@embed true
+                         @@jqm checkRadio("verRadioGroup", "radio-choice-v-2a");
+                      ]@
+                    -->
+
+        <!--
+                     @[scrap
+                        @@name verGroupRadio3
+                        @@run@ radioManager
+                        @@embed true
+                        @@jqm checkRadio("verRadioGroup", "radio-choice-v-2d");
+                     ]@
+                   -->
+
+		<div id="verDiv" data-demo-html="true">
             <form>
-            		<fieldset data-role="controlgroup">
+            		<fieldset class="verGroup" data-role="controlgroup">
 					<legend>Vertical:</legend>
-					<input type="radio" name="radio-choice-v-2" id="radio-choice-v-2a" value="on">
+					<input type="radio" name="radio-choice-v-2" class="verRadioGroup" id="radio-choice-v-2a" value="on">
 					<label for="radio-choice-v-2a">One</label>
-					<input type="radio" name="radio-choice-v-2" id="radio-choice-v-2b" value="off">
+					<input type="radio" name="radio-choice-v-2"  class="verRadioGroup" id="radio-choice-v-2b" value="off">
 					<label for="radio-choice-v-2b">Two</label>
-					<input type="radio" name="radio-choice-v-2" id="radio-choice-v-2c" value="other">
+					<input type="radio" name="radio-choice-v-2"  class="verRadioGroup" id="radio-choice-v-2c" value="other">
 					<label for="radio-choice-v-2c">Three</label>
-                        <input type="radio" name="radio-choice-v-2" id="radio-choice-v-2d" value="Four">
+                        <input type="radio" name="radio-choice-v-2" class="verRadioGroup"  id="radio-choice-v-2d" value="Four">
                         <label for="radio-choice-v-2d">Four</label>
 				</fieldset>
         	</form>
@@ -70,15 +118,43 @@
 
 		<p>To make a horizontal button set, add the <code> data-type="horizontal"</code> to the <code>fieldset</code>.</p>
 
-		<div data-demo-html="true">
+
+        <!--
+                @[scrap
+                   @@name horDivScroll
+                   @@run@ radioManager
+                   @@embed true
+                   @@jqm scrollTo("horDiv");
+
+                ]@
+           -->
+        <!--
+                      @[scrap
+                         @@name horGroupRadio
+                         @@run@ radioManager
+                         @@embed true
+                         @@jqm checkRadio("horGroup", "radio-choice-h-2c");
+                      ]@
+                    -->
+
+        <!--
+                     @[scrap
+                        @@name horGroupRadio2
+                        @@run@ radioManager
+                        @@embed true
+                        @@jqm checkRadio("horGroup", "radio-choice-h-2b");
+                     ]@
+                   -->
+
+		<div id="horDiv" data-demo-html="true">
             <form>
 				<fieldset data-role="controlgroup" data-type="horizontal">
 					<legend>Horizontal:</legend>
-					<input type="radio" name="radio-choice-h-2" id="radio-choice-h-2a" value="on" checked="checked">
+					<input type="radio" name="radio-choice-h-2" class="horGroup" id="radio-choice-h-2a" value="on" checked="checked">
 					<label for="radio-choice-h-2a">One</label>
-					<input type="radio" name="radio-choice-h-2" id="radio-choice-h-2b" value="off">
+					<input type="radio" name="radio-choice-h-2" class="horGroup" id="radio-choice-h-2b" value="off">
 					<label for="radio-choice-h-2b">Two</label>
-					<input type="radio" name="radio-choice-h-2" id="radio-choice-h-2c" value="other">
+					<input type="radio" name="radio-choice-h-2" class="horGroup" id="radio-choice-h-2c" value="other">
 					<label for="radio-choice-h-2c">Three</label>
 				</fieldset>
         	</form>
@@ -152,12 +228,52 @@
 
 		<h2>Enhanced</h2>
 
-		<div data-demo-html="true">
+
+
+        <!--
+                @[scrap
+                   @@name agreeDivScroll
+                   @@run@ radioManager
+                   @@embed true
+                   @@jqm scrollTo("agreeDiv");
+
+                ]@
+           -->
+        <!--
+                      @[scrap
+                         @@name agreeGroupRadio
+                         @@run@ radioManager
+                         @@embed true
+                         @@jqm checkRadio("agreeClass", "radio-enhanced");
+                      ]@
+                    -->
+        <div id="agreeDiv" data-demo-html="true">
 			<div class="ui-radio">
 				<label for="radio-enhanced" class="ui-btn ui-corner-all ui-btn-inherit ui-btn-icon-left ui-radio-off">I agree</label>
-				<input type="radio" name="radio-enhanced" id="radio-enhanced" data-enhanced="true">
+				<input type="radio" name="radio-enhanced" class="agreeClass" id="radio-enhanced" data-enhanced="true">
 			</div>
 		</div><!--/demo-html -->
+        <!--
+       @[scrap
+          @@name radioManager
+          @@perform[
+              @@verDivScroll repeat(1)
+              @@verGroupRadio repeat(1)
+              @@verGroupRadio2 repeat(1)
+              @@verGroupRadio3 repeat(1)
+              @@horDivScroll repeat(1)
+              @@horGroupRadio repeat(1)
+              @@horGroupRadio2 repeat(1)
+                @@agreeDivScroll repeat(1)
+                @@agreeGroupRadio repeat(1)
+
+          ]
+          @@embed true
+          @@catui on
+          @@manager true
+          @@signal TESTEND
+       ]@
+       -->
 
 	</div><!-- /content -->
 	    <div data-role="panel" class="jqm-navmenu-panel" data-position="left" data-display="overlay" data-theme="a">

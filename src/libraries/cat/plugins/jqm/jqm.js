@@ -28,9 +28,8 @@ _cat.plugins.jqm = function () {
 
             clickRef: function (idName) {
                 $(document).ready(function(){
-
+                    $('.ui-btn').removeClass('ui-focus');
                     $('#' + idName).trigger('click');
-                    $.mobile.activePage.find('#' + idName).click();
                     window.location = $('#' + idName).attr('href');
                 });
 
@@ -39,9 +38,9 @@ _cat.plugins.jqm = function () {
 
             click: function (idName) {
                 $(document).ready(function(){
-
+                    $('.ui-btn').removeClass('ui-focus');
                     $('#' + idName).trigger('click');
-
+                    $('#' + idName).closest('.ui-btn').addClass('ui-focus');
                 });
 
             },

@@ -11,6 +11,16 @@
 	<script src="../js/jquery.js"></script>
 	<script src="../_assets/js/index.js"></script>
 	<script src="../js/jquery.mobile-1.4.0.min.js"></script>
+        <!--
+@[scrap
+@@name catImport
+@@import[
+../cat.css
+../cat.js
+../cat.src.js
+]
+]@
+-->
 </head>
 <body>
 <div data-role="page" class="jqm-demos" data-quicklinks="true">
@@ -18,7 +28,15 @@
 	<div data-role="header" class="jqm-header">
 		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
-		<a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
+        <!--
+                      @[scrap
+                         @@name appMenuGridsClick
+                         @@run@ gridManager
+                         @@embed true
+                         @@jqm clickRef("appMenuGrids");
+                      ]@
+                    -->
+		<a href="#" id="appMenuGrids" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
 		<a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
 	</div><!-- /header -->
 
@@ -57,7 +75,16 @@
 
 		<p>The other grid layout configuration uses <code>class=ui-grid-b</code> on the parent, and 3 child container elements, each with its respective <code>ui-block-a/b/c</code> class, to create a three-column layout (33/33/33%). </p>
 
-			<div data-demo-html="true">
+        <!--
+                  @[scrap
+                     @@name btnDivsScroll
+                     @@run@ gridManager
+                     @@embed true
+                     @@jqm scrollTo("btnDivs");
+
+                  ]@
+             -->
+			<div id="btnDivs" data-demo-html="true">
 				<div class="ui-grid-b">
 					<div class="ui-block-a"><div class="ui-bar ui-bar-a" style="height:60px">Block A</div></div>
 					<div class="ui-block-b"><div class="ui-bar ui-bar-a" style="height:60px">Block B</div></div>
@@ -69,11 +96,38 @@
 
 			<div data-demo-html="true">
 				<fieldset class="ui-grid-b">
-					<div class="ui-block-a"><input type="button" value="Hmm"></div>
-					<div class="ui-block-b"><input type="reset" value="No"></div>
-					<div class="ui-block-c"><input type="submit" value="Yes"></div>
+                    <!--
+                      @[scrap
+                         @@name hmmBtnClick
+                         @@run@ gridManager
+                         @@embed true
+                         @@jqm click("hmmBtn");
+                      ]@
+                    -->
+
+                    <!--
+                      @[scrap
+                         @@name yesBtnClick
+                         @@run@ gridManager
+                         @@embed true
+                         @@jqm click("yesBtn");
+                      ]@
+                    -->
+                    <!--
+                      @[scrap
+                         @@name noBtnClick
+                         @@run@ gridManager
+                         @@embed true
+                         @@jqm click("noBtn");
+                      ]@
+                    -->
+					<div class="ui-block-a"><input id="hmmBtn" type="button" value="Hmm"></div>
+					<div class="ui-block-b"><input id="noBtn" type="reset" value="No"></div>
+					<div class="ui-block-c"><input id="yesBtn" type="submit" value="Yes"></div>
 				</fieldset>
 			</div><!--/demo-html -->
+
+
 
             <p>View more examples of <a href="../grids-buttons/" data-ajax="false">buttons in grids</a>.</p>
 
@@ -126,7 +180,9 @@
 
 		<p>The framework adds left and right margin to buttons in a grid (one exception: 100% width button elements). For a single button you can use a container with class <code>ui-grid-solo</code> and wrap the button in a div with class <code>ui-block-a</code> like the example below. This way the button will get the same margin. View more examples of <a href="../grids-buttons/" data-ajax="false">buttons in grids</a>.</p>
 
-			<div data-demo-html="true">
+			<div id="soloGrid" data-demo-html="true">
+
+
 				<div class="ui-grid-a">
 					<div class="ui-block-a"><a class="ui-shadow ui-btn ui-corner-all">Previous</a></div>
 					<div class="ui-block-b"><a class="ui-shadow ui-btn ui-corner-all">Next</a></div>
@@ -136,6 +192,8 @@
 					<div class="ui-block-a"><input type="button" value="More"></div>
 				</div>
 			</div><!--/demo-html -->
+
+
 
 		<h2>Responsive grids</h2>
 
@@ -208,12 +266,78 @@
 <li data-filtertext="buttons button markup buttonmarkup method anchor link button element"><a href="../button-markup/" data-ajax="false">Buttons</a></li>
 <li data-filtertext="form button widget input button submit reset"><a href="../button/" data-ajax="false">Button widget</a></li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Checkboxradio widget</h3>
+    <!--
+             @[scrap
+                @@name radioMenuScroll
+                @@run@ gridManager
+                @@embed true
+                @@jqm scrollTo("radioMenu");
+             ]@
+        -->
+
+    <!--
+                     @[scrap
+                        @@name radioMenuClick
+                        @@run@ gridManager
+                        @@embed true
+                        @@jqm click("radioMenu");
+                     ]@
+                   -->
+
+    <!--
+                   @[scrap
+                      @@name radioMenuScroll2
+                      @@run@ gridManager
+                      @@embed true
+                      @@jqm scrollTo("radioMenu");
+                   ]@
+              -->
+
+    <!--
+                  @[scrap
+                     @@name radioRef
+                     @@run@ gridManager
+                     @@embed true
+                     @@jqm clickRef("radioRef");
+                  ]@
+                -->
+	<h3 id="radioMenu">Checkboxradio widget</h3>
 	<ul>
-		<li data-filtertext="form checkboxradio widget checkbox input checkboxes controlgroups"><a href="../checkboxradio-checkbox/" data-ajax="false">Checkboxes</a></li>
-		<li data-filtertext="form checkboxradio widget radio input radio buttons controlgroups"><a href="../checkboxradio-radio/" data-ajax="false">Radio buttons</a></li>
+		<li data-filtertext="form checkboxradio widget checkbox input checkboxes controlgroups"><a  href="../checkboxradio-checkbox/" data-ajax="false">Checkboxes</a></li>
+		<li data-filtertext="form checkboxradio widget radio input radio buttons controlgroups"><a id="radioRef" href="../checkboxradio-radio/" data-ajax="false">Radio buttons</a></li>
 	</ul>
 </li>
+
+<!--
+           @[scrap
+              @@name scrollTopGrids
+              @@run@ gridManager
+              @@embed true
+              @@jqm scrollTop();
+           ]@
+      -->
+
+<!--
+@[scrap
+@@name gridManager
+@@perform[
+   @@btnDivsScroll repeat(1)
+   @@hmmBtnClick repeat(1)
+   @@yesBtnClick repeat(1)
+   @@noBtnClick repeat(1)
+   @@scrollTopGrids repeat(1)
+   @@appMenuGridsClick repeat(1)
+   @@radioMenuScroll repeat(1)
+   @@radioMenuClick repeat(1)
+   @@radioMenuScroll2 repeat(1)
+   @@radioRef repeat(1)
+]
+@@embed true
+@@catui on
+@@manager true
+@@signal TESTEND
+]@
+-->
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
 	<h3>Collapsible (set) widget</h3>
 	<ul>

@@ -2,6 +2,7 @@ var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _scraputils = require("./Utils");
 
+var tipNum = 1;
 module.exports = function () {
 
     return {
@@ -27,13 +28,17 @@ module.exports = function () {
                         validcode = false;
 
                     jqmRows = this.get("jqm");
+                    var scrapConf = me.config;
 
                     if (jqmRows) {
                         _utils.prepareCode(jqmRows);
                         jqm = jqmRows.join("\n");
-
+                        var scrap = scrapConf,
+                            scrapName = (scrap.name ? scrap.name[0] : undefined);
 
                         if (jqm) {
+
+                            me.print("_cat.core.ui.setContent({style: 'color:blue', header: '" + scrapName + "', desc: '" + jqm + "',tips: 1});");
 
                             var match = _scraputils.generate({
                                 api: "scrollTo",

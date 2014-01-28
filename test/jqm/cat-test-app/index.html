@@ -87,8 +87,8 @@
                      @@name formWidgetsScroll
                      @@run@ mainPageManager
                      @@embed true
-                     @@assert ok(true, "Fake test")
                      @@jqm scrollTo("formWidgets");
+                     @@description scroll to form
                   ]@
              -->
 
@@ -96,10 +96,9 @@
         			<h3 id="formWidgets">Form widgets</h3>
                     <!--
                       [scrap
-                         @@name checkboxradioClick
+                         @@name checkboxradioMainClick
                          @@run@ mainPageManager
                          @@embed true
-                         @@assert ok(true, "Fake test")
                          @@jqm clickRef("checkboxradioPage");
                       ]@
                     -->
@@ -119,13 +118,10 @@
           @@name mainPageManager
           @@perform[
               @@formWidgetsScroll repeat(1)
-              @@formWidgetsScroll delay(10000)
-
-
-
+              @@checkboxradioMainClick repeat(1)
           ]
-          @@catui on
           @@embed true
+          @@catui on
           @@manager true
           @@signal TESTEND
       ]@

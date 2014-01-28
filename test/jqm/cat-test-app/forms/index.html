@@ -15,6 +15,7 @@
 @[scrap
 @@name catImport
 @@import[
+    ../cat.css
    ../cat.js
    ../cat.src.js
 ]
@@ -27,7 +28,15 @@
 		<div data-role="header" class="jqm-header">
 			<h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
-			<a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
+            <!--
+                      @[scrap
+                         @@name appMenuFormClick
+                         @@run@ scrapFormManager
+                         @@embed true
+                         @@jqm clickRef("appMenuForm");
+                      ]@
+                    -->
+			<a href="#" id="appMenuForm" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
 			<a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
 			</div><!-- /header -->
 
@@ -430,10 +439,12 @@
                 @@hRadio repeat(1)
                 @@hRadio2 repeat(1)
                 @@scrollTopForm repeat(1)
+                @@appMenuFormClick repeat(1)
 
             ]
 
             @@embed true
+            @@catui on
             @@manager true
             @@signal TESTEND
         ]@
@@ -570,13 +581,74 @@ $( document ).bind( "mobileinit", function() {
 	</ul>
 </li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Grids</h3>
+    <!--
+                 @[scrap
+                    @@name gridsMenuScroll
+                    @@run@ scrapFormManager
+                    @@embed true
+                    @@jqm scrollTo("gridsMenu");
+                 ]@
+            -->
+
+    <!--
+                     @[scrap
+                        @@name gridsMenuClick
+                        @@run@ scrapFormManager
+                        @@embed true
+                        @@jqm click("gridsMenu");
+                     ]@
+                   -->
+
+    <!--
+                   @[scrap
+                      @@name gridsMenuScroll2
+                      @@run@ scrapFormManager
+                      @@embed true
+                      @@jqm scrollTo("gridsMenu");
+                   ]@
+              -->
+
+    <!--
+                  @[scrap
+                     @@name gridsRef
+                     @@run@ scrapFormManager
+                     @@embed true
+                     @@jqm clickRef("gridsPageLink");
+                  ]@
+                -->
+	<h3 id="gridsMenu">Grids</h3>
 	<ul>
-		<li data-filtertext="grids columns blocks content formatting rwd responsive css framework"><a href="../grids/" data-ajax="false">Grids</a></li>
+		<li data-filtertext="grids columns blocks content formatting rwd responsive css framework"><a id="gridsPageLink" href="../grids/" data-ajax="false">Grids</a></li>
 		<li data-filtertext="buttons in grids css framework"><a href="../grids-buttons/" data-ajax="false">Buttons in grids</a></li>
 		<li data-filtertext="custom responsive grids rwd css framework"><a href="../grids-custom-responsive/" data-ajax="false">Custom responsive grids</a></li>
 	</ul>
 </li>
+<!--
+        @[scrap
+            @@name scrapFormManager
+            @@perform[
+                @@formTextScroll repeat(1)
+                @@setTextForm repeat(1)
+                @@formDateScroll repeat(1)
+                @@setDate repeat(1)
+                @@checkbox-radioHScroll repeat(1)
+                @@hRadio repeat(1)
+                @@hRadio2 repeat(1)
+                @@scrollTopForm repeat(1)
+                @@appMenuFormClick repeat(1)
+                @@gridsMenuScroll repeat(1)
+                @@gridsMenuClick repeat(1)
+                @@gridsMenuScroll2 repeat(1)
+                @@gridsRef repeat(1)
+
+            ]
+
+            @@embed true
+            @@catui on
+            @@manager true
+            @@signal TESTEND
+        ]@
+        -->
 <li data-filtertext="blocks content formatting sections heading"><a href="../body-bar-classes/" data-ajax="false">Grouping and dividing content</a></li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
 	<h3>Icons</h3>
