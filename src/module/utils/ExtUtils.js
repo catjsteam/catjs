@@ -30,7 +30,13 @@ module.exports = function () {
                 basepath = config.basepath,
                 fileName = _path.basename(file, ".js"),
                 path,
-                pkgName;
+                pkgName,
+                newFile;
+
+            if (!file) {
+                _log.warning("[CAT extutils] No valid file was found, scrap info:" + (scrap || ""));
+                return undefined;
+            }
 
             path = _path.dirname(file);
             if (basepath) {
@@ -39,11 +45,13 @@ module.exports = function () {
             if (path.indexOf("/") === 0) {
                 path = path.substring(1);
             }
+
+            newFile = _path.join(_path.dirname(file), fileName.replace(fileName, ["_cat", fileName].join("_")));
             pkgName = (scrap ? [path.split("/").join("."), fileName, scrap.get("name")].join(".") : undefined);
 
             return {
                 pkgName: pkgName,
-                file: (file ? file.replace(fileName, ["_cat", fileName].join("_")) : undefined)
+                file: newFile
             };
 
         },

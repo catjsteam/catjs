@@ -1,213 +1,67 @@
 {
-    "name": "self-test",
+    "name": "sandbox",
 
-    "env": {
-        "source": "src/",
-        "target": "target/",
-        "lib": {
-            "name": "cat.test",
-            "source": "lib/",
-            "target": "lib/target/",
-            "copyto": "./target/self-test/"
-        }
+    "source": "src/",
+    "target": "target/",
+    "host": "localhost",
+    "port": "8086",
+    "protocol": "http",
+
+    "appserver": {
+        "host": "localhost",
+        "port": "8086",
+        "protocol": "http"
     },
-
-    "dependencies": [
-        {
-            "name": "dependency.loader",
-            "type": "loader",
-            "path": ["./plugins/"]
-        },
-        {
-            "name": "spawn.ext",
-            "type": "spawn"
-        },
-        {
-            "name": "phantomjs.ext",
-            "type": "phantomjs"
-        },
-        {
-            "name": "webserver.ext",
-            "type": "webserver"
-        },
-        {
-            "name": "scan.ext",
-            "type": "scan"
-        },
-        {
-            "name": "inject.ext",
-            "type": "inject"
-        },
-        {
-            "name": "source.scan",
-            "type": "scan",
-            "path": "./../cat-tests"
-        },
-        {
-            "name": "target.clean",
-            "type": "clean"
-        }
-    ],
 
     "plugins": [
         {
-            "name": "sample.plugin",
-            "type": "sample",
-            "dependency": "manager",
-            "customAttribute": "install"
-        },
-        {
-            "name": "scrap.common",
-            "type": "scrap-common"
-        },
-        {
-            "name": "scrap.sencha",
-            "type": "scrap-sencha"
-        },
-        {
-            "name": "scrap.mock",
-            "type": "scrap-mock"
-        },
-        {
-            "name": "scrap.enyo",
-            "type": "scrap-enyo"
-        },
-        {
             "name": "init.scrap",
             "type": "scrap",
-            "dependency": "scan.ext",
-            "filters": [
-                {
-                    "type": "file",
-                    "ext": ["*"],
-                    "exclude": true
-                },
-                {
-                    "type": "file",
-                    "ext": [".js", ".html"],
-                    "exclude": false
-                },
-                {
-                    "type": "file",
-                    "ext": [".js"],
-                    "pattern": ["*sencha*"],
-                    "exclude": true
-                },
-                {
-                    "type": "file",
-                    "ext": [".js"],
-                    "pattern": ["*mock*"],
-                    "exclude": true
-                }
-            ]
+            "dependency": "scan"
         },
         {
-            "name": "ext.scrap",
-            "type": "scrapext",
-            "dependency": "dependency.loader"
-        },
-        {
-            "name": "target.libraries",
+            "name": "libraries.build",
             "type": "libraries",
             "dependency": "manager",
             "imports": ["chai", "tmr", "cat"],
-            "action": "install"
-        }, {
-            "name": "target.libraries.clean",
-            "type": "libraries",
-            "dependency": "manager",
-            "imports": ["cat"],
-            "action": "clean"
+            "action": "build"
         },
         {
             "name": "init.copy",
             "type": "copy",
-            "dependency": "source.scan",
+            "dependency": "scan",
+            "path": "./../cat-tests",
             "from": {
                 "path": "/"
             },
             "to": {
-                "path": "./target/"
+                "path": "./target/sandbox"
+            }
+        },
+        {
+            "name": "lib.copy",
+            "type": "copy",
+            "dependency": "scan",
+            "path": "./lib",
+            "from": {
+                "path": "/"
             },
-            "filters": [
-                {
-                    "type": "file",
-                    "ext": [".jar"],
-                    "exclude": true
-                }
-            ]
+            "to": {
+                "path": "./target/sandbox/"
+            }
         },
         {
-            "name": "target.clean",
-            "type": "clean",
-            "dependency": "target.clean",
-            "path": ["lib", "src"]
-        },
-        {
-            "name": "target.inject",
-            "type": "inject",
-            "dependency": "inject.ext"
-        },
-        {
-            "name": "npm.install",
-            "type": "spawn",
-            "dependency": "spawn.ext",
-            "command": "npm",
-            "args": ["install", "--no-color"]
-        },
-        {
-            "name": "project.install",
-            "type": "spawn",
-            "dependency": "spawn.ext",
-            "command": "grunt",
-            "args": ["install", "--no-color"]
-        },
-        {
-            "name": "project.clean",
-            "type": "spawn",
-            "dependency": "spawn.ext",
-            "command": "grunt",
-            "args": ["clean", "--no-color"]
-        },
-        {
-            "name": "mobile.install",
-            "type": "spawn",
-            "dependency": "spawn.ext",
-            "command": "adb",
-            "args": ["install", "-r", "phonegap.apk"]
-        },
-        {
-            "name": "mobile.test",
-            "type": "spawn",
-            "dependency": "spawn.ext",
-            "command": "adb",
-            "args": ["shell", "am", "start",  "-e", "IP", "192.168.1.103", "-n", "com.hp.aamobile.cat/.example"]
-        },
-        {
-            "name": "project.phantomjs",
-            "type": "phantomjs",
-            "dependency": "phantomjs.ext",
-            "file": "phantomjs-script.js",
-            "host": "http://localhost:8089"
-        },
-        {
-            "name": "project.webserver.start",
-            "type": "webserver",
-            "dependency": "webserver.ext",
-            "action": "start",
-            "set": [{"key": "assert", "var": "assert", "prop":"result"}]
-        },
-        {
-            "name": "project.webserver.stop",
-            "type": "webserver",
-            "dependency": "webserver.ext",
-            "action": "stop"
+            "name": "project.minify",
+            "type": "minify",
+            "path": "./target/sandbox/",
+            "filename": "cat.src.js",
+            "src":["./src/**/*.js"]
         },
         {
             "name": "parse.test.a",
             "type": "fileparse",
             "dependency": "manager",
-            "files": ["./target/self-test/src/test/test-replaceme.txt"],
+            "files": ["./target/sandbox/src/test/test-replaceme.txt"],
             "pattern": "replaceme",
             "replace": "xxxtestxxx",
             "applyto":["filename", "content"],
@@ -217,60 +71,20 @@
 
     "tasks": [
         {
-          "name": "tests",
-           "plugins": ["parse.test.a"]
+            "name": "tests",
+            "plugins": ["parse.test.a"]
         },
         {
             "name": "init",
-            "plugins": ["npm.install", "init.copy",  "target.libraries"]
+            "plugins": ["init.copy", "libraries.build", "lib.copy"]
         },
         {
             "name": "scrap",
-            "plugins": ["scrap.common", "scrap.sencha", "scrap.mock", "ext.scrap", "init.scrap"]
+            "plugins": ["scrap-common",  "custom.plugin", "init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap.common", "scrap.sencha", "scrap.mock", "ext.scrap", "target.inject", "project.install"]
-        },
-        {
-            "name": "lib",
-            "plugins":["target.libraries"]
-        },
-        {
-            "name": "clean.lib",
-            "plugins":["target.libraries.clean"]
-        },
-        {
-            "name": "install",
-            "plugins":["project.install"]
-        },
-        {
-            "name": "clean",
-            "plugins": ["project.clean", "target.libraries.clean", "target.clean"]
-        },
-        {
-            "name": "test",
-            "plugins": ["project.webserver.start", "project.phantomjs", "project.webserver.stop"]
-        },
-        {
-            "name": "mtest",
-            "plugins": ["mobile.install", "project.webserver.start", "mobile.test" ]
-        },
-        {
-            "name": "phantom",
-            "plugins": ["project.phantomjs"]
-        },
-        {
-            "name": "server.start",
-            "plugins": ["project.webserver.start"]
-        },
-        {
-            "name": "server.stop",
-            "plugins": ["project.webserver.stop"]
-        },
-        {
-            "name": "sample",
-            "plugins": ["sample.plugin"]
+            "plugins": ["scrap-common",  "custom.plugin", "project.inject", "project.minify"]
         }
     ]
 

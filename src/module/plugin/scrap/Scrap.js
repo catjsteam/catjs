@@ -14,7 +14,8 @@ var _utils = catrequire("cat.utils"),
 
 module.exports = function () {
 
-    var _scraps = [],
+    var _scrapNames = ["name"],
+        _scraps = [],
         _scrapmap,
 
         /**
@@ -53,6 +54,8 @@ module.exports = function () {
                 func = config.func,
                 single = config.single,
                 singleton = config.singleton;
+
+            _scrapNames.push(attrName);
 
             _clazz.prototype[attrName + "Init"] = function () {
                 if (single !== undefined) {
@@ -263,7 +266,10 @@ module.exports = function () {
             function _apply(scrap) {
 
                 if (scrap) {
-                    scrap.apply();
+                    if (isApply) {
+                        scrap.buildContext(_scrapNames);
+                        scrap.apply();
+                    }
 
                     fileName = scrap.get("file");
                     if (!metaData.files[fileName]) {
@@ -277,7 +283,8 @@ module.exports = function () {
             var metaData = {files: {}, project: {}},
                 fileName, scrap, scraps,
                 root, baseClonedProjectPath,
-                updateobj = {files: metaData.files, project: metaData.project};
+                updateobj = {files: metaData.files, project: metaData.project},
+                isApply = true;
 
             if (config) {
                 scraps = (config.scraps || _scraps);
@@ -301,7 +308,7 @@ module.exports = function () {
         },
 
         get: function (key) {
-            return new _clazz({id: key})
+            return new _clazz({id: key});
         },
 
         getScrapEnum: function () {
