@@ -1,71 +1,85 @@
 {
-  "name": "CAT",
-  "description": "CAT Testing Framework",
-  "version": "0.0.1",
-  "homepage": "TBD",
-  "author": {
-    "name": "arik",
-    "email": "arik.levine@hp.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/TBD"
-  },
-  "bugs": {
-    "url": "TBD"
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/arik/grunt-plugin/blob/master/LICENSE-MIT"
-    }
-  ],
-  "engines": {
-    "node": ">= 0.8.0"
-  },
-  "scripts": {
-    "preinstall": "node precatinstall.js",
-    "test": "node cattest.js"
-  },
-  "dependencies": {
-    "fs.extra": "~1.2.1",
-    "typedas": "~1.0.0",
-    "log": "~1.4.0",
-    "q": "~0.9.6",
-    "nopt": "~2.1.1",
-    "properties": "~0.3.3",
-    "async": "~0.2.9",
-    "line-reader": "~0.2.3",
-    "string-format": "~0.2.1",
-    "js-beautify": "~1.4.0",
-    "watch": "~0.8.0",
-    "date-format-lite": "~0.1.5",
-    "line-by-line": "~0.1.1",
-    "underscore": "~1.5.1",
-    "minimatch": "~0.2.12",
-    "phantomjs": "~1.9.1-0",
-    "package-script": "~0.0.2",
-    "bower-config": "~0.5.0",
-    "uglify-js": "~2.4.0",
-    "jshint": "~2.1.10",
-    "bower": "~1.2.7",
-    "express": "~3.4.4",
-    "test-model-reporter": "~0.0.6",
-    "Faker": "~0.5.11",
-    "js.utils": "~0.1.2",
-    "require-mapper": "0.0.2",
-    "glob": "~3.2.7",
-    "my-ip": "~1.1.0",
-    "json-lint": "~0.1.0",
-    "prompt": "~0.2.12"
-  },
-  "keywords": [
-    "test",
-    "cat",
-    "catcli",
-    "annotation",
-    "app",
-    "mobile",
-    "hytml5"
-  ]
+    "name": "CAT",
+    "description": "Mobile-Web Automation Framework",
+    "version": "0.1.0",
+    "homepage": "TBD",
+    "author": {
+        "name": "arik",
+        "email": "arik.levine@hp.com"
+    },
+    "maintainers": [
+        {
+            "name": "Pablo Retyk",
+            "email": "pablo.retyk@hp.com"
+        },
+        {
+            "name": "Ran Snir",
+            "email": "ran.snir@hp.com"
+        },
+        {
+            "name": "Lior Reuven",
+            "email": "lior.reuven@hp.com"
+        }
+    ],
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/HPSoftware/CATCore"
+    },
+    "bugs": {
+        "url": "https://github.com/HPSoftware/CATCore/issues"
+    },
+    "licenses": [
+        {
+            "type": "Apache-2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    ],
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+    "scripts": {
+        "preinstall": "node precatinstall.js"
+    },
+    "dependencies": {
+        "fs.extra": "~1.2.1",
+        "typedas": "~1.0.0",
+        "log": "~1.4.0",
+        "q": "~0.9.6",
+        "nopt": "~2.1.1",
+        "properties": "~0.3.3",
+        "async": "~0.2.9",
+        "line-reader": "~0.2.3",
+        "string-format": "~0.2.1",
+        "js-beautify": "~1.4.0",
+        "watch": "~0.8.0",
+        "date-format-lite": "~0.1.5",
+        "line-by-line": "~0.1.1",
+        "underscore": "~1.5.1",
+        "minimatch": "~0.2.12",
+        "phantomjs": "~1.9.1-0",
+        "package-script": "~0.0.2",
+        "bower-config": "~0.5.0",
+        "uglify-js": "~2.4.0",
+        "jshint": "~2.1.10",
+        "bower": "~1.2.7",
+        "express": "~3.4.4",
+        "test-model-reporter": "~0.0.6",
+        "Faker": "~0.5.11",
+        "js.utils": "~0.1.2",
+        "require-mapper": "0.0.2",
+        "glob": "~3.2.7",
+        "my-ip": "~1.1.0",
+        "json-lint": "~0.1.0",
+        "prompt": "~0.2.12"
+    },
+    "keywords": [
+        "test",
+        "cat",
+        "catcli",
+        "annotation",
+        "app",
+        "mobile",
+        "hytml5"
+    ]
 }
