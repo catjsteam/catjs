@@ -1,17 +1,45 @@
 ************ Node Modules usage
 (i) init (s) scrap (j) inject
-catcli -pisj
+catcli -isj
 
 
 
 ************ CAT Phantom test usage
-    cat command:  catcli -pt
+    cat command:  catcli -t
 
 ************ CAT Mobile test usage
-(android)
+    cat command:  catcli -m
 
-    1)  Install resource CATTest.apk on your device
-    2)  Make sure that you have adb installed
-    3)  run the command:
-        *)  cat command:   catcli -p --task mtest
-        *)  grunt command: grunt cat.compile
+
+Install CAT as NPM for development environment
+==============================================
+
+== Ubuntu
+
+add a symbolic link:
+--------------------
+:/usr/bin$ sudo ln -s ~/dev/projects/lastboy/HPSoftware/CATCore/catcli ./catcli
+
+remove symbolic link:
+---------------------
+:/usr/bin$ sudo unlink catcli
+
+check exiting symbolic links:
+-----------------------------
+:/usr/bin$ ls -lah | grep ^l | grep cat
+
+
+== Windows
+
+add shortcut:
+-------------
+create catcli.cmd file under folder: C:\Users\[windows user]\AppData\Roaming\npm\
+
+:: Created by npm, please don't edit manually.
+@IF EXIST "%~dp0\node.exe" (
+  "%~dp0\node.exe"  "[path_to_catcli_file]\catcli" %*
+) ELSE (
+  node  "[path_to_catcli_file]\catcli" %*
+)
+
+
