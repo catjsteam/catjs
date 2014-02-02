@@ -1,6 +1,6 @@
 {
     "proxy": {
-        "enable": true,
+        "enable": false,
         "base": {
             "host": "web-proxy.isr.hp.com",
             "port": "8080"
