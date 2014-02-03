@@ -1,0 +1,11 @@
+$dark-theme: false;
+$base-color: #2672EC;
+
+@import 'sencha-touch/windows';
+@import 'sencha-touch/windows/all';
+
+$background-color: #fff !default;
+$primary-text-color: #000 !default;
+$secondary-text-color: #000 !default;
+
+@import 'shared';

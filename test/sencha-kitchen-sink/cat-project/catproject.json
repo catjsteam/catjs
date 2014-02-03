@@ -1,0 +1,102 @@
+{
+    "name": "sencha-kitchen-sink",
+
+    "source": "src/",
+    "target": "target/",
+    "host": "localhost",
+    "port": "8089",
+    "protocol": "http",
+
+    "appserver": {
+        "host": "localhost",
+        "port": "8089",
+        "protocol": "http"
+    },
+
+    "plugins": [
+        {
+            "name": "init.scrap",
+            "type": "scrap",
+            "dependency": "scan",
+            "filters": [
+                {
+                    "type": "file",
+                    "ext": ["*"],
+                    "exclude": true
+                },
+                {
+                    "type": "file",
+                    "ext": [".js", ".html"],
+                    "exclude": false
+                },
+                {
+                    "type": "file",
+                    "ext": [".js"],
+                    "pattern": ["*sencha*"],
+                    "exclude": true
+                },
+                {
+                    "type": "file",
+                    "ext": [".js"],
+                    "pattern": ["*mock*"],
+                    "exclude": true
+                }
+            ]
+        },
+        {
+            "name": "libraries.build",
+            "type": "libraries",
+            "dependency": "manager",
+            "imports": ["chai", "tmr", "cat"],
+            "action": "build"
+        },
+        {
+            "name": "init.copy",
+            "type": "copy",
+            "dependency": "scan",
+            "path": "./../cat-test-app",
+            "from": {
+                "path": "/"
+            },
+            "to": {
+                "path": "./target/sencha-kitchen-sink"
+            }
+        },
+        {
+            "name": "lib.copy",
+            "type": "copy",
+            "dependency": "scan",
+            "path": "./lib",
+            "from": {
+                "path": "/"
+            },
+            "to": {
+                "path": "./target/sencha-test/"
+            }
+        },
+        {
+            "name": "project.minify",
+            "type": "minify",
+            "path": "./target/sencha-kitchen-sink/",
+            "filename": "cat.src.js",
+            "src":["./src/**/*.js"]
+        }
+    ],
+
+    "tasks": [
+        {
+            "name": "init",
+            "plugins": ["init.copy", "libraries.build", "lib.copy"]
+        },
+        {
+            "name": "scrap",
+            "plugins": ["scrap-common", "scrap-sencha", "custom.plugin", "init.scrap"]
+        },
+        {
+            "name": "inject",
+            "plugins": ["scrap-common", "scrap-sencha", "custom.plugin", "project.inject", "project.minify"]
+        }
+    ]
+
+
+}
