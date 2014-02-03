@@ -88,22 +88,21 @@
                      @@run@ mainPageManager
                      @@embed true
                      @@jqm scrollTo("formWidgets");
-                     @@description scroll to form
                   ]@
              -->
 
                 <div class="jqm-block-content">
         			<h3 id="formWidgets">Form widgets</h3>
                     <!--
-                      [scrap
-                         @@name checkboxradioMainClick
+                      @[scrap
+                         @@name checkboxesRef
                          @@run@ mainPageManager
                          @@embed true
-                         @@jqm clickRef("checkboxradioPage");
+                         @@jqm clickRef("checkboxesRef");
                       ]@
                     -->
 
-                    <p><a id="checkboxradioPage" href="checkboxradio-checkbox/" data-ajax="false">Checkboxes</a>, <a href="checkboxradio-radio/" data-ajax="false">Radio buttons</a></p>
+                    <p><a id="checkboxesRef" href="checkboxradio-checkbox/" data-ajax="false">Checkboxes</a>, <a href="checkboxradio-radio/" data-ajax="false">Radio buttons</a></p>
         			<p><a href="selectmenu/" data-ajax="false">Selectmenu</a>, <a href="selectmenu-custom/" data-ajax="false">Custom menu</a></p>
         			<p><a href="flipswitch/" data-ajax="false">Flipswitch</a></p>
         			<p><a href="slider/" data-ajax="false">Slider</a>, <a href="rangeslider/" data-ajax="false">Rangeslider</a></p>
@@ -118,7 +117,7 @@
           @@name mainPageManager
           @@perform[
               @@formWidgetsScroll repeat(1)
-              @@checkboxradioMainClick repeat(1)
+              @@checkboxesRef repeat(1)
           ]
           @@embed true
           @@catui on

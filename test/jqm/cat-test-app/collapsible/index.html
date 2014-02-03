@@ -7,13 +7,24 @@
     <link rel="stylesheet" href="../css/themes/default/jquery.mobile-1.4.0.min.css">
     <link rel="stylesheet" href="../_assets/css/jqm-demos.css">
     <link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+
     <script src="../js/jquery.js"></script>
     <script src="../_assets/js/index.js"></script>
     <script src="../js/jquery.mobile-1.4.0.min.js"></script>
     <style id="negateDoubleBorder">
         #demo-borders .ui-collapsible-heading .ui-btn { border-top-width: 1px !important; }
     </style>
+    <!--
+@[scrap
+@@name catImport
+@@import[
+../cat.css
+../cat.js
+../cat.src.js
+]
+]@
+-->
+
 </head>
 <body>
 <div data-role="page" class="jqm-demos" data-quicklinks="true">
@@ -21,7 +32,15 @@
     <div data-role="header" class="jqm-header">
 		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
-        <a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
+        <!--
+                    @[scrap
+                       @@name appMenuCollapsibleClick
+                       @@run@ collapsibleManager
+                       @@embed true
+                       @@jqm clickRef("appMenuCollapsible");
+                    ]@
+                  -->
+        <a id="appMenuCollapsible" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
         <a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
     </div><!-- /header -->
 
@@ -34,13 +53,32 @@
         <h2>Basic collapsible</h2>
 
         <p>To create a collapsible block of content, create a container and add the <code> data-role="collapsible"</code> attribute. Directly inside this container, add any header (H1-H6) or legend element. The framework will style the header to look like a clickable button and add a "+" icon to the left to indicate it's expandable. After the header, add any HTML markup you want to be collapsible. The framework will wrap this markup in a container that will be hidden/shown when the heading is clicked.</p>
+        <!--
+                  @[scrap
+                     @@name basicCollapsibleScroll
+                     @@run@ collapsibleManager
+                     @@embed true
+                     @@jqm scrollTo("basicCollapsibleScroll");
+                  ]@
+             -->
 
-        <div data-demo-html="true">
-            <div data-role="collapsible">
-                <h4>Heading</h4>
+        <!--
+                     @[scrap
+                        @@name basicCollapsibleClick
+                        @@run@ collapsibleManager
+                        @@embed true
+                        @@jqm collapsible("basicCollapsible");
+                     ]@
+                   -->
+
+        <div id="basicCollapsibleScroll" data-demo-html="true">
+            <div id="basicCollapsible" data-role="collapsible">
+                <h4 >Heading</h4>
                 <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
             </div>
         </div><!--/demo-html -->
+
+
 
         <h2>Theme</h2>
 
@@ -117,12 +155,68 @@
             </div>
 
         <h2>Legend</h2>
+        <!--
+                      @[scrap
+                         @@name legendScroll
+                         @@run@ collapsibleManager
+                         @@embed true
+                         @@jqm scrollTo("legend");
+                      ]@
+                 -->
 
-        <p>For forms, use a <code>fieldset</code> and <code>legend</code> for the collapsible.</p>
+
+        <p id="legend">For forms, use a <code>fieldset</code> and <code>legend</code> for the collapsible.</p>
         <div data-demo-html="true">
             <form>
-                <fieldset data-role="collapsible">
-                    <legend>Legend</legend>
+                <!--
+                     @[scrap
+                        @@name legendClick
+                        @@run@ collapsibleManager
+                        @@embed true
+                        @@jqm collapsible("legendClick");
+                     ]@
+                   -->
+
+                <!--
+                 @[scrap
+                    @@name setTextLegend
+                    @@run@ collapsibleManager
+                    @@embed true
+                    @@jqm setText("textinput-f", "hello from legend");
+                 ]@
+            -->
+
+
+                <!--
+                  @[scrap
+                     @@name setCheckCollaps3
+                     @@run@ collapsibleManager
+                     @@embed true
+                     @@jqm setCheck("checkbox-3-a");
+                  ]@
+             -->
+
+
+                <!--
+                  @[scrap
+                     @@name setCheckCollaps1
+                     @@run@ collapsibleManager
+                     @@embed true
+                     @@jqm setCheck("checkbox-1-a");
+                  ]@
+             -->
+
+                <!--
+                     @[scrap
+                        @@name legendUnClick
+                        @@run@ collapsibleManager
+                        @@embed true
+                        @@jqm collapsible("legendClick");
+                     ]@
+                   -->
+
+                <fieldset id="legendClick" data-role="collapsible">
+                    <legend >Legend</legend>
 
                     <label for="textinput-f">Text Input:</label>
                     <input type="text" name="textinput-f" id="textinput-f" placeholder="Text input" value="">
@@ -138,6 +232,9 @@
                 </fieldset>
             </form>
         </div><!--/demo-html -->
+
+
+
 
         <h2>Non-inset collapsible</h2>
 
@@ -361,9 +458,72 @@
 <li data-filtertext="form rangeslider widget dual sliders dual handle sliders range input"><a href="../rangeslider/" data-ajax="false">Rangeslider widget</a></li>
 <li data-filtertext="responsive web design rwd adaptive progressive enhancement PE accessible mobile breakpoints media query media queries"><a href="../rwd/" data-ajax="false">Responsive Web Design</a></li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Selectmenu widget</h3>
+
+
+    <!--
+                 @[scrap
+                    @@name selectMenuScroll
+                    @@run@ collapsibleManager
+                    @@embed true
+                    @@jqm scrollTo("selectMenu");
+                 ]@
+            -->
+
+    <!--
+                     @[scrap
+                        @@name selectMenuClick
+                        @@run@ collapsibleManager
+                        @@embed true
+                        @@jqm click("selectMenu");
+                     ]@
+                   -->
+
+    <!--
+                   @[scrap
+                      @@name selectMenuScroll2
+                      @@run@ collapsibleManager
+                      @@embed true
+                      @@jqm scrollTo("selectMenu");
+                   ]@
+              -->
+
+    <!--
+                  @[scrap
+                     @@name selectmenuRef
+                     @@run@ collapsibleManager
+                     @@embed true
+                     @@jqm clickRef("selectmenuRef");
+                  ]@
+                -->
+
+    <!--
+               @[scrap
+                 @@name collapsibleManager
+                 @@perform[
+                    @@basicCollapsibleScroll repeat(1)
+                    @@basicCollapsibleClick repeat(1)
+                    @@legendScroll repeat(1)
+                    @@legendClick repeat(1)
+                    @@setTextLegend repeat(1)
+                    @@setCheckCollaps3 repeat(1)
+                    @@setCheckCollaps1 repeat(1)
+                    @@legendUnClick repeat(1)
+                    @@appMenuCollapsibleClick repeat(1)
+                    @@selectMenuScroll repeat(1)
+                    @@selectMenuScroll2 repeat(1)
+                    @@selectmenuRef repeat(1)
+                 ]
+                 @@embed true
+                 @@catui on
+                 @@manager true
+                 @@signal TESTEND
+               ]@
+               -->
+
+
+	<h3 id="selectMenu">Selectmenu widget</h3>
 	<ul>
-		<li data-filtertext="form selectmenu widget select input custom select menu selects"><a href="../selectmenu/" data-ajax="false">Selectmenu</a></li>
+		<li data-filtertext="form selectmenu widget select input custom select menu selects"><a id="selectmenuRef" href="../selectmenu/" data-ajax="false">Selectmenu</a></li>
 		<li data-filtertext="form custom select menu selectmenu widget custom menu option optgroup multiple selects"><a href="../selectmenu-custom/" data-ajax="false">Custom select menu</a></li>
 		<li data-filtertext="filterable select filter popup dialog"><a href="../selectmenu-custom-filter/" data-ajax="false">Custom select menu with filter</a></li>
 	</ul>

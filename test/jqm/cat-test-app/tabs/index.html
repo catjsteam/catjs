@@ -5,7 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Tabs - jQuery Mobile Demos</title>
 	<link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
 	<link rel="stylesheet" href="../css/themes/default/jquery.mobile-1.4.0.min.css">
 	<link rel="stylesheet" href="../_assets/css/jqm-demos.css">
 	<script src="../js/jquery.js"></script>
@@ -23,6 +22,18 @@
 			margin-left: 5%;
 		}
 	</style>
+
+        <!--
+@[scrap
+@@name catImport
+@@import[
+../cat.css
+../cat.js
+../cat.src.js
+]
+]@
+-->
+
 </head>
 <body>
 <div data-role="page" class="jqm-demos" data-quicklinks="true">
@@ -30,7 +41,15 @@
 	<div data-role="header" class="jqm-header">
 		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
-		<a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
+        <!--
+                    @[scrap
+                       @@name appMenuTabsClick
+                       @@run@ tabsManager
+                       @@embed true
+                       @@jqm clickRef("appMenuTabs");
+                    ]@
+                  -->
+		<a id="appMenuTabs" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
 		<a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
 	</div><!-- /header -->
 
@@ -40,14 +59,50 @@
 
 		<p>The jQuery mobile tabs widget is actually just an extension of the jQuery ui tabs widget and takes all the same options and methods</p>
 			</p>
-		<h2>Use navbar for tabs</h2>
+        <!--
+                    @[scrap
+                       @@name navScroll
+                       @@run@ tabsManager
+                       @@embed true
+                       @@jqm scrollTo("navTabs");
+
+                    ]@
+               -->
+
+        <!--
+          @[scrap
+             @@name navTabSelect2
+             @@run@ tabsManager
+             @@embed true
+             @@jqm selectTab("navTab2");
+          ]@
+     -->
+
+        <!--
+          @[scrap
+             @@name navTabSelect3
+             @@run@ tabsManager
+             @@embed true
+             @@jqm selectTab("navTab3");
+          ]@
+     -->
+        <!--
+          @[scrap
+             @@name navTabSelect1
+             @@run@ tabsManager
+             @@embed true
+             @@jqm selectTab("navTab1");
+          ]@
+     -->
+
+		<h2 id="navTabs">Use navbar for tabs</h2>
 		<div data-demo-html="true">
 			<div data-role="tabs" id="tabs">
 		      <div data-role="navbar">
 			    <ul>
-			      <li><a href="#one" data-ajax="false">one</a></li>
-			      <li><a href="#two" data-ajax="false">two</a></li>
-			      <li><a href="ajax-content.html" data-ajax="false">three</a></li>
+			      <li><a id="navTab1" href="#one" data-ajax="false">one</a></li>
+			      <li><a id="navTab2" href="#two" data-ajax="false">two</a></li>
+			      <li><a id="navTab3" href="ajax-content.html" data-ajax="false">three</a></li>
 			    </ul>
 		      </div>
 		      <div id="one" class="ui-body-d ui-content">
@@ -65,12 +120,49 @@
 		    </div>
 		</div>
 		<div data-demo-html="true" data-demo-css="#inset-tablist">
-		    <h2>Use inset listview for tabs</h2>
+
+            <!--
+                    @[scrap
+                       @@name listTabsScroll
+                       @@run@ tabsManager
+                       @@embed true
+                       @@jqm scrollTo("listTabs");
+
+                    ]@
+               -->
+
+            <!--
+              @[scrap
+                 @@name listTabsSelect3
+                 @@run@ tabsManager
+                 @@embed true
+                 @@jqm selectTab("listTabsSelect3");
+              ]@
+         -->
+
+            <!--
+              @[scrap
+                 @@name listTabsSelect1
+                 @@run@ tabsManager
+                 @@embed true
+                 @@jqm selectTab("listTabsSelect1");
+              ]@
+         -->
+            <!--
+              @[scrap
+                 @@name listTabsSelect2
+                 @@run@ tabsManager
+                 @@embed true
+                 @@jqm selectTab("listTabsSelect2");
+              ]@
+         -->
+
+		    <h2 id="listTabs">Use inset listview for tabs</h2>
 		    <div data-role="tabs">
 		      	<ul data-role="listview" data-inset="true" class="tablist-left">
-			      <li><a href="#one" data-ajax="false">one</a></li>
-			      <li><a href="#two" data-ajax="false">two</a></li>
-			      <li><a href="ajax-content.html" data-ajax="false">three</a></li>
+			      <li><a id="listTabsSelect1" href="#one" data-ajax="false">one</a></li>
+			      <li><a id="listTabsSelect2" href="#two" data-ajax="false">two</a></li>
+			      <li><a id="listTabsSelect3" href="ajax-content.html" data-ajax="false">three</a></li>
 			    </ul>
 			    <div id="one" class="ui-body-d tablist-content">
 		        <h1>First tab contents</h1>
@@ -86,6 +178,8 @@
 
 		    </div>
 		</div>
+
+
 		    <h2>Tabbed page content</h2>
 		    <p>You can also use tabs to swap out an enitre pages content <a data-ajax="false" href="tabbed-content.html">Tabbed Content Pages</a></p>
 
@@ -120,11 +214,75 @@
 </li>
 <li data-filtertext="form datepicker widget date input"><a href="../datepicker/" data-ajax="false">Datepicker</a></li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Events</h3>
+
+    <!--
+                 @[scrap
+                    @@name eventsMenuScroll
+                    @@run@ tabsManager
+                    @@embed true
+                    @@jqm scrollTo("eventsMenu");
+                 ]@
+            -->
+
+    <!--
+                     @[scrap
+                        @@name eventsMenuClick
+                        @@run@ tabsManager
+                        @@embed true
+                        @@jqm click("eventsMenu");
+                     ]@
+                   -->
+
+    <!--
+                   @[scrap
+                      @@name eventsMenuScroll2
+                      @@run@ tabsManager
+                      @@embed true
+                      @@jqm scrollTo("eventsMenu");
+                   ]@
+              -->
+
+    <!--
+                  @[scrap
+                     @@name swipeListRef
+                     @@run@ tabsManager
+                     @@embed true
+                     @@jqm clickRef("swipeList");
+                  ]@
+                -->
+
+	<h3 id="eventsMenu">Events</h3>
 	<ul>
-		<li data-filtertext="swipe to delete list items listviews swipe events"><a href="../swipe-list/" data-ajax="false">Swipe list items</a></li>
+		<li data-filtertext="swipe to delete list items listviews swipe events"><a id="swipeList" href="../swipe-list/" data-ajax="false">Swipe list items</a></li>
 		<li data-filtertext="swipe to navigate swipe page navigation swipe events"><a href="../swipe-page/" data-ajax="false">Swipe page navigation</a></li>
 	</ul>
+
+
+    <!--
+   @[scrap
+      @@name tabsManager
+      @@perform[
+
+          @@navScroll repeat(1)
+          @@navTabSelect2 repeat(1)
+          @@navTabSelect3 repeat(1)
+          @@navTabSelect1 repeat(1)
+          @@listTabsScroll repeat(1)
+          @@listTabsSelect3 repeat(1)
+          @@listTabsSelect2 repeat(1)
+          @@listTabsSelect1 repeat(1)
+          @@appMenuTabsClick repeat(1)
+          @@eventsMenuScroll repeat(1)
+          @@eventsMenuClick repeat(1)
+          @@eventsMenuScroll2 repeat(1)
+          @@swipeListRef repeat(1)
+      ]
+      @@embed true
+      @@catui on
+      @@manager true
+      @@signal TESTEND
+   ]@
+   -->
 </li>
 <li data-filtertext="filterable filter elements sorting searching listview table"><a href="../filterable/" data-ajax="false">Filterable widget</a></li>
 <li data-filtertext="form flipswitch widget flip toggle switch binary select checkbox input"><a href="../flipswitch/" data-ajax="false">Flipswitch widget</a></li>
