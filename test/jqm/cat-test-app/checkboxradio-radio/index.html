@@ -5,7 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Radio buttons - jQuery Mobile Demos</title>
 	<link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
 	<link rel="stylesheet" href="../css/themes/default/jquery.mobile-1.4.0.min.css">
 	<link rel="stylesheet" href="../_assets/css/jqm-demos.css">
 	<script src="../js/jquery.js"></script>
@@ -29,7 +28,15 @@
 	<div data-role="header" class="jqm-header">
 		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
-		<a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
+        <!--
+                     @[scrap
+                        @@name appMenuRadioClick
+                        @@run@ radioManager
+                        @@embed true
+                        @@jqm clickRef("appMenuRadio");
+                     ]@
+                   -->
+		<a id="appMenuRadio" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
 		<a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
 	</div><!-- /header -->
 
@@ -253,27 +260,6 @@
 				<input type="radio" name="radio-enhanced" class="agreeClass" id="radio-enhanced" data-enhanced="true">
 			</div>
 		</div><!--/demo-html -->
-        <!--
-       @[scrap
-          @@name radioManager
-          @@perform[
-              @@verDivScroll repeat(1)
-              @@verGroupRadio repeat(1)
-              @@verGroupRadio2 repeat(1)
-              @@verGroupRadio3 repeat(1)
-              @@horDivScroll repeat(1)
-              @@horGroupRadio repeat(1)
-              @@horGroupRadio2 repeat(1)
-                @@agreeDivScroll repeat(1)
-                @@agreeGroupRadio repeat(1)
-
-          ]
-          @@embed true
-          @@catui on
-          @@manager true
-          @@signal TESTEND
-       ]@
-       -->
 
 	</div><!-- /content -->
 	    <div data-role="panel" class="jqm-navmenu-panel" data-position="left" data-display="overlay" data-theme="a">
@@ -290,13 +276,78 @@
 	</ul>
 </li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Collapsible (set) widget</h3>
+
+    <!--
+                 @[scrap
+                    @@name collapsibleMenuScroll
+                    @@run@ radioManager
+                    @@embed true
+                    @@jqm scrollTo("collapsibleMenuScroll");
+                 ]@
+            -->
+
+    <!--
+                     @[scrap
+                        @@name collapsibleMenuClick
+                        @@run@ radioManager
+                        @@embed true
+                        @@jqm click("collapsibleMenuScroll");
+                     ]@
+                   -->
+
+    <!--
+                   @[scrap
+                      @@name collapsibleMenuScroll2
+                      @@run@ radioManager
+                      @@embed true
+                      @@jqm scrollTo("collapsibleMenuScroll");
+                   ]@
+              -->
+
+    <!--
+                  @[scrap
+                     @@name collapsibleRef
+                     @@run@ radioManager
+                     @@embed true
+                     @@jqm clickRef("collapsibleRef");
+                  ]@
+                -->
+
+	<h3 id="collapsibleMenuScroll">Collapsible (set) widget</h3>
 	<ul>
-		<li data-filtertext="collapsibles content formatting"><a href="../collapsible/" data-ajax="false">Collapsible</a></li>
+		<li data-filtertext="collapsibles content formatting"><a id="collapsibleRef" href="../collapsible/" data-ajax="false">Collapsible</a></li>
 		<li data-filtertext="dynamic collapsible set accordion append expand"><a href="../collapsible-dynamic/" data-ajax="false">Dynamic collapsibles</a></li>
 		<li data-filtertext="accordions collapsible set widget content formatting grouped collapsibles"><a href="../collapsibleset/" data-ajax="false">Collapsible set</a></li>
 	</ul>
 </li>
+
+<!--
+      @[scrap
+         @@name radioManager
+         @@perform[
+             @@verDivScroll repeat(1)
+             @@verGroupRadio repeat(1)
+             @@verGroupRadio2 repeat(1)
+             @@verGroupRadio3 repeat(1)
+             @@horDivScroll repeat(1)
+             @@horGroupRadio repeat(1)
+             @@horGroupRadio2 repeat(1)
+               @@agreeDivScroll repeat(1)
+               @@agreeGroupRadio repeat(1)
+               @@appMenuRadioClick repeat(1)
+               @@collapsibleMenuScroll repeat(1)
+               @@collapsibleMenuClick repeat(1)
+               @@collapsibleMenuScroll2 repeat(1)
+               @@collapsibleRef repeat(1)
+
+         ]
+         @@embed true
+         @@catui on
+         @@manager true
+         @@signal TESTEND
+      ]@
+      -->
+
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
 	<h3>Controlgroup widget</h3>
 	<ul>

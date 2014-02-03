@@ -7,10 +7,19 @@
     <link rel="stylesheet" href="../css/themes/default/jquery.mobile-1.4.0.min.css">
     <link rel="stylesheet" href="../_assets/css/jqm-demos.css">
     <link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
     <script src="../js/jquery.js"></script>
     <script src="../_assets/js/index.js"></script>
     <script src="../js/jquery.mobile-1.4.0.min.js"></script>
+    <!--
+@[scrap
+@@name catImport
+@@import[
+../cat.css
+../cat.js
+../cat.src.js
+]
+]@
+-->
 </head>
 <body>
 <div data-role="page" class="jqm-demos" data-quicklinks="true">
@@ -18,7 +27,15 @@
     <div data-role="header" class="jqm-header">
 		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
-        <a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
+        <!--
+                    @[scrap
+                       @@name appMenuSelectClick
+                       @@run@ selectManager
+                       @@embed true
+                       @@jqm clickRef("appMenuSelect");
+                    ]@
+                  -->
+        <a id="appMenuSelect" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
         <a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
     </div><!-- /header -->
 
@@ -32,8 +49,37 @@
         <h2>Basic select</h2>
         <div data-demo-html="true">
             <form>
-            <div class="ui-field-contain">
+                <!--
+                @[scrap
+                   @@name basicSelectScroll
+                   @@run@ selectManager
+                   @@embed true
+                   @@jqm scrollTo("basicSelect");
+
+                ]@
+           -->
+
+            <div id="basicSelect" class="ui-field-contain">
                 <label for="select-native-1">Basic:</label>
+
+                <!--
+                  @[scrap
+                     @@name selectMenu3
+                     @@run@ selectManager
+                     @@embed true
+                     @@jqm selectMenu("select-native-1", 3);
+                  ]@
+             -->
+
+                <!--
+                  @[scrap
+                     @@name selectMenu2
+                     @@run@ selectManager
+                     @@embed true
+                     @@jqm selectMenu("select-native-1", 2);
+                  ]@
+             -->
+
                 <select name="select-native-1" id="select-native-1">
                     <option value="1">The 1st Option</option>
                     <option value="2">The 2nd Option</option>
@@ -43,6 +89,9 @@
             </div>
             </form>
         </div><!--/demo-html -->
+
+
+
 
         <h2>Mini</h2>
 
@@ -132,33 +181,69 @@
             </form>
         </div><!--/demo-html -->
 
-        <h2>Vertical group</h2>
+        <!--
+                @[scrap
+                   @@name verticalGroupScroll
+                   @@run@ selectManager
+                   @@embed true
+                   @@jqm scrollTo("verticalGroup");
+
+                ]@
+           -->
+
+        <h2 id="verticalGroup">Vertical group</h2>
 
         <div data-demo-html="true">
             <form>
             <fieldset data-role="controlgroup">
                 <legend>Vertical controlgroup:</legend>
                 <label for="select-native-5">Select A</label>
+                <!--
+                  @[scrap
+                     @@name selectGroupMenu5
+                     @@run@ selectManager
+                     @@embed true
+                     @@jqm selectMenu("select-native-5", "twoOption");
+                  ]@
+             -->
+                <!--
+                  @[scrap
+                     @@name selectGroupMenu7
+                     @@run@ selectManager
+                     @@embed true
+                     @@jqm selectMenu("select-native-7", "threeOption");
+                  ]@
+             -->
+                <!--
+                  @[scrap
+                     @@name selectGroupMenu6
+                     @@run@ selectManager
+                     @@embed true
+                     @@jqm selectMenu("select-native-6", "threeOption2");
+                  ]@
+             -->
                 <select name="select-native-5" id="select-native-5">
                     <option value="#">One</option>
-                    <option value="#">Two</option>
+                    <option id="twoOption" value="#">Two</option>
                     <option value="#">Three</option>
                 </select>
                 <label for="select-native-6">Select B</label>
                 <select name="select-native-6" id="select-native-6">
                     <option value="#">One</option>
                     <option value="#">Two</option>
-                    <option value="#">Three</option>
+                    <option id="threeOption2" value="#">Three</option>
                 </select>
                 <label for="select-native-7">Select C</label>
                 <select name="select-native-7" id="select-native-7">
                     <option value="#">One</option>
                     <option value="#">Two</option>
-                    <option value="#">Three</option>
+                    <option id="threeOption" value="#">Three</option>
                 </select>
             </fieldset>
             </form>
         </div><!--/demo-html -->
+
+
 
         <h2>Vertical group, mini</h2>
 
@@ -190,19 +275,53 @@
 
         <h2>Horizontal group</h2>
 
-        <div data-demo-html="true">
+        <!--
+               @[scrap
+                  @@name horGroupScroll
+                  @@run@ selectManager
+                  @@embed true
+                  @@jqm scrollTo("horGroup");
+
+               ]@
+          -->
+
+        <!--
+                 @[scrap
+                    @@name selectGroupMenu11
+                    @@run@ selectManager
+                    @@embed true
+                    @@jqm selectMenu("select-native-11", "twoOptionHor");
+                 ]@
+            -->
+        <!--
+          @[scrap
+             @@name selectGroupMenu12
+             @@run@ selectManager
+             @@embed true
+             @@jqm selectMenu("select-native-12", "oneOptionHor");
+          ]@
+     -->
+        <!--
+          @[scrap
+             @@name selectGroupMenu13
+             @@run@ selectManager
+             @@embed true
+             @@jqm selectMenu("select-native-13", "threeOptionHor");
+          ]@
+     -->
+        <div id="horGroup" data-demo-html="true">
             <form>
             <fieldset data-role="controlgroup" data-type="horizontal">
                 <legend>Horizontal controlgroup:</legend>
                 <label for="select-native-11">Select A</label>
                 <select name="select-native-11" id="select-native-11">
                     <option value="#">One</option>
-                    <option value="#">Two</option>
+                    <option id="twoOptionHor" value="#">Two</option>
                     <option value="#">Three</option>
                 </select>
                 <label for="select-native-12">Select B</label>
                 <select name="select-native-12" id="select-native-12">
-                    <option value="#">One</option>
+                    <option id="oneOptionHor" value="#">One</option>
                     <option value="#">Two</option>
                     <option value="#">Three</option>
                 </select>
@@ -210,12 +329,37 @@
                 <select name="select-native-13" id="select-native-13">
                     <option value="#">One</option>
                     <option value="#">Two</option>
-                    <option value="#">Three</option>
+                    <option id="threeOptionHor" value="#">Three</option>
                 </select>
             </fieldset>
             </form>
         </div><!--/demo-html -->
 
+        <!--
+    @[scrap
+       @@name selectManager
+       @@perform[
+           @@basicSelectScroll repeat(1)
+           @@selectMenu3 repeat(1)
+           @@selectMenu2 repeat(1)
+           @@verticalGroupScroll repeat(1)
+           @@selectGroupMenu5 repeat(1)
+           @@selectGroupMenu7 repeat(1)
+           @@selectGroupMenu6 repeat(1)
+           @@horGroupScroll repeat(1)
+           @@selectGroupMenu11 repeat(1)
+           @@selectGroupMenu12 repeat(1)
+           @@selectGroupMenu13 repeat(1)
+           @@appMenuSelectClick repeat(1)
+           @@tabsMenuScroll repeat(1)
+           @@tabsMenuClick repeat(1)
+       ]
+       @@embed true
+       @@catui on
+       @@manager true
+       @@signal TESTEND
+    ]@
+    -->
         <h2>Horizontal group, mini</h2>
 
         <div data-demo-html="true">
@@ -397,7 +541,26 @@
 		<li data-filtertext="responsive tables table reflow stack custom styles"><a href="../table-reflow-styling/" data-ajax="false">Table Reflow custom styles</a></li>
 	</ul>
 </li>
-<li data-filtertext="ui tabs widget"><a href="../tabs/" data-ajax="false">Tabs widget</a></li>
+<!--
+ @[scrap
+    @@name tabsMenuScroll
+    @@run@ selectManager
+    @@embed true
+    @@jqm scrollTo("tabsRef");
+ ]@
+-->
+
+<!--
+                 @[scrap
+                    @@name tabsMenuClick
+                    @@run@ selectManager
+                    @@embed true
+                    @@jqm clickRef("tabsRef");
+                 ]@
+               -->
+
+
+<li data-filtertext="ui tabs widget"><a id="tabsRef" href="../tabs/" data-ajax="false">Tabs widget</a></li>
 <li data-filtertext="form textinput widget text input textarea number date time tel email file color password"><a href="../textinput/" data-ajax="false">Textinput widget</a></li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
 	<h3>Theming</h3>

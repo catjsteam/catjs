@@ -62,6 +62,14 @@ module.exports = function () {
                                 });
                             }
 
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "clickButton",
+                                    apiname: "clickButton",
+                                    exp: jqm
+                                });
+                            }
+
 
                             if (!match) {
                                 match = _scraputils.generate({
@@ -104,7 +112,61 @@ module.exports = function () {
                                 });
                             }
 
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "collapsible",
+                                    apiname: "collapsible",
+                                    exp: jqm
+                                });
+                            }
 
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "selectMenu",
+                                    apiname: "selectMenu",
+                                    exp: jqm
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "selectTab",
+                                    apiname: "selectTab",
+                                    exp: jqm
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "swipeItemRight",
+                                    apiname: "swipeItemRight",
+                                    exp: jqm
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "swipeItemLeft",
+                                    apiname: "swipeItemLeft",
+                                    exp: jqm
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "swipePageRight",
+                                    apiname: "swipePageRight",
+                                    exp: jqm
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "swipePageLeft",
+                                    apiname: "swipePageLeft",
+                                    exp: jqm
+                                });
+                            }
 
                             if (match) {
                                 me.print("_cat.core.plugin('jqm').actions."+ match);

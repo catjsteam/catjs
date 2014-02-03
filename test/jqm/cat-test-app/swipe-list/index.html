@@ -5,12 +5,22 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Swipe to delete list item - jQuery Mobile Demos</title>
 	<link rel="shortcut icon" href="../favicon.ico">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+
 	<link rel="stylesheet" href="../css/themes/default/jquery.mobile-1.4.0.min.css">
 	<link rel="stylesheet" href="../_assets/css/jqm-demos.css">
 	<script src="../js/jquery.js"></script>
 	<script src="../_assets/js/index.js"></script>
 	<script src="../js/jquery.mobile-1.4.0.min.js"></script>
+    <!--
+@[scrap
+@@name catImport
+@@import[
+../cat.css
+../cat.js
+../cat.src.js
+]
+]@
+-->
 	<script>
 		$( document ).on( "pagecreate", "#demo-page", function() {
 
@@ -136,7 +146,15 @@
     <div data-role="header" class="jqm-header">
         <h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
-        <a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
+        <!--
+                    @[scrap
+                       @@name appMenuSwipeListClick
+                       @@run@ swipeItemsManager
+                       @@embed true
+                       @@jqm clickRef("appMenuSwipeList");
+                    ]@
+                  -->
+        <a id="appMenuSwipeList" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
         <a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
     </div><!-- /header -->
 
@@ -146,14 +164,31 @@
 
 		<p>This demo shows how you can remove list items by swiping left or right. For devices without touchscreen there is a delete button. This demo also contains a custom styled confirmation popup.</p>
 
-		<p><a href="#demo-page" data-transition="fade" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Open swipe list demo</a></p>
+        <!--
+             @[scrap
+                @@name openSwipe
+                @@run@ swipeItemsManager
+                @@embed true
+                @@jqm clickRef("openSwipe");
+             ]@
+           -->
+
+		<p><a id="openSwipe" href="#demo-page" data-transition="fade" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Open swipe list demo</a></p>
 
         <div data-demo-html="#demo-page" data-demo-js="true" data-demo-css="true"></div>
 
     </div><!-- /content -->
 	    <div data-role="panel" class="jqm-navmenu-panel" data-position="left" data-display="overlay" data-theme="a">
 	    	<ul class="jqm-list ui-alt-icon ui-nodisc-icon">
-<li data-filtertext="demos homepage" data-icon="home"><a href=".././">Home</a></li>
+            <!--
+              @[scrap
+                 @@name homePageRef
+                 @@run@ swipeItemsManager
+                 @@embed true
+                 @@jqm clickRef("homePage");
+              ]@
+            -->
+<li data-filtertext="demos homepage" data-icon="home"><a id="homePage" href=".././">Home</a></li>
 <li data-filtertext="introduction overview getting started"><a href="../intro/" data-ajax="false">Introduction</a></li>
 <li data-filtertext="buttons button markup buttonmarkup method anchor link button element"><a href="../button-markup/" data-ajax="false">Buttons</a></li>
 <li data-filtertext="form button widget input button submit reset"><a href="../button/" data-ajax="false">Button widget</a></li>
@@ -181,11 +216,50 @@
 </li>
 <li data-filtertext="form datepicker widget date input"><a href="../datepicker/" data-ajax="false">Datepicker</a></li>
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
-	<h3>Events</h3>
-	<ul>
-		<li data-filtertext="swipe to delete list items listviews swipe events"><a href="../swipe-list/" data-ajax="false">Swipe list items</a></li>
-		<li data-filtertext="swipe to navigate swipe page navigation swipe events"><a href="../swipe-page/" data-ajax="false">Swipe page navigation</a></li>
-	</ul>
+
+
+    <!--
+                 [scrap
+                    @@name eventsMenuScrollSwipeItems
+                    @@run@ swipeItemsManager
+                    @@embed true
+                    @@jqm scrollTo("eventsMenu");
+                 ]@
+            -->
+
+    <!--
+                     [scrap
+                        @@name eventsMenuClickSwipeItems
+                        @@run@ swipeItemsManager
+                        @@embed true
+                        @@jqm click("eventsMenu");
+                     ]@
+                   -->
+
+    <!--
+                   [scrap
+                      @@name eventsMenuScroll2SwipeItems
+                      @@run@ swipeItemsManager
+                      @@embed true
+                      @@jqm scrollTo("eventsMenu");
+                   ]@
+              -->
+
+    <!--
+                  [scrap
+                     @@name swipePageRef
+                     @@run@ swipeItemsManager
+                     @@embed true
+                     @@jqm clickRef("swipePage");
+                  ]@
+                -->
+
+    <h3 id="eventsMenu">Events</h3>
+    <ul>
+        <li data-filtertext="swipe to delete list items listviews swipe events"><a id="swipeList" href="../swipe-list/" data-ajax="false">Swipe list items</a></li>
+        <li data-filtertext="swipe to navigate swipe page navigation swipe events"><a id="swipePage" href="../swipe-page/" data-ajax="false">Swipe page navigation</a></li>
+    </ul>
+
 </li>
 <li data-filtertext="filterable filter elements sorting searching listview table"><a href="../filterable/" data-ajax="false">Filterable widget</a></li>
 <li data-filtertext="form flipswitch widget flip toggle switch binary select checkbox input"><a href="../flipswitch/" data-ajax="false">Flipswitch widget</a></li>
@@ -546,7 +620,15 @@
 
     <div data-role="header" data-position="fixed" data-theme="b">
         <h1>Inbox</h1>
-        <a href="#demo-intro" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
+        <!--
+                  @[scrap
+                     @@name backBtn
+                     @@run@ swipeItemsManager
+                     @@embed true
+                     @@jqm clickButton("backBtn");
+                  ]@
+                -->
+        <a id="backBtn" href="#demo-intro" data-rel="back" data-icon="carat-l" data-iconpos="notext">Back</a>
         <a href="#" onclick="window.location.reload()" data-icon="back" data-iconpos="notext">Refresh</a>
     </div><!-- /header -->
 
@@ -554,7 +636,16 @@
 
         <ul id="list" class="touch" data-role="listview" data-icon="false" data-split-icon="delete">
             <li>
-                <a href="#demo-mail">
+
+                <!--
+                   @[scrap
+                      @@name swipeAvery
+                      @@run@ swipeItemsManager
+                      @@embed true
+                      @@jqm swipeItemRight("swipeAvery");
+                   ]@
+                 -->
+                <a id="swipeAvery" href="#demo-mail">
                     <h3>Avery Walker</h3>
                     <p class="topic"><strong>Re: Dinner Tonight</strong></p>
                     <p>Sure, let's plan on meeting at Highland Kitchen at 8:00 tonight. Can't wait! </p>
@@ -572,7 +663,18 @@
                 <a href="#" class="delete">Delete</a>
             </li>
             <li>
-                <a href="#demo-mail">
+
+                <!--
+                   @[scrap
+                      @@name swipeMike
+                      @@run@ swipeItemsManager
+                      @@embed true
+                      @@jqm swipeItemLeft("swipeMike");
+                   ]@
+                 -->
+
+
+                <a id="swipeMike" href="#demo-mail">
                     <h3>Mike Taylor</h3>
                     <p class="topic"><strong>Re: This weekend in Maine</strong></p>
                     <p>Hey little buddy, sorry but I can't make it up to vacationland this weekend. Maybe next weekend?</p>
@@ -581,7 +683,16 @@
                 <a href="#" class="delete">Delete</a>
             </li>
             <li>
-                <a href="#demo-mail">
+
+                <!--
+                   @[scrap
+                      @@name swipeRedfin
+                      @@run@ swipeItemsManager
+                      @@embed true
+                      @@jqm swipeItemLeft("swipeRedfin");
+                   ]@
+                 -->
+                <a id="swipeRedfin" href="#demo-mail">
                     <h3>Redfin</h3>
                     <p class="topic"><strong>Redfin listing updates for today</strong></p>
                     <p>There are 3 updates for the home on your watchlist: 1 updated MLS listing and 2 homes under contract.</p>
@@ -590,7 +701,15 @@
                 <a href="#" class="delete">Delete</a>
             </li>
             <li>
-                <a href="#demo-mail">
+                <!--
+                   @[scrap
+                      @@name swipeAngela
+                      @@run@ swipeItemsManager
+                      @@embed true
+                      @@jqm swipeItemLeft("swipeAngela");
+                   ]@
+                 -->
+                <a id="swipeAngela" href="#demo-mail">
                     <h3>Angela Smith</h3>
                     <p class="topic"><strong>Link Request</strong></p>
                     <p>My name is Angela Smith, SEO Consultant. I've greatly enjoyed looking through your site and I was wondering if you'd be interested in providing a link</p>
@@ -687,6 +806,45 @@
 
         <p id="question">Are you sure you want to delete:</p>
 
+        <!--
+              @[scrap
+                 @@name swipeMikeDel
+                 @@run@ swipeItemsManager
+                 @@embed true
+                 @@jqm click("yes");
+              ]@
+            -->
+
+
+        <!--
+              @[scrap
+                 @@name swipeRedfinCancel
+                 @@run@ swipeItemsManager
+                 @@embed true
+                 @@jqm click("cancel");
+              ]@
+            -->
+
+        <!--
+              @[scrap
+                 @@name swipeAveryCancel
+                 @@run@ swipeItemsManager
+                 @@embed true
+                 @@jqm click("cancel");
+              ]@
+            -->
+
+
+        <!--
+              @[scrap
+                 @@name swipeAngelaDel
+                 @@run@ swipeItemsManager
+                 @@embed true
+                 @@jqm click("yes");
+              ]@
+            -->
+
+
         <div class="ui-grid-a">
             <div class="ui-block-a">
                 <a id="yes" class="ui-btn ui-corner-all ui-mini ui-btn-a" data-rel="back">Yes</a>
@@ -695,6 +853,32 @@
                 <a id="cancel" class="ui-btn ui-corner-all ui-mini ui-btn-a" data-rel="back">Cancel</a>
             </div>
         </div>
+
+        <!--
+              @[scrap
+                @@name swipeItemsManager
+                @@perform[
+                   @@openSwipe repeat(1)
+                   @@swipeMike repeat(1)
+                   @@swipeMikeDel repeat(1)
+                   @@swipeRedfin repeat(1)
+                   @@swipeRedfinCancel repeat(1)
+                   @@swipeAvery repeat(1)
+                   @@swipeAveryCancel repeat(1)
+                   @@swipeAngela repeat(1)
+                   @@swipeAngelaDel repeat(1)
+                   @@backBtn repeat(1)
+                   @@appMenuSwipeListClick repeat(1)
+                   @@homePageRef repeat(1)
+
+
+                ]
+                @@embed true
+                @@catui on
+                @@manager true
+                @@signal TESTEND
+              ]@
+              -->
 
 	</div><!-- /popup -->
 
