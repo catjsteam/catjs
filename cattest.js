@@ -13,6 +13,6 @@ require('package-script').spawn([
     },
     callback: function () {
 
-        console.log("[CAT test process done.")
+        console.log("[CAT test process done.");
     }
 });

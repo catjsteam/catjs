@@ -77,7 +77,7 @@ module.exports = function () {
             return this._mode;
         };
 
-    }
+    };
 
     return {
         ext: function (fn) {
@@ -86,6 +86,6 @@ module.exports = function () {
             }
             return new fn();
         }
-    }
+    };
 
 }();

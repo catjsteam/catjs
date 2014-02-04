@@ -71,9 +71,9 @@ module.exports = _basePlugin.ext(function () {
          * @returns {{dependencies: Array}}
          */
         validate: function() {
-            return { dependencies: ["manager"]}
+            return { dependencies: ["manager"]};
         }
 
-    }
+    };
 
 });

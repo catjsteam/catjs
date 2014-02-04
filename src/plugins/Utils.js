@@ -15,7 +15,7 @@ module.exports = function () {
         generate: function(config) {
 
             //str = (config.exp).match(/setText\((.*)\);/);
-            var str = regexputils.getMatch(config.exp, [config.api, "\\((.*)\\);"].join(""))
+            var str = regexputils.getMatch(config.exp, [config.api, "\\((.*)\\);"].join(""));
             if (str) {
 
                 // split the args, parseInt the args that are numbers

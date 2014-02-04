@@ -27,7 +27,7 @@ function _validateConfigEntry(key, config) {
     if (key === "singleton") {
         value = config[key];
         if (value) {
-            if (value == 2) {
+            if (value === 2) {
                 config[key] = 1;
             }
         }
@@ -225,7 +225,7 @@ _clazz.prototype.addConfig = function (arr, key) {
 
         arr.forEach(function(item) {
 
-            if (item && item.key && (typeof(item.value) != 'undefined')) {
+            if (item && item.key && (typeof(item.value) !== 'undefined')) {
 
                 this.config[key][item.key] = item.value;
 
@@ -389,7 +389,7 @@ _clazz.prototype.update = function (key, config) {
 
 _clazz.prototype.getContextItem = function(key) {
     return this.$$context.get(key);
-}
+};
 
 _clazz.prototype.buildContext = function(scrapNames) {
     var me = this;
@@ -466,7 +466,7 @@ _clazz.prototype.$setReplaceData = function (config) {
             if (replaceRowsData) {
                 lvalue = (replaceRowsData[0] ? replaceRowsData[0].trim() : undefined);
                 rvalue = (replaceRowsData[1] ? replaceRowsData[1].trim() : undefined);
-                if (lvalue && rvalue != undefined) {
+                if (lvalue && rvalue !== undefined) {
                     if (lvalue === "after") {
                         idx = row + 1;
                         size = (idx + Number(rvalue));
@@ -533,7 +533,7 @@ _clazz.prototype.$setReplaceData = function (config) {
                                     // if we have processed all rows...
                                     currentLine = line.row-1;
                                     if ( (currentLine) === (line.lines.length)) {
-                                        test = this.$linesmap[currentLine]
+                                        test = this.$linesmap[currentLine];
                                         if (test || test === null) {
                                             line.lines[currentLine-1] =  ( (test || "") + ( (test && test.indexOf("\n") === -1) ? "\n" : "") );
                                         }
@@ -541,7 +541,7 @@ _clazz.prototype.$setReplaceData = function (config) {
                                 }
                             }
                         }
-                    }
+                    };
                     this.set("replaceinfo", value);
                 }
             }

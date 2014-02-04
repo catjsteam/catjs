@@ -7,6 +7,7 @@ var _global = catrequire("cat.global"),
     _props = catrequire("cat.props"),
     _watch = catrequire("cat.watch"),
     _catconfig,
+    _loadCATConfig,
 
     /**
      * CAT Configuration class
@@ -38,10 +39,10 @@ var _global = catrequire("cat.global"),
 
                 ext.getPhase = function() {
                     return (ext.phase || "default");
-                }
+                };
                 me._extmap[ext.name] = {externalConfig: externalConfig, ext: ext, ref: null};
             }
-        };
+        }
 
         this._extmap = {};
         this._watch = {};
@@ -90,8 +91,6 @@ var _global = catrequire("cat.global"),
             }
 
         }
-
-
     };
 
     /**

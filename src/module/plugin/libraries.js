@@ -39,11 +39,11 @@ module.exports = _basePlugin.ext(function () {
             }
 
             this.concats[key].push(concat);
-        }
+        };
 
         this.get = function(key) {
             return this.concats[key];
-        }
+        };
 
         this.all = function() {
             var result = [],
@@ -59,7 +59,7 @@ module.exports = _basePlugin.ext(function () {
             }
 
             return result;
-        }
+        };
     }
 
     var _emitter,
@@ -168,7 +168,7 @@ module.exports = _basePlugin.ext(function () {
                             _log.warning(_props.get("cat.plugin.libraries.config.missing").format("[libraries ext]", library.name));
                         }
                     } catch (e) {
-                        _log.error(_props.get("cat.file.copy.failed").format("[libraries]", from, e))
+                        _log.error(_props.get("cat.file.copy.failed").format("[libraries]", from, e));
                     }
                 }
 
@@ -215,12 +215,167 @@ module.exports = _basePlugin.ext(function () {
                         _utils.copySync(manifestLib, targetManifestPath);
                     }
                 } catch (e) {
-                    _log.error(_props.get("cat.file.copy.failed").format("[libraries]", targetManifestPath, e))
+                    _log.error(_props.get("cat.file.copy.failed").format("[libraries]", targetManifestPath, e));
                 }
 
                 actions.install = function () {
 
                     var bowerConfig = {cwd: workPath};
+
+                    function _installLibs(lib, mode) {
+
+                        function __installLib(data) {
+
+                            if (!data) {
+                                return undefined;
+                            }
+
+                            var src = data.src,
+                                type = data.type,
+                                path = data.path,
+                                name = data.name,
+                                funcs = {
+                                    "_baseCopy": function(config) {
+                                        var src = config.src,
+                                            path = config.path,
+                                            name = config.name,
+                                            content = config.content;
+
+                                        if (src) {
+                                            src = _utils.globmatch({src: src});
+
+                                            src.forEach(function(item) {
+                                                if (item) {
+                                                    _utils.copySync(item, _path.join(path, name));
+                                                }
+                                            });
+                                        } else if (content) {
+                                            _fs.writeFileSync(_path.join(path, name), content);
+                                        }
+                                    },
+
+                                    "json": function(config) {
+
+                                        var parse = ('parse' in config ? config.parse : undefined),
+                                            src = "src" in config && config.src,
+                                            path = config.path,
+                                            name = config.name;
+
+                                        if (src) {
+                                            src = _utils.globmatch({src: src});
+
+                                            src.forEach(function(item) {
+                                                var content;
+
+                                                if (item) {
+                                                    content = _fs.readFileSync(item, "utf8");
+                                                    if (content) {
+                                                        funcs._baseCopy({
+                                                            content: content,
+                                                            name: name,
+                                                            path: path
+                                                        });
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    },
+
+                                    "css": function(config) {
+
+                                        funcs._baseCopy(config);
+                                    },
+
+                                    "js" : function(config) {
+
+                                        var src = config.src,
+                                            path = config.path,
+                                            name = config.name;
+
+                                        jsutils.dev({
+                                            src: src,
+                                            out:{
+                                                name: name,
+                                                path: path
+                                            },
+                                            jshint: {
+                                                opt: {
+                                                    "evil": true,
+                                                    "strict": false,
+                                                    "curly": true,
+                                                    "eqeqeq": true,
+                                                    "immed": false,
+                                                    "latedef": true,
+                                                    "newcap": false,
+                                                    "noarg": true,
+                                                    "sub": true,
+                                                    "undef": true,
+                                                    "boss": true,
+                                                    "eqnull": true,
+                                                    "node": true,
+                                                    "es5": false
+                                                },
+                                                "globals": {
+                                                    XMLHttpRequest: true,
+                                                    document: true,
+                                                    _cat: true,
+                                                    $ : true,
+                                                    window : true,
+                                                    chai: true
+                                                }
+                                            }
+                                        });
+                                    }
+                                };
+
+                            if (!src || !type || !path || !name) {
+                                _log.error("[CAT libraries install] Not valid argument(s) 'src' / 'type' / 'path' / 'name' ");
+                            }
+
+                            resolvedSrcs = [];
+                            src.forEach(function(item) {
+                                resolvedSrcs.push(_path.join(libWorkPath, item));
+                            });
+
+                            data.src = resolvedSrcs;
+                            funcs[type].call(this, data);
+
+
+                        }
+
+                        var jsutils = _jsutils.Task,
+                            src,
+                            resolvedSrcs = [],
+                            targetPath = library.base,
+                            libData;
+
+                        // init
+                        // TODO TBD ... DEV is hard coded
+                        if (mode in library && library[mode]) {
+                            libData = library[mode];
+                            targetPath = _path.join(libWorkPath, targetPath);
+                            if (targetPath) {
+                                // create internal project library folder if not exists
+                                if (!_fs.existsSync(targetPath)) {
+                                    _fs.mkdirpSync(targetPath);
+                                }
+                            }
+
+                            if (_typedas.isArray(libData)) {
+                                libData.forEach(function(data) {
+                                    data.path = targetPath;
+                                    __installLib(data);
+                                });
+
+                                _copydone();
+
+                            } else {
+                                _log.error("[CAT libraries install] library's dev property should be of 'Array' type");
+
+                            }
+                        }
+
+                    }
 
                     if (library.install === "static") {
 
@@ -228,161 +383,6 @@ module.exports = _basePlugin.ext(function () {
 
 
                     } else if (library.install === "internal") {
-
-                        function _installLibs(lib, mode) {
-
-                            function __installLib(data) {
-
-                                if (!data) {
-                                    return undefined;
-                                }
-
-                                var src = data.src,
-                                    type = data.type,
-                                    path = data.path,
-                                    name = data.name,
-                                    funcs = {
-                                        "_baseCopy": function(config) {
-                                            var src = config.src,
-                                                path = config.path,
-                                                name = config.name,
-                                                content = config.content;
-
-                                            if (src) {
-                                                src = _utils.globmatch({src: src});
-
-                                                src.forEach(function(item) {
-                                                    if (item) {
-                                                        _utils.copySync(item, _path.join(path, name));
-                                                    }
-                                                });
-                                            } else if (content) {
-                                                _fs.writeFileSync(_path.join(path, name), content);
-                                            }
-                                        },
-
-                                        "json": function(config) {
-
-                                            var parse = ('parse' in config ? config.parse : undefined),
-                                                src = "src" in config && config.src,
-                                                path = config.path,
-                                                name = config.name;
-
-                                            if (src) {
-                                                src = _utils.globmatch({src: src});
-
-                                                src.forEach(function(item) {
-                                                    var content;
-
-                                                    if (item) {
-                                                        content = _fs.readFileSync(item, "utf8");
-                                                        if (content) {
-                                                            funcs._baseCopy({
-                                                                content: content,
-                                                                name: name,
-                                                                path: path
-                                                            });
-                                                        }
-                                                    }
-                                                });
-                                            }
-                                        },
-
-                                        "css": function(config) {
-
-                                            funcs._baseCopy(config);
-                                        },
-
-                                        "js" : function(config) {
-
-                                            var src = config.src,
-                                                path = config.path,
-                                                name = config.name;
-
-                                            jsutils.dev({
-                                                src: src,
-                                                out:{
-                                                    name: name,
-                                                    path: path
-                                                },
-                                                jshint: {
-                                                    opt: {
-                                                        "evil": true,
-                                                        "strict": false,
-                                                        "curly": true,
-                                                        "eqeqeq": true,
-                                                        "immed": false,
-                                                        "latedef": true,
-                                                        "newcap": false,
-                                                        "noarg": true,
-                                                        "sub": true,
-                                                        "undef": true,
-                                                        "boss": true,
-                                                        "eqnull": true,
-                                                        "node": true,
-                                                        "es5": false
-                                                    },
-                                                    "globals": {
-                                                        XMLHttpRequest: true,
-                                                        document: true,
-                                                        _cat: true,
-                                                        $ : true,
-                                                        window : true,
-                                                        chai: true
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    };
-
-                                if (!src || !type || !path || !name) {
-                                    _log.error("[CAT libraries install] Not valid argument(s) 'src' \ 'type' \ 'path' \ 'name' ")
-                                }
-
-                                resolvedSrcs = [];
-                                src.forEach(function(item) {
-                                    resolvedSrcs.push(_path.join(libWorkPath, item));
-                                });
-
-                                data.src = resolvedSrcs;
-                                funcs[type].call(this, data);
-
-
-                            }
-
-                            var jsutils = _jsutils.Task,
-                                src,
-                                resolvedSrcs = [],
-                                targetPath = library.base,
-                                libData;
-
-                            // init
-                            // TODO TBD ... DEV is hard coded
-                            if (mode in library && library[mode]) {
-                                libData = library[mode];
-                                targetPath = _path.join(libWorkPath, targetPath);
-                                if (targetPath) {
-                                    // create internal project library folder if not exists
-                                    if (!_fs.existsSync(targetPath)) {
-                                        _fs.mkdirpSync(targetPath);
-                                    }
-                                }
-
-                                if (_typedas.isArray(libData)) {
-                                    libData.forEach(function(data) {
-                                        data.path = targetPath;
-                                        __installLib(data);
-                                    });
-
-                                    _copydone();
-
-                                } else {
-                                    _log.error("[CAT libraries install] library's dev property should be of 'Array' type");
-
-                                }
-                            }
-
-                        }
 
                          _installLibs(library, "dev");
 
@@ -426,7 +426,7 @@ module.exports = _basePlugin.ext(function () {
                     if (library.install === "internal") {
                         path = _path.join(libWorkPath, path);
                         _utils.deleteSync(path);
-                        _exec()
+                        _exec();
                     } else if (library.install === "bower") {
                         _utils.deleteSync(_path.join(workPath, library.name));
                         _exec();
@@ -477,7 +477,7 @@ module.exports = _basePlugin.ext(function () {
                                         });
                                     }
                                 }
-                                _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue)
+                                _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue);
                             }
                         }
                     });
@@ -555,9 +555,9 @@ module.exports = _basePlugin.ext(function () {
          * @returns {{dependencies: Array}}
          */
         validate: function() {
-            return { dependencies: ["manager"]}
+            return { dependencies: ["manager"]};
         }
 
-    }
+    };
 
 });

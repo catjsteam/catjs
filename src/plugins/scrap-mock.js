@@ -30,7 +30,7 @@ module.exports = function () {
                         mock,
                         me = this,
                         validcode = false;
-                    debugger;
+
                     mockRows = this.get("mock");
 
                     if (mockRows) {
@@ -40,37 +40,37 @@ module.exports = function () {
 
                         if (mock) {
 
-                            var mockCode = (mock).match(/equal\((.*)\);/);
+                            var args, mockCode = (mock).match(/equal\((.*)\);/);
 
                             if (mockCode) {
 
                                 // split the args, parseInt the args that are numbers
                                 mockCode[1] = mockCode[1].replace(/ /g,"");
-                                var args = mockCode[1].split(",");
+                                args = mockCode[1].split(",");
 
-                                me.print("if (" + args[0] + "===" + args[1] + ") { console.log(" + args[2] + "); } else { console.log(" + args[3] + "); }")
+                                me.print("if (" + args[0] + "===" + args[1] + ") { console.log(" + args[2] + "); } else { console.log(" + args[3] + "); }");
 
                                 me.print("console.log(tests_db);");
 
 
                             } else {
-                                var mockCode = (mock).match(/set\((.*)\);/);
+                                mockCode = (mock).match(/set\((.*)\);/);
 
                                 if (mockCode) {
 
                                     mockCode[1] = mockCode[1].replace(/ /g,"");
-                                    var args = mockCode[1].split(",");
+                                    args = mockCode[1].split(",");
 
                                     me.print(args[0] + "=" + args[1] + ";");
 
                                 } else {
 
-                                    var mockCode = (mock).match(/get\((.*)\);/);
+                                    mockCode = (mock).match(/get\((.*)\);/);
 
                                     if (mockCode) {
 
                                         mockCode[1] = mockCode[1].replace(/ /g,"");
-                                        var args = mockCode[1].split(",");
+                                        args = mockCode[1].split(",");
 
                                         me.print(args[1] + "=" + args[0] + ";");
 
@@ -93,6 +93,6 @@ module.exports = function () {
         getType: function () {
             return "scrap-mock";
         }
-    }
+    };
 
 };

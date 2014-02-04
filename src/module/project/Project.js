@@ -55,7 +55,6 @@ var _fsconfig = require("./../utils/fs/Config.js"),
         if (!config) {
             _log.error(msg[0]);
             throw msg[0];
-            return undefined;
         }
 
         path = (config.path || ".");

@@ -12,7 +12,7 @@ module.exports = function () {
     /**
      * Synchronized process for creating folder recursively
      */
-    _mkdirSync = function (folder) {
+    var _mkdirSync = function (folder) {
         if (!_fs.existsSync(folder)) {
             try {
                 _fs.mkdirRecursiveSync(folder);
@@ -71,7 +71,7 @@ module.exports = function () {
 
         isWindows: function () {
             var type = _os.platform();
-            if (type.toLocaleLowerCase() == "win32") {
+            if (type.toLocaleLowerCase() === "win32") {
                 return true;
             }
 
@@ -300,7 +300,7 @@ module.exports = function () {
             if (arr && _typedas.isArray(arr)) {
                 arr.forEach(function (item) {
                     if (item !== null && item !== undefined) {
-                        newArr.push(item)
+                        newArr.push(item);
                     }
                 });
             }
@@ -397,7 +397,7 @@ module.exports = function () {
                 pids.forEach(function (pid) {
                     if (excludes) {
                         excludes.forEach(function (exclude) {
-                            if (pid != exclude) {
+                            if (pid !== exclude) {
                                 try {
                                     process.kill(pid, "SIGKILL");
 
@@ -411,6 +411,6 @@ module.exports = function () {
                 });
             }
         }
-    }
+    };
 
 }();

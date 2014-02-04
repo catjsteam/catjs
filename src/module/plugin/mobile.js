@@ -61,7 +61,6 @@ module.exports = _basePlugin.ext(function () {
             me.port = config.port;
             me.pkg = config.pkg;
             me.app = config.app;
-            me.ip;
 
             if (!me.host) {
                 _utils.log("error", "[CAT mobile plugin] No valid host was found");
@@ -107,7 +106,7 @@ module.exports = _basePlugin.ext(function () {
                     app: this.app
                 })
             };
-        }
+        };
     }
 
     return {
@@ -205,9 +204,9 @@ module.exports = _basePlugin.ext(function () {
          * @returns {{dependencies: Array}}
          */
         validate: function() {
-            return { dependencies: ["manager"]}
+            return { dependencies: ["manager"]};
         }
 
-    }
+    };
 
 });

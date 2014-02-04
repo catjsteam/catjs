@@ -83,7 +83,7 @@ module.exports = function () {
                                      * Delete the scrap key at the content (stored data)
                                      * We want to set the new content from the config object
                                      */
-                                    if (typeof(validate) == "undefined") {
+                                    if (typeof(validate) === "undefined") {
                                         delete content.files[fileKey][scrapKey];
                                     }
                                 }
@@ -120,7 +120,7 @@ module.exports = function () {
                 store;
 
             if (!override) {
-                data = (this.exists() ? this.read() : undefined)
+                data = (this.exists() ? this.read() : undefined);
                 if (!data) {
                     data = new _MDRecord(config);
 
@@ -149,7 +149,7 @@ module.exports = function () {
                 _fs.writeFileSync(_getMDFile(), _beautify(content, { indent_size: 2 }));
                 _log.debug(_props.get("cat.mdata.write").format("[cat mdata]"));
             } catch(e) {
-                _utils.error(_props.get("cat.error").format("[cat mdata]", err));
+                _utils.error(_props.get("cat.error").format("[cat mdata]", e));
             }
 
         },

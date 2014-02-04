@@ -20,26 +20,26 @@ module.exports = function () {
 
                     console.log(" -- > " + process.getuid());
 
-                    monitor.files['./**/*.js'];
+                    // monitor.files['./**/*.js'];
 
                     monitor.on("created", function (f, stat) {
                         // Handle new files
                         if (f && !_fs.existsSync(f)){
-                            _apply({impl: new me.createWatch({file: f, stat: stat, "crud": "c"})})
+                            _apply({impl: new me.createWatch({file: f, stat: stat, "crud": "c"})});
                         }
                     });
 
                     monitor.on("changed", function (f, curr, prev) {
                         // Handle file changes
                         if (curr.mtime - prev.mtime) {
-                            _apply({impl: new me.createWatch({file: f, "crud": "u"})})
+                            _apply({impl: new me.createWatch({file: f, "crud": "u"})});
                         }
                     });
 
                     monitor.on("removed", function (f, stat) {
                         // Handle removed files
                         if (f && _fs.existsSync(f)){
-                            _apply({impl: new me.createWatch({file: f, stat: stat, "crud": "d"})})
+                            _apply({impl: new me.createWatch({file: f, stat: stat, "crud": "d"})});
                         }
                     });
 
@@ -64,11 +64,11 @@ module.exports = function () {
 
             this.get = function(key) {
                 return (key ? this[key] : undefined);
-            }
+            };
 
             this.getConfig = function() {
                 return this.config;
-            }
+            };
         }
     };
 

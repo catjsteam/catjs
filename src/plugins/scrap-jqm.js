@@ -188,6 +188,6 @@ module.exports = function () {
         getType: function () {
             return "scrap-jqm";
         }
-    }
+    };
 
 };

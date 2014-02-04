@@ -27,7 +27,7 @@ module.exports = function () {
                 name: actualname,
                 sign: sign,
                 hint: value
-            }
+            };
         }
     };
 

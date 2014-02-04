@@ -68,7 +68,7 @@ module.exports = function () {
 
             _clazz.prototype[attrName + "Apply"] = function (config) {
                 return func.call(this, config);
-            }
+            };
         },
 
         create: function (configArg) {
@@ -193,7 +193,7 @@ module.exports = function () {
                                         _scrapUtils.putScrapConfig(config, configKey, configVal);
                                     }
                                 } catch(e) {
-                                    console.log(e)
+                                    console.log(e);
                                 }
 
 
@@ -229,7 +229,7 @@ module.exports = function () {
         },
 
         normalize: function (scraps) {
-            var config = { files: {}}
+            var config = { files: {}};
 
             if (scraps) {
                 scraps.forEach(function (scrap) {

@@ -36,10 +36,10 @@ module.exports = function () {
                     comment = _records[file].comment,
                     comments = _records[file].comments;
 
-                if ((typeOpenAPos != -1 || typeOpenBPos != -1)) {
+                if ((typeOpenAPos !== -1 || typeOpenBPos !== -1)) {
                     _records[file].opened = 1;
                     collected = 1;
-                    if (typeOpenAPos != -1) {
+                    if (typeOpenAPos !== -1) {
                         //comment.push(line.substring(typeOpenAPos));
                         comment.push({
                             line: line.substring(typeOpenAPos),
@@ -47,7 +47,7 @@ module.exports = function () {
                             col: typeOpenAPos
                         });
                     }
-                    if (typeOpenBPos != -1) {
+                    if (typeOpenBPos !== -1) {
                         //comment.push(line.substring(typeOpenBPos));
                         comment.push({
                             line: line.substring(typeOpenBPos),
@@ -56,10 +56,10 @@ module.exports = function () {
                         });
                     }
                 }
-                if (_records[file].opened && (typeCloseAPos != -1 || typeCloseBPos != -1)) {
+                if (_records[file].opened && (typeCloseAPos !== -1 || typeCloseBPos !== -1)) {
                     _records[file].opened = 0;
                     if (comment.length > 1) {
-                        if (typeCloseAPos != -1) {
+                        if (typeCloseAPos !== -1) {
 //                        comment.push(line.substring(0, (typeCloseAPos + closeBlock[0].length)));
                             comment.push({
                                 line: line.substring(0, (typeCloseAPos + closeBlock[0].length)),
@@ -67,7 +67,7 @@ module.exports = function () {
                                 col: (typeCloseAPos + closeBlock[0].length)
                             });
                         }
-                        if (typeCloseBPos != -1) {
+                        if (typeCloseBPos !== -1) {
                             //comment.push(line.substring(0, (typeCloseBPos + closeBlock[1].length)));
                             comment.push({
                                 line: line.substring(0, (typeCloseBPos + closeBlock[1].length)),
@@ -100,7 +100,7 @@ module.exports = function () {
             }).then(function () {
                     _records[file].lineNumber--;
                     _comments.push(_records[file].comment);
-                    cb.call(me, _records[file].comments)
+                    cb.call(me, _records[file].comments);
 
                 });
 
