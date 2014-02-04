@@ -1,9 +1,10 @@
-var _fs = require("fs"),
+var _fs = require("fs.extra"),
     _typedas = require("typedas"),
     _log = catrequire("cat.global").log(),
     _utils = catrequire("cat.utils"),
     _path = require("path"),
     _basePlugin = require("./Base.js"),
+    _glob = require("glob"),
     _to,
 
     /**
@@ -30,7 +31,7 @@ var _fs = require("fs"),
                             // break;
                         }
 
-                    })
+                    });
                 }
             });
 
@@ -197,6 +198,48 @@ module.exports = _basePlugin.ext(function () {
          */
         init: function (config) {
 
+            var dependency,
+                frompath, topath,
+                stats, counter=0;
+
+            function _copx(afrompath, cb) {
+
+                var me = this;
+
+                if (_fs.existsSync(afrompath)) {
+
+                    if (!_fs.existsSync(topath)) {
+                        _fs.mkdirRecursiveSync(topath);
+                    }
+
+                    stats = _fs.statSync(afrompath);
+
+                    if (stats.isDirectory()) {
+                        _fs.copyRecursive(afrompath, topath, function (err) {
+
+                            if (err) {
+                                _utils.error("[copy action] error while copy: " + err);
+                            }
+
+                            if (cb) {
+                                cb.call(me);
+                            }
+                        });
+                    } else {
+
+                        _utils.copySync(afrompath, _path.join(topath, _path.basename(afrompath)));
+
+                        if (cb) {
+                            cb.call(me);
+                        }
+
+                    }
+                } else {
+                    _emitter.emit("job.done", {status: "done"});
+                    _log.warning("[copy action] 'to' path and/or 'from' path does not exists, failed to copy");
+                }
+            }
+
             // TODO extract messages to resource bundle with message format
             _errors = ["copy action] copy operation disabled, No valid configuration"];
 
@@ -214,23 +257,63 @@ module.exports = _basePlugin.ext(function () {
             // initial data binding to 'this'
             _me.dataInit(_data);
 
-            // Listen to the process emitter
-            if (_emitter) {
-                _emitter.removeListener("job.copy.wait", _jobCopyWait);
-                _emitter.on("scan.init", _module.initListener);
-                _emitter.on("scan.file", _module.file);
-                _emitter.on("scan.folder", _module.folder);
-                _emitter.on("scan.done", _module.done);
-                _emitter.on("job.copy.wait", _jobCopyWait);
-                _wait = 0;
-            } else {
-                _log.warning("[copy action] No valid emitter, failed to assign listeners");
+            function _copyrec(cb) {
+                var path = frompath[counter];
+                if (path) {
+                    _copx(path, function() {
+                        counter++;
+                        _copyrec(cb);
+                    });
+                } else {
+                    if (cb) {
+                        cb.call(this);
+                    }
+                }
             }
 
-        },
+            dependency = _me.get("dependency");
 
-        getType: function () {
-            return "copy";
+            // Listen to the process emitter
+            if (!dependency) {
+                // just copy :)
+                frompath = _me.get("from");
+                topath = _me.get("to");
+
+                if (frompath) {
+                    frompath = (frompath.path ? frompath.path : undefined);
+                }
+                if (topath) {
+                    topath = (topath.path ? topath.path : undefined);
+                }
+
+                if (topath && frompath) {
+
+                    frompath = _glob.sync(frompath);
+                    counter = 0;
+
+                    _copyrec(function() {
+                        _emitter.emit("job.done", {status: "done"});
+                    });
+
+
+                } else {
+                    _emitter.emit("job.done", {status: "done"});
+                    _log.warning("[copy action] No valid 'from' and/or 'to' properties, failed to copy");
+                }
+
+            } else if (dependency === "scan") {
+                if (_emitter) {
+                    _emitter.removeListener("job.copy.wait", _jobCopyWait);
+                    _emitter.on("scan.init", _module.initListener);
+                    _emitter.on("scan.file", _module.file);
+                    _emitter.on("scan.folder", _module.folder);
+                    _emitter.on("scan.done", _module.done);
+                    _emitter.on("job.copy.wait", _jobCopyWait);
+                    _wait = 0;
+                } else {
+                    _log.warning("[copy action] No valid emitter, failed to assign listeners");
+                }
+            }
         },
 
         /**
@@ -241,7 +324,7 @@ module.exports = _basePlugin.ext(function () {
          * @returns {{dependencies: Array}}
          */
         validate: function() {
-            return { dependencies: ["scan"]}
+            return { dependencies: ["scan", "manager"]};
         }
     };
 
