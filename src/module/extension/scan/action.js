@@ -31,11 +31,15 @@ module.exports = _basePlugin.ext(function () {
             var walk = function (dir, done) {
                 var results = [];
                 _fs.readdir(dir, function (err, list) {
-                    if (err) return done(err);
+                    if (err) {
+                        return done(err);
+                    }
                     var i = 0;
                     (function next() {
                         var file = list[i++];
-                        if (!file) return done(null, results);
+                        if (!file) {
+                            return done(null, results);
+                        }
 
                         file = dir + '/' + file;
                         file = file.split("//").join("/");
@@ -87,7 +91,7 @@ module.exports = _basePlugin.ext(function () {
                     watch = ic.getWatch(),
                     path, stat;
 
-                path = config.path = watch.get("file"),
+                path = config.path = watch.get("file");
                 stat = watch.get("stat");
 
                 emitter.emit("scan.init", {path: _path.dirname(path)});
@@ -123,7 +127,7 @@ module.exports = _basePlugin.ext(function () {
                     dir = data.path;
 
                 } else {
-                    dir = config.path
+                    dir = config.path;
                 }
 
 

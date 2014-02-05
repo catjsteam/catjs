@@ -9,7 +9,7 @@ var _fs = require("fs"),
 module.exports = function () {
 
     function _store(data, option) {
-        var option = (option || "appendFileSync");
+        option = (option || "appendFileSync");
         try {
             if (option) {
                 _fs[option](_fileName, data, "utf8");

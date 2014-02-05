@@ -180,7 +180,7 @@ module.exports = function() {
                     if (item && !bracketsTest.test(item))  {
                         item = addapostrophe(item);
                         if (counter<size-1) {
-                            item += ","
+                            item += ",";
                         }
                         counter++;
                     }

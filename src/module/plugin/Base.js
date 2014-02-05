@@ -23,10 +23,15 @@ module.exports = function () {
         proto._data = null;
 
         proto.dataInit = function (data) {
+            var me = this;
             if (data) {
                 this._data = data;
                 _utils.copyObjProps(data, this);
             }
+
+            this.get = function (key) {
+                return (key && key in me._data ? me._data[key] : undefined);
+            };
         };
 
         proto.isDisabled = function () {
@@ -99,7 +104,7 @@ module.exports = function () {
                     }
                 }
             } else {
-                _log.info("[CAT base plugin] No plugin validation has implemented.")
+                _log.info("[CAT base plugin] No plugin validation has implemented.");
             }
 
             return true;
@@ -194,6 +199,6 @@ module.exports = function () {
             }
             return fn;
         }
-    }
+    };
 
 }();

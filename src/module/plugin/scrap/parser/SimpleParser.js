@@ -49,10 +49,10 @@ module.exports = function () {
                 for (; idx < size; idx++) {
                     // see the Comment parser class for the object reference ({line: , number:, pos: })
                     commentobj = scrapCommentBlock[idx];
-                    if (idx == 0) {
+                    if (idx === 0) {
                         commentBlock.start.line = commentobj.number;
                         commentBlock.start.col = commentobj.col;
-                    } else if (idx == size - 1) {
+                    } else if (idx === size - 1) {
                         commentBlock.end.line = commentobj.number;
                         commentBlock.end.col = commentobj.col;
                     }
@@ -104,7 +104,7 @@ module.exports = function () {
                             // reset for the next scrap if exists
                             lineNumber = [0, 0];
                             scrap = [-1, -1];
-                            scrapBlockName = undefined
+                            scrapBlockName = undefined;
 
                         }
 

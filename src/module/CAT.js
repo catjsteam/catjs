@@ -97,8 +97,8 @@ var CAT = function () {
 
             (function (config) {
 
-                basedir = _basedir(config),
-                    projectDir = basedir.path;
+                basedir = _basedir(config);
+                projectDir = basedir.path;
 
                 _global = catrequire("cat.global");
                 _log = _global.log();
@@ -123,7 +123,7 @@ var CAT = function () {
                 // on error
                 if (error) {
                     // we don't have the error properties just yet
-                    _log.error("[Properties] " + error + " result: " + p);
+                    _log.error("[Properties] " + error);
                     return undefined;
                 }
 
@@ -303,7 +303,7 @@ var CAT = function () {
                         };
 
                         _prompt.get(schema, function (err, args) {
-                            args.projectname = initProject,
+                            args.projectname = initProject;
                             linit.create(args);
                         });
 
@@ -314,7 +314,7 @@ var CAT = function () {
                     _utils = catrequire("cat.utils");
 
                     // TODO 1 might be a process number, change it to negative maybe.
-                    if (kill == 1) {
+                    if (kill === 1) {
                         // kill all current running processes except me.
                         pids = _cache.removeByKey("pid", process.pid);
                         _utils.kill(pids, [process.pid]);

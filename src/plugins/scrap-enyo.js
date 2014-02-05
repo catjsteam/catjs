@@ -40,7 +40,7 @@ module.exports = function () {
                             var match,
                                 prefix;
 
-                            var match = _scraputils.generate({
+                            match = _scraputils.generate({
                                 api: "waterfall",
                                 exp: enyo
                             });
@@ -88,6 +88,6 @@ module.exports = function () {
         getType: function () {
             return "scrap-enyo";
         }
-    }
+    };
 
 };

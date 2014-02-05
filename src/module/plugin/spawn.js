@@ -58,7 +58,7 @@ module.exports = _basePlugin.ext(function () {
                 try {
 
                     if (!options) {
-                        options = {cwd: _catglobal.get("home").working.path}
+                        options = {cwd: _catglobal.get("home").working.path};
                     }
 
                     if (_utils.isWindows()) {
@@ -158,7 +158,7 @@ module.exports = _basePlugin.ext(function () {
              * @returns {{dependencies: Array}}
              */
             validate: function() {
-                return { dependencies: ["spawn"]}
+                return { dependencies: ["spawn"]};
             }
         };
 

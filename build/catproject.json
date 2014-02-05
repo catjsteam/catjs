@@ -1,0 +1,84 @@
+{
+    "name": "cat-build",
+
+    "source": "src/",
+    "target": "target/",
+
+    "plugins": [
+        {
+            "name": "init.copy.src",
+            "type": "copy",
+            "from": {
+                "path": "./../src"
+            },
+            "to": {
+                "path": "./target/src"
+            }
+        },
+        {
+            "name": "init.copy.resources",
+            "type": "copy",
+            "from": {
+                "path": "./../resources"
+            },
+            "to": {
+                "path": "./target/resources"
+            }
+        },
+        {
+            "name": "init.copy.root",
+            "type": "copy",
+            "from": {
+                "path": "./../*.*"
+            },
+            "to": {
+                "path": "./target/"
+            }
+        },
+        {
+            "name": "minify",
+            "type": "minify",
+            "jshint": {
+                "opt": {
+                    "evil": true,
+                    "strict": false,
+                    "curly": true,
+                    "eqeqeq": true,
+                    "immed": false,
+                    "latedef": true,
+                    "newcap": false,
+                    "noarg": false,
+                    "sub": true,
+                    "undef": true,
+                    "boss": true,
+                    "eqnull": true,
+                    "node": true,
+                    "es5": false,
+                    "loopfunc": true
+                },
+                "globals": {
+                    "XMLHttpRequest": true,
+                    "document": true,
+                    "_cat": true,
+                    "chai": true,
+                    "catrequire": true,
+                    "cathome": true
+                }
+            },
+            "mode": "prod",
+            "isolate": "true",
+            "path": "./target/src",
+            "src": ["./target/src/**/*.js"],
+            "excludes": ["Gruntfile.js", "./**/.catmin*.js", "./**/libraries/**/*.js"]
+        }
+    ],
+
+    "tasks": [
+        {
+            "name": "build.cat",
+            "plugins": ["init.copy.src", "minify", "init.copy.resources", "init.copy.root"]
+        }
+    ]
+
+
+}

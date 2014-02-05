@@ -107,7 +107,7 @@ module.exports = function (config) {
                         if (extimp.init) {
                             extimp.init(extConfig.externalConfig, extConfig.ext);
                         } else {
-                            _log.warning(_props.get("cat.config.interface").format("[CAT Config Loader]", ext.name, "init"));
+                            _log.warning(_props.get("cat.config.interface").format("[CAT Config Loader]", " ? ", "init"));
                         }
                     }
 
@@ -116,7 +116,7 @@ module.exports = function (config) {
                 }
             }
         } else {
-            _log.warning(_props.get("cat.config.task.ext.not.found").format("[task config]", ext))
+            _log.warning(_props.get("cat.config.task.ext.not.found").format("[task config]", " ? "));
         }
     }
 
@@ -171,7 +171,7 @@ module.exports = function (config) {
                 extLoaded[ext] = extensionConfig;
             }
 
-            if (phase == "default") {
+            if (phase === "default") {
                 pluginHandle = actionApplyImpl({
                     actionApply: actionApply,
                     dependency: ext
@@ -192,7 +192,7 @@ module.exports = function (config) {
         emitter = config.emitter;
         global = config.global;
         catconfig = config.catconfig;
-        _flow = catrequire("cat.flow")
+        _flow = catrequire("cat.flow");
     }
 
     if (config) {
@@ -225,7 +225,7 @@ module.exports = function (config) {
                     }
 
                 }
-            }
+            };
         }
 
     }

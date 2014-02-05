@@ -33,7 +33,7 @@ module.exports = _basePlugin.ext(function () {
 
                         }
                     } catch(e) {
-                        _log.error("[CAT clean plugin] failed with errors: ", e)
+                        _log.error("[CAT clean plugin] failed with errors: ", e);
                     }
                 }
             });
@@ -90,7 +90,7 @@ module.exports = _basePlugin.ext(function () {
                         });
 
                     } else if(_typedas.isString(src)) {
-                        _rm(src)
+                        _rm(src);
 
                     } else {
                         _log.error("[CAT clean plugin] 'src' was found but not valid");
@@ -113,9 +113,9 @@ module.exports = _basePlugin.ext(function () {
          * @returns {{dependencies: Array}}
          */
         validate: function() {
-            return { dependencies: ["manager"]}
+            return { dependencies: ["manager"]};
         }
 
-    }
+    };
 
 });

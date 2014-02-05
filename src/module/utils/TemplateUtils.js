@@ -73,6 +73,6 @@ module.exports = function () {
                 return template(data);
             }
         }
-    }
+    };
 
 }();

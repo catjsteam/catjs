@@ -10,7 +10,7 @@ var _http = require("http"),
     _utils  = catrequire("cat.utils"),
     vars = {
         assert: require('./CatObjects/assert')
-    }
+    };
 
 /**
  * Web Server support mainly for serving static pages
@@ -44,7 +44,7 @@ module.exports = function() {
                 res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
                 next();
 
-            }
+            };
 
             if (!path || (path && !_fs.existsSync(path))) {
                 _utils.log("warning", "[CAT WebServer] not valid location: " + path);
@@ -55,10 +55,10 @@ module.exports = function() {
 
             _server.configure(function () {
                 _server.set('port', process.env.PORT || port);
-                _server.use(_express.logger('dev')),  /* 'default', 'short', 'tiny', 'dev' */
-                _server.use(_express.bodyParser()),
-                _server.use(allowCrossDomain),
-                _server.use(_express.bodyParser()),
+                _server.use(_express.logger('dev'));  /* 'default', 'short', 'tiny', 'dev' */
+                _server.use(_express.bodyParser());
+                _server.use(allowCrossDomain);
+                _server.use(_express.bodyParser());
                 _server.use(_express.static(path));
             });
 

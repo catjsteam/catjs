@@ -92,7 +92,6 @@ module.exports = _basePlugin.ext(function () {
                         ));
 
 
-
                     }
                 });
 
@@ -252,7 +251,7 @@ module.exports = _basePlugin.ext(function () {
                             startpos = [injectinfo.start.line, injectinfo.start.col];
                             endpos = [injectinfo.end.line, injectinfo.end.col];
 
-                            if (lineNumber == startpos[0]) {
+                            if (lineNumber === startpos[0]) {
                                 line = [line.substring(0, startpos[1]), line.substring(endpos[1])].join("");
                             }
                         }
@@ -278,7 +277,6 @@ module.exports = _basePlugin.ext(function () {
                         if (replaceinfo) {
                             return line;
                         }
-
 
 
                         if (engine === _scrapEnum.engines.JS) {
@@ -335,7 +333,7 @@ module.exports = _basePlugin.ext(function () {
                         var markDefault = {
                             prefix: "/*",
                             suffix: "*/"
-                            }, mark;
+                        }, mark;
 
                         if (scraplcl.$getBehavior()) {
 
@@ -361,9 +359,9 @@ module.exports = _basePlugin.ext(function () {
                     }
 
 
-                    if (lineNumber == info.line || replaceinfo) {
+                    if (lineNumber === info.line || replaceinfo) {
 
-                        isLineNumber = (lineNumber == info.line);
+                        isLineNumber = (lineNumber === info.line);
                         engine = scraplcl.$getEngine();
 
                         processReplaceInfo();
@@ -427,7 +425,7 @@ module.exports = _basePlugin.ext(function () {
                 if (_fs.existsSync(file)) {
                     _generateSourceProject(scraps, file);
 
-                    _injectScrapCall(scraps, file, function() {
+                    _injectScrapCall(scraps, file, function () {
                         callback.call(this);
                     });
 
@@ -468,21 +466,23 @@ module.exports = _basePlugin.ext(function () {
             apply: function (config) {
 
                 var data,
-                    fileName,
                     files, filesArr = [],
                     counter = -1,
                     emitter = _me.getEmitter();
 
                 function _apply(filename) {
 
-                    scraps = [];
+                    var scraps = [],
+                        scrapName,
+                        scrapData,
+                        scrap,
+                        scrapDataObj;
+
                     if (filename) {
 
-                        var scrapName,
-                            scrapData,
-                            scrap,
-                            scraps = [],
-                            scrapDataObj = files[filename];
+
+                        scrapDataObj = files[filename];
+                        scraps = [];
 
                         if (scrapDataObj) {
                             for (scrapName in scrapDataObj) {
@@ -499,7 +499,7 @@ module.exports = _basePlugin.ext(function () {
                         // apply all scraps
                         _Scrap.apply({scraps: scraps});
 
-                        _inject(scraps, filename, function() {
+                        _inject(scraps, filename, function () {
                             counter++;
                             _apply(filesArr[counter]);
 
@@ -514,7 +514,8 @@ module.exports = _basePlugin.ext(function () {
 
                 _me.apply(config);
                 if (_mdata) {
-                    _mdata.readAsync(function() {
+                    _mdata.readAsync(function () {
+                        var fileName;
                         if (this.data) {
                             _mdobject = JSON.parse(this.data);
 

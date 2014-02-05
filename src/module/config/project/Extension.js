@@ -1,4 +1,4 @@
-var _global = catrequire("cat.global")
+var _global = catrequire("cat.global"),
     _log = _global.log(),
     _props = catrequire("cat.props"),
     _fs = require("fs.extra"),
