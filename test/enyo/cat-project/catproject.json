@@ -38,13 +38,6 @@
             ]
         },
         {
-            "name": "libraries.build",
-            "type": "libraries",
-            "dependency": "manager",
-            "imports": ["chai", "tmr", "cat"],
-            "action": "build"
-        },
-        {
             "name": "init.copy",
             "type": "copy",
             "dependency": "scan",
@@ -80,15 +73,11 @@
     "tasks": [
         {
             "name": "init",
-            "plugins": ["init.copy", "libraries.build", "lib.copy"]
-        },
-        {
-            "name": "scrap",
-            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "init.scrap"]
+            "plugins": ["init.copy", "$libraries.build", "lib.copy"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "project.inject", "project.minify"]
+            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "init.scrap", "project.inject", "project.minify"]
         }
     ]
 

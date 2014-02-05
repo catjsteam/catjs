@@ -1,7 +1,7 @@
 {
     "dependencies": [
         {
-            "name": "dependency.loader",
+            "name": "d@dependency.loader",
             "type": "loader",
             "path": ["./plugins/"]
         }
@@ -9,119 +9,157 @@
 
     "plugins": [
         {
-            "name": "custom.plugin",
+            "name": "p@custom.plugin",
             "type": "custom-plugin",
-            "dependency": "dependency.loader"
+            "dependency": "d@dependency.loader"
         },
         {
-            "name": "libraries.install",
+            "name": "p@libraries.install",
             "type": "libraries",
             "dependency": "manager",
             "action": "install"
         },
         {
-            "name": "libraries.clean",
+            "name": "p@libraries.clean",
             "type": "libraries",
             "dependency": "manager",
             "imports": ["cat"],
             "action": "clean"
         },
         {
-            "name": "project.inject",
+            "name": "p@project.inject",
             "type": "inject"
         },
         {
-            "name": "project.clean",
+            "name": "p@project.clean",
             "type": "clean",
             "src": ["target", "_cat_md.json"]
         },
         {
-            "name": "project.wipe",
+            "name": "p@project.wipe",
             "type": "clean",
             "src": ["src", "lib", "*.log", "*.xml"]
         },
         {
-            "name": "mobile.start",
+            "name": "p@mobile.start",
             "type": "mobile",
             "device": "android",
             "action": "start"
         },
         {
-            "name": "mobile.install",
+            "name": "p@mobile.install",
             "type": "mobile",
             "device": "android",
             "action": "install"
         },
         {
-            "name": "project.phantomjs",
+            "name": "p@project.phantomjs",
             "type": "phantomjs",
             "file": "phantomjs-script.js"
         },
         {
-            "name": "project.webserver.start",
+            "name": "p@project.webserver.start",
             "type": "webserver",
             "action": "start",
             "set": [{"key": "assert", "var": "assert", "prop":"result"}]
         },
         {
-            "name": "project.webserver.stop",
+            "name": "p@project.webserver.stop",
             "type": "webserver",
             "action": "stop"
+        },
+        {
+            "name": "p@sample.plugin",
+            "type": "sample",
+            "customAttribute": "Custom attribute test"
+        },
+        {
+            "name": "p@init.scrap",
+            "type": "scrap",
+            "dependency": "scan"
+        },
+        {
+            "name": "p@libraries.build",
+            "type": "libraries",
+            "dependency": "manager",
+            "imports": ["chai", "tmr", "cat"],
+            "action": "build"
+        },
+        {
+            "name": "p@scrap.common",
+            "type": "scrap-common"
+        },
+        {
+            "name": "p@scrap.enyo",
+            "type": "scrap-enyo"
+        },
+        {
+            "name": "p@scrap.jqm",
+            "type": "scrap-jqm"
+        },
+        {
+            "name": "p@scrap.mock",
+            "type": "scrap-mock"
+        },
+        {
+            "name": "p@scrap.sencha",
+            "type": "scrap-sencha"
         }
-     ],
+
+    ],
 
     "tasks": [
         {
-            "name": "libs.install",
-            "plugins":["libraries.install"]
+            "name": "t@libs.install",
+            "plugins":["p@libraries.install"]
         },
         {
-            "name": "libs.clean",
-            "plugins":["libraries.clean"]
+            "name": "t@libs.clean",
+            "plugins":["p@libraries.clean"]
         },
         {
-            "name": "clean",
-            "plugins": ["project.clean"]
+            "name": "t@clean",
+            "plugins": ["p@project.clean"]
         },
         {
-            "name": "libs.build",
-            "plugins":["libraries.build"]
+            "name": "t@libs.build",
+            "plugins":["p@libraries.build"]
         },
         {
-            "name": "install",
-            "plugins":["lib.copy"]
+            "name": "t@install",
+            "plugins":["p@lib.copy"]
         },
         {
-            "name": "wipe",
-            "plugins": ["project.clean", "project.wipe"]
+            "name": "t@wipe",
+            "plugins": ["p@project.clean", "p@project.wipe"]
         },
         {
-            "name": "minify",
-            "plugins": ["project.minify"]
+            "name": "t@minify",
+            "plugins": ["p@project.minify"]
         },
         {
-            "name": "test",
-            "plugins": ["project.webserver.start", "project.phantomjs", "project.webserver.stop"]
+            "name": "t@test",
+            "plugins": ["p@project.webserver.start", "p@project.phantomjs", "p@project.webserver.stop"]
         },
         {
-            "name": "mtest",
-            "plugins": ["mobile.install", "project.webserver.start", "mobile.start"]
+            "name": "t@mtest",
+            "plugins": ["p@mobile.install", "p@project.webserver.start", "p@mobile.start"]
         },
         {
-            "name": "phantom",
-            "plugins": ["project.phantomjs"]
+            "name": "t@phantom",
+            "plugins": ["p@project.phantomjs"]
         },
         {
-            "name": "server.start",
-            "plugins": ["project.webserver.start"]
+            "name": "t@server.start",
+            "plugins": ["p@project.webserver.start"]
         },
         {
-            "name": "server.stop",
-            "plugins": ["project.webserver.stop"]
+            "name": "t@server.stop",
+            "plugins": ["p@project.webserver.stop"]
         },
         {
-            "name": "sample",
-            "plugins": ["sample.plugin"]
+            "name": "t@sample",
+            "plugins": ["p@sample.plugin"]
         }
     ]
 

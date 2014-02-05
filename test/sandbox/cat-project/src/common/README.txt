@@ -1,1 +1,0 @@
-In this folder any JavaScript files will be included for CAT's node and/or application logic layer.
