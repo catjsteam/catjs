@@ -533,7 +533,7 @@ module.exports = _basePlugin.ext(function () {
 
                                 if (filesArr && filesArr.length > 0) {
                                     counter = 0;
-                                    _apply(filesArr[counter]);
+                                    //_apply(filesArr[counter]);
                                 }
                             }
 
