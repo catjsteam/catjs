@@ -18,6 +18,8 @@ _cat.plugins.jqm = function () {
 
             },
 
+
+
             scrollTop: function () {
 
                 $(document).ready(function(){
@@ -25,6 +27,16 @@ _cat.plugins.jqm = function () {
 
 
                     $('html, body').animate({scrollTop : 0},1000);
+                });
+
+            },
+
+            scrollToWithRapper : function (idName, rapperId) {
+
+                $(document).ready(function(){
+                    var stop = $('#' + idName).offset().top;
+                    var delay = 1000;
+                    $('#' + rapperId).animate({scrollTop: stop}, delay);
                 });
 
             },

@@ -46,6 +46,16 @@ module.exports = function () {
                                 exp: jqm
                             });
 
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "scrollToWithRapper",
+                                    apiname: "scrollToWithRapper",
+                                    exp: jqm
+                                });
+                            }
+
+
                             if (!match) {
                                 match = _scraputils.generate({
                                     api: "clickRef",
