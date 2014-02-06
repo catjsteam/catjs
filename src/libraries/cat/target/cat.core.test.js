@@ -1354,6 +1354,8 @@ _cat.plugins.jqm = function () {
 
             },
 
+
+
             scrollTop: function () {
 
                 $(document).ready(function(){
@@ -1361,6 +1363,16 @@ _cat.plugins.jqm = function () {
 
 
                     $('html, body').animate({scrollTop : 0},1000);
+                });
+
+            },
+
+            scrollToWithRapper : function (idName, rapperId) {
+
+                $(document).ready(function(){
+                    var stop = $('#' + idName).offset().top;
+                    var delay = 1000;
+                    $('#' + rapperId).animate({scrollTop: stop}, delay);
                 });
 
             },
@@ -1561,24 +1573,7 @@ _cat.plugins.sencha = function () {
 
                 setTextHelp(extElement, str);
 
-            },
-
-
-            tapButton : function (cmp, btn) {
-
-                var j = Ext.ComponentQuery.query("#" + cmp)[0];
-                j.addListener('painted', function() {
-                    var jj = Ext.ComponentQuery.query("#" + btn)[0];
-                    var jjj =jj.getHandler( );
-                    jj.fireAction("tap", jjj());
-
-
-                });
-
-
             }
-
-
         }
 
 

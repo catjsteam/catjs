@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jQuery Mobile Demos</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/themes/default/jquery.mobile-1.4.0.min.css">
+    <link rel="stylesheet" href="_assets/css/jqm-demos.css">
+    <link rel="stylesheet" href="css/demo_app.css">
+    <script src="js/jquery.js"></script>
+    <script src="demo-js/demoScripts.js"></script>
+    <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="_assets/js/index.js"></script>
+    <script src="js/jquery.mobile-1.4.0.min.js"></script>
+    <!--
+ @[scrap
+    @@name catImport
+    @@import[
+        cat.js
+        cat.css
+        cat.src.js
+    ]
+ ]@
+-->
+
+    <style type="text/css">
+        .editor {
+            border: 3px solid blue;
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+<div data-role="page" id="mainPage">
+
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor">
+
+        </div>
+
+
+    </div>
+    <div id="example1" class="exampleBlock box-sizing">
+
+
+        <div>
+            <h1>This is heading 1</h1>
+
+            <h2>This is heading 2</h2>
+
+            <h3>This is heading 3</h3>
+            <h4>This is heading 4</h4>
+            <h5>This is heading 5</h5>
+            <h6>This is heading 6</h6>
+        </div>
+
+
+        <!--
+            @[scrap
+                @@name scrollToButtons
+                @@run@ scrollManager
+                @@embed true
+                @@jqm scrollToWithRapper("buttonsDiv", "example1");
+            ]@
+        -->
+        <div id="buttonsDiv" class="buttons">
+            <input type="button" value="first">
+            <input type="button" value="second">
+            <input type="button" value="third">
+        </div>
+
+
+    </div>
+
+    <div class="tryDemo box-sizing">
+        <input id="tryExample1" type="button" value="Try Me">
+    </div>
+</div>
+
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor2">
+
+        </div>
+
+
+    </div>
+    <div id="example2" class="exampleBlock box-sizing">
+        <!--
+          @[scrap
+             @@name setAsCheck
+             @@run@ checkManager
+             @@embed true
+             @@jqm checkRadio("hRadio" , "radio-choice-e" );
+          ]@
+        -->
+
+
+        <div id="checkbox-radioH" data-demo-html="true">
+            <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+                <legend>Radio buttons, mini, horizontal controlgroup:</legend>
+                <input class="hRadio" type="radio" name="radio-choice-b" id="radio-choice-c" value="list"
+                       checked="checked">
+                <label for="radio-choice-c">List</label>
+                <input class="hRadio" type="radio" name="radio-choice-b" id="radio-choice-d" value="grid">
+                <label for="radio-choice-d">Grid</label>
+                <input class="hRadio" type="radio" name="radio-choice-b" id="radio-choice-e" value="gallery">
+                <label for="radio-choice-e">Gallery</label>
+            </fieldset>
+        </div>
+
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample2" type="button" value="Try Me">
+    </div>
+</div>
+
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor3">
+
+        </div>
+
+
+    </div>
+    <div id="example3" class="exampleBlock box-sizing">
+        <!--
+            @[scrap
+                @@name setText
+                @@run@ textManager
+                @@embed true
+                @@jqm setText("text-basic", "hello world");
+            ]@
+        -->
+
+        <div data-demo-html="true">
+            <label for="text-basic">Text input:</label>
+            <input type="text" name="text-basic" id="text-basic" value="">
+        </div>
+
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample3" type="button" value="Try Me">
+    </div>
+</div>
+
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor4">
+
+        </div>
+
+
+    </div>
+    <div id="example4" class="exampleBlock box-sizing">
+        <!--
+            @[scrap
+                @@name BtnClick
+                @@run@ buttonManager
+                @@embed true
+                @@jqm clickButton("clickBtn");
+            ]@
+        -->
+        <input id="clickBtn" type="button" value="Click">
+
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample4" type="button" value="Try Me">
+    </div>
+</div>
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor5">
+
+        </div>
+
+
+    </div>
+    <div id="example5" class="exampleBlock box-sizing">
+        <!--
+            @[scrap
+                @@name collapsibleClick
+                @@run@ collapsibleManager
+                @@embed true
+                @@jqm collapsible("basicCollapsible");
+            ]@
+        -->
+
+        <div id="basicCollapsibleScroll" data-demo-html="true">
+            <div id="basicCollapsible" data-role="collapsible">
+                <h4>Heading</h4>
+
+                <p>I'm the collapsible content.
+                    By default I'm closed, but you can click the header to open me.</p>
+            </div>
+        </div>
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample5" type="button" value="Try Me">
+    </div>
+</div>
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor6">
+
+        </div>
+
+
+    </div>
+    <div id="example6" class="exampleBlock box-sizing">
+        <!--
+            @[scrap
+                @@name setCheckB
+                @@run@ checkboxManager
+                @@embed true
+                @@jqm setCheck("checkbox-v-2b");
+            ]@
+        -->
+
+        <div id="checkboxVerticalGroup" data-demo-html="true">
+            <form>
+                <fieldset data-role="controlgroup">
+                    <legend>Vertical:</legend>
+                    <input type="checkbox" name="checkbox-v-2a" id="checkbox-v-2a">
+                    <label for="checkbox-v-2a">One</label>
+                    <input type="checkbox" name="checkbox-v-2b" id="checkbox-v-2b">
+                    <label for="checkbox-v-2b">Two</label>
+                    <input type="checkbox" name="checkbox-v-2c" id="checkbox-v-2c">
+                    <label for="checkbox-v-2c">Three</label>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample6" type="button" value="Try Me">
+    </div>
+</div>
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor7">
+
+        </div>
+
+
+    </div>
+    <div id="example7" class="exampleBlock box-sizing">
+        <!--
+            @[scrap
+                @@name navTabSelect2
+                @@run@ tabsManager
+                @@embed true
+                @@jqm selectTab("navTab2");
+            ]@
+        -->
+        <div data-role="tabs" id="tabs">
+            <div data-role="navbar">
+                <ul>
+                    <li><a id="navTab1" href="#one" data-ajax="false">one</a></li>
+                    <li><a id="navTab2" href="#two" data-ajax="false">two</a></li>
+                </ul>
+            </div>
+            <div id="one" class="ui-body-d ui-content">
+                <h1>First tab contents</h1>
+            </div>
+            <div id="two">
+                <ul data-role="listview" data-inset="true">
+                    <li><a href="#">Acura</a></li>
+                    <li><a href="#">Audi</a></li>
+                    <li><a href="#">BMW</a></li>
+                    <li><a href="#">Cadillac</a></li>
+                    <li><a href="#">Ferrari</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample7" type="button" value="Try Me">
+    </div>
+</div>
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor8">
+
+        </div>
+
+
+    </div>
+    <div id="example8" class="exampleBlock box-sizing">
+        <!--
+            @[scrap
+                @@name slider25
+                @@run@ sliderManager
+                @@embed true
+                @@jqm slide("slider-1" , 25);
+            ]@
+        -->
+
+        <form>
+            <label for="slider-1">Slider:</label>
+            <input type="range" name="slider-1" id="slider-1" min="0" max="100" value="50">
+        </form>
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample8" type="button" value="Try Me">
+    </div>
+</div>
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor9">
+
+        </div>
+
+
+    </div>
+    <div id="example9" class="exampleBlock box-sizing">
+        <!--
+                  @[scrap
+                     @@name selectMenu2
+                     @@run@ selectMenuManager
+                     @@embed true
+                     @@jqm selectMenu("select-native-1", 2);
+                  ]@
+        -->
+
+        <select name="select-native-1" id="select-native-1">
+            <option value="1">The 1st Option</option>
+            <option value="2">The 2nd Option</option>
+            <option value="3">The 3rd Option</option>
+            <option value="4">The 4th Option</option>
+        </select>
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample9" type="button" value="Try Me">
+    </div>
+</div>
+
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor10">
+
+        </div>
+
+
+    </div>
+    <div id="example10" class="exampleBlock box-sizing">
+        <!--
+                   @[scrap
+                      @@name swipeMeLeft
+                      @@run@ swipeLeftManager
+                      @@embed true
+                      @@jqm swipeItemLeft("swipeMeLeft");
+                   ]@
+                 -->
+
+        <h3>Swipe the green rectangle in the left direction to change its color:</h3>
+        <div id="swipeMeLeft" class="box"></div>
+        <script>
+            $(function(){
+                // Bind the swipeleftHandler callback function to the swipe event on div.box
+                $( "div.box" ).on( "swipeleft", swipeleftHandler );
+
+                // Callback function references the event target and adds the 'swipeleft' class to it
+                function swipeleftHandler( event ){
+                    $( event.target ).addClass( "swipeleft" );
+                }
+            });
+        </script>
+
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample10" type="button" value="Try Me">
+    </div>
+</div>
+
+
+
+
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor11">
+
+        </div>
+
+
+    </div>
+    <div id="example11" class="exampleBlock box-sizing">
+        <!--
+                    @[scrap
+                       @@name swipeMeRight
+                       @@run@ swipeRightManager
+                       @@embed true
+                       @@jqm swipeItemRight("swipeMeRight");
+                    ]@
+                  -->
+
+        <h3>Swipe the green rectangle in the right direction to change its color:</h3>
+        <div id="swipeMeRight" class="box"></div>
+        <script>
+            $(function(){
+                // Bind the swiperightHandler callback function to the swipe event on div.box
+                $( "div.box" ).on( "swiperight", swiperightHandler );
+
+                // Callback function references the event target and adds the 'swiperight' class to it
+                function swiperightHandler( event ){
+                    $( event.target ).addClass( "swiperight" );
+                }
+            });
+        </script>
+
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample11" type="button" value="Try Me">
+    </div>
+</div>
+
+
+<div class="demoBlock">
+    <div class="editorBlock box-sizing">
+        <div class="editor" id="editor12">
+
+        </div>
+
+
+    </div>
+    <div id="example12" class="exampleBlock box-sizing">
+
+        <!--
+                             @[scrap
+                                @@name selectRadioOption3
+                                @@run@ radioManager
+                                @@embed true
+                                @@jqm checkRadio("RadioGroup", "select3");
+                             ]@
+                           -->
+
+
+            <form>
+                <fieldset data-role="controlgroup">
+                    <legend>Vertical:</legend>
+                    <input type="radio" name="radio-choice" class="RadioGroup" id="select1" value="One">
+                    <label for="select1">One</label>
+                    <input type="radio" name="radio-choice"  class="RadioGroup" id="select2" value="Two">
+                    <label for="select2">Two</label>
+                    <input type="radio" name="radio-choice"  class="RadioGroup" id="select3" value="Three">
+                    <label for="select3">Three</label>
+                    <input type="radio" name="radio-choice" class="RadioGroup"  id="select4" value="Four">
+                    <label for="select4">Four</label>
+                </fieldset>
+            </form>
+
+    </div>
+    <div class="tryDemo box-sizing">
+        <input id="tryExample12" type="button" value="Try Me">
+    </div>
+</div>
+
+
+
+</div>
+<!-- /page -->
+
+</body>
+</html>

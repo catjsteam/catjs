@@ -1,0 +1,45 @@
+
+.demoBlock {
+    height: 300px;
+    width: 100%;
+    border: 3px solid black;
+    overflow: hidden;
+}
+.editorBlock {
+    height: 100%;
+    text-shadow: none !important;
+    width: 50%;
+    float:left; /* add this */
+    border: 3px solid red;
+}
+.exampleBlock {
+    float:left;
+    height: 100%;
+    width: 40%;
+    border: 3px solid green;
+    overflow: auto;
+}
+
+.tryDemo {
+    float:left;
+    width: 10%;
+    height: 100%;
+    border: 3px solid yellow;
+
+}
+
+.box-sizing { box-sizing: border-box; margin: 0; }
+
+
+div.box {
+    width: 10em;
+    height: 3em;
+    background-color: #00ff00;
+}
+div.box.swipeleft {
+    background-color: #0000ff;
+}
+
+div.box.swiperight {
+    background-color: #ff0000;
+}
