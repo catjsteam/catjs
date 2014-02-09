@@ -14,7 +14,7 @@ The port of the server where assertions are sent to
 ##tests
 An array with the details of the tests to be run in the following format:
 
-```javascript"tests": [{"name": "catSenchaText"}, {"name": "catSenchaBtn"}]`
+```javascript "tests": [{"name": "catSenchaText"}, {"name": "catSenchaBtn"}]`
 
 You can also define testsets in the following way
 
@@ -24,7 +24,7 @@ You can also define testsets in the following way
 ```
 and then
 
-```javascript"tests":  [{"name": "catSenchaText2"}, {"name": "unit1"}, {"name": "unit2"}]`
+```javascript "tests":  [{"name": "catSenchaText2"}, {"name": "unit1"}, {"name": "unit2"}]`
 
 
 
