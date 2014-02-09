@@ -2,5 +2,7 @@
     "type": "{{project.name}}",
     "ip": null,
     "port": null,
-    "tests":[]
+    "tests":[],
+    "run-mode": "all",
+    "test-failure-timeout": 30
 }
