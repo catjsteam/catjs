@@ -105,6 +105,23 @@ _cat.core = function () {
                 }
             };
 
+            this.getTests = function () {
+                var innerConfigMap = {};
+
+                if (innerConfig.tests) {
+                    for (var i = 0; i < innerConfig.tests.length; i++) {
+                        innerConfig.tests[i].wasRun = false;
+                        innerConfigMap[innerConfig.tests[i].name] = innerConfig.tests[i];
+                    }
+                }
+
+                return innerConfigMap;
+            }
+
+            this.getRunMode = function () {
+                return innerConfig["run-mode"];
+            }
+
         }
 
         this.hasPhantom = function () {
@@ -253,7 +270,7 @@ _cat.core = function () {
                 manager.scrapsOrder.forEach(function (scrapName) {
                     matchvalue = {};
                     var packageName = "";
-                    for(var i = 0; i < matchValuesCalls.length; i++) {
+                    for (var i = 0; i < matchValuesCalls.length; i++) {
                         if (matchValuesCalls[i].implKey.indexOf((scrapName + "$$cat"), matchValuesCalls[i].implKey.length - (scrapName + "$$cat").length) !== -1) {
                             matchvalue = matchValuesCalls[i];
                             break;
@@ -331,25 +348,34 @@ _cat.core = function () {
         action: function (thiz, config) {
             var scrap = config.scrap,
                 runat, manager,
-                pkgname, args = arguments;
+                pkgname, args = arguments,
+                catConfig = _cat.core.getConfig(),
+                tests = catConfig.getTests();
 
-            runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
-            if (runat) {
-                manager = _cat.core.getManager(runat);
-                if (manager) {
-                    pkgname = scrap.pkgName;
-                    if (!pkgname) {
-                        _cat.core.log("[CAT action] Scrap's Package name is not valid");
-                    } else {
-                        _cat.core.defineImpl(pkgname, function () {
-                            _cat.core.actionimpl.apply(this, args);
-                        });
+            //TODO: make this more readable
+            if (catConfig.getRunMode() === 'all' ||
+                (catConfig.getRunMode() === 'test-manager' && tests[scrap.name[0]])) {
+                runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
+                if (runat) {
+                    manager = _cat.core.getManager(runat);
+                    if (manager) {
+                        pkgname = scrap.pkgName;
+                        if (!pkgname) {
+                            _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
+                        } else {
+                            _cat.core.defineImpl(pkgname, function () {
+                                _cat.core.actionimpl.apply(this, args);
+                            });
+                        }
+
                     }
-
+                } else {
+                    _cat.core.actionimpl.apply(this, arguments);
                 }
             } else {
-                _cat.core.actionimpl.apply(this, arguments);
+                _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
             }
+
         },
 
         getConfig: function () {
@@ -438,11 +464,11 @@ _cat.utils.chai = function () {
 
     function _sendTestResult(data) {
 
-        var config  = _cat.core.getConfig();
+        var config = _cat.core.getConfig();
 
         if (config) {
             _cat.utils.AJAX.sendRequestSync({
-                url:  _cat.core.TestManager.generateAssertCall(config, data)
+                url: _cat.core.TestManager.generateAssertCall(config, data)
             });
         }
     }
@@ -468,7 +494,7 @@ _cat.utils.chai = function () {
         if (name) {
             name = _splitCapilalise(name);
             if (name) {
-                name.forEach(function(item) {
+                name.forEach(function (item) {
                     result.push(_capitalise(item));
                 });
             }
@@ -557,7 +583,7 @@ _cat.utils.chai = function () {
     };
 
 }();
-_cat.core.TestManager = function() {
+_cat.core.TestManager = function () {
 
     function _Data(config) {
 
@@ -567,7 +593,7 @@ _cat.core.TestManager = function() {
         this.config = {};
 
 
-        (function() {
+        (function () {
             var item;
 
             for (item in config) {
@@ -579,31 +605,31 @@ _cat.core.TestManager = function() {
         })();
     }
 
-    _Data.prototype.get = function(key) {
+    _Data.prototype.get = function (key) {
         return this.config[key];
     };
 
-    _Data.prototype.getMessage = function() {
+    _Data.prototype.getMessage = function () {
         return this.get("message");
     };
 
-    _Data.prototype.getStatus = function() {
+    _Data.prototype.getStatus = function () {
         return this.get("status");
     };
 
-    _Data.prototype.getName = function() {
+    _Data.prototype.getName = function () {
         return this.get("name");
     };
 
-    _Data.prototype.getDisplayName = function() {
+    _Data.prototype.getDisplayName = function () {
         return this.get("displayName");
     };
 
-    _Data.prototype.set = function(key, value) {
+    _Data.prototype.set = function (key, value) {
         return this.config[key] = value;
     };
 
-    _Data.prototype.send = function() {
+    _Data.prototype.send = function () {
 
 
     };
@@ -614,7 +640,7 @@ _cat.core.TestManager = function() {
 
     return {
 
-        addTestData: function(config) {
+        addTestData: function (config) {
             var data = new _Data(config);
             _testsData.push(data);
 
@@ -622,11 +648,11 @@ _cat.core.TestManager = function() {
 
         },
 
-        getLastTestData: function() {
-            return (_testsData.length > 0 ? _testsData[_testsData.length-1] : undefined);
+        getLastTestData: function () {
+            return (_testsData.length > 0 ? _testsData[_testsData.length - 1] : undefined);
         },
 
-        getTestCount: function() {
+        getTestCount: function () {
             return (_testsData ? _testsData.length : 0);
         },
 
@@ -635,7 +661,7 @@ _cat.core.TestManager = function() {
          *
          * @param delay
          */
-        updateDelay: function(delay) {
+        updateDelay: function (delay) {
             _globalTestData.delay = delay;
         },
 
@@ -643,7 +669,7 @@ _cat.core.TestManager = function() {
          * Get the total delay between tests calls
          *
          */
-        getDelay: function() {
+        getDelay: function () {
             return (_globalTestData.delay || 0);
         },
 
@@ -660,15 +686,15 @@ _cat.core.TestManager = function() {
          *
          * @returns {string} The assertion URL
          */
-        generateAssertCall: function(config, testdata) {
+        generateAssertCall: function (config, testdata) {
 
-            return "http://" + config.getIp() +  ":" +
+            return "http://" + config.getIp() + ":" +
                 config.getPort() + "/assert?testName=" +
                 testdata.getName() + "&message=" + testdata.getMessage() +
                 "&status=" + testdata.getStatus() +
                 "&type=" + config.getType() +
-                "&hasPhantom="  + config.hasPhantom() +
-                "&cache="+ (new Date()).toUTCString();
+                "&hasPhantom=" + config.hasPhantom() +
+                "&cache=" + (new Date()).toUTCString();
 
         }
 
@@ -677,7 +703,7 @@ _cat.core.TestManager = function() {
 
 }();
 
-_cat.core.TestsDB = function() {
+_cat.core.TestsDB = function () {
 
 
     function _TestsDB() {
@@ -685,11 +711,13 @@ _cat.core.TestsDB = function() {
         this._DB = undefined;
         var me = this;
 
-        _cat.utils.AJAX.sendRequestAsync({url : "tests_db.json", callback : {call : function(check) {
+        _cat.utils.AJAX.sendRequestAsync({url: "tests_db.json", callback: {call: function (check) {
             me._DB = JSON.parse(check.response);
         }}});
 
-        this.getDB = function() { return this._DB; };
+        this.getDB = function () {
+            return this._DB;
+        };
 
         var getProp = function (propString, obj) {
             var current = obj;
@@ -718,8 +746,12 @@ _cat.core.TestsDB = function() {
             return current[split[split.length - 1]];
         };
 
-        this.get = function(field) { return getProp(field, this._DB); };
-        this.set = function(field, value) { return setProp(field, value, this._DB); };
+        this.get = function (field) {
+            return getProp(field, this._DB);
+        };
+        this.set = function (field, value) {
+            return setProp(field, value, this._DB);
+        };
 
 
     }
@@ -728,20 +760,20 @@ _cat.core.TestsDB = function() {
 
     return {
 
-        init : function() {
+        init: function () {
             TestDB = new _TestsDB();
             return TestDB;
         },
 
-        getDB : function() {
+        getDB: function () {
             return TestDB.getDB();
         },
 
-        get : function(field) {
+        get: function (field) {
             return TestDB.get(field);
         },
 
-        set : function(field, value) {
+        set: function (field, value) {
             return TestDB.set(field, value);
         }
 
@@ -752,46 +784,19 @@ _cat.core.TestsDB = function() {
 }();
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function TestDB (){
+function TestDB() {
 
     var testDBJson;
-    try
-    {
+    try {
         if (XMLHttpRequest && !testDBJson) {
-            var xmlhttp =  new XMLHttpRequest();
+            var xmlhttp = new XMLHttpRequest();
             xmlhttp.open("GET", "tests_db.json", false);
             xmlhttp.send();
             var dbText = xmlhttp.responseText;
             testDBJson = JSON.parse(dbText);
         }
     }
-    catch(err)
-    {
+    catch (err) {
         //todo: log error
     }
 
@@ -824,13 +829,17 @@ function TestDB (){
     };
 
 
+    this.getDB = function () {
+        return testDBJson;
+    };
+    this.get = function (feild) {
+        return getProp(feild);
+    };
+    this.set = function (feild, value) {
+        return setProp(feild, value);
+    };
 
-
-    this.getDB = function() { return testDBJson; };
-    this.get = function(feild) { return getProp(feild); };
-    this.set = function(feild, value) { return setProp(feild, value); };
-
-    this.hasPhantom = function (){
+    this.hasPhantom = function () {
         return typeof phantom !== 'undefined';
     };
 }
@@ -908,7 +917,7 @@ _cat.core.ui = function () {
         });
     }
 
-    var _me =  {
+    var _me = {
 
         /**
          * Display the CAT widget (if not created it will be created first)
@@ -985,7 +994,7 @@ _cat.core.ui = function () {
 
         },
 
-        isOpen: function() {
+        isOpen: function () {
             var catElement = _getCATElt(),
                 catStatusElt = _getCATStatusElt(),
                 catStatusContentElt = _getCATStatusContentElt();
@@ -1003,10 +1012,10 @@ _cat.core.ui = function () {
             return true;
         },
 
-        isContent: function() {
+        isContent: function () {
 
             function _isText(elt) {
-                if ( elt &&  elt.innerText && ((elt.innerText).trim()) ) {
+                if (elt && elt.innerText && ((elt.innerText).trim())) {
                     return true;
                 }
                 return false;
@@ -1015,7 +1024,7 @@ _cat.core.ui = function () {
             var catStatusContentElt = _getCATStatusContentElt(),
                 bool = 0;
 
-            bool  += (_isText(catStatusContentElt.childNodes[1]) ? 1 : 0);
+            bool += (_isText(catStatusContentElt.childNodes[1]) ? 1 : 0);
 
             if (bool === 1) {
                 return true;
@@ -1051,8 +1060,7 @@ _cat.core.ui = function () {
                         }
                     });
 
-                        elt.textContent = text;
-
+                    elt.textContent = text;
 
 
                 }
@@ -1077,10 +1085,10 @@ _cat.core.ui = function () {
                             }
                         }
 
-                        setTimeout(function() {
+                        setTimeout(function () {
 
                             if ("header" in config) {
-                                _setText(catStatusContentElt.childNodes[1]  , config.header, config.style);
+                                _setText(catStatusContentElt.childNodes[1], config.header, config.style);
                             }
                             if ("desc" in config) {
                                 _setText(catStatusContentElt.childNodes[2], config.desc, config.style);
@@ -1157,11 +1165,11 @@ _cat.utils.AJAX = function () {
          *      onreadystatechange - [optional] ready listener
          *      callback - [optional] instead of using onreadystatechange this callback will occur when the call is ready
          */
-        sendRequestAsync: function(config) {
+        sendRequestAsync: function (config) {
 
             var xmlhttp = new XMLHttpRequest(),
                 onerror = function (e) {
-                    _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
+                    _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
@@ -1346,7 +1354,7 @@ _cat.plugins.jqm = function () {
 
             scrollTo: function (idName) {
 
-                $(document).ready(function(){
+                $(document).ready(function () {
                     var stop = $('#' + idName).offset().top;
                     var delay = 1000;
                     $('body,html').animate({scrollTop: stop}, delay);
@@ -1355,21 +1363,19 @@ _cat.plugins.jqm = function () {
             },
 
 
-
             scrollTop: function () {
 
-                $(document).ready(function(){
+                $(document).ready(function () {
 
 
-
-                    $('html, body').animate({scrollTop : 0},1000);
+                    $('html, body').animate({scrollTop: 0}, 1000);
                 });
 
             },
 
-            scrollToWithRapper : function (idName, rapperId) {
+            scrollToWithRapper: function (idName, rapperId) {
 
-                $(document).ready(function(){
+                $(document).ready(function () {
                     var stop = $('#' + idName).offset().top;
                     var delay = 1000;
                     $('#' + rapperId).animate({scrollTop: stop}, delay);
@@ -1378,7 +1384,7 @@ _cat.plugins.jqm = function () {
             },
 
             clickRef: function (idName) {
-                $(document).ready(function(){
+                $(document).ready(function () {
                     $('#' + idName).trigger('click');
                     window.location = $('#' + idName).attr('href');
                 });
@@ -1387,7 +1393,7 @@ _cat.plugins.jqm = function () {
 
 
             clickButton: function (idName) {
-                $(document).ready(function(){
+                $(document).ready(function () {
                     $('.ui-btn').removeClass('ui-focus');
                     $('#' + idName).trigger('click');
                     $('#' + idName).closest('.ui-btn').addClass('ui-focus');
@@ -1396,45 +1402,43 @@ _cat.plugins.jqm = function () {
             },
 
             selectTab: function (idName) {
-                $(document).ready(function(){
+                $(document).ready(function () {
                     $('#' + idName).trigger('click');
                 });
 
             },
 
 
-
-            selectMenu : function (selectId, value) {
-                $(document).ready(function(){
+            selectMenu: function (selectId, value) {
+                $(document).ready(function () {
                     if (typeof value === 'number') {
-                        $("#" + selectId + " option[value=" + value + "]").attr('selected','selected');
+                        $("#" + selectId + " option[value=" + value + "]").attr('selected', 'selected');
                     } else if (typeof value === 'string') {
-                        $("#" + selectId + " option[id=" + value + "]").attr('selected','selected');
+                        $("#" + selectId + " option[id=" + value + "]").attr('selected', 'selected');
                     }
-                    $( "#" + selectId).selectmenu("refresh", true);
+                    $("#" + selectId).selectmenu("refresh", true);
                 });
 
             },
 
 
-
-            swipeItemLeft : function(idName) {
-                $(document).ready(function(){
+            swipeItemLeft: function (idName) {
+                $(document).ready(function () {
                     $("#" + idName).swipeleft();
                 });
             },
 
 
-            swipeItemRight : function(idName) {
-                $(document).ready(function(){
+            swipeItemRight: function (idName) {
+                $(document).ready(function () {
                     $("#" + idName).swiperight();
                 });
             },
 
 
-            swipePageLeft : function() {
-                $(document).ready(function(){
-                    $( ".ui-page-active" ).swipeleft();
+            swipePageLeft: function () {
+                $(document).ready(function () {
+                    $(".ui-page-active").swipeleft();
 //                    var next = $( ".ui-page-active" ).jqmData( "next" );
 //                    $( ":mobile-pagecontainer" ).pagecontainer( "change", next + ".html", {
 //
@@ -1447,11 +1451,11 @@ _cat.plugins.jqm = function () {
             },
 
 
-            swipePageRight : function() {
-                $(document).ready(function(){
+            swipePageRight: function () {
+                $(document).ready(function () {
 //                    $( ".ui-page-active" ).swiperight();
-                    var prev = $( ".ui-page-active" ).jqmData( "prev" );
-                    $( ":mobile-pagecontainer" ).pagecontainer( "change", prev + ".html", {
+                    var prev = $(".ui-page-active").jqmData("prev");
+                    $(":mobile-pagecontainer").pagecontainer("change", prev + ".html", {
 
                         reverse: true
                     });
@@ -1460,43 +1464,43 @@ _cat.plugins.jqm = function () {
 
 
             click: function (idName) {
-                $(document).ready(function(){
+                $(document).ready(function () {
                     $('#' + idName).trigger('click');
                 });
 
             },
 
             setCheck: function (idName) {
-                $(document).ready(function(){
-                    $("#"+ idName).prop("checked",true).checkboxradio("refresh");
+                $(document).ready(function () {
+                    $("#" + idName).prop("checked", true).checkboxradio("refresh");
                 });
 
             },
 
-            slide : function (idName, value) {
-                $(document).ready(function(){
-                    $("#"+ idName).val(value).slider("refresh");
+            slide: function (idName, value) {
+                $(document).ready(function () {
+                    $("#" + idName).val(value).slider("refresh");
                 });
             },
 
-            setText : function (idName, value) {
-                $(document).ready(function(){
-                    $("#"+ idName).val(value);
+            setText: function (idName, value) {
+                $(document).ready(function () {
+                    $("#" + idName).val(value);
                 });
             },
 
 
             checkRadio: function (className, idName) {
-                $(document).ready(function(){
-                    $( "." + className ).prop( "checked", false ).checkboxradio( "refresh" );
-                    $( "#" + idName ).prop( "checked", true ).checkboxradio( "refresh" );
+                $(document).ready(function () {
+                    $("." + className).prop("checked", false).checkboxradio("refresh");
+                    $("#" + idName).prop("checked", true).checkboxradio("refresh");
                 });
 
             },
 
-            collapsible : function(idName) {
-                $(document).ready(function(){
-                    $('#' + idName).children( ".ui-collapsible-heading" ).children(".ui-collapsible-heading-toggle").click();
+            collapsible: function (idName) {
+                $(document).ready(function () {
+                    $('#' + idName).children(".ui-collapsible-heading").children(".ui-collapsible-heading-toggle").click();
                 });
 
             }
