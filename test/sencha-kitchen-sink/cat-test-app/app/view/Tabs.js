@@ -6,6 +6,7 @@ Ext.define('Kitchensink.view.Tabs', {
 
     config: {
         ui: 'dark',
+        itemId : "tabBar",
         tabBar: {
             ui: 'dark',
             layout: {
@@ -15,6 +16,16 @@ Ext.define('Kitchensink.view.Tabs', {
         activeTab: 1,
         defaults: {
             scrollable: true
+        },
+        listeners : {
+            painted: function (element, options) {
+                /*
+                 @[scrap
+                 @@name setActiveTab
+                 @@sencha changeTab("tabBar", 2);
+                 ]@
+                 */
+            }
         },
         items: [
             {

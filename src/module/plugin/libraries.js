@@ -320,6 +320,7 @@ module.exports = _basePlugin.ext(function () {
                                                     document: true,
                                                     _cat: true,
                                                     $ : true,
+                                                    Ext : true,
                                                     window : true,
                                                     chai: true
                                                 }

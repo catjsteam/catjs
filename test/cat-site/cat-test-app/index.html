@@ -94,28 +94,30 @@
 
     </div>
     <div id="example2" class="exampleBlock box-sizing">
+
         <!--
-          @[scrap
-             @@name setAsCheck
-             @@run@ checkManager
-             @@embed true
-             @@jqm checkRadio("hRadio" , "radio-choice-e" );
-          ]@
-        -->
+                             @[scrap
+                                @@name selectRadioOption3
+                                @@run@ radioManager
+                                @@embed true
+                                @@jqm checkRadio("RadioGroup", "select3");
+                             ]@
+                           -->
 
 
-        <div id="checkbox-radioH" data-demo-html="true">
-            <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-                <legend>Radio buttons, mini, horizontal controlgroup:</legend>
-                <input class="hRadio" type="radio" name="radio-choice-b" id="radio-choice-c" value="list"
-                       checked="checked">
-                <label for="radio-choice-c">List</label>
-                <input class="hRadio" type="radio" name="radio-choice-b" id="radio-choice-d" value="grid">
-                <label for="radio-choice-d">Grid</label>
-                <input class="hRadio" type="radio" name="radio-choice-b" id="radio-choice-e" value="gallery">
-                <label for="radio-choice-e">Gallery</label>
+        <form>
+            <fieldset data-role="controlgroup">
+                <legend>Vertical:</legend>
+                <input type="radio" name="radio-choice" class="RadioGroup" id="select1" value="One">
+                <label for="select1">One</label>
+                <input type="radio" name="radio-choice"  class="RadioGroup" id="select2" value="Two">
+                <label for="select2">Two</label>
+                <input type="radio" name="radio-choice"  class="RadioGroup" id="select3" value="Three">
+                <label for="select3">Three</label>
+                <input type="radio" name="radio-choice" class="RadioGroup"  id="select4" value="Four">
+                <label for="select4">Four</label>
             </fieldset>
-        </div>
+        </form>
 
     </div>
     <div class="tryDemo box-sizing">
@@ -430,46 +432,6 @@
     </div>
 </div>
 
-
-<div class="demoBlock">
-    <div class="editorBlock box-sizing">
-        <div class="editor" id="editor12">
-
-        </div>
-
-
-    </div>
-    <div id="example12" class="exampleBlock box-sizing">
-
-        <!--
-                             @[scrap
-                                @@name selectRadioOption3
-                                @@run@ radioManager
-                                @@embed true
-                                @@jqm checkRadio("RadioGroup", "select3");
-                             ]@
-                           -->
-
-
-            <form>
-                <fieldset data-role="controlgroup">
-                    <legend>Vertical:</legend>
-                    <input type="radio" name="radio-choice" class="RadioGroup" id="select1" value="One">
-                    <label for="select1">One</label>
-                    <input type="radio" name="radio-choice"  class="RadioGroup" id="select2" value="Two">
-                    <label for="select2">Two</label>
-                    <input type="radio" name="radio-choice"  class="RadioGroup" id="select3" value="Three">
-                    <label for="select3">Three</label>
-                    <input type="radio" name="radio-choice" class="RadioGroup"  id="select4" value="Four">
-                    <label for="select4">Four</label>
-                </fieldset>
-            </form>
-
-    </div>
-    <div class="tryDemo box-sizing">
-        <input id="tryExample12" type="button" value="Try Me">
-    </div>
-</div>
 
 
 

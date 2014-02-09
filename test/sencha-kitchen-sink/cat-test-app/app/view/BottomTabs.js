@@ -19,6 +19,18 @@ Ext.define('Kitchensink.view.BottomTabs', {
         defaults: {
             scrollable: true
         },
+        itemId : "bottomBar",
+        listeners : {
+            painted: function (element, options) {
+                /*
+                 @[scrap
+                 @@name setActiveTabBottom
+                 @@sencha changeTab("bottomBar", 3);
+                 ]@
+                 */
+            }
+        },
+
         items: [
             {
                 title: 'About',

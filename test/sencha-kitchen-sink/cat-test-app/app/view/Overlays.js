@@ -6,11 +6,25 @@ Ext.define('Kitchensink.view.Overlays', {
     config: {
         padding: 20,
         itemId : 'overlay',
-        plugins: [
-            {
-                xclass: 'Ext.ux.CAT'
+
+        listeners : {
+            painted: function (element, options) {
+                debugger;
+                /*
+                 @[scrap
+                     @@name catSenchaTap
+                     @@sencha tapButton('pickerButton');
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name catSenchaTap
+                 @@sencha tapButton('pickerButton');
+                 ]@
+                 */
             }
-        ],
+        },
         scrollable: true,
         layout: {
             type : 'vbox',
@@ -22,9 +36,6 @@ Ext.define('Kitchensink.view.Overlays', {
             xtype : 'button',
             cls   : 'demobtn',
             margin: '10 0'
-        },
-        scraps : {
-
         },
 
         items: [
@@ -127,11 +138,12 @@ Ext.define('Kitchensink.view.Overlays', {
             },
             {
                 text: 'Picker',
-                itemId : 'pickerRan',
+                itemId : 'pickerButton',
                 handler: function() {
                     if (!this.picker) {
                         this.picker = Ext.Viewport.add({
                             xtype: 'picker',
+                            itemId : 'overlayPicker',
                             slots: [
                                 {
                                     name : 'limit_speed',
@@ -155,9 +167,3 @@ Ext.define('Kitchensink.view.Overlays', {
 });
 
 
-/*
- @[scrap
- @@name catSenchaTap
- @@sencha tapButton('overlay', 'pickerRan');
- ]@
- */

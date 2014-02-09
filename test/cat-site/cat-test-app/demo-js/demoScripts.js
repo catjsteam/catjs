@@ -29,7 +29,7 @@ $(document).ready(function(){
     setEditor("editor9", 'example9' );
     setEditor("editor10", 'example10' );
     setEditor("editor11", 'example11' );
-    setEditor("editor12", 'example12' );
+
 
 
 
@@ -55,19 +55,9 @@ $(document).ready(function(){
 
         /*
          @[scrap
-         @@name setAsCheck2
-         @@run@ checkManager
-
-         @@jqm checkRadio("hRadio" , "radio-choice-c" );
-         ]@
-         */
-
-        /*
-         @[scrap
-         @@name checkManager
+         @@name     radioManager
          @@perform[
-         @@setAsCheck repeat(1)
-         @@setAsCheck2 repeat(1)
+         @@selectRadioOption3 repeat(1)
          ]
          @@manager true
          @@signal TESTEND
@@ -208,20 +198,5 @@ $(document).ready(function(){
          ]@
          */
     });
-
-    $('#tryExample12').click(function() {
-        /*
-         @[scrap
-         @@name     radioManager
-         @@perform[
-         @@selectRadioOption3 repeat(1)
-         ]
-         @@manager true
-         @@signal TESTEND
-         ]@
-         */
-    });
-
-
 
 });

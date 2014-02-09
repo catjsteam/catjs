@@ -25,8 +25,19 @@ Ext.define('Kitchensink.view.Sliders', {
                 items: [
                     {
                         xtype: 'sliderfield',
+                        itemId: 'singleSlider',
                         name: 'thumb',
                         value: 20,
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setSimpleSlider
+                                 @@sencha setSliderValue("singleSlider", 85);
+                                 ]@
+                                 */
+                            }
+                        },
                         label: 'Single Thumb'
                     },
                     {
@@ -38,12 +49,34 @@ Ext.define('Kitchensink.view.Sliders', {
                     },
                     {
                         xtype: 'sliderfield',
+                        itemId: 'multiSlider',
                         name: 'multithumb',
                         label: 'Multiple Thumbs',
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setSimpleSlider
+                                 @@sencha setSliderValues("singleSlider", 20, 85);
+                                 ]@
+                                 */
+                            }
+                        },
                         values: [10, 70]
                     },
                     {
                         xtype: 'togglefield',
+                        itemId: 'toggleSlider',
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setSimpleSlider
+                                 @@sencha setToggle("toggleSlider", true);
+                                 ]@
+                                 */
+                            }
+                        },
                         name: 'toggle',
                         label: 'Toggle'
                     }
