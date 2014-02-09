@@ -48,6 +48,90 @@ module.exports = function () {
                                 });
                             }
 
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "tapButton",
+                                    apiname: "tapButton",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "setTextValue",
+                                    apiname: "setTextValue",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "setChecked",
+                                    apiname: "setChecked",
+                                    exp: sencha
+                                });
+                            }
+
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "setUnchecked",
+                                    apiname: "setUnchecked",
+                                    exp: sencha
+                                });
+                            }
+
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "setDate",
+                                    apiname: "setDate",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "setSliderValue",
+                                    apiname: "setSliderValue",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "setSliderValues",
+                                    apiname: "setSliderValues",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "setToggle",
+                                    apiname: "setToggle",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "scrollBy",
+                                    apiname: "scrollBy",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "changeTab",
+                                    apiname: "changeTab",
+                                    exp: sencha
+                                });
+                            }
+
+
+
                             if (match) {
                                 me.print("_cat.core.plugin('sencha').actions."+ match);
                             }

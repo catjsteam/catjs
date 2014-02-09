@@ -25,8 +25,8 @@ Ext.application({
     },
 
     requires: [
-        'Ext.MessageBox',
-        'Ext.ux.CAT'
+        'Ext.MessageBox'
+
     ],
 
     isIconPrecomposed: false,

@@ -25,6 +25,7 @@ Ext.define('Kitchensink.view.FormPanel', {
             {
                 xtype: 'fieldset',
                 id: 'fieldset1',
+
                 title: 'Personal Info',
                 instructions: 'Please enter the information above.',
                 defaults: {
@@ -35,6 +36,17 @@ Ext.define('Kitchensink.view.FormPanel', {
                         xtype         : 'textfield',
                         name          : 'name',
                         label         : 'Name',
+                        itemId: 'formPanelName',
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setNamePanel
+                                 @@sencha setTextValue("formPanelName", 'this is my new name');
+                                 ]@
+                                 */
+                            }
+                        },
                         placeHolder   : 'Tom Roy',
                         autoCapitalize: true,
                         required      : true,
@@ -42,6 +54,17 @@ Ext.define('Kitchensink.view.FormPanel', {
                     },
                     {
                         xtype: 'passwordfield',
+                        itemId: 'formPanelPassword',
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setPasswordPanel
+                                 @@sencha setTextValue("formPanelPassword", '1234');
+                                 ]@
+                                 */
+                            }
+                        },
                         name : 'password',
                         label: 'Password'
                     },
@@ -50,12 +73,34 @@ Ext.define('Kitchensink.view.FormPanel', {
                         name       : 'email',
                         label      : 'Email',
                         placeHolder: 'me@sencha.com',
+                        itemId: 'formPanelEmail',
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setEmailPanel
+                                 @@sencha setTextValue("formPanelEmail", "catteam@cat.com");
+                                 ]@
+                                 */
+                            }
+                        },
                         clearIcon  : true
                     },
                     {
                         xtype      : 'urlfield',
                         name       : 'url',
                         label      : 'Url',
+                        itemId: 'formPanelUrl',
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setUrlPanel
+                                 @@sencha setTextValue("formPanelUrl", "catjsteam@github.io");
+                                 ]@
+                                 */
+                            }
+                        },
                         placeHolder: 'http://sencha.com',
                         clearIcon  : true
                     },
@@ -63,6 +108,20 @@ Ext.define('Kitchensink.view.FormPanel', {
                         xtype      : 'spinnerfield',
                         name       : 'spinner',
                         label      : 'Spinner',
+                        itemId: 'formPanelSpinner',
+                        listeners : {
+                            spin: function (element, options) {
+                                console.log("spin");
+                            },
+                            spinup: function (element, options) {
+                                debugger;
+                                console.log("spinup");
+                            },
+                            spindown: function (element, options) {
+                                console.log("spindown");
+                            }
+                        },
+
                         minValue   : 0,
                         maxValue   : 10,
                         stepValue  : 1,
@@ -70,14 +129,44 @@ Ext.define('Kitchensink.view.FormPanel', {
                     },
                     {
                         xtype: 'checkboxfield',
+                        itemId: 'formPanelCheckbox',
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setCheckboxPanel
+                                 @@sencha setChecked("formPanelCheckbox");
+                                 ]@
+                                 */
+                            }
+                        },
                         name : 'cool',
                         label: 'Cool'
                     },
                     {
                         xtype: 'datepickerfield',
                         destroyPickerOnHide: true,
+                        itemId: 'formPanelDate',
                         name : 'date',
                         label: 'Start Date',
+                        listeners : {
+                            painted: function (element, options) {
+                                /*
+                                 @[scrap
+                                 @@name setCheckboxPanel
+                                 @@sencha setDate("formPanelDate", 2014, 2, 24);
+                                 ]@
+                                 */
+
+
+                                /*
+                                 @[scrap
+                                 @@name scrollBy600
+                                 @@sencha scrollBy("basicform", 600);
+                                 ]@
+                                 */
+                            }
+                        },
                         value: new Date(),
                         picker: {
                             yearFrom: 1990
@@ -113,6 +202,7 @@ Ext.define('Kitchensink.view.FormPanel', {
                 xtype: 'fieldset',
                 id: 'fieldset2',
                 title: 'Favorite color',
+                itemId: 'formPanelRadio',
                 defaults: {
                     xtype     : 'radiofield',
                     labelWidth: '35%'
