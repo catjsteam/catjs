@@ -2,19 +2,21 @@ The *catconfig.json* file defines additional configuration for cat project run.
 Below is an explanation of the configuration properties
 
 
-##type
+###type
 The name of the project *will be changed to name*
 
-##ip
+###ip
 The ip of the server where assertions are sent to
 
-##port
+###port
 The port of the server where assertions are sent to
 
-##tests
+###tests
 An array with the details of the tests to be run in the following format:
 
-```javascript "tests": [{"name": "catSenchaText"}, {"name": "catSenchaBtn"}]```
+```javascript
+"tests": [{"name": "catSenchaText"}, {"name": "catSenchaBtn"}] 
+```
 
 You can also define testsets in the following way
 
@@ -24,14 +26,16 @@ You can also define testsets in the following way
 ```
 and then
 
-```javascript "tests":  [{"name": "catSenchaText2"}, {"name": "unit1"}, {"name": "unit2"}]```
+```javascript
+"tests":  [{"name": "catSenchaText2"}, {"name": "unit1"}, {"name": "unit2"}]
+```
 
 
-##run-mode
+###run-mode
 * _all_ - run all tests (`tests` property is ignored)
 * _test-manager_ - Run the tests according to `tests` property
 
-##test-failure-timeout
+###test-failure-timeout
 The number of the timeout in seconds to wait for an assertion response, if the timeout occurs all the tests that did not run will be failed.
 Set timeout to 0 to avoid the timeout.
 
