@@ -33,7 +33,7 @@ and then
 The
 
 ##run-mode
-* _all_ - run all tests )`tests` property is ignored
+* _all_ - run all tests (`tests` property is ignored)
 * _test-manager_ - Run the tests according to `tests` property
 
 ##test-failure-timeout
