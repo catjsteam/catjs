@@ -19,7 +19,11 @@ Ext.define('Kitchensink.view.tablet.Main', {
                 duration: 250
             }
         },
-
+        listeners : {
+            painted: function (element, options) {
+                debugger;
+            }
+        },
         items: [
             {
                 id: 'launchscreen',
@@ -34,7 +38,15 @@ Ext.define('Kitchensink.view.tablet.Main', {
                 updateTitleText: Ext.theme.name === "Cupertino" ? false : true,
                 docked: 'left',
                 width: 200,
-                store: 'Demos'
+                store: 'Demos',
+                listeners : {
+                    itemtap : function(list, index, target, record, e, eOpts ) {
+                        debugger;
+                    },
+                    leafitemtap : function(list, index, target, record, e, eOpts ) {
+                        debugger;
+                    }
+                }
             },
             {
                 id: 'mainNavigationBar',

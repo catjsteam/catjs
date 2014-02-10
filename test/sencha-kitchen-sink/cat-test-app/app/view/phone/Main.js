@@ -6,7 +6,7 @@ Ext.define('Kitchensink.view.phone.Main', {
 
     config: {
         fullscreen: true,
-        title: 'Kitchen Sink',
+        title: 'Hello2 Kitchen Sink',
         useTitleAsBackText: false,
         layout: {
             animation: {
@@ -16,12 +16,22 @@ Ext.define('Kitchensink.view.phone.Main', {
         },
 
         store: 'Demos',
-
+        itemId : 'kitchenSinkMenu',
+        listeners : {
+            painted: function (element, options) {
+                /*
+                 @[scrap
+                 @@name nestedlistSelect
+                 @@sencha nestedlistSelect("kitchenSinkMenu", 0);
+                 ]@
+                 */
+            }
+        },
         toolbar: {
             id: 'mainNavigationBar',
             xtype: 'titlebar',
             docked: 'top',
-            title: 'Kitchen Sink',
+            title: 'Hello Kitchen Sink',
 
             items: {
                 xtype: 'button',

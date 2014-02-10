@@ -130,6 +130,14 @@ module.exports = function () {
                                 });
                             }
 
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "nestedlistSelect",
+                                    apiname: "nestedlistSelect",
+                                    exp: sencha
+                                });
+                            }
+
 
 
                             if (match) {

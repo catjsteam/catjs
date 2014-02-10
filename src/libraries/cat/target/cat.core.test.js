@@ -1640,6 +1640,19 @@ _cat.plugins.sencha = function () {
 
             },
 
+            nestedlistSelect : function (nestedlistId, index) {
+
+                var nestedlist = getItemById(nestedlistId);
+                var indexItem = nestedlist.getActiveItem().getStore().getRange()[index];
+                if (indexItem.isLeaf()) {
+                    nestedlist.goToLeaf(indexItem);
+
+                } else {
+                    nestedlist.goToNode(indexItem);
+                }
+
+            },
+
             setDate : function (dateItemId, year, month, day) {
 
                 var dateItem = getItemById(dateItemId);
