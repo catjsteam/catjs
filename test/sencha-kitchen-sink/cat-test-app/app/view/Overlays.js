@@ -9,16 +9,15 @@ Ext.define('Kitchensink.view.Overlays', {
 
         listeners : {
             painted: function (element, options) {
-                debugger;
                 /*
-                 @[scrap
+                 [scrap
                      @@name catSenchaTap
                      @@sencha tapButton('pickerButton');
                  ]@
                  */
 
                 /*
-                 @[scrap
+                 [scrap
                  @@name catSenchaTap
                  @@sencha tapButton('pickerButton');
                  ]@
@@ -41,6 +40,7 @@ Ext.define('Kitchensink.view.Overlays', {
         items: [
             {
                 text: 'Action Sheet',
+                itemId : 'actionButton',
                 model: false,
                 handler: function() {
                     var items = [
@@ -82,16 +82,28 @@ Ext.define('Kitchensink.view.Overlays', {
             },
             {
                 text: 'Overlay',
+                itemId : 'overlayButton',
                 handler: function() {
                     if (!this.overlay) {
                         this.overlay = Ext.Viewport.add({
                             xtype: 'panel',
+                            itemId : 'overlayPanel',
                             modal: true,
                             hideOnMaskTap: true,
                             showAnimation: {
                                 type: 'popIn',
                                 duration: 250,
                                 easing: 'ease-out'
+                            },
+                            listeners : {
+                                painted: function (element, options) {
+                                    /*
+                                     [scrap
+                                     @@name removeOverlayPanel
+                                     @@sencha removePanel("overlayPanel");
+                                     ]@
+                                     */
+                                }
                             },
                             hideAnimation: {
                                 type: 'popOut',
@@ -120,20 +132,23 @@ Ext.define('Kitchensink.view.Overlays', {
             },
             {
                 text: 'Alert',
+                itemId : 'alertButton',
                 handler: function() {
                     Ext.Msg.alert('Title', 'The quick brown fox jumped over the lazy dog.', Ext.emptyFn);
                 }
             },
             {
                 text: 'Prompt',
+                itemId : 'promptButton',
                 handler: function() {
                     Ext.Msg.prompt("Welcome!", "What's your first name?", Ext.emptyFn);
                 }
             },
             {
+                itemId : 'confirmButton',
                 text: 'Confirm',
                 handler: function() {
-                    Ext.Msg.confirm("Confirmation", "Are you sure you want to do that?", Ext.emptyFn);
+                    Ext.Msg.confirm("Confirmation", "Are you sure you want to do that?", function(a, b) { debugger; console.log("hi");});
                 }
             },
             {

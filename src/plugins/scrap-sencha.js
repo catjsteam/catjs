@@ -124,6 +124,38 @@ module.exports = function () {
 
                             if (!match) {
                                 match = _scraputils.generate({
+                                    api: "scrollToTop",
+                                    apiname: "scrollToTop",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "carouselNext",
+                                    apiname: "carouselNext",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "carouselPrevious",
+                                    apiname: "carouselPrevious",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "scrollToEnd",
+                                    apiname: "scrollToEnd",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
                                     api: "changeTab",
                                     apiname: "changeTab",
                                     exp: sencha
@@ -138,7 +170,21 @@ module.exports = function () {
                                 });
                             }
 
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "removePanel",
+                                    apiname: "removePanel",
+                                    exp: sencha
+                                });
+                            }
 
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "nestedlistBack",
+                                    apiname: "nestedlistBack",
+                                    exp: sencha
+                                });
+                            }
 
                             if (match) {
                                 me.print("_cat.core.plugin('sencha').actions."+ match);

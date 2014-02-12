@@ -16,7 +16,57 @@ Ext.define('Kitchensink.view.BasicDataView', {
                     /*
                      @[scrap
                      @@name scrollBy500
-                     @@sencha scrollBy("basicDataView", 500);
+                     @@run@ basicDataViewManager
+                     @@sencha scrollBy("basicDataView", 0, 500);
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name scrollBy1200
+                     @@run@ basicDataViewManager
+                     @@sencha scrollBy("basicDataView", 0, 1200);
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name scrollToEndBasic
+                     @@run@ basicDataViewManager
+                     @@sencha scrollToEnd("basicDataView");
+                     ]@
+                     */
+
+
+                    /*
+                     @[scrap
+                     @@name scrollToTopBasic
+                     @@run@ basicDataViewManager
+                     @@sencha scrollToTop("basicDataView");
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name GoToDataViewsHorizontal
+                     @@run@ basicDataViewManager
+                     @@sencha nestedlistSelect("mainNestedList", 1);
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name basicDataViewManager
+                     @@perform[
+                     @@scrollBy500 repeat(1)
+                     @@scrollToEndBasic repeat(1)
+                     @@scrollBy1200 repeat(1)
+                     @@scrollToTopBasic repeat(1)
+                     @@GoToDataViewsHorizontal repeat(1)
+                     ]
+                     @@catui on
+                     @@manager true
+                     @@signal TESTEND
                      ]@
                      */
                 }

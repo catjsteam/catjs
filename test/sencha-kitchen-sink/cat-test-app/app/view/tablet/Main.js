@@ -19,11 +19,7 @@ Ext.define('Kitchensink.view.tablet.Main', {
                 duration: 250
             }
         },
-        listeners : {
-            painted: function (element, options) {
-                debugger;
-            }
-        },
+
         items: [
             {
                 id: 'launchscreen',
@@ -40,13 +36,52 @@ Ext.define('Kitchensink.view.tablet.Main', {
                 width: 200,
                 store: 'Demos',
                 listeners : {
-                    itemtap : function(list, index, target, record, e, eOpts ) {
-                        debugger;
-                    },
-                    leafitemtap : function(list, index, target, record, e, eOpts ) {
-                        debugger;
+                    painted: function (element, options) {
+                        /*
+                         @[scrap
+                         @@name mainTablet
+                         @@run@ mainManager
+                         @@sencha nestedlistSelect("mainNestedList", 0);
+                         ]@
+                         */
+
+                        /*
+                         @[scrap
+                         @@name UITablet
+                         @@run@ mainManager
+                         @@sencha nestedlistSelect("mainNestedList", 1);
+                         ]@
+                         */
+
+                        /*
+                         @[scrap
+                         @@name FormsTablet
+                         @@run@ mainManager
+                         @@sencha nestedlistSelect("mainNestedList", 0);
+                         ]@
+                         */
+
+
+
+
+                        /*
+                         @[scrap
+                         @@name mainManager
+                         @@perform[
+                         @@mainTablet repeat(1)
+                         @@UITablet repeat(1)
+                         @@FormsTablet repeat(1)
+
+                         ]
+                         @@catui on
+                         @@manager true
+                         @@signal TESTEND
+                         ]@
+                        */
                     }
+
                 }
+
             },
             {
                 id: 'mainNavigationBar',

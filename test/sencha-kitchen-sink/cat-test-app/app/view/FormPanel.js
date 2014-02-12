@@ -31,6 +31,40 @@ Ext.define('Kitchensink.view.FormPanel', {
                 defaults: {
                     labelWidth: '35%'
                 },
+
+
+                listeners : {
+                    painted: function(element, options) {
+
+
+                        /*
+                         @[scrap
+                         @@name GoToSliders
+                         @@run@ formPanelManager
+                         @@sencha nestedlistSelect("mainNestedList", 1);
+                         ]@
+                         */
+
+                        /*
+                         @[scrap
+                         @@name formPanelManager
+                         @@perform[
+                         @@setNamePanel repeat(1)
+                         @@setPasswordPanel repeat(1)
+                         @@setEmailPanel repeat(1)
+                         @@setUrlPanel repeat(1)
+                         @@setCheckboxPanel repeat(1)
+                         @@setDatePanel repeat(1)
+                         @@GoToSliders repeat(1)
+
+                         ]
+                         @@catui on
+                         @@manager true
+                         @@signal TESTEND
+                         ]@
+                         */
+                    }
+                },
                 items: [
                     {
                         xtype         : 'textfield',
@@ -42,7 +76,8 @@ Ext.define('Kitchensink.view.FormPanel', {
                                 /*
                                  @[scrap
                                  @@name setNamePanel
-                                 @@sencha setTextValue("formPanelName", 'this is my new name');
+                                 @@run@ formPanelManager
+                                 @@sencha setTextValue("formPanelName", 'this_is_my_new_name');
                                  ]@
                                  */
                             }
@@ -60,6 +95,7 @@ Ext.define('Kitchensink.view.FormPanel', {
                                 /*
                                  @[scrap
                                  @@name setPasswordPanel
+                                 @@run@ formPanelManager
                                  @@sencha setTextValue("formPanelPassword", '1234');
                                  ]@
                                  */
@@ -79,6 +115,7 @@ Ext.define('Kitchensink.view.FormPanel', {
                                 /*
                                  @[scrap
                                  @@name setEmailPanel
+                                 @@run@ formPanelManager
                                  @@sencha setTextValue("formPanelEmail", "catteam@cat.com");
                                  ]@
                                  */
@@ -96,6 +133,7 @@ Ext.define('Kitchensink.view.FormPanel', {
                                 /*
                                  @[scrap
                                  @@name setUrlPanel
+                                 @@run@ formPanelManager
                                  @@sencha setTextValue("formPanelUrl", "catjsteam@github.io");
                                  ]@
                                  */
@@ -135,6 +173,7 @@ Ext.define('Kitchensink.view.FormPanel', {
                                 /*
                                  @[scrap
                                  @@name setCheckboxPanel
+                                 @@run@ formPanelManager
                                  @@sencha setChecked("formPanelCheckbox");
                                  ]@
                                  */
@@ -153,18 +192,12 @@ Ext.define('Kitchensink.view.FormPanel', {
                             painted: function (element, options) {
                                 /*
                                  @[scrap
-                                 @@name setCheckboxPanel
+                                 @@name setDatePanel
+                                 @@run@ formPanelManager
                                  @@sencha setDate("formPanelDate", 2014, 2, 24);
                                  ]@
                                  */
 
-
-                                /*
-                                 @[scrap
-                                 @@name scrollBy600
-                                 @@sencha scrollBy("basicform", 600);
-                                 ]@
-                                 */
                             }
                         },
                         value: new Date(),
@@ -273,3 +306,5 @@ Ext.define('Kitchensink.view.FormPanel', {
         ]
     }
 });
+
+

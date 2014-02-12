@@ -33,30 +33,9 @@ Ext.define('Kitchensink.view.NestedList', {
             },
 
             painted: function (element, options) {
-                debugger;
-            },
-
-            activate : function( newActiveItem, oldActiveItem, eOpts ) {
-                debugger;
-            },
-            activateitemchange : function( newActiveItem, oldActiveItem, eOpts ) {
-                debugger;
-            },
-            add : function( newActiveItem, oldActiveItem, eOpts ) {
-                debugger;
-            },
-            back : function( newActiveItem, oldActiveItem, eOpts ) {
-                debugger;
-            },
-            beforeload : function( newActiveItem, oldActiveItem, eOpts ) {
-                debugger;
-            },
-            fullscreen : function( newActiveItem, oldActiveItem, eOpts ) {
-                debugger;
-            },
-            itemtap : function(list, index, target, record, e, eOpts ) {
-                debugger;
             }
+
+
 
         }
     },
