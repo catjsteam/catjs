@@ -1674,6 +1674,26 @@ _cat.plugins.sencha = function () {
                 }
             },
 
+            scrollToListIndex : function (listId, index) {
+
+                var list = getItemById(listId);
+
+                var scroller = list.getScrollable().getScroller();
+                var item = list.getItemAt(index);
+                var verticalValue = item.renderElement.dom.offsetTop;
+                var horizontalValue = 0;
+
+                if (scrollDelay) {
+                    scroller.scrollTo(horizontalValue,verticalValue, {
+                        duration : 1000
+                    }) ;
+                } else {
+                    scroller.scrollTo(horizontalValue,verticalValue);
+
+                }
+            },
+
+
 
             carouselNext : function (carouselId) {
 
@@ -1709,7 +1729,14 @@ _cat.plugins.sencha = function () {
                 nestedlist.goToNode(node.parentNode);
             },
 
-    removePanel : function (panelId) {
+
+            listSelectIndex : function (listId, index) {
+                var list = getItemById(listId);
+                list.select(index);
+            },
+
+
+            removePanel : function (panelId) {
 
                 var panel = getItemById(panelId);
                 Ext.Viewport.remove(panel);

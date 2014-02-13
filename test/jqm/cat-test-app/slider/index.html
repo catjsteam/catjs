@@ -72,19 +72,27 @@
                 <div data-demo-html="true">
 
 
+                    <form>
+                    <label for="slider-1">Slider:</label>
+                    <input type="range" name="slider-1" id="slider-1" min="0" max="100" value="50">
+				</form>
+
+
+                    <script>
+                        JQMElement = function(elementid){return $('#' + elementid);}
+
+                    </script>
                     <!--
                    @[scrap
                       @@name slider25
                       @@run@ sliderManager
                       @@embed true
                       @@jqm slide("slider-1" , 25);
+                      @@assert ok($('#slider-1').val()=='25','hello')
+
                    ]@
               -->
 
-                    <form>
-                    <label for="slider-1">Slider:</label>
-                    <input type="range" name="slider-1" id="slider-1" min="0" max="100" value="50">
-				</form>
                 </div><!-- /demo-html -->
 
                 <h2>Step attribute</h2>
@@ -115,6 +123,7 @@
                       @@run@ sliderManager
                       @@embed true
                       @@jqm slide("slider-2" , 77);
+                      @@assert ok($('#slider-2').val()=='77','hello')
                    ]@
               -->
 				<form>
@@ -310,6 +319,8 @@
                    @@formsMenuClick repeat(1)
                    @@formsMenu2 repeat(1)
                    @@formRef repeat(1)
+
+
                   ]
 
                   @@embed true

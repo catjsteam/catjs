@@ -83,6 +83,7 @@
                          @@run@ radioManager
                          @@embed true
                          @@jqm checkRadio("verRadioGroup", "radio-choice-v-2c");
+                         @@assert ok($('#radio-choice-v-2c').is(':checked'),'radio-choice-v-2c is checked')
                       ]@
                     -->
 
@@ -92,6 +93,8 @@
                          @@run@ radioManager
                          @@embed true
                          @@jqm checkRadio("verRadioGroup", "radio-choice-v-2a");
+                         @@assert ok($('#radio-choice-v-2a').is(':checked'),'radio-choice-v-2a is checked')
+
                       ]@
                     -->
 
@@ -101,6 +104,7 @@
                         @@run@ radioManager
                         @@embed true
                         @@jqm checkRadio("verRadioGroup", "radio-choice-v-2d");
+                        @@assert ok($('#radio-choice-v-2d').is(':checked'),'radio-choice-v-2d is checked')
                      ]@
                    -->
 
@@ -141,6 +145,7 @@
                          @@run@ radioManager
                          @@embed true
                          @@jqm checkRadio("horGroup", "radio-choice-h-2c");
+                         @@assert ok($('#radio-choice-h-2c').is(':checked'),'radio-choice-h-2c is checked')
                       ]@
                     -->
 
@@ -150,6 +155,7 @@
                         @@run@ radioManager
                         @@embed true
                         @@jqm checkRadio("horGroup", "radio-choice-h-2b");
+                        @@assert ok($('#radio-choice-h-2b').is(':checked'),'radio-choice-h-2b is checked')
                      ]@
                    -->
 
@@ -252,6 +258,7 @@
                          @@run@ radioManager
                          @@embed true
                          @@jqm checkRadio("agreeClass", "radio-enhanced");
+                         @@assert ok($('#radio-enhanced').is(':checked'),'radio-enhanced is checked')
                       ]@
                     -->
         <div id="agreeDiv" data-demo-html="true">
