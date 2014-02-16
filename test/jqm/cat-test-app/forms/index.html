@@ -211,6 +211,7 @@
              @@run@ scrapFormManager
              @@embed true
              @@jqm checkRadio("hRadio" , "radio-choice-c" );
+             @@assert ok($('#radio-choice-c').is(':checked'),'radio-choice-c is checked')
           ]@
         -->
 
@@ -221,6 +222,7 @@
              @@run@ scrapFormManager
              @@embed true
              @@jqm checkRadio("hRadio" , "radio-choice-e" );
+             @@assert ok($('#radio-choice-e').is(':checked'),'radio-choice-e is checked')
           ]@
         -->
 
@@ -309,6 +311,7 @@
                      @@run@ scrapFormManager
                      @@embed true
                      @@jqm setText("text-basic", "hello world");
+                     @@assert ok($('#text-basic').val()=='helloworld','text-basic text == helloworld')
                   ]@
              -->
 
@@ -341,7 +344,8 @@
                      @@name setDate
                      @@run@ scrapFormManager
                      @@embed true
-                     @@jqm setText("date", "2013-02-27");
+                     @@jqm setText("date", "2014-02-27");
+                     @@assert ok($('#date').val()=='2014-02-27','date == 2014-02-27')
                   ]@
              -->
         <div id="dateDiv" data-demo-html="true">
