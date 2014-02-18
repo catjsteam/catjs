@@ -66,6 +66,7 @@
                        @@embed true
                        @@jqm scrollTo("navTabs");
 
+
                     ]@
                -->
 
@@ -75,6 +76,7 @@
              @@run@ tabsManager
              @@embed true
              @@jqm selectTab("navTab2");
+             @@assert ok($('#basicNav').tabs().tabs('option', 'active') === 1,'navTab2 is active')
           ]@
      -->
 
@@ -84,6 +86,7 @@
              @@run@ tabsManager
              @@embed true
              @@jqm selectTab("navTab3");
+             @@assert ok($('#basicNav').tabs().tabs('option', 'active') === 2,'navTab3 is active')
           ]@
      -->
         <!--
@@ -92,13 +95,14 @@
              @@run@ tabsManager
              @@embed true
              @@jqm selectTab("navTab1");
+             @@assert ok($('#basicNav').tabs().tabs('option', 'active') === 0,'navTab1 is active')
           ]@
      -->
 
 		<h2 id="navTabs">Use navbar for tabs</h2>
 		<div data-demo-html="true">
 			<div data-role="tabs" id="tabs">
-		      <div data-role="navbar">
+		      <div id="basicNav" data-role="navbar">
 			    <ul>
 			      <li><a id="navTab1" href="#one" data-ajax="false">one</a></li>
 			      <li><a id="navTab2" href="#two" data-ajax="false">two</a></li>
@@ -137,6 +141,7 @@
                  @@run@ tabsManager
                  @@embed true
                  @@jqm selectTab("listTabsSelect3");
+                 @@assert ok($('#listTabsNavs').tabs().tabs('option', 'active') === 2,'listTabsSelect3 is active')
               ]@
          -->
 
@@ -146,6 +151,7 @@
                  @@run@ tabsManager
                  @@embed true
                  @@jqm selectTab("listTabsSelect1");
+                 @@assert ok($('#listTabsNavs').tabs().tabs('option', 'active') === 0,'listTabsSelect1 is active')
               ]@
          -->
             <!--
@@ -154,11 +160,12 @@
                  @@run@ tabsManager
                  @@embed true
                  @@jqm selectTab("listTabsSelect2");
+                 @@assert ok($('#listTabsNavs').tabs().tabs('option', 'active') === 1,'listTabsSelect2 is active')
               ]@
          -->
 
 		    <h2 id="listTabs">Use inset listview for tabs</h2>
-		    <div data-role="tabs">
+		    <div id="listTabsNavs" data-role="tabs">
 		      	<ul data-role="listview" data-inset="true" class="tablist-left">
 			      <li><a id="listTabsSelect1" href="#one" data-ajax="false">one</a></li>
 			      <li><a id="listTabsSelect2" href="#two" data-ajax="false">two</a></li>

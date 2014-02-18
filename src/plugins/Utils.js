@@ -14,12 +14,11 @@ module.exports = function () {
          */
         generate: function(config) {
 
-            //str = (config.exp).match(/setText\((.*)\);/);
             var str = regexputils.getMatch(config.exp, [config.api, "\\((.*)\\);"].join(""));
             if (str) {
 
                 // split the args, parseInt the args that are numbers
-                str[1] = str[1].replace(/ /g, "");
+//                str[1] = str[1].replace(/ /g, "");
                 var args = str[1].split(",");
                 var functionArg = "";
                 for (var i = 0; i < args.length; i++) {
