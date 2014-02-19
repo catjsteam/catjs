@@ -83,9 +83,9 @@ module.exports = function () {
                 "protocol": config.protocol,
 
                 "appserver": {
-                    "host": (config.appserverhost || config.host),
-                    "port": (config.appserverport || config.port),
-                    "protocol": (config.appserverprotocol || config.protocol)
+                    "host": ( config.host),
+                    "port": (config.port),
+                    "protocol": ( config.protocol)
                 },
                 "appath": config.appath
 
