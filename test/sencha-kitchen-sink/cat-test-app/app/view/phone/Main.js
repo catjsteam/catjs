@@ -14,9 +14,13 @@ Ext.define('Kitchensink.view.phone.Main', {
                 easing: 'ease-in-out'
             }
         },
-
         store: 'Demos',
+        itemId : 'kitchenSinkMenu',
+        listeners : {
+            painted: function (element, options) {
 
+            }
+        },
         toolbar: {
             id: 'mainNavigationBar',
             xtype: 'titlebar',

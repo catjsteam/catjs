@@ -68,6 +68,9 @@
                         @@run@ collapsibleManager
                         @@embed true
                         @@jqm collapsible("basicCollapsible");
+                        @@assert ok(!$('#basicCollapsible').collapsible( 'option' ).collapsed,'radio-choice-v-2c is checked')
+
+
                      ]@
                    -->
 
@@ -174,6 +177,7 @@
                         @@run@ collapsibleManager
                         @@embed true
                         @@jqm collapsible("legendClick");
+                        @@assert ok(!$('#basicCollapsible').collapsible( 'option' ).collapsed,'radio-choice-v-2c is checked')
                      ]@
                    -->
 
@@ -183,6 +187,7 @@
                     @@run@ collapsibleManager
                     @@embed true
                     @@jqm setText("textinput-f", "hello from legend");
+                     @@assert ok($('#textinput-f').val()=='hellofromlegend','textinput-f text is correct')
                  ]@
             -->
 
@@ -193,6 +198,7 @@
                      @@run@ collapsibleManager
                      @@embed true
                      @@jqm setCheck("checkbox-3-a");
+                     @@assert ok($('#checkbox-3-a').is(':checked'),'checkbox-3-a is checked')
                   ]@
              -->
 
@@ -203,6 +209,7 @@
                      @@run@ collapsibleManager
                      @@embed true
                      @@jqm setCheck("checkbox-1-a");
+                     @@assert ok($('#checkbox-1-a').is(':checked'),'checkbox-1-a is checked')
                   ]@
              -->
 
@@ -212,6 +219,7 @@
                         @@run@ collapsibleManager
                         @@embed true
                         @@jqm collapsible("legendClick");
+                        @@assert ok($('#legendClick').collapsible( 'option' ).collapsed,'legendClick is checked')
                      ]@
                    -->
 

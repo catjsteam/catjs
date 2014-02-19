@@ -2,14 +2,7 @@
     "type": "{{project.name}}",
     "ip": null,
     "port": null,
-    "tests": [
-        {
-            "name": "catSenchaText"
-        },
-        {
-            "name": "catSenchaBtn"
-        }
-    ],
+    "tests":[],
     "run-mode": "all",
     "test-failure-timeout": 30
 }

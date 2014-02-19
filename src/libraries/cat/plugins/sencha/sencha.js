@@ -1,3 +1,5 @@
+var scrollDelay = true;
+
 _cat.plugins.sencha = function () {
     var getItemById = function(idName) {
         return Ext.ComponentQuery.query('#' + idName)[0];
@@ -123,11 +125,104 @@ _cat.plugins.sencha = function () {
                 bar.setActiveItem(value);
             },
 
-            scrollBy : function (itemId, value) {
+            scrollBy : function (itemId, horizontalValue, verticalValue) {
 
                 var item = getItemById(itemId);
-                item.getScrollable().getScroller().scrollTo(0,value);
 
+                if (scrollDelay) {
+                    item.getScrollable().getScroller().scrollTo(horizontalValue,verticalValue, {
+                        duration : 1000
+                    }) ;
+                } else {
+                    item.getScrollable().getScroller().scrollTo(horizontalValue,verticalValue);
+
+                }
+            },
+
+            scrollToTop : function (itemId) {
+
+                var item = getItemById(itemId);
+
+                if (scrollDelay) {
+                    item.getScrollable().getScroller().scrollTo(-1, -1, {
+                        duration : 1000
+                    }) ;
+                } else {
+                    item.getScrollable().getScroller().scrollTo(-1, -1);
+
+                }
+            },
+            scrollToEnd : function (itemId) {
+
+                var item = getItemById(itemId);
+
+                if (scrollDelay) {
+                    item.getScrollable().getScroller().scrollToEnd(true);
+                } else {
+                    item.getScrollable().getScroller().scrollToEnd(true);
+
+                }
+            },
+
+            scrollToListItem : function (listId, index) {
+
+                var list = getItemById(listId);
+
+                var scroller = list.getScrollable().getScroller();
+                var item = list.getItemAt(index)
+                var verticalValue = item.renderElement.dom.offsetTop;
+                var horizontalValue = 0;
+
+                if (scrollDelay) {
+                    scroller.scrollTo(horizontalValue,verticalValue, {
+                        duration : 1000
+                    }) ;
+                } else {
+                    scroller.scrollTo(horizontalValue,verticalValue);
+
+                }
+            },
+
+
+
+            carouselNext : function (carouselId) {
+
+                var carousel = getItemById(carouselId);
+                carousel.next();
+            },
+
+            carouselPrevious : function (carouselId) {
+
+                var carousel = getItemById(carouselId);
+                carousel.previous();
+            },
+
+            nestedlistSelect : function (nestedlistId, index) {
+
+                var nestedlist = getItemById(nestedlistId);
+                var indexItem = nestedlist.getActiveItem().getStore().getRange()[index];
+                if (indexItem.isLeaf()) {
+
+                    var activelist= nestedlist.getActiveItem();
+                    nestedlist.fireEvent('itemtap', nestedlist, activelist,index,{},{});
+
+                } else {
+                    nestedlist.goToNode(indexItem);
+                }
+
+            },
+
+            nestedlistBack : function (nestedlistId) {
+
+                var nestedlist = getItemById(nestedlistId);
+                var node = nestedlist.getLastNode();
+                nestedlist.goToNode(node.parentNode);
+            },
+
+    removePanel : function (panelId) {
+
+                var panel = getItemById(panelId);
+                Ext.Viewport.remove(panel);
             },
 
             setDate : function (dateItemId, year, month, day) {

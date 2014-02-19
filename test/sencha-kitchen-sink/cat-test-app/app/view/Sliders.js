@@ -22,6 +22,44 @@ Ext.define('Kitchensink.view.Sliders', {
                     labelWidth: '35%',
                     labelAlign: 'top'
                 },
+
+                listeners : {
+                    painted: function(element, options) {
+
+                        /*
+                         @[scrap
+                         @@name GoBack_FormPanel
+                         @@run@ slidersManager
+                         @@sencha nestedlistBack("mainNestedList");
+                         ]@
+                         */
+
+
+                        /*
+                         @[scrap
+                         @@name GoToBottomTabs
+                         @@run@ slidersManager
+                         @@sencha nestedlistSelect("mainNestedList", 9);
+                         ]@
+                         */
+
+                        /*
+                         @[scrap
+                         @@name slidersManager
+                         @@perform[
+                         @@setSimpleSlider repeat(1)
+                         @@setMultiSlider repeat(1)
+                         @@setToggleSlider repeat(1)
+                         @@GoBack_FormPanel repeat(1)
+                         @@GoToBottomTabs repeat(1)
+                         ]
+                         @@catui on
+                         @@manager true
+                         @@signal TESTEND
+                         ]@
+                         */
+                    }
+                },
                 items: [
                     {
                         xtype: 'sliderfield',
@@ -32,6 +70,7 @@ Ext.define('Kitchensink.view.Sliders', {
                             painted: function (element, options) {
                                 /*
                                  @[scrap
+                                 @@run@ slidersManager
                                  @@name setSimpleSlider
                                  @@sencha setSliderValue("singleSlider", 85);
                                  ]@
@@ -56,8 +95,9 @@ Ext.define('Kitchensink.view.Sliders', {
                             painted: function (element, options) {
                                 /*
                                  @[scrap
-                                 @@name setSimpleSlider
-                                 @@sencha setSliderValues("singleSlider", 20, 85);
+                                 @@name setMultiSlider
+                                 @@run@ slidersManager
+                                 @@sencha setSliderValues("multiSlider", 20, 50);
                                  ]@
                                  */
                             }
@@ -71,7 +111,8 @@ Ext.define('Kitchensink.view.Sliders', {
                             painted: function (element, options) {
                                 /*
                                  @[scrap
-                                 @@name setSimpleSlider
+                                 @@name setToggleSlider
+                                 @@run@ slidersManager
                                  @@sencha setToggle("toggleSlider", true);
                                  ]@
                                  */

@@ -428,6 +428,21 @@
         config: {
             model: 'Kitchensink.model.Demo',
             root: root,
+            listeners : {
+                load: function (records, successful, operation, eOpts ) {
+//                    debugger;
+                },
+                refresh: function (data, eOpts ) {
+//                    debugger;
+                },
+                metachange: function (data, eOpts ) {
+//                    debugger;
+                },
+                rootchangeload: function (store, newRoot, oldRoot, eOpts ) {
+//                    debugger;
+                }
+
+            },
             defaultRootProperty: 'items'
         }
     });

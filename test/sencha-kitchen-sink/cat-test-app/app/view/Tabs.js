@@ -21,8 +21,57 @@ Ext.define('Kitchensink.view.Tabs', {
             painted: function (element, options) {
                 /*
                  @[scrap
-                 @@name setActiveTab
+                 @@name setActiveTab3
+                 @@run@ tabsManager
                  @@sencha changeTab("tabBar", 2);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name setActiveTab1
+                 @@run@ tabsManager
+                 @@sencha changeTab("tabBar", 0);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name setActiveTab2
+                 @@run@ tabsManager
+                 @@sencha changeTab("tabBar", 1);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name GoToDataViews
+                 @@run@ tabsManager
+                 @@sencha nestedlistSelect("mainNestedList", 2);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name GoToDataViewsBasic
+                 @@run@ tabsManager
+                 @@sencha nestedlistSelect("mainNestedList", 0);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name tabsManager
+                 @@perform[
+                 @@setActiveTab3 repeat(1)
+                 @@setActiveTab1 repeat(1)
+                 @@setActiveTab2 repeat(1)
+                 @@GoToDataViews repeat(1)
+                 @@GoToDataViewsBasic repeat(1)
+                 ]
+                 @@catui on
+                 @@manager true
+                 @@signal TESTEND
                  ]@
                  */
             }

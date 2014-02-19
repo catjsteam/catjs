@@ -68,6 +68,7 @@
                      @@run@ selectManager
                      @@embed true
                      @@jqm selectMenu("select-native-1", 3);
+                     @@assert ok($('#select-native-1  option:selected').val() == '3','select-native-1 selected : 3')
                   ]@
              -->
 
@@ -77,6 +78,7 @@
                      @@run@ selectManager
                      @@embed true
                      @@jqm selectMenu("select-native-1", 2);
+                     @@assert ok($('#select-native-1  option:selected').val() == '2','select-native-1 selected : 2')
                   ]@
              -->
 
@@ -204,6 +206,7 @@
                      @@run@ selectManager
                      @@embed true
                      @@jqm selectMenu("select-native-5", "twoOption");
+                     @@assert ok($('#select-native-5  option:selected')[0].id == 'twoOption','select-native-5 selected : twoOption')
                   ]@
              -->
                 <!--
@@ -212,6 +215,7 @@
                      @@run@ selectManager
                      @@embed true
                      @@jqm selectMenu("select-native-7", "threeOption");
+                     @@assert ok($('#select-native-7  option:selected')[0].id == 'threeOption','select-native-7 selected : threeOption')
                   ]@
              -->
                 <!--
@@ -220,6 +224,7 @@
                      @@run@ selectManager
                      @@embed true
                      @@jqm selectMenu("select-native-6", "threeOption2");
+                     @@assert ok($('#select-native-6  option:selected')[0].id == 'threeOption2','select-native-6 selected : threeOption2')
                   ]@
              -->
                 <select name="select-native-5" id="select-native-5">
@@ -291,6 +296,7 @@
                     @@run@ selectManager
                     @@embed true
                     @@jqm selectMenu("select-native-11", "twoOptionHor");
+                    @@assert ok($('#select-native-11  option:selected')[0].id == 'twoOptionHor','select-native-11 selected : twoOptionHor')
                  ]@
             -->
         <!--
@@ -299,6 +305,7 @@
              @@run@ selectManager
              @@embed true
              @@jqm selectMenu("select-native-12", "oneOptionHor");
+             @@assert ok($('#select-native-12 option:selected')[0].id == 'oneOptionHor','select-native-12 selected : oneOptionHor')
           ]@
      -->
         <!--
@@ -307,6 +314,7 @@
              @@run@ selectManager
              @@embed true
              @@jqm selectMenu("select-native-13", "threeOptionHor");
+             @@assert ok($('#select-native-13 option:selected')[0].id == 'threeOptionHor','select-native-13 selected : oneOptionHor')
           ]@
      -->
         <div id="horGroup" data-demo-html="true">

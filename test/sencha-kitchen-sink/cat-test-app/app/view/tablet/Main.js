@@ -34,7 +34,54 @@ Ext.define('Kitchensink.view.tablet.Main', {
                 updateTitleText: Ext.theme.name === "Cupertino" ? false : true,
                 docked: 'left',
                 width: 200,
-                store: 'Demos'
+                store: 'Demos',
+                listeners : {
+                    painted: function (element, options) {
+                        /*
+                         @[scrap
+                         @@name mainTablet
+                         @@run@ mainManager
+                         @@sencha nestedlistSelect("mainNestedList", 0);
+                         ]@
+                         */
+
+                        /*
+                         @[scrap
+                         @@name UITablet
+                         @@run@ mainManager
+                         @@sencha nestedlistSelect("mainNestedList", 1);
+                         ]@
+                         */
+
+                        /*
+                         @[scrap
+                         @@name FormsTablet
+                         @@run@ mainManager
+                         @@sencha nestedlistSelect("mainNestedList", 0);
+                         ]@
+                         */
+
+
+
+
+                        /*
+                         @[scrap
+                         @@name mainManager
+                         @@perform[
+                         @@mainTablet repeat(1)
+                         @@UITablet repeat(1)
+                         @@FormsTablet repeat(1)
+
+                         ]
+                         @@catui on
+                         @@manager true
+                         @@signal TESTEND
+                         ]@
+                        */
+                    }
+
+                }
+
             },
             {
                 id: 'mainNavigationBar',

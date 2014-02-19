@@ -21,6 +21,7 @@ Ext.define('Kitchensink.view.NestedList', {
             }
         },
         displayField: 'text',
+        itemId : 'nestedListView',
         listeners: {
             leafitemtap: function(me, list, index, item) {
                 var editorPanel = Ext.getCmp('editorPanel') || new Kitchensink.view.EditorPanel();
@@ -29,7 +30,13 @@ Ext.define('Kitchensink.view.NestedList', {
                     Ext.Viewport.add(editorPanel);
                 }
                 editorPanel.show();
+            },
+
+            painted: function (element, options) {
             }
+
+
+
         }
     },
 

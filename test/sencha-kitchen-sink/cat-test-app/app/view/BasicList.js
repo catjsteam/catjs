@@ -18,6 +18,30 @@ Ext.define('Kitchensink.view.BasicList', {
             width: Ext.os.deviceType == 'Phone' ? null : '50%',
             height: Ext.os.deviceType == 'Phone' ? null : '80%',
             xtype: 'list',
+            itemId : 'basicList',
+            listeners : {
+              painted : function (element, eOpts) {
+                  /*
+                   @[scrap
+                   @@name basicListScrollBy1000
+                   @@run@ basicListManager
+                   @@sencha scrollBy("basicList", 0, 1000);
+                   ]@
+                   */
+
+                  /*
+                   @[scrap
+                   @@name basicListManager
+                   @@perform[
+                   @@basicListScrollBy1000 repeat(1)
+                   ]
+                   @@catui on
+                   @@manager true
+                   @@signal TESTEND
+                   ]@
+                   */
+              }
+            },
             store: 'List',
             itemTpl: '{firstName} {lastName}'
         }]

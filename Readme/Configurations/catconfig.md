@@ -1,4 +1,4 @@
-The *catconfig.json* file defines additional configuration for cat project run.
+The *cat.json* file defines additional configuration for cat project run.
 Below is an explanation of the configuration properties
 
 

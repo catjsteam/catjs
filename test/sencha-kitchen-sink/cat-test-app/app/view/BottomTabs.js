@@ -24,8 +24,58 @@ Ext.define('Kitchensink.view.BottomTabs', {
             painted: function (element, options) {
                 /*
                  @[scrap
-                 @@name setActiveTabBottom
+                 @@name setActiveTabSettings
+                 @@run@ bottomTabManager
                  @@sencha changeTab("bottomBar", 3);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name setActiveTabFavorites
+                 @@run@ bottomTabManager
+                 @@sencha changeTab("bottomBar", 1);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name setActiveTabUser
+                 @@run@ bottomTabManager
+                 @@sencha changeTab("bottomBar", 4);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name setActiveTabDownloads
+                 @@run@ bottomTabManager
+                 @@sencha changeTab("bottomBar", 2);
+                 ]@
+                 */
+
+
+                /*
+                 @[scrap
+                 @@name GoToTabs
+                 @@run@ bottomTabManager
+                 @@sencha nestedlistSelect("mainNestedList", 8);
+                 ]@
+                 */
+
+                /*
+                 @[scrap
+                 @@name bottomTabManager
+                 @@perform[
+                 @@setActiveTabSettings repeat(1)
+                 @@setActiveTabFavorites repeat(1)
+                 @@setActiveTabUser repeat(1)
+                 @@setActiveTabDownloads repeat(1)
+                 @@GoToTabs repeat(1)
+                 ]
+                 @@catui on
+                 @@manager true
+                 @@signal TESTEND
                  ]@
                  */
             }
