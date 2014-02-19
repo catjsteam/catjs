@@ -184,7 +184,7 @@ var CAT = function () {
 
                 kill = (config.kill || kill);
                 watch = (config.watch || watch);
-                initProject = config.init;
+                initProject = config.init || "cat";
                 _targets = config.task;
                 grunt = config.grunt;
                 args = config;
