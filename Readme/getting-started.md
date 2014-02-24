@@ -73,7 +73,7 @@ in order to start the server.
 ```
 You can also add your browser to catrunner configuration if you want to run simultaneously the browser and your device, add the following to the devices section
 
-```js
+```json
 
  {
 	"type": "localpc",
