@@ -31,11 +31,15 @@ For the rest of the questions press enter, note that if ommited the default that
 A new folder cat-project should be created under init-example.
 
 4. Navigate to folder /test/init-example/cat-project, and type 
+
 ```bash
-catcli -isj```
+catcli -isj
+```
+
 in order to scan the scraps and convert them to tests.
 
 5. Type
+
 ```bash
 catcli --task server.start
 ```
@@ -65,7 +69,7 @@ in order to start the server.
         "authtoken": ""
     },
     "catproject": {
-        "cathome": <the cat project root folder>,
+        "cathome": "<the cat project root folder>",
         "projectPath": "<the cat project root folder>/test/init-example/cat-project"
     }
 }
