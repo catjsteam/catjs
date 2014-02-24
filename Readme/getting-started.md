@@ -84,7 +84,7 @@ You can also add your browser to catrunner configuration if you want to run simu
 	"id": "all",
 	"runner": {
 		"name": "Chrome",
-		"options": {"path": "%LOCALAPPDATA%\\Google\\Chrome\\Application"}
+		"options": {"path": "your/chrome/path"}
 	}
 }
 ```
