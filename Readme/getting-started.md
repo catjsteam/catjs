@@ -4,7 +4,9 @@
 
 In order to create a new project from a template use the init switch with catcli
 
-`bash catcli --init [<template name>] `
+```bash
+catcli --init [<template name>] 
+```
 
 The template projects are located under `src/modules/project/init/projects` , if ommited the templated used will be cat.
 
@@ -28,12 +30,12 @@ Enter CAT server's protocol:  (http)
 For the rest of the questions press enter, note that if ommited the default that will be used is mentioned between the parentesis.
 A new folder cat-project should be created under init-example.
 
-4. Navigate to folder /test/init-example/cat-project, and type `bash catcli -isj` in order to scan the scraps and convert them to tests.
+4. Navigate to folder /test/init-example/cat-project, and type ```bash catcli -isj``` in order to scan the scraps and convert them to tests.
 5. Type catcli --task server.start in order to start the server.
 6. Open a browser and navigate to http://localhost:8089, you should see the example page.
 7. If you want to run the example in a mobile device use the catrunner with the following configuration (should be in the testRunConfig.json file)
 
-```js
+```json
 
 {
     "run": {
