@@ -134,10 +134,6 @@
             "plugins": ["p@project.clean", "p@project.wipe"]
         },
         {
-            "name": "t@minify",
-            "plugins": ["p@project.minify"]
-        },
-        {
             "name": "t@test",
             "plugins": ["p@project.webserver.start", "p@project.phantomjs", "p@project.webserver.stop"]
         },
