@@ -513,6 +513,7 @@ module.exports = _basePlugin.ext(function () {
                 }
 
                 _me.apply(config);
+
                 if (_mdata) {
                     _mdata.readAsync(function () {
                         var fileName;
@@ -533,7 +534,7 @@ module.exports = _basePlugin.ext(function () {
 
                                 if (filesArr && filesArr.length > 0) {
                                     counter = 0;
-                                    //_apply(filesArr[counter]);
+                                    _apply(filesArr[counter]);
                                 }
                             }
 
