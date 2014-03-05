@@ -451,7 +451,6 @@ module.exports = function () {
                                         behaviorLoad = require(requireName);
                                         if (behaviorLoad) {
                                             behave.inject = behaviorLoad[scrapName];
-                                            _log.warn("[CAT scrap-common] Module load successfuly but with missing method for scrap behavior:  '" + scrapName + "'");
 
                                         } else {
                                             _utils.log("warning", "[cat scrap-common plugin] failed to resolve 'replace' functionality module, " + requireName);
