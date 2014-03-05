@@ -184,7 +184,7 @@ var CAT = function () {
 
                 kill = (config.kill || kill);
                 watch = (config.watch || watch);
-                initProject = config.init;
+                initProject = typeof config.init === 'undefined' ? undefined :  config.init || "cat";
                 _targets = config.task;
                 grunt = config.grunt;
                 args = config;
@@ -280,7 +280,7 @@ var CAT = function () {
                                     required: false,
                                     default: "http",
                                     description: "Enter CAT server's protocol"
-                                }),
+                                })/*,
                                 appserverhost: new Schema({
                                     type: "string",
                                     required: false,
@@ -298,7 +298,7 @@ var CAT = function () {
                                     required: false,
                                     default: "http",
                                     description: "Enter your Application server's protocol"
-                                })
+                                })*/
                             }
                         };
 

@@ -42,11 +42,12 @@
         "preinstall": "node precatinstall.js"
     },
     "dependencies": {
+		"mobilerunner" : "~0.0.2",
         "fs.extra": "~1.2.1",
         "typedas": "~1.0.0",
         "log": "~1.4.0",
         "q": "~0.9.6",
-        "nopt": "~2.1.1",
+        "nopt": "~2.2.0",
         "properties": "~0.3.3",
         "async": "~0.2.9",
         "line-reader": "~0.2.3",

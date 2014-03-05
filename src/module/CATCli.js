@@ -8,7 +8,7 @@ var _nopt = require("nopt"),
 _parsed = _nopt({
     "kill": [String, Number],
     "task": [String, Array],
-    "init": [String, String],
+    "init": String,
     "watch": [Boolean, false],
     "project": [String, null]
 }, {
