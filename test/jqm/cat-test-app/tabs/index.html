@@ -65,8 +65,6 @@
                        @@run@ tabsManager
                        @@embed true
                        @@jqm scrollTo("navTabs");
-
-
                     ]@
                -->
 
@@ -76,7 +74,6 @@
              @@run@ tabsManager
              @@embed true
              @@jqm selectTab("navTab2");
-             @@assert ok($('#basicNav').tabs().tabs('option', 'active') === 1,'navTab2 is active')
           ]@
      -->
 
@@ -86,7 +83,6 @@
              @@run@ tabsManager
              @@embed true
              @@jqm selectTab("navTab3");
-             @@assert ok($('#basicNav').tabs().tabs('option', 'active') === 2,'navTab3 is active')
           ]@
      -->
         <!--
@@ -95,7 +91,6 @@
              @@run@ tabsManager
              @@embed true
              @@jqm selectTab("navTab1");
-             @@assert ok($('#basicNav').tabs().tabs('option', 'active') === 0,'navTab1 is active')
           ]@
      -->
 
@@ -131,7 +126,6 @@
                        @@run@ tabsManager
                        @@embed true
                        @@jqm scrollTo("listTabs");
-
                     ]@
                -->
 
@@ -141,7 +135,6 @@
                  @@run@ tabsManager
                  @@embed true
                  @@jqm selectTab("listTabsSelect3");
-                 @@assert ok($('#listTabsNavs').tabs().tabs('option', 'active') === 2,'listTabsSelect3 is active')
               ]@
          -->
 
@@ -151,7 +144,6 @@
                  @@run@ tabsManager
                  @@embed true
                  @@jqm selectTab("listTabsSelect1");
-                 @@assert ok($('#listTabsNavs').tabs().tabs('option', 'active') === 0,'listTabsSelect1 is active')
               ]@
          -->
             <!--
@@ -160,7 +152,6 @@
                  @@run@ tabsManager
                  @@embed true
                  @@jqm selectTab("listTabsSelect2");
-                 @@assert ok($('#listTabsNavs').tabs().tabs('option', 'active') === 1,'listTabsSelect2 is active')
               ]@
          -->
 

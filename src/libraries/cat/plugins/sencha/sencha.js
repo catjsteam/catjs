@@ -164,12 +164,12 @@ _cat.plugins.sencha = function () {
                 }
             },
 
-            scrollToListItem : function (listId, index) {
+            scrollToListIndex : function (listId, index) {
 
                 var list = getItemById(listId);
 
                 var scroller = list.getScrollable().getScroller();
-                var item = list.getItemAt(index)
+                var item = list.getItemAt(index);
                 var verticalValue = item.renderElement.dom.offsetTop;
                 var horizontalValue = 0;
 
@@ -219,7 +219,19 @@ _cat.plugins.sencha = function () {
                 nestedlist.goToNode(node.parentNode);
             },
 
-    removePanel : function (panelId) {
+
+            listSelectIndex : function (listId, index) {
+                var list = getItemById(listId);
+                list.select(index);
+            },
+
+
+            changeView : function (viewName) {
+                var firststep = Ext.create(viewName);
+                Ext.Viewport.setActiveItem(firststep);
+            },
+
+            removePanel : function (panelId) {
 
                 var panel = getItemById(panelId);
                 Ext.Viewport.remove(panel);

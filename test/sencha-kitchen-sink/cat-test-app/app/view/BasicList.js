@@ -20,27 +20,64 @@ Ext.define('Kitchensink.view.BasicList', {
             xtype: 'list',
             itemId : 'basicList',
             listeners : {
-              painted : function (element, eOpts) {
-                  /*
-                   @[scrap
-                   @@name basicListScrollBy1000
-                   @@run@ basicListManager
-                   @@sencha scrollBy("basicList", 0, 1000);
-                   ]@
-                   */
 
-                  /*
-                   @[scrap
-                   @@name basicListManager
-                   @@perform[
-                   @@basicListScrollBy1000 repeat(1)
-                   ]
-                   @@catui on
-                   @@manager true
-                   @@signal TESTEND
-                   ]@
-                   */
-              }
+                painted : function (element, eOpts) {
+                    /*
+                     @[scrap
+                     @@name basicListScrollIndex15
+                     @@run@ basicListManager
+                     @@sencha scrollToListIndex("basicList", 15);
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name basicListScrollIndex60
+                     @@run@ basicListManager
+                     @@sencha scrollToListIndex("basicList", 50);
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name basicListScrollIndex30
+                     @@run@ basicListManager
+                     @@sencha scrollToListIndex("basicList", 30);
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name basicListSelect30
+                     @@run@ basicListManager
+                     @@sencha listSelectIndex("basicList", 30);
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name basicListSelect35
+                     @@run@ basicListManager
+                     @@sencha listSelectIndex("basicList", 35);
+                     ]@
+                     */
+
+                    /*
+                     @[scrap
+                     @@name basicListManager
+                     @@perform[
+                     @@basicListScrollIndex15 repeat(1)
+                     @@basicListScrollIndex60 repeat(1)
+                     @@basicListScrollIndex30 repeat(1)
+                     @@basicListSelect30 repeat(1)
+                     @@basicListSelect35 repeat(1)
+                     ]
+                     @@catui on
+                     @@manager true
+                     @@signal TESTEND
+                     ]@
+                     */
+                }
             },
             store: 'List',
             itemTpl: '{firstName} {lastName}'
