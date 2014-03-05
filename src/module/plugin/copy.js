@@ -218,7 +218,7 @@ module.exports = _basePlugin.ext(function () {
                         _fs.copyRecursive(afrompath, topath, function (err) {
 
                             if (err) {
-                                _utils.error("[copy action] error while copy: " + err);
+                                _log.warning("[copy action] warning, " + err);
                             }
 
                             if (cb) {

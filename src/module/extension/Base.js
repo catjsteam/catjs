@@ -18,9 +18,9 @@ module.exports = function () {
 
             var pluginHandle;
 
-            if (this._apply) {
-                _log.warning(_props.get("cat.ext.apply.warn").format("[base extension]", "?"));
-            }
+//            if (this._apply) {
+//                _log.warning(_props.get("cat.ext.apply.warn").format("[base extension]", "?"));
+//            }
             this._apply ++;
 
             if (config.internalConfig) {

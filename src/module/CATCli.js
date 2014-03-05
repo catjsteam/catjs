@@ -17,7 +17,7 @@ _parsed = _nopt({
     "s": ["--task", "scrap"],
     "i": ["--task", "init"],
     "j": ["--task", "inject"],
-    "t": ["--task", "test"],
+    "t": ["--task", "t@test"],
     "c": ["--task", "clean"],
     "p": ["--project" , "."]
 });

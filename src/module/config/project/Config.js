@@ -185,7 +185,9 @@ var _typedas = require('typedas'),
                 _typedas.isArray(tasksConfig)) {
                 tasksConfig.forEach(function (item) {
                     if (item) {
-                        tasks.push(new _Task({data: item, emitter: emitter, global: data, catconfig: me}));
+                        if (!(item.name && map.tasks[item.name])) {
+                            tasks.push(new _Task({data: item, emitter: emitter, global: data, catconfig: me}));
+                        }
                     }
                 });
             } else {
@@ -201,7 +203,9 @@ var _typedas = require('typedas'),
                 _typedas.isArray(actionsConfig)) {
                 actionsConfig.forEach(function (item) {
                     if (item) {
-                        actions.push(new _Action({data: item, emitter: emitter, global: data, catconfig: me}));
+                        if (!(item.name && map.actions[item.name])) {
+                            actions.push(new _Action({data: item, emitter: emitter, global: data, catconfig: me}));
+                        }
                     }
                 });
             } else {
@@ -217,7 +221,9 @@ var _typedas = require('typedas'),
                 _typedas.isArray(extensionsConfig)) {
                 extensionsConfig.forEach(function (item) {
                     if (item) {
-                        extensions.push(new _Extension({data: item, emitter: emitter, global: data, catconfig: me}));
+                        if (!(item.name && map.extensions[item.name])) {
+                            extensions.push(new _Extension({data: item, emitter: emitter, global: data, catconfig: me}));
+                        }
                     }
                 });
 

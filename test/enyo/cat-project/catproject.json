@@ -15,37 +15,7 @@
 
     "plugins": [
         {
-            "name": "init.scrap",
-            "type": "scrap",
-            "dependency": "scan",
-            "filters": [
-                {
-                    "type": "file",
-                    "ext": ["*"],
-                    "exclude": true
-                },
-                {
-                    "type": "file",
-                    "ext": [".js", ".html"],
-                    "exclude": false
-                },
-                {
-                    "type": "file",
-                    "ext": [".js"],
-                    "pattern": ["enyo", "cat"],
-                    "exclude": true
-                }
-            ]
-        },
-        {
-            "name": "libraries.build",
-            "type": "libraries",
-            "dependency": "manager",
-            "imports": ["chai", "tmr", "cat"],
-            "action": "build"
-        },
-        {
-            "name": "init.copy",
+            "name": "project.copy",
             "type": "copy",
             "dependency": "scan",
             "path": "./../cat-test-app",
@@ -80,15 +50,15 @@
     "tasks": [
         {
             "name": "init",
-            "plugins": ["init.copy", "libraries.build", "lib.copy"]
+            "plugins": ["project.copy", "p@libraries.build", "lib.copy"]
         },
         {
             "name": "scrap",
-            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "init.scrap"]
+            "plugins": ["p@scrap.common", "p@scrap.enyo", "p@custom.plugin", "p@init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap-common", "scrap-enyo", "custom.plugin", "project.inject", "project.minify"]
+            "plugins": ["p@scrap.common", "p@scrap.enyo", "p@custom.plugin", "p@project.inject", "project.minify"]
         }
     ]
 

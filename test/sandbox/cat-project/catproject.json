@@ -15,25 +15,15 @@
 
     "plugins": [
         {
-            "name": "init.scrap",
-            "type": "scrap",
-            "dependency": "scan"
+            "name": "p@project.wipe",
+            "type": "clean",
+            "src": ["lib", "*.log", "*.xml"]
         },
         {
-            "name": "libraries.build",
-            "type": "libraries",
-            "dependency": "manager",
-            "imports": ["chai", "tmr", "cat"],
-            "action": "build"
-        },
-        {
-            "name": "init.copy",
+            "name": "project.copy",
             "type": "copy",
             "dependency": "scan",
             "path": "./../cat-tests",
-            "from": {
-                "path": "/"
-            },
             "to": {
                 "path": "./target/sandbox"
             }
@@ -43,15 +33,12 @@
             "type": "copy",
             "dependency": "scan",
             "path": "./lib",
-            "from": {
-                "path": "/"
-            },
             "to": {
                 "path": "./target/sandbox/"
             }
         },
         {
-            "name": "project.minify",
+            "name": "sandbox.minify",
             "type": "minify",
             "path": "./target/sandbox/",
             "filename": "cat.src.js",
@@ -76,15 +63,15 @@
         },
         {
             "name": "init",
-            "plugins": ["init.copy", "libraries.build", "lib.copy"]
+            "plugins": ["project.copy", "p@libraries.build", "lib.copy"]
         },
         {
             "name": "scrap",
-            "plugins": ["scrap-common",  "custom.plugin", "init.scrap"]
+            "plugins": ["p@scrap.common",  "p@custom.plugin", "p@init.scrap"]
         },
         {
             "name": "inject",
-            "plugins": ["scrap-common",  "custom.plugin", "project.inject", "project.minify"]
+            "plugins": ["p@scrap.common",  "p@custom.plugin", "p@project.inject"]
         }
     ]
 
