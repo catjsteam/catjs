@@ -26,7 +26,8 @@ var _global = catrequire("cat.global"),
 
         var me = this,
             idx = 0, size, project, pluginsPath = [],
-            dependencies = [];
+            dependencies = [],
+            appTargetPath, appPath, projectcopy, customTasks;
 
         /**
          * Extension initialization
@@ -78,6 +79,7 @@ var _global = catrequire("cat.global"),
                         // add internal extensions info
                         project.appendEntity("dependencies", dependencies);
                     }
+
                     // set environment info
                     project.setInfo("template", this.env.template);
                     project.setInfo("libraries", this.env.libraries);
@@ -85,6 +87,50 @@ var _global = catrequire("cat.global"),
                         pluginsPath.push(_path.join(cathome, path));
                     });
                     project.addPluginLocations(pluginsPath);
+
+                    customTasks = [];
+                    appTargetPath = _path.join("./", _path.relative(_path.resolve("."), project.getInfo("target")), project.name);
+                    appPath = project.getInfo("apppath");
+                    if (appPath) {
+                        projectcopy= {
+                            "name": "p@project.copy",
+                            "type": "copy",
+                            "dependency": "scan",
+                            "path": appPath,
+                            "from": {
+                                "path": "/"
+                            },
+                            "to": {
+                                "path": appTargetPath
+                            }
+                        };
+                        customTasks.push(projectcopy);
+                    }
+
+                    customTasks = customTasks.concat([
+                        {
+                            "name": "p@lib.copy",
+                            "type": "copy",
+                            "dependency": "scan",
+                            "path": "./lib",
+                            "from": {
+                                "path": "/"
+                            },
+                            "to": {
+                                "path": appTargetPath
+                            }
+                        },
+                        {
+                            "name": "p@project.minify",
+                            "type": "minify",
+                            "path": appTargetPath,
+                            "filename": "cat.src.js",
+                            "src":["./src/**/*.js"]
+                        }
+                        ]);
+                    project.appendEntity("plugins", customTasks);
+
+
                 } else {
                     _log.warning(_props.get("cat.project.env.failed").format("[CAT Config Loader]"));
                 }

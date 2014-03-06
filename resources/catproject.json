@@ -156,6 +156,18 @@
         {
             "name": "t@sample",
             "plugins": ["p@sample.plugin"]
+        },
+        {
+            "name": "t@init",
+            "plugins": ["p@project.copy", "p@libraries.build", "p@lib.copy"]
+        },
+        {
+            "name": "t@scrap",
+            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@custom.plugin", "p@init.scrap"]
+        },
+        {
+            "name": "t@inject",
+            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@custom.plugin", "p@project.inject", "p@project.minify"]
         }
     ]
 
