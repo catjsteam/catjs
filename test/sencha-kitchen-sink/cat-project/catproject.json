@@ -7,6 +7,7 @@
     "port": "8089",
     "protocol": "http",
 
+    "apppath": "./../cat-test-app",
     "appserver": {
         "host": "localhost",
         "port": "8089",
@@ -14,52 +15,9 @@
     },
 
     "plugins": [
-        {
-            "name": "project.copy",
-            "type": "copy",
-            "dependency": "scan",
-            "path": "./../cat-test-app",
-            "from": {
-                "path": "/"
-            },
-            "to": {
-                "path": "./target/sencha-kitchen-sink"
-            }
-        },
-        {
-            "name": "lib.copy",
-            "type": "copy",
-            "dependency": "scan",
-            "path": "./lib",
-            "from": {
-                "path": "/"
-            },
-            "to": {
-                "path": "./target/sencha-test/"
-            }
-        },
-        {
-            "name": "project.minify",
-            "type": "minify",
-            "path": "./target/sencha-kitchen-sink/",
-            "filename": "cat.src.js",
-            "src":["./src/**/*.js"]
-        }
     ],
 
     "tasks": [
-        {
-            "name": "init",
-            "plugins": ["project.copy", "p@libraries.build", "lib.copy"]
-        },
-        {
-            "name": "scrap",
-            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@custom.plugin", "p@init.scrap"]
-        },
-        {
-            "name": "inject",
-            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@custom.plugin", "p@project.inject", "project.minify"]
-        }
     ]
-
 }
+

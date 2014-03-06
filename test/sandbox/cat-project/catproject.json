@@ -62,15 +62,15 @@
             "plugins": ["parse.test.a"]
         },
         {
-            "name": "init",
+            "name": "t@init",
             "plugins": ["project.copy", "p@libraries.build", "lib.copy"]
         },
         {
-            "name": "scrap",
+            "name": "t@scrap",
             "plugins": ["p@scrap.common",  "p@custom.plugin", "p@init.scrap"]
         },
         {
-            "name": "inject",
+            "name": "t@inject",
             "plugins": ["p@scrap.common",  "p@custom.plugin", "p@project.inject"]
         }
     ]

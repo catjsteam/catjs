@@ -7,6 +7,7 @@
     "port": "8087",
     "protocol": "http",
 
+    "apppath": "./../cat-test-app",
     "appserver": {
         "host": "localhost",
         "port": "8087",
@@ -14,52 +15,11 @@
     },
 
     "plugins": [
-        {
-            "name": "project.copy",
-            "type": "copy",
-            "dependency": "scan",
-            "path": "./../cat-test-app",
-            "from": {
-                "path": "/"
-            },
-            "to": {
-                "path": "./target/enyo-test"
-            }
-        },
-        {
-            "name": "lib.copy",
-            "type": "copy",
-            "dependency": "scan",
-            "path": "./lib",
-            "from": {
-                "path": "/"
-            },
-            "to": {
-                "path": "./target/enyo-test/"
-            }
-        },
-        {
-            "name": "project.minify",
-            "type": "minify",
-            "path": "./target/enyo-test/",
-            "filename": "cat.src.js",
-            "src":["./src/**/*.js"]
-        }
+
     ],
 
     "tasks": [
-        {
-            "name": "init",
-            "plugins": ["project.copy", "p@libraries.build", "lib.copy"]
-        },
-        {
-            "name": "scrap",
-            "plugins": ["p@scrap.common", "p@scrap.enyo", "p@custom.plugin", "p@init.scrap"]
-        },
-        {
-            "name": "inject",
-            "plugins": ["p@scrap.common", "p@scrap.enyo", "p@custom.plugin", "p@project.inject", "project.minify"]
-        }
+
     ]
 
 
