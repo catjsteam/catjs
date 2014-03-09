@@ -128,8 +128,8 @@ var _typedas = require('typedas'),
                 sourcePath;
 
             function _mkEnvDir(prop) {
-                var commonpath,
-                    readmefile;
+                var commonpath;
+
                 if (prop) {
                     sourcePath = _utils.resolveObject(data, prop);
                     sourcefolder = _path.normalize([workpath, sourcePath].join("/"));
@@ -145,8 +145,10 @@ var _typedas = require('typedas'),
                             commonpath = _path.join(sourcefolder, "common");
                             if (!_fs.existsSync(commonpath)) {
                                 _utils.mkdirSync(commonpath);
-                                readmefile = _path.join(commonpath, "README.txt");
-                                _fs.writeFileSync(readmefile, "In this folder any JavaScript files will be included for CAT's node and/or application logic layer.");
+
+                                // copy source's resources to the project
+                                // TODO copy recursive sync...
+                                _utils.copySync(_path.join(_cathome.path, "src/module/project/src/common/README.txt"), _path.join(commonpath, "README.txt"));
                             }
                         }
 
