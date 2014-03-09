@@ -105,6 +105,23 @@ _cat.core = function () {
                 }
             };
 
+            this.getTests = function () {
+                var innerConfigMap = {};
+
+                if (innerConfig.tests) {
+                    for (var i = 0; i < innerConfig.tests.length; i++) {
+                        innerConfig.tests[i].wasRun = false;
+                        innerConfigMap[innerConfig.tests[i].name] = innerConfig.tests[i];
+                    }
+                }
+
+                return innerConfigMap;
+            }
+
+            this.getRunMode = function () {
+                return innerConfig["run-mode"];
+            }
+
         }
 
         this.hasPhantom = function () {
@@ -331,15 +348,20 @@ _cat.core = function () {
         action: function (thiz, config) {
             var scrap = config.scrap,
                 runat, manager,
-                pkgname, args = arguments;
+                pkgname, args = arguments,
+                catConfig = _cat.core.getConfig(),
+                tests = catConfig.getTests();
 
+            //TODO: make this more readable
+            if (catConfig.getRunMode() === 'all' ||
+                (catConfig.getRunMode() === 'test-manager' && tests[scrap.name[0]])) {
             runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
             if (runat) {
                 manager = _cat.core.getManager(runat);
                 if (manager) {
                     pkgname = scrap.pkgName;
                     if (!pkgname) {
-                        _cat.core.log("[CAT action] Scrap's Package name is not valid");
+                            _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
                     } else {
                         _cat.core.defineImpl(pkgname, function () {
                             _cat.core.actionimpl.apply(this, args);
@@ -350,6 +372,10 @@ _cat.core = function () {
             } else {
                 _cat.core.actionimpl.apply(this, arguments);
             }
+            } else {
+                _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
+            }
+
         },
 
         getConfig: function () {
