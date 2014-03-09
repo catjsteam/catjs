@@ -262,7 +262,7 @@ var CAT = function () {
                                 appath: new Schema({
                                     type: "string",
                                     required: true,
-                                    description: "Enter your project application path"
+                                    description: "Enter your project's (application) path"
                                 }),
                                 host: new Schema({
                                     type: "string",
