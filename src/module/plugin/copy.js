@@ -150,7 +150,7 @@ module.exports = _basePlugin.ext(function () {
 
 
                 } else {
-                    _log.debug("[Copy Action] filter match, skipping file: " + tmpFolder);
+                   // _log.debug("[Copy Action] filter match, skipping file: " + tmpFolder);
                 }
             }
 

@@ -145,7 +145,7 @@ module.exports = _basePlugin.ext(function () {
 
                     }});
                 } else {
-                    _log.debug("[Copy Action] filter match, skipping file: " + from);
+                    //_log.debug("[Copy Action] filter match, skipping file: " + from);
                     _emitter.emit("job.scrap.wait", {status: "wait"});
                 }
             }
