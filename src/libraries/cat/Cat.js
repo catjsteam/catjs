@@ -270,7 +270,7 @@ _cat.core = function () {
                 manager.scrapsOrder.forEach(function (scrapName) {
                     matchvalue = {};
                     var packageName = "";
-                    for(var i = 0; i < matchValuesCalls.length; i++) {
+                    for (var i = 0; i < matchValuesCalls.length; i++) {
                         if (matchValuesCalls[i].implKey.indexOf((scrapName + "$$cat"), matchValuesCalls[i].implKey.length - (scrapName + "$$cat").length) !== -1) {
                             matchvalue = matchValuesCalls[i];
                             break;
@@ -355,23 +355,23 @@ _cat.core = function () {
             //TODO: make this more readable
             if (catConfig.getRunMode() === 'all' ||
                 (catConfig.getRunMode() === 'test-manager' && tests[scrap.name[0]])) {
-            runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
-            if (runat) {
-                manager = _cat.core.getManager(runat);
-                if (manager) {
-                    pkgname = scrap.pkgName;
-                    if (!pkgname) {
+                runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
+                if (runat) {
+                    manager = _cat.core.getManager(runat);
+                    if (manager) {
+                        pkgname = scrap.pkgName;
+                        if (!pkgname) {
                             _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
-                    } else {
-                        _cat.core.defineImpl(pkgname, function () {
-                            _cat.core.actionimpl.apply(this, args);
-                        });
-                    }
+                        } else {
+                            _cat.core.defineImpl(pkgname, function () {
+                                _cat.core.actionimpl.apply(this, args);
+                            });
+                        }
 
+                    }
+                } else {
+                    _cat.core.actionimpl.apply(this, arguments);
                 }
-            } else {
-                _cat.core.actionimpl.apply(this, arguments);
-            }
             } else {
                 _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
             }
