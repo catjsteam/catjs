@@ -153,8 +153,9 @@ module.exports = function () {
             }
         },
 
+        // log to the console and to the log file
         log: function (type, msg) {
-            if (type) {
+            if (type && _log[type]) {
                 _log[type](msg);
             }
 

@@ -156,6 +156,22 @@ module.exports = function () {
 
                             if (!match) {
                                 match = _scraputils.generate({
+                                    api: "scrollToListIndex",
+                                    apiname: "scrollToListIndex",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "listSelectIndex",
+                                    apiname: "listSelectIndex",
+                                    exp: sencha
+                                });
+                            }
+
+                            if (!match) {
+                                match = _scraputils.generate({
                                     api: "changeTab",
                                     apiname: "changeTab",
                                     exp: sencha

@@ -1,0 +1,55 @@
+{
+
+    "run": {
+
+        "devices": [
+
+            {
+
+                "type": "localpc",
+
+                "id": "all",
+
+                "runner": {
+
+                    "name": "google-chrome",
+
+                    "options": {
+                        "path": "."
+                    }
+
+                }
+
+            }
+
+
+
+        ]
+
+    },
+
+    "runningEnvironment": {
+
+        "type": "local|lab",
+
+        "host": "",
+
+        "authtoken": ""
+
+    },
+
+    "server": {
+
+        "nodeStartFile": "catcli",
+
+        "cwd": "",
+
+        "ip": "auto",
+
+        "port": "8087",
+
+        "args": ["--task", "t@server.start"]
+
+    }
+
+}

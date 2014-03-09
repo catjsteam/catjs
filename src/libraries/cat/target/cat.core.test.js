@@ -1435,11 +1435,6 @@ _cat.plugins.jqm = function () {
             swipePageLeft : function() {
                 $(document).ready(function(){
                     $( ".ui-page-active" ).swipeleft();
-//                    var next = $( ".ui-page-active" ).jqmData( "next" );
-//                    $( ":mobile-pagecontainer" ).pagecontainer( "change", next + ".html", {
-//
-//                    });
-
 
                 });
 
@@ -1449,12 +1444,9 @@ _cat.plugins.jqm = function () {
 
             swipePageRight : function() {
                 $(document).ready(function(){
-//                    $( ".ui-page-active" ).swiperight();
-                    var prev = $( ".ui-page-active" ).jqmData( "prev" );
-                    $( ":mobile-pagecontainer" ).pagecontainer( "change", prev + ".html", {
 
-                        reverse: true
-                    });
+                    var prev = $( ".ui-page-active" ).jqmData( "prev" );
+
                 });
             },
 
@@ -1482,6 +1474,7 @@ _cat.plugins.jqm = function () {
             setText : function (idName, value) {
                 $(document).ready(function(){
                     $("#"+ idName).val(value);
+                    $("#"+ idName).trigger( 'change' );
                 });
             },
 
@@ -1735,6 +1728,11 @@ _cat.plugins.sencha = function () {
                 list.select(index);
             },
 
+
+            changeView : function (viewName) {
+                var firststep = Ext.create(viewName);
+                Ext.Viewport.setActiveItem(firststep);
+            },
 
             removePanel : function (panelId) {
 

@@ -51,8 +51,10 @@ module.exports = function () {
                         _fs.mkdirpSync(targetpath);
                     }
 
+                    // creating cat project file
                     _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content);
 
+                    // copy additional resources to the initial target project folder
                     _fs.copyRecursive(_path.resolve(_path.join(currentpath, "base")), targetpath, function (err) {
                         if (err) {
                             _utils.log("[CAT init project] resources copy failed with errors: ", err);

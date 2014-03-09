@@ -513,6 +513,7 @@ module.exports = _basePlugin.ext(function () {
                 }
 
                 _me.apply(config);
+
                 if (_mdata) {
                     _mdata.readAsync(function () {
                         var fileName;

@@ -1,8 +1,9 @@
 
 .demoBlock {
     height: 300px;
+    margin-bottom: 100px;
     width: 100%;
-    border: 3px solid black;
+    /*border: 3px solid black;*/
     overflow: hidden;
 }
 .editorBlock {
@@ -10,13 +11,14 @@
     text-shadow: none !important;
     width: 50%;
     float:left; /* add this */
-    border: 3px solid red;
+    /*border: 3px solid red;*/
 }
 .exampleBlock {
+    padding : 15px;
     float:left;
     height: 100%;
     width: 40%;
-    border: 3px solid green;
+    /*border: 3px solid green;*/
     overflow: auto;
 }
 
@@ -24,22 +26,30 @@
     float:left;
     width: 10%;
     height: 100%;
-    border: 3px solid yellow;
+    /*border: 3px solid yellow;*/
 
 }
 
 .box-sizing { box-sizing: border-box; margin: 0; }
 
-
-div.box {
-    width: 10em;
-    height: 3em;
-    background-color: #00ff00;
-}
-div.box.swipeleft {
-    background-color: #0000ff;
+.hideme
+{
+    opacity:0;
 }
 
-div.box.swiperight {
-    background-color: #ff0000;
+/*
+#container
+{
+    list-style-type: none;
+    padding-left: 0px
 }
+
+#container li
+{
+    margin:50px;
+    padding: 10px;
+    min-height: 350px;
+    border-radius: 10px;
+    border : 1px solid #ddd;
+    background-color: #fff;
+}*/
