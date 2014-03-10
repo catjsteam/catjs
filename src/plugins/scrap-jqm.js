@@ -38,7 +38,7 @@ module.exports = function () {
 
                         if (jqm) {
 
-                            me.print("_cat.core.ui.setContent({style: 'color:blue', header: '" + scrapName + "', desc: '" + jqm + "',tips: ''});");
+                            me.print("_cat.core.ui.setContent({style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqm + "',tips: ''});");
 
                             var match = _scraputils.generate({
                                 api: "scrollTo",

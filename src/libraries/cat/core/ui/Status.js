@@ -1,6 +1,6 @@
 _cat.core.ui = function () {
-
     function _create() {
+
 
         var catElement;
         if (typeof document !== "undefined") {
@@ -16,10 +16,10 @@ _cat.core.ui = function () {
             catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
                 '<div id=loading></div>' +
                 '<div id="catlogo"></div>' +
-                '<div id="cat-status-content">' +
+                '<div id="catHeader">CAT - Tests</div>' +
                 '<div class="text-tips"></div>' +
-                '<div class="text-top"><span style="color:green"></span></div>' +
-                '<div class="text"></div>' +
+                '<div id="cat-status-content">' +
+                '<ul id="testList"></ul>' +
                 '</div>' +
                 '</div>';
 
@@ -56,7 +56,7 @@ _cat.core.ui = function () {
         if (catElement) {
             catStatusElt = _getCATStatusElt();
             if (catStatusElt) {
-                catStatusContentElt = catStatusElt.childNodes[2];
+                catStatusContentElt = catStatusElt.childNodes[3];
             }
         }
 
@@ -71,6 +71,8 @@ _cat.core.ui = function () {
             reset: true
         });
     }
+
+    var testNumber = 0;
 
     var _me =  {
 
@@ -203,6 +205,8 @@ _cat.core.ui = function () {
                 isOpen = false,
                 reset = ("reset" in config ? config.reset : false);
 
+
+
             function _setText(elt, text, style) {
 
                 var styleAttrs = (style ? style.split(";") : []);
@@ -215,10 +219,7 @@ _cat.core.ui = function () {
                         }
                     });
 
-                        elt.textContent = text;
-
-
-
+                    elt.textContent = text;
                 }
             }
 
@@ -240,21 +241,49 @@ _cat.core.ui = function () {
                                 }, 300);
                             }
                         }
+                        var innerListElement =
 
-                        setTimeout(function() {
+                                '<div class="text-top"><span style="color:green"></span></div>' +
+                                '<div class="text"></div>';
 
-                            if ("header" in config) {
-                                _setText(catStatusContentElt.childNodes[1]  , config.header, config.style);
-                            }
-                            if ("desc" in config) {
-                                _setText(catStatusContentElt.childNodes[2], config.desc, config.style);
+                        if (config.header || config.desc || config.tips) {
+                            var ul = document.getElementById("testList");
+                            var newLI = document.createElement("LI");
+                            ul.insertBefore(newLI, ul.children[0]);
+                            newLI.innerHTML = innerListElement;
 
-                            }
-                            if ("tips" in config) {
-                                _setText(catStatusContentElt.childNodes[0], config.tips, config.style);
-                            }
+                            var textTips =  document.getElementsByClassName("text-tips")[0];
 
-                        }, 300);
+                            setTimeout(function() {
+
+                                // add element to ui test list
+                                if ("header" in config) {
+                                    _setText(newLI.childNodes[0]  , config.header, config.style);
+                                }
+                                if ("desc" in config) {
+                                    _setText(newLI.childNodes[1], config.desc, config.style);
+                                }
+
+                                if ("tips" in config) {
+                                    if (config.tips) {
+                                        testNumber  = config.tips;
+                                        _setText(textTips, "Number of test passed : " + testNumber, config.style);
+                                    } else {
+                                        _setText(textTips, "Number of test passed : " + testNumber, "color : green");
+                                    }
+
+                                }
+
+                                if ("elementType" in config) {
+                                    newLI.className = newLI.className + " " + config.elementType;
+
+                                } else {
+                                    newLI.className = newLI.className + " listImageInfo";
+                                }
+
+                            }, 300);
+                        }
+
                     }
                 }
             }
