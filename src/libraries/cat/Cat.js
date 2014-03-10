@@ -350,10 +350,11 @@ _cat.core = function () {
                 runat, manager,
                 pkgname, args = arguments,
                 catConfig = _cat.core.getConfig(),
-                tests = catConfig.getTests();
+
+                tests = catConfig ? catConfig.getTests() : [];
 
             //TODO: make this more readable
-            if (catConfig.getRunMode() === 'all' ||
+            if (typeof catConfig === 'undefined' || catConfig.getRunMode() === 'all' ||
                 (catConfig.getRunMode() === 'test-manager' && tests[scrap.name[0]])) {
                 runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
                 if (runat) {
