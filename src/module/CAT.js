@@ -50,7 +50,7 @@ var CAT = function () {
                 // apply task
                 task.apply(_catconfigInternal);
             } else {
-                _log.error("[CAT] No valid task named: '" + _targets + "', validate your cat's project configuration (catproject.json)");
+                _utils.log("error", "[CAT] No valid task named: '" + _targets + "', validate your cat's project configuration (catproject.json)");
             }
         }
     }
@@ -106,6 +106,7 @@ var CAT = function () {
                 _project = catrequire("cat.project");
                 _catconfig = catrequire("cat.config");
                 _properties = catrequire("cat.props");
+                _utils = catrequire("cat.utils");
 
                 // initial global "home" property
                 _global.set("home", basedir);
@@ -261,7 +262,7 @@ var CAT = function () {
                                 appath: new Schema({
                                     type: "string",
                                     required: true,
-                                    description: "Enter your project application path"
+                                    description: "Enter your project's (application) path"
                                 }),
                                 host: new Schema({
                                     type: "string",
@@ -311,7 +312,6 @@ var CAT = function () {
                 }
 
                 if (kill) {
-                    _utils = catrequire("cat.utils");
 
                     // TODO 1 might be a process number, change it to negative maybe.
                     if (kill === 1) {

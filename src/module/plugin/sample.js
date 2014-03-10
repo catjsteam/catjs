@@ -54,8 +54,8 @@ module.exports = _basePlugin.ext(function () {
 
                 // Your code in here ...
 
-                console.log("[sample test Init] an external attributes named, customAttribute='" + customAttribute + "'");
-                console.log("[sample test init] Project: ", JSON.stringify(_project));
+                console.log("[sample test init] Running Project: ", _project.name);
+                console.log("[sample test Init] External attributes named, customAttribute = '" + customAttribute + "'");
 
 
                 // done processing notification for the next task to take place

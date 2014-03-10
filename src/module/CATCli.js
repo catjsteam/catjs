@@ -14,11 +14,12 @@ _parsed = _nopt({
 }, {
     "w": ["--watch", "true"],
     "k": ["--kill", 0],
-    "s": ["--task", "scrap"],
-    "i": ["--task", "init"],
-    "j": ["--task", "inject"],
-    "t": ["--task", "test"],
-    "c": ["--task", "clean"],
+    "i": ["--init", "cat"],
+    "b": ["--task", "t@init", "--task", "t@scrap", "--task", "t@inject"],
+    "t": ["--task", "t@test"],
+    "c": ["--task", "t@clean"],
+    "s": ["--task", "t@server.start"],
+    "m": ["--task", "t@mtest"],
     "p": ["--project" , "."]
 });
 

@@ -1,4 +1,5 @@
-var _log = catrequire("cat.global").log(),
+var _catglobal = catrequire("cat.global"),
+    _log = _catglobal.log(),
     _path = require("path"),
     _props = catrequire("cat.props"),
     _basePlugin = catrequire("cat.plugin.base"),
@@ -28,11 +29,12 @@ module.exports = _basePlugin.ext(function () {
                     return undefined;
                 }
 
-                var extensionParams = _data.data,
+                var globalhome = _catglobal.get("home"),
+                    extensionParams = _data.data,
                     phantomjs = config.phantomjs,
                     thiz = config.thiz,
-                    basePath = _project.getTargetFolder(),
-                    file = _path.join(basePath, extensionParams.file),
+                    basePath = globalhome.working.path,//_project.getTargetFolder(),
+                    file = _path.join(basePath, "phantom", extensionParams.file),
                     address, host, port;
 
                 address = (extensionParams.host || extensionParams.address);

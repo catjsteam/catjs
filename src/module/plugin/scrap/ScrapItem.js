@@ -24,6 +24,7 @@ function _validateConfigEntry(key, config) {
         thisKey;
 
     // validate singlton
+    // TODO need to be fixed
     if (key === "singleton") {
         value = config[key];
         if (value) {

@@ -128,8 +128,8 @@ var _typedas = require('typedas'),
                 sourcePath;
 
             function _mkEnvDir(prop) {
-                var commonpath,
-                    readmefile;
+                var commonpath;
+
                 if (prop) {
                     sourcePath = _utils.resolveObject(data, prop);
                     sourcefolder = _path.normalize([workpath, sourcePath].join("/"));
@@ -145,8 +145,10 @@ var _typedas = require('typedas'),
                             commonpath = _path.join(sourcefolder, "common");
                             if (!_fs.existsSync(commonpath)) {
                                 _utils.mkdirSync(commonpath);
-                                readmefile = _path.join(commonpath, "README.txt");
-                                _fs.writeFileSync(readmefile, "In this folder any JavaScript files will be included for CAT's node and/or application logic layer.");
+
+                                // copy source's resources to the project
+                                // TODO copy recursive sync...
+                                _utils.copySync(_path.join(_cathome.path, "src/module/project/src/common/README.txt"), _path.join(commonpath, "README.txt"));
                             }
                         }
 
@@ -173,7 +175,7 @@ var _typedas = require('typedas'),
             _mkEnvDir("target");
 
             // set the info properties incoming from the cat's project
-            _setInfoData(["host", "port", "appserver"]);
+            _setInfoData(["host", "port", "appserver", "apppath"]);
 
         }
 
@@ -185,7 +187,9 @@ var _typedas = require('typedas'),
                 _typedas.isArray(tasksConfig)) {
                 tasksConfig.forEach(function (item) {
                     if (item) {
-                        tasks.push(new _Task({data: item, emitter: emitter, global: data, catconfig: me}));
+                        if (!(item.name && map.tasks[item.name])) {
+                            tasks.push(new _Task({data: item, emitter: emitter, global: data, catconfig: me}));
+                        }
                     }
                 });
             } else {
@@ -201,7 +205,9 @@ var _typedas = require('typedas'),
                 _typedas.isArray(actionsConfig)) {
                 actionsConfig.forEach(function (item) {
                     if (item) {
-                        actions.push(new _Action({data: item, emitter: emitter, global: data, catconfig: me}));
+                        if (!(item.name && map.actions[item.name])) {
+                            actions.push(new _Action({data: item, emitter: emitter, global: data, catconfig: me}));
+                        }
                     }
                 });
             } else {
@@ -217,7 +223,9 @@ var _typedas = require('typedas'),
                 _typedas.isArray(extensionsConfig)) {
                 extensionsConfig.forEach(function (item) {
                     if (item) {
-                        extensions.push(new _Extension({data: item, emitter: emitter, global: data, catconfig: me}));
+                        if (!(item.name && map.extensions[item.name])) {
+                            extensions.push(new _Extension({data: item, emitter: emitter, global: data, catconfig: me}));
+                        }
                     }
                 });
 

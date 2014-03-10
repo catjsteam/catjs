@@ -451,11 +451,15 @@ module.exports = function () {
                                         behaviorLoad = require(requireName);
                                         if (behaviorLoad) {
                                             behave.inject = behaviorLoad[scrapName];
-                                            _log.warn("[CAT scrap-common] Module load successfuly but with missing method for scrap behavior:  '" + scrapName + "'");
+
+                                        } else {
+                                            _utils.log("warning", "[cat scrap-common plugin] failed to resolve 'replace' functionality module, " + requireName);
+
                                         }
 
                                     } catch (e) {
                                         // failed to load user behavior
+                                        _utils.log("warning", "[cat scrap-common plugin] failed to resolve 'replace' functionality module, " + scrapValue);
                                     }
                                 }
                             }
@@ -469,12 +473,16 @@ module.exports = function () {
 
                 }
 
-                // insert the behavior
-                this.$setBehavior(behave);
+                if (behave && behave.inject) {
+                    // insert the behavior
+                    this.$setBehavior(behave);
 
-                // set the replace data info
-                this.$setReplaceData({action: behave.inject});
+                    // set the replace data info
+                    this.$setReplaceData({action: behave.inject});
 
+                } else {
+                    _utils.log("warning", "[cat scrap-common plugin] No valid behavior was found, check your scrap behavior settings.");
+                }
             }});
 
 

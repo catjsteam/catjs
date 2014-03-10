@@ -4,6 +4,7 @@ var _system = require('system'),
 
 _page.open( _url, function (status) {
 
+    var hasPhantomjs;
     console.log("[phantom] opening url: ", _url );
 
     if (status !== 'success') {

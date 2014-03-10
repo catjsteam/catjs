@@ -322,7 +322,8 @@ module.exports = _basePlugin.ext(function () {
                                                     $ : true,
                                                     Ext : true,
                                                     window : true,
-                                                    chai: true
+                                                    chai: true,
+                                                    phantom: true
                                                 }
                                             }
                                         });
