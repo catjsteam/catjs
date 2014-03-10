@@ -137,8 +137,10 @@ _cat.plugins.jqm = function () {
 
             setText : function (idName, value) {
                 $(document).ready(function(){
+                    $("#"+ idName).focus();
                     $("#"+ idName).val(value);
                     $("#"+ idName).trigger( 'change' );
+                    $("#"+ idName).blur();
                 });
             },
 
