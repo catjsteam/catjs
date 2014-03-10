@@ -114,7 +114,8 @@ _cat.utils.chai = function () {
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestCount()
+                        tips: _cat.core.TestManager.getTestCount(),
+                        elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
                     });
                     _sendTestResult(testdata);
 
