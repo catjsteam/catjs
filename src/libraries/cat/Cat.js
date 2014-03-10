@@ -116,11 +116,11 @@ _cat.core = function () {
                 }
 
                 return innerConfigMap;
-            }
+            };
 
             this.getRunMode = function () {
                 return innerConfig["run-mode"];
-            }
+            };
 
         }
 
