@@ -38,7 +38,7 @@
         {
             "name": "p@project.wipe",
             "type": "clean",
-            "src": ["src", "lib", "*.log", "*.xml"]
+            "src": ["src", "lib", "*.log", "*.xml", "phantom/app-view.png"]
         },
         {
             "name": "p@mobile.start",
