@@ -13,15 +13,18 @@ _cat.core.ui = function () {
             catElement.style.bottom = "10px";
             catElement.style.zIndex = "10000000";
             catElement.style.display = "none";
-            catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
-                '<div id=loading></div>' +
-                '<div id="catlogo"></div>' +
-                '<div id="catHeader">CAT - Tests</div>' +
-                '<div class="text-tips"></div>' +
-                '<div id="cat-status-content">' +
-                '<ul id="testList"></ul>' +
+            catElement.innerHTML =
+
+                '<div id="cat-status" class="cat-dynamic cat-status-open">' +
+                            '<div id=loading></div>' +
+                            '<div id="catlogo"></div>' +
+                            '<div id="catHeader">CAT - Tests</div>' +
+                            '<div class="text-tips"></div>' +
+                            '<div id="cat-status-content">' +
+                               '<ul id="testList"></ul>' +
+                            '</div>' +
                 '</div>' +
-                '</div>';
+                '<div class="fadeMe"></div>';
 
             if (document.body) {
                 document.body.appendChild(catElement);
@@ -188,6 +191,12 @@ _cat.core.ui = function () {
             }
 
             return false;
+        },
+
+
+        markedElement : function(elementId ) {
+            var element = document.getElementById(elementId);
+            element.className = element.className + " markedElement";
         },
 
         /**

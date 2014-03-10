@@ -877,15 +877,18 @@ _cat.core.ui = function () {
             catElement.style.bottom = "10px";
             catElement.style.zIndex = "10000000";
             catElement.style.display = "none";
-            catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
-                '<div id=loading></div>' +
-                '<div id="catlogo"></div>' +
-                '<div id="catHeader">CAT - Tests</div>' +
-                '<div class="text-tips"></div>' +
-                '<div id="cat-status-content">' +
-                '<ul id="testList"></ul>' +
+            catElement.innerHTML =
+
+                '<div id="cat-status" class="cat-dynamic cat-status-open">' +
+                            '<div id=loading></div>' +
+                            '<div id="catlogo"></div>' +
+                            '<div id="catHeader">CAT - Tests</div>' +
+                            '<div class="text-tips"></div>' +
+                            '<div id="cat-status-content">' +
+                               '<ul id="testList"></ul>' +
+                            '</div>' +
                 '</div>' +
-                '</div>';
+                '<div class="fadeMe"></div>';
 
             if (document.body) {
                 document.body.appendChild(catElement);
@@ -1052,6 +1055,12 @@ _cat.core.ui = function () {
             }
 
             return false;
+        },
+
+
+        markedElement : function(elementId ) {
+            var element = document.getElementById(elementId);
+            element.className = element.className + " markedElement";
         },
 
         /**
@@ -1396,6 +1405,16 @@ var animation = false;
 
 _cat.plugins.jqm = function () {
 
+    var oldElement = "";
+    var setBoarder = function(element) {
+        if (oldElement) {
+
+            oldElement.classList.remove("markedElement");
+        }
+        element.className = element.className + " markedElement";
+        oldElement = element;
+    };
+
     return {
 
         actions: {
@@ -1407,6 +1426,8 @@ _cat.plugins.jqm = function () {
                     var stop = $('#' + idName).offset().top;
                     var delay = 1000;
                     $('body,html').animate({scrollTop: stop}, delay);
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1430,6 +1451,7 @@ _cat.plugins.jqm = function () {
                     var stop = $('#' + idName).offset().top;
                     var delay = 1000;
                     $('#' + rapperId).animate({scrollTop: stop}, delay);
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1438,6 +1460,8 @@ _cat.plugins.jqm = function () {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
                     window.location = $('#' + idName).attr('href');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1448,6 +1472,8 @@ _cat.plugins.jqm = function () {
                     $('.ui-btn').removeClass('ui-focus');
                     $('#' + idName).trigger('click');
                     $('#' + idName).closest('.ui-btn').addClass('ui-focus');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1455,6 +1481,8 @@ _cat.plugins.jqm = function () {
             selectTab: function (idName) {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1469,6 +1497,8 @@ _cat.plugins.jqm = function () {
                         $("#" + selectId + " option[id=" + value + "]").attr('selected','selected');
                     }
                     $( "#" + selectId).selectmenu("refresh", true);
+
+                    setBoarder( $('#' + selectId).eq(0)[0]);
                 });
 
             },
@@ -1478,6 +1508,8 @@ _cat.plugins.jqm = function () {
             swipeItemLeft : function(idName) {
                 $(document).ready(function(){
                     $("#" + idName).swipeleft();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1485,6 +1517,8 @@ _cat.plugins.jqm = function () {
             swipeItemRight : function(idName) {
                 $(document).ready(function(){
                     $("#" + idName).swiperight();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1511,6 +1545,8 @@ _cat.plugins.jqm = function () {
             click: function (idName) {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1518,6 +1554,8 @@ _cat.plugins.jqm = function () {
             setCheck: function (idName) {
                 $(document).ready(function(){
                     $("#"+ idName).prop("checked",true).checkboxradio("refresh");
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1525,6 +1563,8 @@ _cat.plugins.jqm = function () {
             slide : function (idName, value) {
                 $(document).ready(function(){
                     $("#"+ idName).val(value).slider("refresh");
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1534,6 +1574,8 @@ _cat.plugins.jqm = function () {
                     $("#"+ idName).val(value);
                     $("#"+ idName).trigger( 'change' );
                     $("#"+ idName).blur();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1542,6 +1584,10 @@ _cat.plugins.jqm = function () {
                 $(document).ready(function(){
                     $( "." + className ).prop( "checked", false ).checkboxradio( "refresh" );
                     $( "#" + idName ).prop( "checked", true ).checkboxradio( "refresh" );
+
+
+                    setBoarder($("label[for='" + idName + "']").eq(0)[0]);
+
                 });
 
             },
@@ -1549,6 +1595,8 @@ _cat.plugins.jqm = function () {
             collapsible : function(idName) {
                 $(document).ready(function(){
                     $('#' + idName).children( ".ui-collapsible-heading" ).children(".ui-collapsible-heading-toggle").click();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             }
