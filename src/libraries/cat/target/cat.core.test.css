@@ -249,3 +249,10 @@ div.fadeMe {
     left:       0;
     position:   fixed;
 }
+
+
+/* prevent scrolling */
+body {
+    height: 100%;
+    overflow: hidden;
+}
