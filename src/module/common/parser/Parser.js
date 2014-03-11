@@ -1,0 +1,1 @@
+module.exports=function(){return{get:function(e){return require("./"+e)}}}();

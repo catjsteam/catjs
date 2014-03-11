@@ -1,0 +1,1 @@
+var _path=require("path");module.exports=function(t){var e=this;t&&(this.type=t.type||void 0,this.pattern=t.pattern||void 0,this.ext=t.ext||void 0,this.exclude=t.exclude||void 0,this.apply=function(t){return t.call(this,e)})};

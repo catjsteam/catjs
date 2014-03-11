@@ -1,0 +1,1 @@
+var _regutils=catrequire("cat.regexp.utils");module.exports=function(){return{parseName:function(e){var r,t,n=_regutils.getMatch(e,"^(.*)([!=@])(.*)$"),u=e;return n&&(u=n[1],r=n[2],t=n[3]),{name:u,sign:r,hint:t}}}}();

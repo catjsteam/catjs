@@ -1,0 +1,1 @@
+_cat.core.declare('{{name}}',{{scrap}}, '{{type}}');

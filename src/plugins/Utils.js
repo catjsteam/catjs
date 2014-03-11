@@ -1,0 +1,1 @@
+var regexputils=catrequire("cat.regexp.utils");module.exports=function(){return{generate:function(e){var t=regexputils.getMatch(e.exp,[e.api,"\\((.*)\\);"].join(""));if(t){for(var r=t[1].split(","),i="",n=0;n<r.length;n++)/^\d+$/.test(r[n])&&(r[n]=parseInt(r[n])),i+=r[n]+",";return i=i.substring(0,i.length-1),[e.apiname||e.api,"("+i+");"].join("")}}}}();

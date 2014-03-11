@@ -1,0 +1,73 @@
+{
+    "mode": "dev",
+    "out": {
+        "name": "cat",
+        "folder": "lib"
+    },
+    "libraries": [
+        {
+            "name": "cat",
+            "address": "local",
+            "base": "target",
+            "prod" :[
+                {
+                    "name": "cat.core.test.min.js",
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
+                    "type": "js"
+                },
+                {
+                    "name": "cat.core.test.min.css",
+                    "src": ["css/*.css"],
+                    "type": "css"
+                },
+                {
+                    "name": "cat.core.catconfig.json",
+                    "src": ["config/catconfig.json"],
+                    "type": "json"
+                }
+            ],
+            "dev" :[
+                {
+                    "name":"cat.core.test.js",
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
+                    "type": "js"
+                },
+                {
+                    "name": "cat.core.test.css",
+                    "src": ["css/*.css"],
+                    "type": "css"
+                },
+                {
+                    "name": "cat.core.catconfig.json",
+                    "src": ["config/catconfig.json"],
+                    "type": "json",
+                    "parse": true
+                }
+            ],
+            "static-names": ["catconfig.json"],
+            "install" : "internal"
+        },
+        {
+            "name": "requirejs",
+            "address": "local",
+            "base": ".",
+            "prod" :["requirejs-min.js"],
+            "dev" :["requirejs-min.js"],
+            "install" : "static"
+        },
+        {
+            "name": "tmr",
+            "address": "local",
+            "base": ".",
+            "prod" :["tmr-min-all.js"],
+            "dev" :["tmr-min-all.js"],
+            "install" : "static"
+        },
+        {
+            "name": "chai",
+            "prod" :["chai.js"],
+            "dev" :["chai.js"],
+            "install": "static"
+        }
+    ]
+}

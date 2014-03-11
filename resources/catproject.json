@@ -1,0 +1,182 @@
+{
+    "dependencies": [
+        {
+            "name": "d@dependency.loader",
+            "type": "loader",
+            "path": ["./plugins/"]
+        }
+    ],
+
+    "plugins": [
+        {
+            "name": "p@custom.plugin",
+            "type": "custom-plugin",
+            "dependency": "d@dependency.loader"
+        },
+        {
+            "name": "p@libraries.install",
+            "type": "libraries",
+            "dependency": "manager",
+            "action": "install"
+        },
+        {
+            "name": "p@libraries.clean",
+            "type": "libraries",
+            "dependency": "manager",
+            "imports": ["cat"],
+            "action": "clean"
+        },
+        {
+            "name": "p@project.inject",
+            "type": "inject"
+        },
+        {
+            "name": "p@project.clean",
+            "type": "clean",
+            "src": ["target", "_cat_md.json"]
+        },
+        {
+            "name": "p@project.wipe",
+            "type": "clean",
+            "src": ["src", "lib", "*.log", "*.xml", "phantom/app-view.png"]
+        },
+        {
+            "name": "p@mobile.start",
+            "type": "mobile",
+            "device": "android",
+            "action": "start"
+        },
+        {
+            "name": "p@mobile.install",
+            "type": "mobile",
+            "device": "android",
+            "action": "install"
+        },
+        {
+            "name": "p@project.phantomjs",
+            "type": "phantomjs",
+            "file": "phantomjs-script.js"
+        },
+        {
+            "name": "p@project.webserver.start",
+            "type": "webserver",
+            "action": "start",
+            "set": [{"key": "assert", "var": "assert", "prop":"result"}]
+        },
+        {
+            "name": "p@project.webserver.stop",
+            "type": "webserver",
+            "action": "stop"
+        },
+        {
+            "name": "p@sample.plugin",
+            "type": "sample",
+            "customAttribute": "Custom attribute test"
+        },
+        {
+            "name": "p@init.scrap",
+            "type": "scrap",
+            "dependency": "scan"
+        },
+        {
+            "name": "p@libraries.build",
+            "type": "libraries",
+            "dependency": "manager",
+            "imports": ["chai", "tmr", "cat"],
+            "action": "build"
+        },
+        {
+            "name": "p@scrap.common",
+            "type": "scrap-common"
+        },
+        {
+            "name": "p@scrap.enyo",
+            "type": "scrap-enyo"
+        },
+        {
+            "name": "p@scrap.dom",
+            "type": "scrap-dom"
+        },
+        {
+            "name": "p@scrap.jqm",
+            "type": "scrap-jqm"
+        },
+        {
+            "name": "p@scrap.mock",
+            "type": "scrap-mock"
+        },
+        {
+            "name": "p@scrap.sencha",
+            "type": "scrap-sencha"
+        }
+
+    ],
+
+    "tasks": [
+        {
+            "name": "t@libs.install",
+            "plugins":["p@libraries.install"]
+        },
+        {
+            "name": "t@libs.clean",
+            "plugins":["p@libraries.clean"]
+        },
+        {
+            "name": "t@clean",
+            "plugins": ["p@project.clean"]
+        },
+        {
+            "name": "t@libs.rebuild",
+            "plugins": ["p@libraries.clean", "p@libraries.install", "p@libraries.build"]
+        },
+        {
+            "name": "t@libs.build",
+            "plugins":["p@libraries.build"]
+        },
+        {
+            "name": "t@install",
+            "plugins":["p@lib.copy"]
+        },
+        {
+            "name": "t@wipe",
+            "plugins": ["p@project.clean", "p@project.wipe"]
+        },
+        {
+            "name": "t@test",
+            "plugins": ["p@project.webserver.start", "p@project.phantomjs", "p@project.webserver.stop"]
+        },
+        {
+            "name": "t@mtest",
+            "plugins": ["p@mobile.install", "p@project.webserver.start", "p@mobile.start"]
+        },
+        {
+            "name": "t@phantom",
+            "plugins": ["p@project.phantomjs"]
+        },
+        {
+            "name": "t@server.start",
+            "plugins": ["p@project.webserver.start"]
+        },
+        {
+            "name": "t@server.stop",
+            "plugins": ["p@project.webserver.stop"]
+        },
+        {
+            "name": "t@sample",
+            "plugins": ["p@sample.plugin"]
+        },
+        {
+            "name": "t@init",
+            "plugins": ["p@project.copy", "p@libraries.build", "p@lib.copy"]
+        },
+        {
+            "name": "t@scrap",
+            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@custom.plugin", "p@init.scrap"]
+        },
+        {
+            "name": "t@inject",
+            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@custom.plugin", "p@project.inject", "p@project.minify"]
+        }
+    ]
+
+}

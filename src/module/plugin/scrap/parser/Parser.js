@@ -1,0 +1,1 @@
+var _parsers=[];!function(){var r=["SimpleParser","SimpleSingleParser"];r.forEach(function(r){_parsers.push(require(["./",r].join("")))})}(),module.exports=function(){return{parse:function(r){var e,n=[];return _parsers.forEach(function(a){a&&(e=a.parse(r),e&&(n=n.concat(e)))}),n}}}();

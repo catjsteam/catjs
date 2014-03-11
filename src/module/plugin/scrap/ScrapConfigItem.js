@@ -1,0 +1,1 @@
+module.exports=function(){function t(t){this.$$classType="ScrapConfigItem",t&&(this.config=t)}return t.prototype.get=function(t){return this.config?this.config[t]:void 0},t.prototype.getValue=function(){return this.get("value")},t.prototype.getSign=function(){return this.get("sign")},{create:function(n){return new t(n)},instanceOf:function(t){return t.$$classType?!0:!1}}}();

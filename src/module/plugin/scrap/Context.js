@@ -1,0 +1,1 @@
+var _log=catrequire("cat.global").log(),_clazz;_clazz=function(){this.$$context={}},_clazz.prototype.set=function(t,o){t&&(this.$$context[t]=o)},_clazz.prototype.get=function(t){return t?this.$$context[t]:void 0},_clazz.prototype.destroy=function(){this.$$context={}},module.exports=_clazz;

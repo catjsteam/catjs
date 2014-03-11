@@ -1,0 +1,1 @@
+var _properties=require("properties"),_global=require("./CATGlob.js"),_log=_global.log();module.exports=function(){var o={comment:"# ",separator:" = ",sections:!1};return{init:function(r){_properties.load([cathome,"resources/log.properties"].join("/"),o,r)},all:global&&global.CAT?global.CAT.props:void 0,get:function(o){return o?global.CAT.props[o]:void 0}}}();

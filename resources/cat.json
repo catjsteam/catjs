@@ -1,0 +1,50 @@
+{
+    "env": {
+        "template": {
+            "path": "src/template/project/"
+        },
+        "libraries" : {
+            "path": "src/libraries/"
+        }
+    },
+
+    "plugins" : [
+        "src/module/plugin/",
+        "src/plugins/"
+    ],
+
+    "extensions" : [
+        {
+            "name": "manager",
+            "impl": "src/module/extension/manager/action.js"
+        },
+        {
+            "name": "webserver",
+            "impl": "src/module/extension/webserver/action.js"
+        },
+        {
+            "name": "phantomjs",
+            "impl": "src/module/extension/phantomjs/action.js"
+        },    {
+            "name": "spawn",
+            "impl": "src/module/extension/spawn/action.js"
+        },
+        {
+            "name": "scan",
+            "impl": "src/module/extension/scan/action.js"
+        },
+        {
+            "name": "clean",
+            "impl": "src/module/extension/clean/action.js"
+        },
+        {
+            "name": "inject",
+            "impl": "src/module/extension/inject/action.js"
+        },
+        {
+            "name": "loader",
+            "impl": "src/module/extension/loader/action.js",
+            "phase": "init"
+        }
+    ]
+}
