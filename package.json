@@ -1,24 +1,22 @@
 {
-    "name": "CAT",
-    "description": "Mobile-Web Automation Framework",
+    "name": "CATJS",
+    "description": "(Mobile) Web Automation Framework",
     "version": "0.1.0",
-    "homepage": "TBD",
+    "homepage": "http://catjsteam.github.io",
     "author": {
         "name": "arik",
-        "email": "arik.levine@hp.com"
+        "email": "lewin.arik@hp.com"
     },
     "maintainers": [
         {
             "name": "Pablo Retyk",
-            "email": "pablo.retyk@hp.com"
+            "email": "pabloretyk@gmail.com"
         },
         {
-            "name": "Ran Snir",
-            "email": "ran.snir@hp.com"
+            "name": "Ran Snir"
         },
         {
-            "name": "Lior Reuven",
-            "email": "lior.reuven@hp.com"
+            "name": "Lior Reuven"
         }
     ],
 
@@ -81,6 +79,15 @@
         "annotation",
         "app",
         "mobile",
-        "html5"
+        "html5",
+        "test",
+        "testing",
+        "unit",
+        "automation",
+        "ui",
+        "jquery",
+        "sencha",
+        "chai",
+        "enyo"
     ]
 }
