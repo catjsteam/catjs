@@ -100,6 +100,11 @@ div#cat-status div#catlogo {
     border-radius: 50%;
     position: absolute;
 
+    -webkit-transition: opacity 1000ms ;
+    -moz-transition: opacity 1000ms ;
+    -ms-transition: opacity 1000ms ;
+    -o-transition: opacity 1000ms ;
+    transition: opacity 1000ms ;
 }
 
 div#cat-status.cat-dynamic {

@@ -350,10 +350,11 @@ _cat.core = function () {
                 runat, manager,
                 pkgname, args = arguments,
                 catConfig = _cat.core.getConfig(),
-                tests = catConfig.getTests();
+
+                tests = catConfig ? catConfig.getTests() : [];
 
             //TODO: make this more readable
-            if (catConfig.getRunMode() === 'all' ||
+            if (typeof catConfig === 'undefined' || catConfig.getRunMode() === 'all' ||
                 (catConfig.getRunMode() === 'test-manager' && tests[scrap.name[0]])) {
                 runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
                 if (runat) {
@@ -511,12 +512,14 @@ _cat.utils.chai = function () {
             }
 
             var code,
+                result,
                 fail,
                 failure,
                 testdata,
                 scrap = config.scrap.config,
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
-                testName = (scrapName || "NA");
+                testName = (scrapName || "NA"),
+                key, item, items=[], args=[];
 
             if (_chai) {
                 if (config) {
@@ -530,16 +533,20 @@ _cat.utils.chai = function () {
                     var output;
                     if (code) {
                         try {
-                            eval(code);
+                            //eval(code);
+                            args.push("assert");
+                            items.push(assert);
+                            for (key in config.args) {
+                                if (config.args.hasOwnProperty(key)) {
+                                    args.push(key);
+                                    items.push(config.args[key]);
+                                }
+                            }
+                            result = new Function(args, "return " + code).apply(this, items);
 
                         } catch (e) {
                             success = false;
-
                             output = ["[CAT] Test failed, exception: ", e].join("");
-
-                            //console.log("output report demo : ", output);
-
-
                         }
                     }
 
@@ -553,19 +560,21 @@ _cat.utils.chai = function () {
                         name: testName,
                         displayName: _getDisplayName(testName),
                         status: success ? "success" : "failure",
-                        message: output
+                        message: output,
+                        success: success
                     });
 
                     _cat.core.ui.setContent({
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestCount()
+                        tips: _cat.core.TestManager.getTestSucceededCount()
                     });
+
                     _sendTestResult(testdata);
 
                     if (!success) {
-                        throw new Error("[CAT] Test failed, exception: ", (fail || ""));
+                        throw new Error((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
                     }
                 }
             }
@@ -635,6 +644,7 @@ _cat.core.TestManager = function() {
     };
 
     var _testsData = [],
+        _counter = 0,
         _globalTestData = {};
 
 
@@ -643,6 +653,9 @@ _cat.core.TestManager = function() {
         addTestData: function(config) {
             var data = new _Data(config);
             _testsData.push(data);
+            if (config.success) {
+                _counter++;
+            }
 
             return data;
 
@@ -654,6 +667,10 @@ _cat.core.TestManager = function() {
 
         getTestCount: function() {
             return (_testsData ? _testsData.length : 0);
+        },
+
+        getTestSucceededCount: function() {
+            return _counter;
         },
 
         /**
@@ -861,8 +878,8 @@ function TestDB (){
     };
 }
 _cat.core.ui = function () {
-
     function _create() {
+
 
         var catElement;
         if (typeof document !== "undefined") {
@@ -878,10 +895,10 @@ _cat.core.ui = function () {
             catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
                 '<div id=loading></div>' +
                 '<div id="catlogo"></div>' +
-                '<div id="cat-status-content">' +
+                '<div id="catHeader">CAT Tests</div>' +
                 '<div class="text-tips"></div>' +
-                '<div class="text-top"><span style="color:green"></span></div>' +
-                '<div class="text"></div>' +
+                '<div id="cat-status-content">' +
+                '<ul id="testList"></ul>' +
                 '</div>' +
                 '</div>';
 
@@ -918,7 +935,7 @@ _cat.core.ui = function () {
         if (catElement) {
             catStatusElt = _getCATStatusElt();
             if (catStatusElt) {
-                catStatusContentElt = catStatusElt.childNodes[2];
+                catStatusContentElt = catStatusElt.childNodes[3];
             }
         }
 
@@ -933,6 +950,9 @@ _cat.core.ui = function () {
             reset: true
         });
     }
+
+    var testNumber = 0,
+        logoopacity = 0.5;
 
     var _me =  {
 
@@ -955,6 +975,20 @@ _cat.core.ui = function () {
                         catElement.style.display = "";
                     }
                 }
+
+                setInterval(function() {
+                    var logoelt = document.getElementById("catlogo");
+
+                    if (logoopacity === 1) {
+                        logoopacity = 0.5;
+                    } else {
+                        logoopacity = 1;
+                    }
+                    if (logoelt) {
+                        logoelt.style.opacity = logoopacity+"";
+                    }
+                }, 2000);
+
             }
 
         },
@@ -1065,6 +1099,8 @@ _cat.core.ui = function () {
                 isOpen = false,
                 reset = ("reset" in config ? config.reset : false);
 
+
+
             function _setText(elt, text, style) {
 
                 var styleAttrs = (style ? style.split(";") : []);
@@ -1077,10 +1113,7 @@ _cat.core.ui = function () {
                         }
                     });
 
-                        elt.textContent = text;
-
-
-
+                    elt.textContent = text;
                 }
             }
 
@@ -1102,21 +1135,49 @@ _cat.core.ui = function () {
                                 }, 300);
                             }
                         }
+                        var innerListElement =
 
-                        setTimeout(function() {
+                                '<div class="text-top"><span style="color:green"></span></div>' +
+                                '<div class="text"></div>';
 
-                            if ("header" in config) {
-                                _setText(catStatusContentElt.childNodes[1]  , config.header, config.style);
-                            }
-                            if ("desc" in config) {
-                                _setText(catStatusContentElt.childNodes[2], config.desc, config.style);
+                        if (config.header || config.desc || config.tips) {
+                            var ul = document.getElementById("testList");
+                            var newLI = document.createElement("LI");
+                            ul.insertBefore(newLI, ul.children[0]);
+                            newLI.innerHTML = innerListElement;
 
-                            }
-                            if ("tips" in config) {
-                                _setText(catStatusContentElt.childNodes[0], config.tips, config.style);
-                            }
+                            var textTips =  document.getElementsByClassName("text-tips")[0];
 
-                        }, 300);
+                            setTimeout(function() {
+
+                                // add element to ui test list
+                                if ("header" in config) {
+                                    _setText(newLI.childNodes[0]  , config.header, config.style);
+                                }
+                                if ("desc" in config) {
+                                    _setText(newLI.childNodes[1], config.desc, config.style);
+                                }
+
+                                if ("tips" in config) {
+                                    if (config.tips) {
+                                        testNumber  = config.tips;
+                                        _setText(textTips, "Number of test passed : " + testNumber, config.style);
+                                    } else {
+                                        _setText(textTips, "Number of test passed : " + testNumber, "color : green");
+                                    }
+
+                                }
+
+                                if ("elementType" in config) {
+                                    newLI.className = newLI.className + " " + config.elementType;
+
+                                } else {
+                                    newLI.className = newLI.className + " listImageInfo";
+                                }
+
+                            }, 300);
+                        }
+
                     }
                 }
             }
@@ -1226,7 +1287,7 @@ _cat.utils.Signal = function () {
             setTimeout(function () {
                 var testCount = _cat.core.TestManager.getTestCount();
                 _cat.core.ui.setContent({
-                    header: [testCount, "Tests complete"].join(" "),
+                    header: [testCount-1, "Tests complete"].join(" "),
                     desc: "",
                     tips: "",
                     style: "color:green"
@@ -1297,6 +1358,102 @@ _cat.utils.Utils = function () {
     };
 
 }();
+var animation = false;
+
+
+_cat.plugins.dom = function () {
+
+    function _type(o) {
+        return !!o && Object.prototype.toString.call(o).match(/(\w+)\]/)[1];
+    }
+
+    function _fireEvent(name, elt) {
+
+        var clickEvent;
+
+        if (!elt || !name) {
+            return undefined;
+        }
+
+        if(document.createEvent){
+
+            clickEvent = document.createEvent("MouseEvents");
+            clickEvent.initMouseEvent(name, true, true, window,
+                0, 0, 0, 0, 0, false, false, false, 0, null);
+            elt.dispatchEvent(clickEvent);
+
+        } else {
+
+            elt.fireEvent("on" + name);
+        }
+    }
+
+    function _addEventListener(elem, event, fn) {
+        if (!elem) {
+            return undefined;
+        }
+        if (elem.addEventListener) {
+            elem.addEventListener(event, fn, false);
+        } else {
+            elem.attachEvent("on" + event, function () {
+                return(fn.call(elem, window.event));
+            });
+        }
+    }
+
+    function _getElement(idName) {
+
+        var elt;
+
+        if (!idName) {
+            return undefined;
+        }
+        if (_type(idName) === "String") {
+            // try resolving by id
+            elt = document.getElementById(idName);
+
+        } else if (_type(idName).indexOf("Element") !== -1) {
+            // try getting the element
+            elt = idName;
+        }
+
+        return (elt || idName);
+    }
+
+    return {
+
+        actions: {
+
+
+            listen: function (name, idName, callback) {
+
+                var elt = _getElement(idName);
+
+                if (elt) {
+                    _addEventListener(elt, name, callback);
+                }
+
+
+            },
+
+            fire: function (name, idName) {
+
+                var elt = _getElement(idName);
+
+                if (elt) {
+                    _fireEvent(elt, name);
+                }
+
+            }
+
+
+        }
+
+
+    };
+
+}();
+
 _cat.plugins.enyo = function () {
 
     var _me;
@@ -1373,8 +1530,8 @@ _cat.plugins.jqm = function () {
             scrollTo: function (idName) {
 
                 $(document).ready(function(){
-                    var stop = $('#' + idName).offset().top;
-                    var delay = 1000;
+                    var stop = $('#' + idName).offset().top,
+                         delay = 1000;
                     $('body,html').animate({scrollTop: stop}, delay);
                 });
 
@@ -1385,9 +1542,6 @@ _cat.plugins.jqm = function () {
             scrollTop: function () {
 
                 $(document).ready(function(){
-
-
-
                     $('html, body').animate({scrollTop : 0},1000);
                 });
 
@@ -1499,8 +1653,10 @@ _cat.plugins.jqm = function () {
 
             setText : function (idName, value) {
                 $(document).ready(function(){
+                    $("#"+ idName).focus();
                     $("#"+ idName).val(value);
                     $("#"+ idName).trigger( 'change' );
+                    $("#"+ idName).blur();
                 });
             },
 
