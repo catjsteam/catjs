@@ -13,7 +13,7 @@ _cat.utils.Signal = function () {
             setTimeout(function () {
                 var testCount = _cat.core.TestManager.getTestCount();
                 _cat.core.ui.setContent({
-                    header: [testCount, "Tests complete"].join(" "),
+                    header: [testCount-1, "Tests complete"].join(" "),
                     desc: "",
                     tips: "",
                     style: "color:green"
