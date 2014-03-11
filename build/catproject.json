@@ -62,21 +62,22 @@
                     "_cat": true,
                     "chai": true,
                     "catrequire": true,
-                    "cathome": true
+                    "cathome": true,
+                    "phantom": true
                 }
             },
             "mode": "prod",
             "isolate": "true",
             "path": "./target/src",
             "src": ["./target/src/**/*.js"],
-            "excludes": ["Gruntfile.js", "./**/.catmin*.js", "./**/libraries/**/*.js"]
+            "excludes": ["Gruntfile.js", "./**/.catmin*.js", "./**/libraries/**/*.js", "./**/module/project/init/projects/**/*.js"]
         }
     ],
 
     "tasks": [
         {
             "name": "build.cat",
-            "plugins": ["init.copy.src", "minify", "init.copy.resources", "init.copy.root"]
+            "plugins": ["p@project.clean", "p@project.wipe", "init.copy.src", "minify", "init.copy.resources", "init.copy.root"]
         }
     ]
 
