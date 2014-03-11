@@ -1,5 +1,5 @@
 {
-    "name": "catjs",
+    "name": "CATJS",
     "description": "(Mobile) Web Automation Framework",
     "version": "0.1.0",
     "homepage": "http://catjsteam.github.io",
@@ -11,21 +11,15 @@
         {
             "name": "Pablo Retyk",
             "email": "pabloretyk@gmail.com"
-        },
-        {
-            "name": "Ran Snir"
-        },
-        {
-            "name": "Lior Reuven"
         }
     ],
 
     "repository": {
         "type": "git",
-        "url": "https://github.com/HPSoftware/CATCore"
+        "url": "https://github.com/lastboy/catjs"
     },
     "bugs": {
-        "url": "https://github.com/HPSoftware/CATCore/issues"
+        "url": "https://github.com/lastboy/catjs/issues"
     },
     "licenses": [
         {
@@ -40,7 +34,7 @@
         "preinstall": "node precatinstall.js"
     },
     "dependencies": {
-		"mobilerunner" : "~0.0.2",
+        "mobilerunner" : "~0.0.2",
         "fs.extra": "~1.2.1",
         "typedas": "~1.0.0",
         "log": "~1.4.0",
