@@ -62,7 +62,7 @@ module.exports = function (grunt) {
 
         this.async();
         grunt.util.spawn({
-            cmd: 'catcli', args: ['-isj'], opts: { stdio: [ process.stdin
+            cmd: 'catcli', args: ['-b'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
@@ -91,7 +91,7 @@ module.exports = function (grunt) {
         this.async();
 
         grunt.util.spawn({
-            cmd: 'catcli', args: ['--task', 'server.start'], opts: { stdio: [ process.stdin
+            cmd: 'catcli', args: ['--task', 't@server.start'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
@@ -106,7 +106,7 @@ module.exports = function (grunt) {
         this.async();
 
         grunt.util.spawn({
-            cmd: 'catcli', args: ['--task', 'server.stop'], opts: { stdio: [ process.stdin
+            cmd: 'catcli', args: ['--task', 't@server.stop'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
@@ -136,7 +136,7 @@ module.exports = function (grunt) {
         this.async();
 
         grunt.util.spawn({
-            cmd: 'catcli', args: ['--task', 'wipe'], opts: { stdio: [ process.stdin
+            cmd: 'catcli', args: ['--task', 't@wipe'], opts: { stdio: [ process.stdin
                 , process.stout
                 , process.stderr
             ]}
