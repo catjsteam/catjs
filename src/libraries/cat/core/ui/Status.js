@@ -1,7 +1,19 @@
 _cat.core.ui = function () {
+
+    function _addEventListener(elem, event, fn) {
+        if (!elem) {
+            return undefined;
+        }
+        if (elem.addEventListener) {
+            elem.addEventListener(event, fn, false);
+        } else {
+            elem.attachEvent("on" + event, function () {
+                return(fn.call(elem, window.event));
+            });
+        }
+    }
+
     function _create() {
-
-
         var catElement;
         if (typeof document !== "undefined") {
             catElement = document.createElement("DIV");
@@ -13,15 +25,18 @@ _cat.core.ui = function () {
             catElement.style.bottom = "10px";
             catElement.style.zIndex = "10000000";
             catElement.style.display = "none";
-            catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
-                '<div id=loading></div>' +
-                '<div id="catlogo"></div>' +
-                '<div id="catHeader">CAT - Tests</div>' +
-                '<div class="text-tips"></div>' +
-                '<div id="cat-status-content">' +
-                '<ul id="testList"></ul>' +
-                '</div>' +
-                '</div>';
+            catElement.innerHTML =
+
+                '<div id="cat-status" class="cat-dynamic cat-status-open">' +
+                    '<div id=loading></div>' +
+                    '<div id="catlogo" ></div>' +
+                    '<div id="catHeader">CAT Tests<span id="catheadermask">click to mask on/off</span></div>' +
+                    '<div class="text-tips"></div>' +
+                    '<div id="cat-status-content">' +
+                    '<ul id="testList"></ul>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div id="catmask" class="fadeMe"></div>';
 
             if (document.body) {
                 document.body.appendChild(catElement);
@@ -72,7 +87,9 @@ _cat.core.ui = function () {
         });
     }
 
-    var testNumber = 0;
+    var testNumber = 0,
+        logoopacity = 0.5,
+        masktipopacity = 1;
 
     var _me =  {
 
@@ -95,6 +112,40 @@ _cat.core.ui = function () {
                         catElement.style.display = "";
                     }
                 }
+
+                // set logo listener
+                var logoelt = document.getElementById("catlogo"),
+                    catmask = document.getElementById("catmask"),
+                    listener = function() {
+                        var catmask = document.getElementById("catmask");
+                        if (catmask) {
+                            catmask.classList.toggle("fadeMe");
+                        }
+                    };
+
+                if (logoelt && catmask && catmask.classList) {
+                    _addEventListener(logoelt, "click", listener);
+                }
+
+                setInterval(function() {
+                    var logoelt = document.getElementById("catlogo"),
+                        catheadermask = document.getElementById("catheadermask");
+
+                    if (logoopacity === 1) {
+                        logoopacity = 0.5;
+                        setTimeout(function() {
+                            masktipopacity = 0;
+                        }, 2000);
+
+                    } else {
+                        logoopacity = 1;
+                    }
+                    if (logoelt) {
+                        catheadermask.style.opacity = masktipopacity+"";
+                        logoelt.style.opacity = logoopacity+"";
+                    }
+                }, 2000);
+
             }
 
         },
@@ -188,6 +239,12 @@ _cat.core.ui = function () {
             }
 
             return false;
+        },
+
+
+        markedElement : function(elementId ) {
+            var element = document.getElementById(elementId);
+            element.className = element.className + " markedElement";
         },
 
         /**

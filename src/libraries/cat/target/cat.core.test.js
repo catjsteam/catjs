@@ -512,12 +512,14 @@ _cat.utils.chai = function () {
             }
 
             var code,
+                result,
                 fail,
                 failure,
                 testdata,
                 scrap = config.scrap.config,
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
-                testName = (scrapName || "NA");
+                testName = (scrapName || "NA"),
+                key, item, items=[], args=[];
 
             if (_chai) {
                 if (config) {
@@ -531,16 +533,20 @@ _cat.utils.chai = function () {
                     var output;
                     if (code) {
                         try {
-                            eval(code);
+                            //eval(code);
+                            args.push("assert");
+                            items.push(assert);
+                            for (key in config.args) {
+                                if (config.args.hasOwnProperty(key)) {
+                                    args.push(key);
+                                    items.push(config.args[key]);
+                                }
+                            }
+                            result = new Function(args, "return " + code).apply(this, items);
 
                         } catch (e) {
                             success = false;
-
                             output = ["[CAT] Test failed, exception: ", e].join("");
-
-                            //console.log("output report demo : ", output);
-
-
                         }
                     }
 
@@ -554,20 +560,21 @@ _cat.utils.chai = function () {
                         name: testName,
                         displayName: _getDisplayName(testName),
                         status: success ? "success" : "failure",
-                        message: output
+                        message: output,
+                        success: success
                     });
 
                     _cat.core.ui.setContent({
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestCount(),
-                        elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
+                        tips: _cat.core.TestManager.getTestSucceededCount()
                     });
+
                     _sendTestResult(testdata);
 
                     if (!success) {
-                        throw new Error("[CAT] Test failed, exception: ", (fail || ""));
+                        throw new Error((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
                     }
                 }
             }
@@ -637,6 +644,7 @@ _cat.core.TestManager = function() {
     };
 
     var _testsData = [],
+        _counter = 0,
         _globalTestData = {};
 
 
@@ -645,6 +653,9 @@ _cat.core.TestManager = function() {
         addTestData: function(config) {
             var data = new _Data(config);
             _testsData.push(data);
+            if (config.success) {
+                _counter++;
+            }
 
             return data;
 
@@ -656,6 +667,10 @@ _cat.core.TestManager = function() {
 
         getTestCount: function() {
             return (_testsData ? _testsData.length : 0);
+        },
+
+        getTestSucceededCount: function() {
+            return _counter;
         },
 
         /**
@@ -863,9 +878,21 @@ function TestDB (){
     };
 }
 _cat.core.ui = function () {
+
+    function _addEventListener(elem, event, fn) {
+        if (!elem) {
+            return undefined;
+        }
+        if (elem.addEventListener) {
+            elem.addEventListener(event, fn, false);
+        } else {
+            elem.attachEvent("on" + event, function () {
+                return(fn.call(elem, window.event));
+            });
+        }
+    }
+
     function _create() {
-
-
         var catElement;
         if (typeof document !== "undefined") {
             catElement = document.createElement("DIV");
@@ -877,15 +904,18 @@ _cat.core.ui = function () {
             catElement.style.bottom = "10px";
             catElement.style.zIndex = "10000000";
             catElement.style.display = "none";
-            catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
-                '<div id=loading></div>' +
-                '<div id="catlogo"></div>' +
-                '<div id="catHeader">CAT - Tests</div>' +
-                '<div class="text-tips"></div>' +
-                '<div id="cat-status-content">' +
-                '<ul id="testList"></ul>' +
-                '</div>' +
-                '</div>';
+            catElement.innerHTML =
+
+                '<div id="cat-status" class="cat-dynamic cat-status-open">' +
+                    '<div id=loading></div>' +
+                    '<div id="catlogo" ></div>' +
+                    '<div id="catHeader">CAT Tests<span id="catheadermask">click to mask on/off</span></div>' +
+                    '<div class="text-tips"></div>' +
+                    '<div id="cat-status-content">' +
+                    '<ul id="testList"></ul>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div id="catmask" class="fadeMe"></div>';
 
             if (document.body) {
                 document.body.appendChild(catElement);
@@ -936,7 +966,9 @@ _cat.core.ui = function () {
         });
     }
 
-    var testNumber = 0;
+    var testNumber = 0,
+        logoopacity = 0.5,
+        masktipopacity = 1;
 
     var _me =  {
 
@@ -959,6 +991,40 @@ _cat.core.ui = function () {
                         catElement.style.display = "";
                     }
                 }
+
+                // set logo listener
+                var logoelt = document.getElementById("catlogo"),
+                    catmask = document.getElementById("catmask"),
+                    listener = function() {
+                        var catmask = document.getElementById("catmask");
+                        if (catmask) {
+                            catmask.classList.toggle("fadeMe");
+                        }
+                    };
+
+                if (logoelt && catmask && catmask.classList) {
+                    _addEventListener(logoelt, "click", listener);
+                }
+
+                setInterval(function() {
+                    var logoelt = document.getElementById("catlogo"),
+                        catheadermask = document.getElementById("catheadermask");
+
+                    if (logoopacity === 1) {
+                        logoopacity = 0.5;
+                        setTimeout(function() {
+                            masktipopacity = 0;
+                        }, 2000);
+
+                    } else {
+                        logoopacity = 1;
+                    }
+                    if (logoelt) {
+                        catheadermask.style.opacity = masktipopacity+"";
+                        logoelt.style.opacity = logoopacity+"";
+                    }
+                }, 2000);
+
             }
 
         },
@@ -1052,6 +1118,12 @@ _cat.core.ui = function () {
             }
 
             return false;
+        },
+
+
+        markedElement : function(elementId ) {
+            var element = document.getElementById(elementId);
+            element.className = element.className + " markedElement";
         },
 
         /**
@@ -1257,7 +1329,7 @@ _cat.utils.Signal = function () {
             setTimeout(function () {
                 var testCount = _cat.core.TestManager.getTestCount();
                 _cat.core.ui.setContent({
-                    header: [testCount, "Tests complete"].join(" "),
+                    header: [testCount-1, "Tests complete"].join(" "),
                     desc: "",
                     tips: "",
                     style: "color:green"
@@ -1328,6 +1400,102 @@ _cat.utils.Utils = function () {
     };
 
 }();
+var animation = false;
+
+
+_cat.plugins.dom = function () {
+
+    function _type(o) {
+        return !!o && Object.prototype.toString.call(o).match(/(\w+)\]/)[1];
+    }
+
+    function _fireEvent(name, elt) {
+
+        var clickEvent;
+
+        if (!elt || !name) {
+            return undefined;
+        }
+
+        if(document.createEvent){
+
+            clickEvent = document.createEvent("MouseEvents");
+            clickEvent.initMouseEvent(name, true, true, window,
+                0, 0, 0, 0, 0, false, false, false, 0, null);
+            elt.dispatchEvent(clickEvent);
+
+        } else {
+
+            elt.fireEvent("on" + name);
+        }
+    }
+
+    function _addEventListener(elem, event, fn) {
+        if (!elem) {
+            return undefined;
+        }
+        if (elem.addEventListener) {
+            elem.addEventListener(event, fn, false);
+        } else {
+            elem.attachEvent("on" + event, function () {
+                return(fn.call(elem, window.event));
+            });
+        }
+    }
+
+    function _getElement(idName) {
+
+        var elt;
+
+        if (!idName) {
+            return undefined;
+        }
+        if (_type(idName) === "String") {
+            // try resolving by id
+            elt = document.getElementById(idName);
+
+        } else if (_type(idName).indexOf("Element") !== -1) {
+            // try getting the element
+            elt = idName;
+        }
+
+        return (elt || idName);
+    }
+
+    return {
+
+        actions: {
+
+
+            listen: function (name, idName, callback) {
+
+                var elt = _getElement(idName);
+
+                if (elt) {
+                    _addEventListener(elt, name, callback);
+                }
+
+
+            },
+
+            fire: function (name, idName) {
+
+                var elt = _getElement(idName);
+
+                if (elt) {
+                    _fireEvent(elt, name);
+                }
+
+            }
+
+
+        }
+
+
+    };
+
+}();
+
 _cat.plugins.enyo = function () {
 
     var _me;
@@ -1396,6 +1564,16 @@ var animation = false;
 
 _cat.plugins.jqm = function () {
 
+    var oldElement = "";
+    var setBoarder = function(element) {
+        if (oldElement) {
+
+            oldElement.classList.remove("markedElement");
+        }
+        element.className = element.className + " markedElement";
+        oldElement = element;
+    };
+
     return {
 
         actions: {
@@ -1407,6 +1585,8 @@ _cat.plugins.jqm = function () {
                     var stop = $('#' + idName).offset().top;
                     var delay = 1000;
                     $('body,html').animate({scrollTop: stop}, delay);
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1430,6 +1610,7 @@ _cat.plugins.jqm = function () {
                     var stop = $('#' + idName).offset().top;
                     var delay = 1000;
                     $('#' + rapperId).animate({scrollTop: stop}, delay);
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1438,6 +1619,8 @@ _cat.plugins.jqm = function () {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
                     window.location = $('#' + idName).attr('href');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1448,6 +1631,8 @@ _cat.plugins.jqm = function () {
                     $('.ui-btn').removeClass('ui-focus');
                     $('#' + idName).trigger('click');
                     $('#' + idName).closest('.ui-btn').addClass('ui-focus');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1455,6 +1640,8 @@ _cat.plugins.jqm = function () {
             selectTab: function (idName) {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1469,6 +1656,8 @@ _cat.plugins.jqm = function () {
                         $("#" + selectId + " option[id=" + value + "]").attr('selected','selected');
                     }
                     $( "#" + selectId).selectmenu("refresh", true);
+
+                    setBoarder( $('#' + selectId).eq(0)[0]);
                 });
 
             },
@@ -1478,6 +1667,8 @@ _cat.plugins.jqm = function () {
             swipeItemLeft : function(idName) {
                 $(document).ready(function(){
                     $("#" + idName).swipeleft();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1485,6 +1676,8 @@ _cat.plugins.jqm = function () {
             swipeItemRight : function(idName) {
                 $(document).ready(function(){
                     $("#" + idName).swiperight();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1511,6 +1704,8 @@ _cat.plugins.jqm = function () {
             click: function (idName) {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1518,6 +1713,8 @@ _cat.plugins.jqm = function () {
             setCheck: function (idName) {
                 $(document).ready(function(){
                     $("#"+ idName).prop("checked",true).checkboxradio("refresh");
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1525,6 +1722,8 @@ _cat.plugins.jqm = function () {
             slide : function (idName, value) {
                 $(document).ready(function(){
                     $("#"+ idName).val(value).slider("refresh");
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1534,6 +1733,8 @@ _cat.plugins.jqm = function () {
                     $("#"+ idName).val(value);
                     $("#"+ idName).trigger( 'change' );
                     $("#"+ idName).blur();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1542,6 +1743,10 @@ _cat.plugins.jqm = function () {
                 $(document).ready(function(){
                     $( "." + className ).prop( "checked", false ).checkboxradio( "refresh" );
                     $( "#" + idName ).prop( "checked", true ).checkboxradio( "refresh" );
+
+
+                    setBoarder($("label[for='" + idName + "']").eq(0)[0]);
+
                 });
 
             },
@@ -1549,6 +1754,8 @@ _cat.plugins.jqm = function () {
             collapsible : function(idName) {
                 $(document).ready(function(){
                     $('#' + idName).children( ".ui-collapsible-heading" ).children(".ui-collapsible-heading-toggle").click();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             }

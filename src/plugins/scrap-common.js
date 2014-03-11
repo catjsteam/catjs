@@ -126,6 +126,39 @@ module.exports = function () {
                 }});
 
             /**
+             * Annotation for javascript code
+             *
+             *  properties:
+             *  name    - code
+             *  single  - false
+             *  $type   - js
+             */
+            _Scrap.add({name: "log",
+                func: function (config) {
+
+                    var logRow,
+                        code,
+                        me = this;
+
+                    logRow = this.get("log");
+
+                    if (logRow) {
+                        _utils.prepareCode(logRow);
+
+                        code = ['console.log(', logRow, ");"];
+
+                        me.print(_tplutils.template({
+                            content: funcSnippetTpl,
+                            data: {
+                                comment: " Generated log statement according to the scrap comment (see @@code)",
+                                code: code.join("")
+                            }
+                        }));
+
+                    }
+                }});
+
+            /**
              * Annotation for javascript run@
              *
              *  properties:
@@ -284,9 +317,14 @@ module.exports = function () {
                     var codeRows,
                         me = this,
                         codeSnippet,
-                        codeSnippetObject;
+                        codeSnippetObject,
+                        context,
+                        contextargs = "",
+                        counter= 0,
+                        size;
 
                     codeRows = this.get("assert");
+                    context = this.get("context");
 
                     if (codeRows) {
                         codeSnippet = codeRows[0];
@@ -301,12 +339,23 @@ module.exports = function () {
                             }
                         }
 
+                        if (context) {
+                            size = context.length;
+                            contextargs += "{";
+                            context.forEach(function(arg) {
+                                contextargs += arg + ":" + arg + (counter < size-1 ? ",": "");
+                                counter++;
+                            });
+                            contextargs += "}";
+
+                        }
                         me.print(_tplutils.template({
                             content: assertCallTpl,
                             data: {
                                 expression: JSON.stringify(["assert", codeSnippetObject].join(".")),
                                 fail: true,
-                                scrap: JSON.stringify(me)
+                                scrap: JSON.stringify(me),
+                                param1: (contextargs || "{}")
                             }
                         }));
                     }

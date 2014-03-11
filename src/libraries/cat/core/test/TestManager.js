@@ -50,6 +50,7 @@ _cat.core.TestManager = function() {
     };
 
     var _testsData = [],
+        _counter = 0,
         _globalTestData = {};
 
 
@@ -58,6 +59,9 @@ _cat.core.TestManager = function() {
         addTestData: function(config) {
             var data = new _Data(config);
             _testsData.push(data);
+            if (config.success) {
+                _counter++;
+            }
 
             return data;
 
@@ -69,6 +73,10 @@ _cat.core.TestManager = function() {
 
         getTestCount: function() {
             return (_testsData ? _testsData.length : 0);
+        },
+
+        getTestSucceededCount: function() {
+            return _counter;
         },
 
         /**

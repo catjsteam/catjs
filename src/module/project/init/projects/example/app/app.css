@@ -1,0 +1,17 @@
+HTML, BODY {
+    color: #444444;
+    font-family: Tahoma;
+    margin: 0px;
+    padding: 4px;
+}
+
+#description {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 6px 0px 0px 6px;
+}
+
+#description, #testbtn {
+    margin: 4px;
+    float:left;
+}
