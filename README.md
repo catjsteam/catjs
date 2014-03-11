@@ -88,7 +88,7 @@ A brief annotations description:
 * *log* property <code>@@code 'test'</code>
 * *assert* property <code>@@assert ok(true, 'a message)</code>
 * *jqm* property <code>@@jqm tap(id)</code>
-* *sencha* property <code>@@jqm fireTap(extElt)</code>
+* *sencha* property <code>@@sencha fireTap(extElt)</code>
 * *enyo* property <code>@@enyo next(enyoElt)</code>
 
 
