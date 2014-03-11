@@ -16,7 +16,7 @@ _cat.core.ui = function () {
             catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
                 '<div id=loading></div>' +
                 '<div id="catlogo"></div>' +
-                '<div id="catHeader">CAT - Tests</div>' +
+                '<div id="catHeader">CAT Tests</div>' +
                 '<div class="text-tips"></div>' +
                 '<div id="cat-status-content">' +
                 '<ul id="testList"></ul>' +
@@ -72,7 +72,8 @@ _cat.core.ui = function () {
         });
     }
 
-    var testNumber = 0;
+    var testNumber = 0,
+        logoopacity = 0.5;
 
     var _me =  {
 
@@ -95,6 +96,20 @@ _cat.core.ui = function () {
                         catElement.style.display = "";
                     }
                 }
+
+                setInterval(function() {
+                    var logoelt = document.getElementById("catlogo");
+
+                    if (logoopacity === 1) {
+                        logoopacity = 0.5;
+                    } else {
+                        logoopacity = 1;
+                    }
+                    if (logoelt) {
+                        logoelt.style.opacity = logoopacity+"";
+                    }
+                }, 2000);
+
             }
 
         },
