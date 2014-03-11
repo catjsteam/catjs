@@ -65,12 +65,14 @@ _cat.utils.chai = function () {
             }
 
             var code,
+                result,
                 fail,
                 failure,
                 testdata,
                 scrap = config.scrap.config,
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
-                testName = (scrapName || "NA");
+                testName = (scrapName || "NA"),
+                key, item, items=[], args=[];
 
             if (_chai) {
                 if (config) {
@@ -84,16 +86,20 @@ _cat.utils.chai = function () {
                     var output;
                     if (code) {
                         try {
-                            eval(code);
+                            //eval(code);
+                            args.push("assert");
+                            items.push(assert);
+                            for (key in config.args) {
+                                if (config.args.hasOwnProperty(key)) {
+                                    args.push(key);
+                                    items.push(config.args[key]);
+                                }
+                            }
+                            result = new Function(args, "return " + code).apply(this, items);
 
                         } catch (e) {
                             success = false;
-
                             output = ["[CAT] Test failed, exception: ", e].join("");
-
-                            //console.log("output report demo : ", output);
-
-
                         }
                     }
 
@@ -107,20 +113,21 @@ _cat.utils.chai = function () {
                         name: testName,
                         displayName: _getDisplayName(testName),
                         status: success ? "success" : "failure",
-                        message: output
+                        message: output,
+                        success: success
                     });
 
                     _cat.core.ui.setContent({
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestCount(),
-                        elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
+                        tips: _cat.core.TestManager.getTestSucceededCount()
                     });
+
                     _sendTestResult(testdata);
 
                     if (!success) {
-                        throw new Error("[CAT] Test failed, exception: ", (fail || ""));
+                        throw new Error((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
                     }
                 }
             }
