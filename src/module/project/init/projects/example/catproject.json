@@ -1,0 +1,27 @@
+{
+    "name": "{{name}}",
+
+    "source": "src/",
+    "target": "target/",
+
+    "host": "{{host}}",
+    "port": "{{port}}",
+    "protocol": "{{protocol}}",
+
+    "apppath": "{{appath}}",
+    "appserver": {
+        "host": "{{appserver.host}}",
+        "port": "{{appserver.port}}",
+        "protocol": "{{appserver.protocol}}"
+    },
+
+    "plugins": [
+
+    ],
+
+    "tasks": [
+
+    ]
+
+
+}

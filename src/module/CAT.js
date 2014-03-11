@@ -237,7 +237,8 @@ var CAT = function () {
                         this.required = args.required;
                         this.default = args.default;
                         this.description  = args.description;
-                    };
+                    },
+                    appPath;
 
 
                 _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
@@ -250,6 +251,7 @@ var CAT = function () {
                         // user prompt section
                         _prompt.start();
 
+
                         schema = {
                             properties: {
                                 name: new Schema({
@@ -258,11 +260,6 @@ var CAT = function () {
                                     message: 'Name must be only letters, numbers or dashes',
                                     required: true,
                                     description: "Enter the project name"
-                                }),
-                                appath: new Schema({
-                                    type: "string",
-                                    required: true,
-                                    description: "Enter your project's (application) path"
                                 }),
                                 host: new Schema({
                                     type: "string",
@@ -303,7 +300,22 @@ var CAT = function () {
                             }
                         };
 
+                        if (initProject === "example") {
+                            // apppath will be set automatically
+                            appPath = "./../app"
+
+                        } else {
+                            schema.properties.appPath = new Schema({
+                                type: "string",
+                                required: true,
+                                description: "Enter your project's (application) path"
+                            })
+                        }
+
                         _prompt.get(schema, function (err, args) {
+                            if (!args.appath) {
+                                args.appath = appPath;
+                            }
                             args.projectname = initProject;
                             linit.create(args);
                         });

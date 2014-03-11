@@ -32,14 +32,16 @@ module.exports = function () {
             function _generate(name, path, data) {
 
                 var content,
-                    targetpath;
+                    targetpath,
+                    catprojeccontent,
+                    appfolder;
 
                 if (name && path) {
 
                     data = (data || {});
 
-                    path = _path.resolve(_path.join(path, "catproject.json"));
-                    content = _fs.readFileSync(path, "utf8");
+                    catprojeccontent = _path.resolve(_path.join(path, "catproject.json"));
+                    content = _fs.readFileSync(catprojeccontent, "utf8");
 
                     content = _jsutils.Template.template({
                         content: content,
@@ -50,7 +52,6 @@ module.exports = function () {
                     if (!_fs.existsSync(targetpath)) {
                         _fs.mkdirpSync(targetpath);
                     }
-
                     // creating cat project file
                     _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content);
 
@@ -60,9 +61,22 @@ module.exports = function () {
                             _utils.log("[CAT init project] resources copy failed with errors: ", err);
 
                         } else {
-                            console.log("[CAT init project] project creation completed");
+
+                            appfolder = _fs.existsSync(_path.join(path, "app"));
+                            if (appfolder) {
+                                // copy additional resources to the initial target project folder
+                                _fs.copyRecursive(_path.resolve(_path.join(path, "app")), _path.resolve(_path.join(workpath, "app")), function (err) {
+                                    if (err) {
+                                        _utils.log("[CAT init project] resources copy failed with errors: ", err);
+
+                                    }
+                                });
+                            }
                         }
                     });
+
+
+
                 }
             }
 
@@ -92,6 +106,7 @@ module.exports = function () {
                 "appath": config.appath
 
             };
+
             _generate(name, projectPath, args);
 
 
