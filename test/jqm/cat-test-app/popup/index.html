@@ -7,9 +7,9 @@
 	<link rel="shortcut icon" href="../favicon.ico">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
 	<link rel="stylesheet" href="../css/themes/default/jquery.mobile-1.4.0.min.css">
-	<link rel="stylesheet" href="../_assets/css/jqm-demos.css">
+	<link rel="stylesheet" href="../jqmlib/css/jqm-demos.css">
 	<script src="../js/jquery.js"></script>
-	<script src="../_assets/js/index.js"></script>
+	<script src="../jqmlib/js/index.js"></script>
 	<script src="../js/jquery.mobile-1.4.0.min.js"></script>
 	<script id="popup-arrow-script">
 	$.mobile.document.on( "click", "#open-popupArrow", function( evt ) {
@@ -38,7 +38,7 @@
 <div data-role="page" class="jqm-demos" data-quicklinks="true">
 
 	<div data-role="header" class="jqm-header">
-		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../_assets/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
+		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../jqmlib/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
 		<a href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
 		<a href="#" class="jqm-search-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-search ui-nodisc-icon ui-alt-icon ui-btn-right">Search</a>
@@ -76,18 +76,18 @@
 		<p>A lightbox for displaying images can be created easily by placing an image in a popup. In this example, a close button is added to the markup by adding a link. The <code>data-overlay-theme="b"</code> attribute adds a dark backdrop behind the photos. For advanced photo techniques, see <a href="popup-images.html" data-ajax="false">scaling images in popups</a>.</p>
 
 		<div data-demo-html="true">
-			<a href="#popupParis" data-rel="popup" data-position-to="window" data-transition="fade"><img class="popphoto" src="../_assets/img/paris.jpg" alt="Paris, France" style="width:30%"></a>
-			<a href="#popupSydney" data-rel="popup" data-position-to="window" data-transition="fade"><img class="popphoto" src="../_assets/img/sydney.jpg" alt="Sydney, Australia" style="width:30%"></a>
-			<a href="#popupNYC" data-rel="popup" data-position-to="window" data-transition="fade"><img class="popphoto" src="../_assets/img/newyork.jpg" alt="New York, USA" style="width:30%"></a>
+			<a href="#popupParis" data-rel="popup" data-position-to="window" data-transition="fade"><img class="popphoto" src="../jqmlib/img/paris.jpg" alt="Paris, France" style="width:30%"></a>
+			<a href="#popupSydney" data-rel="popup" data-position-to="window" data-transition="fade"><img class="popphoto" src="../jqmlib/img/sydney.jpg" alt="Sydney, Australia" style="width:30%"></a>
+			<a href="#popupNYC" data-rel="popup" data-position-to="window" data-transition="fade"><img class="popphoto" src="../jqmlib/img/newyork.jpg" alt="New York, USA" style="width:30%"></a>
 
 			<div data-role="popup" id="popupParis" data-overlay-theme="b" data-theme="b" data-corners="false">
-				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a><img class="popphoto" src="../_assets/img/paris.jpg" style="max-height:512px;" alt="Paris, France">
+				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a><img class="popphoto" src="../jqmlib/img/paris.jpg" style="max-height:512px;" alt="Paris, France">
 			</div>
 			<div data-role="popup" id="popupSydney" data-overlay-theme="b" data-theme="b" data-corners="false">
-				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a><img class="popphoto" src="../_assets/img/sydney.jpg" style="max-height:512px;" alt="Sydney, Australia">
+				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a><img class="popphoto" src="../jqmlib/img/sydney.jpg" style="max-height:512px;" alt="Sydney, Australia">
 			</div>
 			<div data-role="popup" id="popupNYC" data-overlay-theme="b" data-theme="b" data-corners="false">
-				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a><img class="popphoto" src="../_assets/img/newyork.jpg" style="max-height:512px;" alt="New York, USA">
+				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a><img class="popphoto" src="../jqmlib/img/newyork.jpg" style="max-height:512px;" alt="New York, USA">
 			</div>
 		</div><!--/demo-html -->
 
@@ -282,7 +282,7 @@
 			<a href="#transparent" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Theme "none", no shadow</a>
 			<div id="transparent" data-role="popup" data-theme="none" data-shadow="false">
 				<a href="#" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
-			  <img src="../_assets/img/firefox-logo.png" class="popphoto" alt="firefox logo on a transparent popup" height="300" width="300">
+			  <img src="../jqmlib/img/firefox-logo.png" class="popphoto" alt="firefox logo on a transparent popup" height="300" width="300">
 			</div>
 
 			<a href="#overlay" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Overlay theme A</a>

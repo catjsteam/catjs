@@ -10,6 +10,7 @@
 
 div#cat-status {
     opacity: .8;
+    z-index:    100;
 }
 
 div#cat-status div#loading {
@@ -105,6 +106,8 @@ div#cat-status div#catlogo {
     -ms-transition: opacity 1000ms ;
     -o-transition: opacity 1000ms ;
     transition: opacity 1000ms ;
+
+    cursor: pointer;
 }
 
 div#cat-status.cat-dynamic {
@@ -194,7 +197,7 @@ div#cat-status {
 }
 
 div#catHeader {
-    text-align: center;
+    text-align: left !important;
     margin-left: 60px;
     text-align: center;
     margin-left: 60px;
@@ -204,10 +207,24 @@ div#catHeader {
 
 
 }
+span#catHeadermask {
+    font-size:10px;
+    color:#444444;
+    white-space: nowrap;
+    position: absolute;
+    left: 12px;
+    top: 45px;
+
+    -webkit-transition: opacity 1000ms ;
+    -moz-transition: opacity 1000ms ;
+    -ms-transition: opacity 1000ms ;
+    -o-transition: opacity 1000ms ;
+    transition: opacity 1000ms ;
+}
 
 div#cat-status-content {
     padding: 0px !important;
-    margin-top: 15px;
+    margin-top: 0px;
     max-height: 250px;
     overflow: auto;
 }
@@ -223,7 +240,7 @@ ul#testList li{
 }
 
 div.text-tips {
-    margin-top: 15px;
+    margin-top: 35px;
     padding-left: 10px;
 }
 
@@ -237,4 +254,26 @@ li.listImageCross {
 
 li.listImageInfo {
     list-style-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACRUlEQVQ4T2NkQANdXV0JjIyM8UDsgCz1////A0C8sKysbAGyOCOM097ersDCwrKen5/fwMrKikFWVpaBj48PLP3p0yeGx48fMxw7dozh48ePF/78+RNYWVn5ACQHNgCkmZWV9by2traAh4cHw8P3vxkO3fsKpH+BDZAXZGOwU+IG0qwMO3bsYLh69eqH379/G4IMARvQ3d19XkdHxwCkeeGZ9ww7bnwGayx2EGV4+O4Xw5pLH8F8Dw1ehngTQbAhV65cuVBaWmrICPKzgIDA/NTUVIYFp94xbL3+Ce7FbGsRhldf/jCsvvgBLuatyceQYCbEMHv2bIYPHz4kMgJt3+/p6enAJanKULzhCXqYMojxsIANQQa9ATIM357fZti+ffsBxp6env8g21dd/cWw+QrCJj8dAQYnNV6Gr7/+MVRveYpigC9QLkybDewKsAHFxcUMFZueMFx+9g2uUFeSk6HQSYLh1ec/QLnHKAboSnExdPjJMPT29iIMKF3/iOHSU4QB4MANlANrBMkhAz1pLrAc3ACQF5Zc+Maw9vw7FIV9wfJgftHahyjiwYZCDDEGXBAvwAKRXUyZIXnxHRSFE0MVwfz81fdRxOfGqjD8fHUXEojI0Thx3zOGVWfegBXbqfIxVHvJgtmt2x4zHLoNid4wExGGfCcpRDSC/YqUkPr3PGVYceoVg5E8D4qt5x5+YYgwE2ModJFGTUggVehJ+dbL7wybL75luPkCEqjqElwMvvrCDGrinNiTMswQsjMTsltJzc4Ak1AmaHPwABkAAAAASUVORK5CYII=);
+}
+
+.markedElement {
+    border : 3px solid red !important;
+}
+
+div.fadeMe {
+    opacity:    0.3;
+    background: #000;
+    width:      100%;
+    height:     100%;
+    z-index:    10;
+    top:        0;
+    left:       0;
+    position:   fixed;
+}
+
+
+/* prevent scrolling */
+body {
+    height: 100%;
+    overflow: hidden;
 }

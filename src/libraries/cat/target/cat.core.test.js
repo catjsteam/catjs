@@ -878,9 +878,21 @@ function TestDB (){
     };
 }
 _cat.core.ui = function () {
+
+    function _addEventListener(elem, event, fn) {
+        if (!elem) {
+            return undefined;
+        }
+        if (elem.addEventListener) {
+            elem.addEventListener(event, fn, false);
+        } else {
+            elem.attachEvent("on" + event, function () {
+                return(fn.call(elem, window.event));
+            });
+        }
+    }
+
     function _create() {
-
-
         var catElement;
         if (typeof document !== "undefined") {
             catElement = document.createElement("DIV");
@@ -892,15 +904,18 @@ _cat.core.ui = function () {
             catElement.style.bottom = "10px";
             catElement.style.zIndex = "10000000";
             catElement.style.display = "none";
-            catElement.innerHTML = '<div id="cat-status" class="cat-dynamic cat-status-open">' +
-                '<div id=loading></div>' +
-                '<div id="catlogo"></div>' +
-                '<div id="catHeader">CAT Tests</div>' +
-                '<div class="text-tips"></div>' +
-                '<div id="cat-status-content">' +
-                '<ul id="testList"></ul>' +
-                '</div>' +
-                '</div>';
+            catElement.innerHTML =
+
+                '<div id="cat-status" class="cat-dynamic cat-status-open">' +
+                    '<div id=loading></div>' +
+                    '<div id="catlogo" ></div>' +
+                    '<div id="catHeader">CAT Tests<span id="catheadermask">click to mask on/off</span></div>' +
+                    '<div class="text-tips"></div>' +
+                    '<div id="cat-status-content">' +
+                    '<ul id="testList"></ul>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div id="catmask" class="fadeMe"></div>';
 
             if (document.body) {
                 document.body.appendChild(catElement);
@@ -952,7 +967,8 @@ _cat.core.ui = function () {
     }
 
     var testNumber = 0,
-        logoopacity = 0.5;
+        logoopacity = 0.5,
+        masktipopacity = 1;
 
     var _me =  {
 
@@ -976,15 +992,35 @@ _cat.core.ui = function () {
                     }
                 }
 
+                // set logo listener
+                var logoelt = document.getElementById("catlogo"),
+                    catmask = document.getElementById("catmask"),
+                    listener = function() {
+                        var catmask = document.getElementById("catmask");
+                        if (catmask) {
+                            catmask.classList.toggle("fadeMe");
+                        }
+                    };
+
+                if (logoelt && catmask && catmask.classList) {
+                    _addEventListener(logoelt, "click", listener);
+                }
+
                 setInterval(function() {
-                    var logoelt = document.getElementById("catlogo");
+                    var logoelt = document.getElementById("catlogo"),
+                        catheadermask = document.getElementById("catheadermask");
 
                     if (logoopacity === 1) {
                         logoopacity = 0.5;
+                        setTimeout(function() {
+                            masktipopacity = 0;
+                        }, 2000);
+
                     } else {
                         logoopacity = 1;
                     }
                     if (logoelt) {
+                        catheadermask.style.opacity = masktipopacity+"";
                         logoelt.style.opacity = logoopacity+"";
                     }
                 }, 2000);
@@ -1082,6 +1118,12 @@ _cat.core.ui = function () {
             }
 
             return false;
+        },
+
+
+        markedElement : function(elementId ) {
+            var element = document.getElementById(elementId);
+            element.className = element.className + " markedElement";
         },
 
         /**
@@ -1522,6 +1564,16 @@ var animation = false;
 
 _cat.plugins.jqm = function () {
 
+    var oldElement = "";
+    var setBoarder = function(element) {
+        if (oldElement) {
+
+            oldElement.classList.remove("markedElement");
+        }
+        element.className = element.className + " markedElement";
+        oldElement = element;
+    };
+
     return {
 
         actions: {
@@ -1530,9 +1582,11 @@ _cat.plugins.jqm = function () {
             scrollTo: function (idName) {
 
                 $(document).ready(function(){
-                    var stop = $('#' + idName).offset().top,
-                         delay = 1000;
+                    var stop = $('#' + idName).offset().top;
+                    var delay = 1000;
                     $('body,html').animate({scrollTop: stop}, delay);
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1542,6 +1596,9 @@ _cat.plugins.jqm = function () {
             scrollTop: function () {
 
                 $(document).ready(function(){
+
+
+
                     $('html, body').animate({scrollTop : 0},1000);
                 });
 
@@ -1553,6 +1610,7 @@ _cat.plugins.jqm = function () {
                     var stop = $('#' + idName).offset().top;
                     var delay = 1000;
                     $('#' + rapperId).animate({scrollTop: stop}, delay);
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1561,6 +1619,8 @@ _cat.plugins.jqm = function () {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
                     window.location = $('#' + idName).attr('href');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1571,6 +1631,8 @@ _cat.plugins.jqm = function () {
                     $('.ui-btn').removeClass('ui-focus');
                     $('#' + idName).trigger('click');
                     $('#' + idName).closest('.ui-btn').addClass('ui-focus');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1578,6 +1640,8 @@ _cat.plugins.jqm = function () {
             selectTab: function (idName) {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1592,6 +1656,8 @@ _cat.plugins.jqm = function () {
                         $("#" + selectId + " option[id=" + value + "]").attr('selected','selected');
                     }
                     $( "#" + selectId).selectmenu("refresh", true);
+
+                    setBoarder( $('#' + selectId).eq(0)[0]);
                 });
 
             },
@@ -1601,6 +1667,8 @@ _cat.plugins.jqm = function () {
             swipeItemLeft : function(idName) {
                 $(document).ready(function(){
                     $("#" + idName).swipeleft();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1608,6 +1676,8 @@ _cat.plugins.jqm = function () {
             swipeItemRight : function(idName) {
                 $(document).ready(function(){
                     $("#" + idName).swiperight();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1634,6 +1704,8 @@ _cat.plugins.jqm = function () {
             click: function (idName) {
                 $(document).ready(function(){
                     $('#' + idName).trigger('click');
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1641,6 +1713,8 @@ _cat.plugins.jqm = function () {
             setCheck: function (idName) {
                 $(document).ready(function(){
                     $("#"+ idName).prop("checked",true).checkboxradio("refresh");
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             },
@@ -1648,6 +1722,8 @@ _cat.plugins.jqm = function () {
             slide : function (idName, value) {
                 $(document).ready(function(){
                     $("#"+ idName).val(value).slider("refresh");
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1657,6 +1733,8 @@ _cat.plugins.jqm = function () {
                     $("#"+ idName).val(value);
                     $("#"+ idName).trigger( 'change' );
                     $("#"+ idName).blur();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
             },
 
@@ -1665,6 +1743,10 @@ _cat.plugins.jqm = function () {
                 $(document).ready(function(){
                     $( "." + className ).prop( "checked", false ).checkboxradio( "refresh" );
                     $( "#" + idName ).prop( "checked", true ).checkboxradio( "refresh" );
+
+
+                    setBoarder($("label[for='" + idName + "']").eq(0)[0]);
+
                 });
 
             },
@@ -1672,6 +1754,8 @@ _cat.plugins.jqm = function () {
             collapsible : function(idName) {
                 $(document).ready(function(){
                     $('#' + idName).children( ".ui-collapsible-heading" ).children(".ui-collapsible-heading-toggle").click();
+
+                    setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
             }
