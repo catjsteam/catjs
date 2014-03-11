@@ -1,7 +1,7 @@
 {
-    "name": "CATJS",
+    "name": "catjs",
     "description": "(Mobile) Web Automation Framework",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "homepage": "http://catjsteam.github.io",
     "author": {
         "name": "arik",
@@ -11,21 +11,14 @@
         {
             "name": "Pablo Retyk",
             "email": "pabloretyk@gmail.com"
-        },
-        {
-            "name": "Ran Snir"
-        },
-        {
-            "name": "Lior Reuven"
         }
     ],
-
     "repository": {
         "type": "git",
-        "url": "https://github.com/HPSoftware/CATCore"
+        "url": "git://github.com/lastboy/catjs.git"
     },
     "bugs": {
-        "url": "https://github.com/HPSoftware/CATCore/issues"
+        "url": "https://github.com/lastboy/catjs/issues"
     },
     "licenses": [
         {
@@ -36,11 +29,15 @@
     "engines": {
         "node": ">= 0.8.0"
     },
+    "main": "src/module/CAT",
+    "bin": {
+        "catcli": "catcli"
+    },
     "scripts": {
         "preinstall": "node precatinstall.js"
     },
     "dependencies": {
-		"mobilerunner" : "~0.0.2",
+        "mobilerunner": "~0.0.2",
         "fs.extra": "~1.2.1",
         "typedas": "~1.0.0",
         "log": "~1.4.0",
@@ -89,5 +86,10 @@
         "sencha",
         "chai",
         "enyo"
-    ]
+    ],
+    "contributors": [
+        "Arik Lewin (https://github.com/lastboy)"
+    ],
+    "_from": "catjs@~0.1.0",
+    "license": "Apache-2.0"
 }
