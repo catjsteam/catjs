@@ -302,14 +302,14 @@ var CAT = function () {
 
                         if (initProject === "example") {
                             // apppath will be set automatically
-                            appPath = "./../app"
+                            appPath = "./../app";
 
                         } else {
                             schema.properties.appPath = new Schema({
                                 type: "string",
                                 required: true,
                                 description: "Enter your project's (application) path"
-                            })
+                            });
                         }
 
                         _prompt.get(schema, function (err, args) {
