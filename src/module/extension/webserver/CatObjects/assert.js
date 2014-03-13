@@ -1,4 +1,6 @@
 var _jmr = require("test-model-reporter"),
+    _global = catrequire("cat.global"),
+    _log = _global.log(),
     _reportCreator,
     _testsuite = _jmr.create({
         type: "model.testsuite",
@@ -35,61 +37,65 @@ function readConfig() {
 _testConfigMap = readConfig();
 
 function ReportCreator(filename) {
-    var _fileName = filename;
+    this._fileName = filename;
+}
 
-    this.addTestCase = function (testName, status, phantomStatus, message) {
-        var testCase,
-            failure,
-            result;
+ReportCreator.prototype.addTestCase = function (testName, status, phantomStatus, message) {
+    var testCase,
+        failure,
+        result;
 
-        testCase = _jmr.create({
-            type: "model.testcase",
+    testCase = _jmr.create({
+        type: "model.testcase",
+        data: {
+            time: (new Date()).toUTCString()
+        }
+    });
+    testCase.set("name", phantomStatus + testName);
+
+    if (status === 'failure') {
+        result = _jmr.create({
+            type: "model.failure",
             data: {
-                time: (new Date()).toUTCString()
+                message: message,
+                type: status
             }
         });
-        testCase.set("name", phantomStatus + testName);
+        testCase.add(result);
+    }
 
-        if (status === 'failure') {
-            result = _jmr.create({
-                type: "model.failure",
-                data: {
-                    message: message,
-                    type: status
-                }
-            });
-            testCase.add(result);
-        }
+    if (_testConfigMap[testName]) {
+        _testConfigMap[testName].wasRun = true;
+    }
+    else {
+        _log.info("Test " + testName + " not in test manager");
+    }
 
-        if (_testConfigMap[testName]) {
-            _testConfigMap[testName].wasRun = true;
-        }
-        else {
-            console.log("Test " + testName + " not in test manager");
-        }
+    _testsuite.add(testCase);
 
-        _testsuite.add(testCase);
+    var output = _testsuite.compile();
 
-        var output = _testsuite.compile();
-        console.log(output);
+    var symbol = status === 'failure' ? '✖' : '✓',
+        statusDesc = status === 'failure' ? 'failed' : 'passed';
 
-        if (_fs.existsSync(_fileName)) {
-            _fs.unlinkSync(_fileName);
-        }
-        _jmr.write(_fileName, output);
-    };
-}
+    console.log(symbol + "Test " + testName + " " + message + " " + statusDesc);
+
+    if (_fs.existsSync(this._fileName)) {
+        _fs.unlinkSync(this._fileName);
+    }
+    _jmr.write(this._fileName, output);
+};
 
 _checkIfAlive = setInterval(function () {
     if (!_isAlive) {
         clearInterval(_checkIfAlive);
-        console.log("Tests stopped reporting, probably a network problem, failing the rest of the tests");
+        _log.info("Tests stopped reporting, probably a network problem, failing the rest of the tests");
         if (!_reportCreator) {
             _reportCreator = new ReportCreator("notestname.xml");
         }
 
         for (var key in _testConfigMap) {
-            console.log(_testConfigMap[key]);
+            _log.info(_testConfigMap[key]);
             if (!_testConfigMap[key].wasRun) {
                 _reportCreator.addTestCase(_testConfigMap[key].name, 'failure', 'unknown', 'failed due to network issue');
             }
@@ -98,7 +104,7 @@ _checkIfAlive = setInterval(function () {
 }, 30000); //TODO: make this configurable
 
 if (_jmr === undefined) {
-    console.log("Test Unit Reporter is not supported, consider adding it to the .catproject dependencies");
+    _log.info("Test Unit Reporter is not supported, consider adding it to the .catproject dependencies");
 }
 
 
@@ -111,23 +117,23 @@ exports.result = function (req, res) {
         hasPhantom = req.query.hasPhantom,
         file;
 
-  /*  if (status === 'end') {
-        clearInterval(_checkIfAlive);
-    } else {*/
-        _isAlive = true;
-        console.log("requesting " + testName + message + status);
-        res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
-        res.send({"testName": testName, "message": message, "status": status});
+    /*  if (status === 'end') {
+     clearInterval(_checkIfAlive);
+     } else {*/
+    _isAlive = true;
+    _log.info("requesting " + testName + message + status);
+    res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+    res.send({"testName": testName, "message": message, "status": status});
 
 
-        var phantomStatus = (hasPhantom === "true" ? "phantom" : "");
-        file = "./cattestresult" + reportType + "-" + phantomStatus + ".xml";
+    var phantomStatus = (hasPhantom === "true" ? "phantom" : "");
+    file = "./cattestresult" + reportType + "-" + phantomStatus + ".xml";
 
-        if (!_reportCreator) {
-            _reportCreator = new ReportCreator(file);
-        }
+    if (!_reportCreator) {
+        _reportCreator = new ReportCreator(file);
+    }
 
-        _reportCreator.addTestCase(testName, status, phantomStatus, message);
-   // }
+    _reportCreator.addTestCase(testName, status, phantomStatus, message);
+    // }
 };
 
