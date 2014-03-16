@@ -68,7 +68,8 @@
     "my-ip": "~1.1.0",
     "json-lint": "~0.1.0",
     "prompt": "~0.2.12",
-    "jetty": "^0.2.1"
+    "jetty": "^0.2.1",
+    "winston": "^0.7.2"
   },
   "keywords": [
     "test",

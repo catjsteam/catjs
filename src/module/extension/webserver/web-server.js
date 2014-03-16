@@ -8,6 +8,7 @@ var _http = require("http"),
     _props = catrequire("cat.props"),
     _server,
     _utils  = catrequire("cat.utils"),
+     _winston = require('winston'),
     vars = {
         assert: require('./CatObjects/assert')
     };
@@ -20,7 +21,9 @@ var _http = require("http"),
  *
  * @type {module.exports}
  */
-module.exports = function() {
+
+
+var webserver  = function() {
 
     return {
 
@@ -53,9 +56,22 @@ module.exports = function() {
 
             _server = _express();
 
+            var logger = new (_winston.Logger)({
+                transports: [
+                   //new (_winston.transports.Console)({ level: 'verbose', json: false}),
+                    new (_winston.transports.File)({ filename: 'express_server.log',  level: 'verbose', json: false })
+                ]
+            });
+
+            var winstonStream = {
+                write: function(message, encoding){
+                    logger.info(message);
+                }
+            };
+
             _server.configure(function () {
                 _server.set('port', process.env.PORT || port);
-                _server.use(_express.logger('dev'));  /* 'default', 'short', 'tiny', 'dev' */
+                _server.use(_express.logger({stream: winstonStream, format: 'dev'}));
                 _server.use(_express.bodyParser());
                 _server.use(allowCrossDomain);
                 _server.use(_express.bodyParser());
@@ -110,3 +126,5 @@ module.exports = function() {
     };
 
 }();
+
+module.exports = webserver;
