@@ -85,10 +85,10 @@ A brief annotations description:
 
 * *Scrap* block <code>@[scrap ]@</code>
 * *Code* property <code>@@code console.log('test')</code>
-* *log* property <code>@@code 'test'</code>
+* *log* property <code>@@log 'test'</code>
 * *assert* property <code>@@assert ok(true, 'a message)</code>
 * *jqm* property <code>@@jqm tap(id)</code>
-* *sencha* property <code>@@jqm fireTap(extElt)</code>
+* *sencha* property <code>@@sencha fireTap(extElt)</code>
 * *enyo* property <code>@@enyo next(enyoElt)</code>
 
 

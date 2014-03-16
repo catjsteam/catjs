@@ -105,6 +105,9 @@ var _global = catrequire("cat.global"),
                             }
                         };
                         customTasks.push(projectcopy);
+
+                    } else  {
+                        _utils.log("error", "[CAT config] 'apppath property is missing or not valid. See catproject.json spec")
                     }
 
                     customTasks = customTasks.concat([

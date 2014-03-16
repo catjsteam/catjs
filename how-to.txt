@@ -43,3 +43,14 @@ create catcli.cmd file under folder: C:\Users\[windows user]\AppData\Roaming\npm
 )
 
 
+== As a Module
+ var log = require("./src/module/CATGlob.js").log(),
+            isasync;
+
+        // Tell grunt this task is asynchronous.
+        isasync = this.async();
+
+        log.info("[Grunt] default task; initialized");
+        var x = require("./src/module/CAT.js");
+        x.init({target: 'scan', grunt: grunt});
+
