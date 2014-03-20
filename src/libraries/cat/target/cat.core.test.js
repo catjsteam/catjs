@@ -8,6 +8,10 @@ var hasPhantomjs = false;
 
 _cat.core = function () {
 
+    var scrapsNameList = [];
+    var scrapsPerformList = [];
+    var scrapsPkgNames = [];
+
     var _vars = {},
         _managers = {},
         _context = function () {
@@ -353,29 +357,80 @@ _cat.core = function () {
 
                 tests = catConfig ? catConfig.getTests() : [];
 
-            //TODO: make this more readable
-            if (typeof catConfig === 'undefined' || catConfig.getRunMode() === 'all' ||
-                (catConfig.getRunMode() === 'test-manager' && tests[scrap.name[0]])) {
-                runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
-                if (runat) {
-                    manager = _cat.core.getManager(runat);
-                    if (manager) {
+
+
+            if ((catConfig) && (catConfig.getRunMode() === 'test-manager')) {
+                // check if the test name is in the cat.json
+                if (tests[scrap.name[0]]) {
+                    var lastTest = tests[Object.keys(tests)[Object.keys(tests).length - 1]];
+
+                    scrapsPerformList.push("@@" + scrap.name[0] + " repeat(1)");
+                    scrapsNameList.push(scrap.name[0]);
+                    scrapsPkgNames.push(scrap.pkgName + "$$cat");
+
+                    if (scrap.name[0] === lastTest.name) {
+                        scrap.catui = ["on"];
+                        scrap.manager = ["true"];
+                        scrap.perform = scrapsNameList;
+
+
                         pkgname = scrap.pkgName;
                         if (!pkgname) {
                             _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
                         } else {
+
+                            for (var i = 0; i < scrapsPerformList.length; i++) {
+                                _cat.core.setManager(scrap.name[0], scrapsPkgNames[i]);
+                                _cat.core.setManagerBehavior(scrap.name[0], scrapsNameList[i], 'repeat(1)');
+
+                            }
+
+                            /*  CAT UI call  */
+                            _cat.core.ui.on();
+
+                            /*  Manager call  */
+                            (function() {
+                                _cat.core.managerCall(scrap.name[0], function() {
+                                    _cat.utils.Signal.send('TESTEND');
+                                });
+                            })();
+
                             _cat.core.defineImpl(pkgname, function () {
                                 _cat.core.actionimpl.apply(this, args);
                             });
                         }
-
+                    } else {
+                        pkgname = scrap.pkgName;
+                        _cat.core.defineImpl(pkgname, function () {
+                            _cat.core.actionimpl.apply(this, args);
+                        });
                     }
-                } else {
-                    _cat.core.actionimpl.apply(this, arguments);
                 }
             } else {
-                _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
+
+                if (typeof catConfig === 'undefined' || catConfig.getRunMode() === 'all') {
+                    runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
+                    if (runat) {
+                        manager = _cat.core.getManager(runat);
+                        if (manager) {
+                            pkgname = scrap.pkgName;
+                            if (!pkgname) {
+                                _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
+                            } else {
+                                _cat.core.defineImpl(pkgname, function () {
+                                    _cat.core.actionimpl.apply(this, args);
+                                });
+                            }
+
+                        }
+                    } else {
+                        _cat.core.actionimpl.apply(this, arguments);
+                    }
+                } else {
+                    _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
+                }
             }
+
 
         },
 

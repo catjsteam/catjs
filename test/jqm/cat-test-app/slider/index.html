@@ -39,7 +39,7 @@
 		<h2><a href="../" title="jQuery Mobile Demos home"><img src="../jqmlib/img/jquery-logo.png" alt="jQuery Mobile"></a></h2>
 		<p><span class="jqm-version"></span> Demos</p>
         <!--
-                      @[scrap
+                      [scrap
                          @@name appMenuSliderClick
                          @@run@ sliderManager
                          @@embed true
@@ -61,7 +61,6 @@
         <!--
                    @[scrap
                       @@name basicSliderScroll
-                      @@run@ sliderManager
                       @@embed true
                       @@jqm scrollTo("basicSlider");
                    ]@
@@ -80,10 +79,8 @@
                     <!--
                    @[scrap
                       @@name slider25
-                      @@run@ sliderManager
                       @@embed true
                       @@jqm slide("slider-1" , 25);
-                      @@assert ok($('#slider-1').val()=='25','hello')
 
                    ]@
               -->
@@ -103,7 +100,6 @@
         <!--
                    @[scrap
                       @@name HighlightScroll
-                      @@run@ sliderManager
                       @@embed true
                       @@jqm scrollTo("highlightSlider");
                    ]@
@@ -115,10 +111,8 @@
                     <!--
                    @[scrap
                       @@name sliderHighlight77
-                      @@run@ sliderManager
                       @@embed true
                       @@jqm slide("slider-2" , 77);
-                      @@assert ok($('#slider-2').val()=='77','hello')
                    ]@
               -->
 				<form>
@@ -127,8 +121,17 @@
 				</form>
                 </div><!-- /demo-html -->
 
+
         <!--
-           @[scrap
+                @[scrap
+                  @@name sliderManager
+                  @@embed true
+                  @@signal TESTEND
+                ]@
+                -->
+
+        <!--
+           [scrap
               @@name scrollTopSlider
               @@run@ sliderManager
               @@embed true
@@ -252,7 +255,7 @@
 
 
     <!--
-                  @[scrap
+                  [scrap
                      @@name formsMenuScroll
                      @@run@ sliderManager
                      @@embed true
@@ -261,7 +264,7 @@
              -->
 
     <!--
-                     @[scrap
+                     [scrap
                         @@name formsMenuClick
                         @@run@ sliderManager
                         @@embed true
@@ -270,7 +273,7 @@
                    -->
 
     <!--
-                   @[scrap
+                   [scrap
                       @@name formsMenu2
                       @@run@ sliderManager
                       @@embed true
@@ -279,7 +282,7 @@
               -->
 
     <!--
-                  @[scrap
+                  [scrap
                      @@name formRef
                      @@run@ sliderManager
                      @@embed true
@@ -300,30 +303,7 @@
 </li>
 
 
-<!--
-                @[scrap
-                  @@name sliderManager
-                  @@perform[
-                  @@basicSliderScroll repeat(1)
-                      @@slider25 repeat(1)
-                      @@HighlightScroll repeat(1)
-                      @@sliderHighlight77 repeat(1)
-                      @@scrollTopSlider repeat(1)
-                    @@appMenuSliderClick repeat(1)
-                   @@formsMenuScroll repeat(1)
-                   @@formsMenuClick repeat(1)
-                   @@formsMenu2 repeat(1)
-                   @@formRef repeat(1)
 
-
-                  ]
-
-                  @@embed true
-                  @@catui on
-                  @@manager true
-                  @@signal TESTEND
-                ]@
-                -->
 
 
 <li data-role="collapsible" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-inset="false">
