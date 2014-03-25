@@ -12,6 +12,43 @@ _cat.core = function () {
     var scrapsPerformList = [];
     var scrapsPkgNames = [];
 
+    var managerScraps = [];
+    var testNumber = 0;
+    var addScrapToManager = function(testsInfo, scrap) {
+
+        for (var i = 0; i < testsInfo.length; i++) {
+            testNumber--;
+            var test = testsInfo[i];
+
+
+            var testRepeats = parseInt((test.repeat ? test.repeat : 1));
+            test.repeat = "repeat(" + testRepeats + ")";
+
+            var preformVal = "@@" + scrap.name[0] + " " + testRepeats;
+            var pkgNameVal = scrap.pkgName + "$$cat";
+            managerScraps[test.index] = {"preform" : preformVal,
+                "pkgName" : pkgNameVal,
+                "repeat" : testRepeats,
+                "name" : scrap.name[0],
+                "scrap" : scrap};
+        }
+
+    };
+
+    var getScrapTestInfo = function(tests, scrapName) {
+        var scrapTests = [];
+        for (var i = 0; i < tests.length; i++) {
+            if (tests[i].name === scrapName) {
+                var tempInfo = tests[i];
+                tempInfo.index = i;
+                scrapTests.push(tempInfo);
+            }
+        }
+        return scrapTests;
+    };
+
+
+
     var _vars = {},
         _managers = {},
         _context = function () {
@@ -109,18 +146,18 @@ _cat.core = function () {
                 }
             };
 
-            this.getTests = function () {
-                var innerConfigMap = {};
 
+            this.getTests = function () {
+                var innerConfigMap = [];
                 if (innerConfig.tests) {
                     for (var i = 0; i < innerConfig.tests.length; i++) {
                         innerConfig.tests[i].wasRun = false;
-                        innerConfigMap[innerConfig.tests[i].name] = innerConfig.tests[i];
+                        innerConfigMap.push(innerConfig.tests[i]);
                     }
                 }
-
                 return innerConfigMap;
             };
+
 
             this.getRunMode = function () {
                 return innerConfig["run-mode"];
@@ -361,50 +398,59 @@ _cat.core = function () {
 
             if ((catConfig) && (catConfig.getRunMode() === 'test-manager')) {
                 // check if the test name is in the cat.json
-                if (tests[scrap.name[0]]) {
-                    var lastTest = tests[Object.keys(tests)[Object.keys(tests).length - 1]];
-
-                    scrapsPerformList.push("@@" + scrap.name[0] + " repeat(1)");
-                    scrapsNameList.push(scrap.name[0]);
-                    scrapsPkgNames.push(scrap.pkgName + "$$cat");
-
-                    if (scrap.name[0] === lastTest.name) {
-                        scrap.catui = ["on"];
-                        scrap.manager = ["true"];
-                        scrap.perform = scrapsNameList;
+                var scrapsTestsInfo = getScrapTestInfo(tests, scrap.name[0]);
 
 
-                        pkgname = scrap.pkgName;
+                pkgname = scrap.pkgName;
+                _cat.core.defineImpl(pkgname, function () {
+                    _cat.core.actionimpl.apply(this, args);
+                });
+
+                if (scrapsTestsInfo.length !== 0) {
+
+                    // init managerScraps
+                    if (managerScraps.length === 0) {
+                        testNumber = tests.length;
+                        managerScraps = new Array(tests.length);
+                    }
+
+                    addScrapToManager(scrapsTestsInfo, scrap);
+
+                    if (testNumber === 0) {
+                        var managerScrap = managerScraps[managerScraps.length - 1];
+
+                        managerScrap.scrap.catui = ["on"];
+                        managerScrap.scrap.manager = ["true"];
+
+
+
+                        pkgname = managerScrap.scrap.pkgName;
                         if (!pkgname) {
                             _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
                         } else {
 
-                            for (var i = 0; i < scrapsPerformList.length; i++) {
-                                _cat.core.setManager(scrap.name[0], scrapsPkgNames[i]);
-                                _cat.core.setManagerBehavior(scrap.name[0], scrapsNameList[i], 'repeat(1)');
 
+                            for (var i = 0; i < managerScraps.length; i++) {
+                                var tempScrap = managerScraps[i];
+                                _cat.core.setManager(managerScrap.scrap.name[0], tempScrap.pkgName);
+                                _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.repeat);
                             }
+
 
                             /*  CAT UI call  */
                             _cat.core.ui.on();
 
                             /*  Manager call  */
                             (function() {
-                                _cat.core.managerCall(scrap.name[0], function() {
+                                _cat.core.managerCall(managerScrap.scrap.name[0], function() {
                                     _cat.utils.Signal.send('TESTEND');
                                 });
                             })();
 
-                            _cat.core.defineImpl(pkgname, function () {
-                                _cat.core.actionimpl.apply(this, args);
-                            });
+
                         }
-                    } else {
-                        pkgname = scrap.pkgName;
-                        _cat.core.defineImpl(pkgname, function () {
-                            _cat.core.actionimpl.apply(this, args);
-                        });
                     }
+
                 }
             } else {
 
