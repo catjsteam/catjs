@@ -39,7 +39,9 @@ _cat.core = function () {
         var scrapTests = [];
         for (var i = 0; i < tests.length; i++) {
             if (tests[i].name === scrapName) {
-                var tempInfo = tests[i];
+                var tempInfo = {"name" : tests[i].name,
+                    "wasRun" : tests[i].wasRun,
+                    "repeat" : tests[i].repeat};
                 tempInfo.index = i;
                 scrapTests.push(tempInfo);
             }
@@ -112,6 +114,31 @@ _cat.core = function () {
         var innerConfig,
             xmlhttp,
             configText;
+
+
+        var getTestsHelper = function (testList) {
+
+            var innerConfigMap = [];
+            if (testList.tests) {
+                for (var i = 0; i < testList.tests.length; i++) {
+                    if (testList.tests[i].tests) {
+                        var repeatFlow =  testList.tests[i].repeat ? testList.tests[i].repeat : 1;
+
+                        for (var j = 0; j < repeatFlow; j++ ) {
+                            var tempArr = getTestsHelper(testList.tests[i]);
+                            innerConfigMap = innerConfigMap.concat(tempArr);
+                        }
+
+                    } else {
+                        testList.tests[i].wasRun = false;
+                        innerConfigMap.push(testList.tests[i]);
+                    }
+                }
+            }
+            return innerConfigMap;
+        };
+
+
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
                 url: "/cat.json"
@@ -148,15 +175,10 @@ _cat.core = function () {
 
 
             this.getTests = function () {
-                var innerConfigMap = [];
-                if (innerConfig.tests) {
-                    for (var i = 0; i < innerConfig.tests.length; i++) {
-                        innerConfig.tests[i].wasRun = false;
-                        innerConfigMap.push(innerConfig.tests[i]);
-                    }
-                }
-                return innerConfigMap;
+                return getTestsHelper(innerConfig);
+
             };
+
 
 
             this.getRunMode = function () {
@@ -433,7 +455,10 @@ _cat.core = function () {
                             for (var i = 0; i < managerScraps.length; i++) {
                                 var tempScrap = managerScraps[i];
                                 _cat.core.setManager(managerScrap.scrap.name[0], tempScrap.pkgName);
-                                _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.repeat);
+                                // set number of repeats for scrap
+                                for (var j = 0; j < tempScrap.repeat; j++) {
+                                    _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.repeat);
+                                }
                             }
 
 
