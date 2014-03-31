@@ -50,6 +50,14 @@ var runner = function () {
                         },
                         {
                             "disable": false,
+                            "type": "localpc",
+                            "runner": {
+                                "name": "firefox",
+                                "address": "/index.html"
+                            }
+                        },
+                        {
+                            "disable": false,
                             "type": "android",
                             "id": "all",
                             "runner": {
