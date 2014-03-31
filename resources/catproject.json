@@ -64,6 +64,11 @@
             "set": [{"key": "assert", "var": "assert", "prop":"result"}]
         },
         {
+            "name": "p@project.runner.start",
+            "type": "runner",
+            "action": "start"
+        },
+        {
             "name": "p@project.webserver.stop",
             "type": "webserver",
             "action": "stop"
@@ -156,6 +161,10 @@
         {
             "name": "t@server.start",
             "plugins": ["p@project.webserver.start"]
+        },
+        {
+            "name": "t@runner.start",
+            "plugins": ["p@project.runner.start"]
         },
         {
             "name": "t@server.stop",

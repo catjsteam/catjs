@@ -37,7 +37,7 @@
     "preinstall": "node precatinstall.js"
   },
   "dependencies": {
-    "mobilerunner": "~0.0.2",
+    "mobilerunner": "latest",
     "fs.extra": "~1.2.1",
     "typedas": "~1.0.0",
     "log": "~1.4.0",

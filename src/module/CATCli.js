@@ -19,6 +19,7 @@ _parsed = _nopt({
     "t": ["--task", "t@test"],
     "c": ["--task", "t@clean"],
     "s": ["--task", "t@server.start"],
+    "r": ["--task", "t@runner.start"],
     "m": ["--task", "t@mtest"],
     "p": ["--project" , "."]
 });
