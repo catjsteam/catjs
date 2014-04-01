@@ -305,7 +305,7 @@ var CAT = function () {
                             appPath = "./../app";
 
                         } else {
-                            schema.properties.appPath = new Schema({
+                            schema.properties.appath = new Schema({
                                 type: "string",
                                 required: true,
                                 description: "Enter your project's (application) path"
