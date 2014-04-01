@@ -1,10 +1,7 @@
 node_modules
-npm-debug.log
 tmp
 .idea
-CAT.log
-cat.libraries.log
-cat.flow.log
 .cat
 .DS_Store
 *.log
+_cat_md.json
