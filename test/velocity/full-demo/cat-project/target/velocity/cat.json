@@ -1,0 +1,11 @@
+{
+    "type": "CAT-Velocity",
+    "ip": null,
+    "port": null,
+    "tests":[
+	{"name" : "setUsername"},
+	{"name" : "setPassword"},
+	{"name" : "clickLogin"}],
+    "run-mode": "test-manager",
+    "test-failure-timeout": 30
+}
