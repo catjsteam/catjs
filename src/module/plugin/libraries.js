@@ -479,7 +479,11 @@ module.exports = _basePlugin.ext(function () {
                                         });
                                     }
                                 }
-                                _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue);
+                                // specific condition for cat.json TODO put a generic property
+                                if (concatItem.key === "json" && !_fs.existsSync(_path.join(catProjectLibTarget, filename))) {
+                                    _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue);
+                                }
+
                             }
                         }
                     });
