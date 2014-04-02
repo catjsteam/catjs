@@ -5,3 +5,5 @@ tmp
 .DS_Store
 *.log
 _cat_md.json
+build/target
+build/src
