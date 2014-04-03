@@ -79,6 +79,10 @@
             "customAttribute": "Custom attribute test"
         },
         {
+            "name": "p@autotest.plugin",
+            "type": "autotest"
+        },
+        {
             "name": "p@init.scrap",
             "type": "scrap",
             "dependency": "scan"
@@ -141,6 +145,10 @@
         {
             "name": "t@install",
             "plugins":["p@lib.copy"]
+        },
+        {
+            "name": "t@autotest",
+            "plugins":["p@autotest.plugin", "p@lib.copy"]
         },
         {
             "name": "t@wipe",

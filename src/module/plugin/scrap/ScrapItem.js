@@ -167,6 +167,7 @@ _clazz = function (config) {
         _init("single", {});
         _init("singleton", {});
         _init("arguments", []);
+        _init("auto", true);
         _init("id", _scrapId());
         _init("$type", _scrapEnum.scrapEnum.defaultFileType);
 

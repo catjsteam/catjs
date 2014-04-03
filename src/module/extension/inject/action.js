@@ -278,7 +278,6 @@ module.exports = _basePlugin.ext(function () {
                             return line;
                         }
 
-
                         if (engine === _scrapEnum.engines.JS) {
                             // JS file type call
                             content = _tplutils.template({

@@ -316,6 +316,32 @@ module.exports = function () {
         },
 
         getScraps: function () {
+
+            var data, key, scrap, file,
+                scrapkey;
+            if (!_scraps || (_scraps && _scraps.length === 0)) {
+                data = _md.read();
+                if (data) {
+                    data = JSON.parse(data);
+                    if (data.files) {
+                        for (key in data.files) {
+                            file = data.files[key];
+                            if (file) {
+
+                                for (scrapkey in file) {
+
+                                    scrap = new _clazz(file[scrapkey]);
+                                    if (scrap) {
+                                        _scraps.push(scrap);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             return _scraps;
         },
 

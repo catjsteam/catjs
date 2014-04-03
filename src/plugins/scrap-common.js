@@ -417,6 +417,7 @@ module.exports = function () {
                         me = this;
 
                     me.$setType("html");
+                    me.set("auto", false);
                     if (importannos) {
                         importannos.forEach(function (item) {
                             if (item) {
