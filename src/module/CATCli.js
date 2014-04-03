@@ -2,37 +2,38 @@ var _nopt = require("nopt"),
     _path = require("path"),
     _fs = require("fs"),
     _Mapper = require("require-mapper"),
-    _mapper = new _Mapper(),
-    _parsed;
+    _mapper = new _Mapper();
 
-_parsed = _nopt({
-    "kill": [String, Number],
-    "task": [String, Array],
-    "init": String,
-    "watch": [Boolean, false],
-    "project": [String, null]
-}, {
-    "w": ["--watch", "true"],
-    "k": ["--kill", 0],
-    "i": ["--init", "cat"],
-    "b": ["--task", "t@init", "--task", "t@scrap", "--task", "t@inject"],
-    "t": ["--task", "t@test"],
-    "c": ["--task", "t@clean"],
-    "s": ["--task", "t@server.start"],
-    "r": ["--task", "t@runner.start"],
-    "m": ["--task", "t@mtest"],
-    "p": ["--project" , "."]
-});
+
 
 
 module.exports = function () {
 
     return {
 
-        init: function (dirname) {
+        init: function (config) {
             var moduleName,
-                home = (dirname || _path.resolve(__dirname + "../../../")),
-                workingPath = _path.resolve(".");
+                home = ((config && config.dirname) ? config.dirname : _path.resolve(__dirname + "../../../")),
+                workingPath = _path.resolve("."),
+                key,
+                parsed = _nopt({
+                    "kill": [String, Number],
+                    "task": [String, Array],
+                    "init": String,
+                    "watch": [Boolean, false],
+                    "project": [String, null]
+                }, {
+                    "w": ["--watch", "true"],
+                    "k": ["--kill", 0],
+                    "i": ["--init", "cat"],
+                    "b": ["--task", "t@init", "--task", "t@scrap", "--task", "t@inject"],
+                    "t": ["--task", "t@test"],
+                    "c": ["--task", "t@clean"],
+                    "s": ["--task", "t@server.start"],
+                    "r": ["--task", "t@runner.start"],
+                    "m": ["--task", "t@mtest"],
+                    "p": ["--project" , "."]
+                });;
 
             (function () {
 
@@ -79,13 +80,22 @@ module.exports = function () {
 
             // Everything looks good. Require local grunt and run it.
             moduleName = _path.join(home, "src/module/CAT.js");
-            _parsed.home = {
+            parsed.home = {
                 path: home,
                 working: {path: workingPath}
             };
 
+            if (config && !config.dirname) {
+                for (key in config) {
+                    if (config.hasOwnProperty(key)) {
+                        parsed[key] = config[key];
+                    }
+                }
+            }
+
             // CAT Module Initialization
-            require(moduleName).init(_parsed);
+            var catjs = new require(moduleName)();
+            catjs.init(parsed);
 
         }
     };

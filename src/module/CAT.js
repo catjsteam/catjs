@@ -63,6 +63,8 @@ var CAT = function () {
             if (_counter < _targets.length) {
                 _emitter.removeAllListeners("task.done");
                 _runme(watch);
+            } else {
+               //callback in here
             }
         });
         _runTask(_targets[_counter], watch);
@@ -229,7 +231,7 @@ var CAT = function () {
                     targets = _targets, counter,
                     wait = false,
                     home = _global.get("home"),
-                    schema,
+                    schema = (config ? config.schema : undefined),
                     Schema =  function(args) {
                         this.type = (args.type || "string");
                         this.pattern = args.pattern;
@@ -240,6 +242,15 @@ var CAT = function () {
                     },
                     appPath;
 
+                function _createProject(args) {
+                    if (!args.appath) {
+                        args.appath = appPath;
+                    }
+                    args.projectname = initProject;
+                    args.callback = config.callback;
+                    linit.create(args);
+                }
+
 
                 _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
 
@@ -248,78 +259,86 @@ var CAT = function () {
                     linit = catrequire("cat.init");
                     if (linit) {
 
-                        // user prompt section
-                        _prompt.start();
+                        if (!schema) {
+
+                            // user prompt section
+                            _prompt.start();
 
 
-                        schema = {
-                            properties: {
-                                name: new Schema({
-                                    type: "string",
-                                    pattern: /^[a-zA-Z0-9\-]+$/,
-                                    message: 'Name must be only letters, numbers or dashes',
-                                    required: true,
-                                    description: "Enter the project name"
-                                }),
-                                host: new Schema({
-                                    type: "string",
-                                    required: false,
-                                    default: "localhost",
-                                    description: "Enter CAT server's host name"
-                                }),
-                                port: new Schema({
-                                    type: "string",
-                                    required: false,
-                                    default: "8089",
-                                    description: "Enter CAT server's port"
-                                }),
-                                protocol: new Schema({
-                                    type: "string",
-                                    required: false,
-                                    default: "http",
-                                    description: "Enter CAT server's protocol"
-                                })/*,
-                                appserverhost: new Schema({
-                                    type: "string",
-                                    required: false,
-                                    default: "localhost",
-                                    description: "Enter your Application server's host name"
-                                }),
-                                appserverport: new Schema({
-                                    type: "string",
-                                    required: false,
-                                    default: "8089",
-                                    description: "Enter your Application server's port"
-                                }),
-                                appserverprotocol: new Schema({
-                                    type: "string",
-                                    required: false,
-                                    default: "http",
-                                    description: "Enter your Application server's protocol"
-                                })*/
-                            }
-                        };
+                            schema = {
+                                properties: {
+                                    name: new Schema({
+                                        type: "string",
+                                        pattern: /^[a-zA-Z0-9\-]+$/,
+                                        message: 'Name must be only letters, numbers or dashes',
+                                        required: true,
+                                        description: "Enter the project name"
+                                    }),
+                                    host: new Schema({
+                                        type: "string",
+                                        required: false,
+                                        default: "localhost",
+                                        description: "Enter CAT server's host name"
+                                    }),
+                                    port: new Schema({
+                                        type: "string",
+                                        required: false,
+                                        default: "8089",
+                                        description: "Enter CAT server's port"
+                                    }),
+                                    protocol: new Schema({
+                                        type: "string",
+                                        required: false,
+                                        default: "http",
+                                        description: "Enter CAT server's protocol"
+                                    })/*,
+                                    appserverhost: new Schema({
+                                        type: "string",
+                                        required: false,
+                                        default: "localhost",
+                                        description: "Enter your Application server's host name"
+                                    }),
+                                    appserverport: new Schema({
+                                        type: "string",
+                                        required: false,
+                                        default: "8089",
+                                        description: "Enter your Application server's port"
+                                    }),
+                                    appserverprotocol: new Schema({
+                                        type: "string",
+                                        required: false,
+                                        default: "http",
+                                        description: "Enter your Application server's protocol"
+                                    })*/
+                                }
+                            };
+
+                        } else {
+                            _prompt = null;
+                        }
 
                         if (initProject === "example") {
                             // apppath will be set automatically
                             appPath = "./../app";
 
                         } else {
-                            schema.properties.appath = new Schema({
-                                type: "string",
-                                required: true,
-                                description: "Enter your project's (application) path"
-                            });
+                            if (!schema.properties.appath) {
+                                schema.properties.appath = new Schema({
+                                    type: "string",
+                                    required: true,
+                                    description: "Enter your project's (application) path"
+                                });
+                            }
                         }
 
-                        _prompt.get(schema, function (err, args) {
-                            if (!args.appath) {
-                                args.appath = appPath;
-                            }
-                            args.projectname = initProject;
-                            linit.create(args);
-                        });
+                        if (_prompt) {
+                            _prompt.get(schema, function (err, args) {
+                                _createProject(args);
+                            });
 
+                        } else {
+                            _createProject(schema.properties);
+                        }
                     }
                 }
 
@@ -395,11 +414,7 @@ var CAT = function () {
     };
 
 
-}();
+};
 
 
-module.exports = function () {
-
-    return CAT;
-
-}();
+module.exports = CAT;

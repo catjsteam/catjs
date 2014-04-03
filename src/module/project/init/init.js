@@ -16,7 +16,7 @@ module.exports = function () {
         create: function(config) {
 
            var name = (("name" in config && config.projectname)? config.projectname : undefined),
-                msg = "[CAT init project] No valid project name was found, generating an base project",
+                msg = "[CAT init project] No valid project name was found, generating a base project",
                 projectPath,
                 args;
 
@@ -50,33 +50,49 @@ module.exports = function () {
 
                     targetpath = _path.join(workpath, "cat-project");
                     if (!_fs.existsSync(targetpath)) {
+
                         _fs.mkdirpSync(targetpath);
-                    }
-                    // creating cat project file
-                    _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content);
 
-                    // copy additional resources to the initial target project folder
-                    _fs.copyRecursive(_path.resolve(_path.join(currentpath, "base")), targetpath, function (err) {
-                        if (err) {
-                            _utils.log("[CAT init project] resources copy failed with errors: ", err);
+                        // creating cat project file
+                        _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content);
 
-                        } else {
+                        // copy additional resources to the initial target project folder
+                        _fs.copyRecursive(_path.resolve(_path.join(currentpath, "base")), targetpath, function (err) {
+                            if (err) {
+                                _utils.log("[CAT init project] resources copy failed with errors: ", err);
 
-                            appfolder = _fs.existsSync(_path.join(path, "app"));
-                            if (appfolder) {
-                                // copy additional resources to the initial target project folder
-                                _fs.copyRecursive(_path.resolve(_path.join(path, "app")), _path.resolve(_path.join(workpath, "app")), function (err) {
-                                    if (err) {
-                                        _utils.log("[CAT init project] resources copy failed with errors: ", err);
+                            } else {
 
+                                appfolder = _fs.existsSync(_path.join(path, "app"));
+                                if (appfolder) {
+                                    // copy additional resources to the initial target project folder
+                                    _fs.copyRecursive(_path.resolve(_path.join(path, "app")), _path.resolve(_path.join(workpath, "app")), function (err) {
+                                        if (err) {
+                                            _utils.log("[CAT init project] resources copy failed with errors: ", err);
+
+                                        }
+                                        if (config && config.callback) {
+                                            config.callback.call();
+                                        }
+                                    });
+                                } else {
+                                    if (config && config.callback) {
+                                        config.callback.call();
                                     }
-                                });
+
+                                }
                             }
+                        });
+                    } else {
+
+                        console.warn("[CAT init project] Project already exists (consider, delete the project first)");
+
+                        if (config && config.callback) {
+                            config.callback.call();
                         }
-                    });
 
-
-
+                        return undefined;
+                    }
                 }
             }
 
