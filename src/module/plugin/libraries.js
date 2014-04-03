@@ -399,6 +399,7 @@ module.exports = _basePlugin.ext(function () {
                                 });
 
                         } else {
+
                             /* on windows we have an issue related to git <> bower
                              thus we are running custom spawn
                              */
@@ -480,7 +481,7 @@ module.exports = _basePlugin.ext(function () {
                                     }
                                 }
                                 // specific condition for cat.json TODO put a generic property
-                                if (concatItem.key === "json" && !_fs.existsSync(_path.join(catProjectLibTarget, filename))) {
+                                if ( concatItem.key !== "json" || (concatItem.key === "json" && !_fs.existsSync(_path.join(catProjectLibTarget, filename))) ) {
                                     _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue);
                                 }
 
