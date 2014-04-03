@@ -121,17 +121,21 @@ _cat.core = function () {
             var innerConfigMap = [];
             if (testList.tests) {
                 for (var i = 0; i < testList.tests.length; i++) {
-                    if (testList.tests[i].tests) {
-                        var repeatFlow =  testList.tests[i].repeat ? testList.tests[i].repeat : 1;
+                    if (!(testList.tests[i].disable)) {
+                        if (testList.tests[i].tests) {
+                            var repeatFlow =  testList.tests[i].repeat ? testList.tests[i].repeat : 1;
 
-                        for (var j = 0; j < repeatFlow; j++ ) {
-                            var tempArr = getTestsHelper(testList.tests[i]);
-                            innerConfigMap = innerConfigMap.concat(tempArr);
+                            for (var j = 0; j < repeatFlow; j++ ) {
+                                var tempArr = getTestsHelper(testList.tests[i]);
+                                innerConfigMap = innerConfigMap.concat(tempArr);
+                            }
+
+                        } else {
+
+                            testList.tests[i].wasRun = false;
+                            innerConfigMap.push(testList.tests[i]);
+
                         }
-
-                    } else {
-                        testList.tests[i].wasRun = false;
-                        innerConfigMap.push(testList.tests[i]);
                     }
                 }
             }
