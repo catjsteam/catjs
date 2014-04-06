@@ -9,7 +9,10 @@ var _nopt = require("nopt"),
 
 module.exports = function () {
 
-    return {
+    var _module,
+        _catjs;
+
+    _module = {
 
         init: function (config) {
             var moduleName,
@@ -94,10 +97,16 @@ module.exports = function () {
             }
 
             // CAT Module Initialization
-            var catjs = new require(moduleName)();
-            catjs.init(parsed);
+            _catjs = new require(moduleName)();
+            _catjs.init(parsed);
 
+        },
+
+        kill: function(pid) {
+            _catjs.kill(pid);
         }
     };
+
+    return _module;
 
 }();
