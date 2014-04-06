@@ -52,6 +52,7 @@ module.exports = function () {
                     if (!_fs.existsSync(targetpath)) {
 
                         _fs.mkdirpSync(targetpath);
+                    }
 
                         // creating cat project file
                         _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content);
@@ -59,40 +60,40 @@ module.exports = function () {
                         // copy additional resources to the initial target project folder
                         _fs.copyRecursive(_path.resolve(_path.join(currentpath, "base")), targetpath, function (err) {
                             if (err) {
-                                _utils.log("[CAT init project] resources copy failed with errors: ", err);
+                                _utils.log("[CAT init project] probably the files already exists, skipping... ");
 
-                            } else {
+                            }
 
-                                appfolder = _fs.existsSync(_path.join(path, "app"));
-                                if (appfolder) {
-                                    // copy additional resources to the initial target project folder
-                                    _fs.copyRecursive(_path.resolve(_path.join(path, "app")), _path.resolve(_path.join(workpath, "app")), function (err) {
-                                        if (err) {
-                                            _utils.log("[CAT init project] resources copy failed with errors: ", err);
+                            appfolder = _fs.existsSync(_path.join(path, "app"));
+                            if (appfolder) {
+                                // copy additional resources to the initial target project folder
+                                _fs.copyRecursive(_path.resolve(_path.join(path, "app")), _path.resolve(_path.join(workpath, "app")), function (err) {
+                                    if (err) {
+                                        _utils.log("[CAT init project] probably the files already exists, skipping... ");
 
-                                        }
-                                        if (config && config.callback) {
-                                            config.callback.call();
-                                        }
-                                    });
-                                } else {
+                                    }
                                     if (config && config.callback) {
                                         config.callback.call();
                                     }
-
+                                });
+                            } else {
+                                if (config && config.callback) {
+                                    config.callback.call();
                                 }
+
                             }
+
                         });
-                    } else {
-
-                        console.warn("[CAT init project] Project already exists (consider, delete the project first)");
-
-                        if (config && config.callback) {
-                            config.callback.call();
-                        }
-
-                        return undefined;
-                    }
+//                    } else {
+//
+//                        console.warn("[CAT init project] Project already exists (consider, delete the project first)");
+//
+//                        if (config && config.callback) {
+//                            config.callback.call();
+//                        }
+//
+//                        return undefined;
+//                    }
                 }
             }
 
