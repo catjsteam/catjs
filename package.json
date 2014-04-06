@@ -38,7 +38,8 @@
     "catcli": "catcli"
   },
   "scripts": {
-    "preinstall": "node precatinstall.js"
+    "preinstall": "node precatinstall.js",
+     "test": "node ./test/test.js"
   },
   "dependencies": {
     "mobilerunner": "latest",
