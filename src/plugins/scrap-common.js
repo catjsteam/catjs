@@ -455,6 +455,7 @@ module.exports = function () {
 
                 this.setSingle("inject", true);
                 this.$setType("*");
+                this.set("auto", false);
 
                 this.print(injectanno);
             }});
