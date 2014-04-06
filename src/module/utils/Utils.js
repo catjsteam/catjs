@@ -394,20 +394,28 @@ module.exports = function () {
         kill: function (pids, excludes) {
             var me = this;
 
+            function process(pid, exclude) {
+                if (pid !== exclude) {
+                    try {
+                        _log.error("[kill process] sending SIGKILL signal to pid: " + pid );
+                        process.kill(pid, "SIGKILL");
+
+                    } catch (e) {
+                        // TODO check if the process is running
+                        _log.error("[kill process] failed to kill pid: " + pid + "; The process might not exists");
+                    }
+                }
+            }
+
             if (pids) {
                 pids.forEach(function (pid) {
+
                     if (excludes) {
                         excludes.forEach(function (exclude) {
-                            if (pid !== exclude) {
-                                try {
-                                    process.kill(pid, "SIGKILL");
-
-                                } catch (e) {
-                                    // TODO check if the process is running
-                                    _log.error("[kill process] failed to kill pid: " + pid + "; The process might not exists");
-                                }
-                            }
+                            process(pid, exclude);
                         });
+                    } else {
+                        process(pid);
                     }
                 });
             }
