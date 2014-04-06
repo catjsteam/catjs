@@ -84,6 +84,7 @@ module.exports = _basePlugin.ext(function () {
              */
             init: function (config) {
 
+
                 // TODO extract messages to resource bundle with message format
                 var errors = ["[spawn plugin] spawn operation disabled, No valid configuration"];
 

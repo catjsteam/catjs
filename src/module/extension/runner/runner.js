@@ -29,9 +29,7 @@ var runner = function () {
         /**
          * Start a local web server for running an application
          *
-         * @param config The passed configuration
-         *      path - The path of the application
-         *      port - The port of the server (optional, default: 8089)
+         * @param {}
          *
          * @returns {undefined}
          */
@@ -41,7 +39,6 @@ var runner = function () {
                 "run": {
                     "devices": [
                         {
-                            "disable": false,
                             "type": "localpc",
                             "runner": {
                                 "name": "chrome",
@@ -49,7 +46,6 @@ var runner = function () {
                             }
                         },
                         {
-                            "disable": false,
                             "type": "localpc",
                             "runner": {
                                 "name": "firefox",
@@ -57,11 +53,18 @@ var runner = function () {
                             }
                         },
                         {
-                            "disable": false,
                             "type": "android",
                             "id": "all",
                             "runner": {
                                 "name": "apk"
+                            }
+                        },
+                        {
+                            "type": "iphone",
+                            "id": "all",
+                            "runner": {
+                                "name": "agent",
+                                "options": {"ip": "192.168.2.112", "port": "54321", "path": "/cat"}
                             }
                         }
 
@@ -70,7 +73,7 @@ var runner = function () {
 
                 "server": {
                     "host": "auto",
-                    "port": "8089"
+                    "port": config.port
                 }
             };
             _mobilerunner.run(runnerConfig);
