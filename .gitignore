@@ -8,3 +8,5 @@ _cat_md.json
 build/target
 build/src
 *.xml
+test/enyo/cat-project/
+test/sencha/cat-project/
