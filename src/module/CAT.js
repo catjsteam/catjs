@@ -19,7 +19,9 @@ var CAT = function () {
         _utils,
         _targets,
         _catconfigInternal,
-        _counter=0;
+        _counter= 0,
+        _configargs,
+        _module;
 
     /**
      * Get which task to get to run from the CAT command line.
@@ -63,8 +65,15 @@ var CAT = function () {
             if (_counter < _targets.length) {
                 _emitter.removeAllListeners("task.done");
                 _runme(watch);
+
+                if (_configargs && _configargs.callback) {
+                    _configargs.taskcb.call(this, _targets[_counter]);
+                }
+
             } else {
-               //callback in here
+                if (_configargs && _configargs.callback) {
+                    _configargs.callback.call(_configargs);
+                }
             }
         });
         _runTask(_targets[_counter], watch);
@@ -82,7 +91,7 @@ var CAT = function () {
 
     })();
 
-    return {
+    _module = {
 
 
         /**
@@ -97,6 +106,7 @@ var CAT = function () {
                 basedir,
                 projectDir;
 
+            _configargs = config;
             (function (config) {
 
                 basedir = _basedir(config);
@@ -115,6 +125,7 @@ var CAT = function () {
 
                 _cache = catrequire("cat.cache");
                 _cache.set("pid", process.pid);
+
 
 
             })(config);
@@ -163,7 +174,7 @@ var CAT = function () {
         apply: function (config) {
 
             // TODO messages should be taken from resource
-            var grunt, args, path, watch = false, kill = 0,
+            var grunt, args, path, watch = false, kill = -1,
                 initProject,
                 msg = ["[CAT] Project failed to load, No valid argument path was found"];
 
@@ -342,18 +353,7 @@ var CAT = function () {
                     }
                 }
 
-                if (kill) {
-
-                    // TODO 1 might be a process number, change it to negative maybe.
-                    if (kill === 1) {
-                        // kill all current running processes except me.
-                        pids = _cache.removeByKey("pid", process.pid);
-                        _utils.kill(pids, [process.pid]);
-
-                    } else {
-                        _utils.kill([kill], [process.pid]);
-                    }
-                }
+                _module.kill(kill);
 
                 if (_targets) {
 
@@ -410,8 +410,37 @@ var CAT = function () {
             _init();
             _apply();
 
+        },
+
+        kill: function(pid) {
+            var pids;
+
+            if (pid !== undefined && pid !== null && pid !== -1) {
+
+                // TODO 1 might be a process number, change it to negative maybe.
+                if (pid === 1) {
+                    // kill all current running processes except me.
+                    pids = _cache.removeByKey("pid", process.pid);
+                    _utils.kill(pids, [process.pid]);
+
+                } else if (pid === 0) {
+                    if (process) {
+                        process.exit(1);
+                    }
+
+                } else {
+                    _utils.kill([pid], [process.pid]);
+                }
+
+                if (_configargs && _configargs.callback) {
+                    _configargs.callback.call(_configargs);
+                }
+            }
+
         }
     };
+
+    return _module;
 
 
 };
