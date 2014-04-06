@@ -69,6 +69,11 @@
             "action": "start"
         },
         {
+            "name": "p@project.runner.stop",
+            "type": "runner",
+            "action": "stop"
+        },
+        {
             "name": "p@project.webserver.stop",
             "type": "webserver",
             "action": "stop"
@@ -173,6 +178,10 @@
         {
             "name": "t@runner.start",
             "plugins": ["p@project.runner.start"]
+        },
+        {
+            "name": "t@runner.stop",
+            "plugins": ["p@project.runner.stop"]
         },
         {
             "name": "t@server.stop",
