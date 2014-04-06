@@ -36,11 +36,11 @@ function test(config, callback) {
                             console.log("[CAT build] waiting 60 seconds");
                             setTimeout(function() {
 
-                                process.chdir('./..');
-                                require("fs.extra").rmrf('./cat-project', function (err) {
-                                    if (err) {
-                                        console.error(err);
-                                    }
+//                                process.chdir('./..');
+//                                require("fs.extra").rmrf('./cat-project', function (err) {
+//                                    if (err) {
+//                                        console.error(err);
+//                                    }
 
 
                                     if (callback) {
@@ -49,7 +49,7 @@ function test(config, callback) {
 
                                     process.send({status: "done"});
 
-                                });
+//                                });
 
 
                             }, 30000);
