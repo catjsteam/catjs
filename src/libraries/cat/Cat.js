@@ -270,11 +270,11 @@ _cat.core = function () {
                     matchvalues[callsIdx].callback = function () {
                         callbackCounter++;
                         callsIdx++;
-                        if (callsIdx < matchvalues.length + 1) {
+                        if (callsIdx < matchvalues.length) {
                             __callMatchValues(callsIdx, callback);
                         }
 
-                        if (callbackCounter === matchvalues.length + 1) {
+                        if (callbackCounter === matchvalues.length) {
                             if (callback) {
                                 callback.call(this);
                             }
