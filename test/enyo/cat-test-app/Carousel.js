@@ -107,7 +107,6 @@ enyo.kind({
         /*
              @[scrap
                  @@name enyoNext
-                 @@run@ scrapManager
                  @@context pagesList
                  @@enyo next(pagesList)
                  @@assert ok(true, "Fake test")
@@ -117,26 +116,12 @@ enyo.kind({
         /*
            @[scrap
                 @@name letsGo
-                @@run@ scrapManager
                 @@context btn
                 @@enyo waterfall(btn, 'ontap')
                 @@assert ok(true, "Fake test")
            ]@
 
          */
-
-        /*
-            @[scrap
-                @@name scrapManager
-                @@perform[
-                    @@enyoNext repeat(2)
-                    @@letsGo repeat(1)
-                ]
-                @@catui on
-                @@manager true
-                @@signal TESTEND
-            ]@
-        */
 
     },
     slideHandler: function (inSender, inEvent) {
