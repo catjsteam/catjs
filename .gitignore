@@ -7,3 +7,4 @@ tmp
 _cat_md.json
 build/target
 build/src
+*.xml
