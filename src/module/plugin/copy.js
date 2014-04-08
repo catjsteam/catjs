@@ -1,4 +1,5 @@
 var _fs = require("fs.extra"),
+    _wrench = require("wrench"),
     _typedas = require("typedas"),
     _log = catrequire("cat.global").log(),
     _utils = catrequire("cat.utils"),
@@ -76,7 +77,7 @@ module.exports = _basePlugin.ext(function () {
         if (_wait === 2) {
             _emitter.emit("job.wait", {status: "done"});
         }
-        _wait=0;
+        _wait = 0;
     }
 
     _module = {
@@ -90,7 +91,7 @@ module.exports = _basePlugin.ext(function () {
             if (!_wait) {
                 _emitter.emit("job.wait", {status: "done"});
             } else {
-                _wait=2;
+                _wait = 2;
             }
             //_emitter.on("job.copy.wait", _jobCopyWait);
             //_emitter.removeListener("job.copy.wait", _jobCopyWait);
@@ -150,7 +151,7 @@ module.exports = _basePlugin.ext(function () {
 
 
                 } else {
-                   // _log.debug("[Copy Action] filter match, skipping file: " + tmpFolder);
+                    // _log.debug("[Copy Action] filter match, skipping file: " + tmpFolder);
                 }
             }
 
@@ -199,45 +200,38 @@ module.exports = _basePlugin.ext(function () {
         init: function (config) {
 
             var dependency,
-                frompath, topath,
-                stats, counter=0;
+                frompath, topath, files,
+                stats, counter = 0;
+
+            function _copyRecursiveSync(src, dest) {
+                _wrench.mkdirSyncRecursive(dest, 0777);
+
+                _wrench.copyDirSyncRecursive(src, dest, {
+                    forceDelete: true,
+                    preserveFiles: true
+                });
+            };
 
             function _copx(afrompath, cb) {
 
                 var me = this;
 
-                if (_fs.existsSync(afrompath)) {
 
-                    if (!_fs.existsSync(topath)) {
-                        _fs.mkdirRecursiveSync(topath);
-                    }
+                stats = _fs.statSync(afrompath);
 
-                    stats = _fs.statSync(afrompath);
+                if (stats.isDirectory()) {
+                    _copyRecursiveSync(afrompath, topath);
 
-                    if (stats.isDirectory()) {
-                        _fs.copyRecursive(afrompath, topath, function (err) {
-
-                            if (err) {
-                                _log.warning("[copy action] warning, " + err);
-                            }
-
-                            if (cb) {
-                                cb.call(me);
-                            }
-                        });
-                    } else {
-
-                        _utils.copySync(afrompath, _path.join(topath, _path.basename(afrompath)));
-
-                        if (cb) {
-                            cb.call(me);
-                        }
-
-                    }
                 } else {
-                    _emitter.emit("job.done", {status: "done"});
-                    _log.warning("[copy action] 'to' path and/or 'from' path does not exists, failed to copy");
+
+                    _utils.copySync(afrompath, _path.join(topath, _path.basename(afrompath)));
+
                 }
+
+                if (cb) {
+                    cb.call(me);
+                }
+
             }
 
             // TODO extract messages to resource bundle with message format
@@ -258,17 +252,9 @@ module.exports = _basePlugin.ext(function () {
             _me.dataInit(_data);
 
             function _copyrec(cb) {
-                var path = frompath[counter];
-                if (path) {
-                    _copx(path, function() {
-                        counter++;
-                        _copyrec(cb);
-                    });
-                } else {
-                    if (cb) {
-                        cb.call(this);
-                    }
-                }
+
+                _copx(frompath, cb);
+
             }
 
             dependency = _me.get("dependency");
@@ -276,6 +262,7 @@ module.exports = _basePlugin.ext(function () {
             // Listen to the process emitter
             if (!dependency) {
                 // just copy :)
+
                 frompath = _me.get("from");
                 topath = _me.get("to");
 
@@ -288,10 +275,10 @@ module.exports = _basePlugin.ext(function () {
 
                 if (topath && frompath) {
 
-                    frompath = _glob.sync(frompath);
+                    //frompath = _glob.sync(frompath);
                     counter = 0;
 
-                    _copyrec(function() {
+                    _copyrec(function () {
                         _emitter.emit("job.done", {status: "done"});
                     });
 
@@ -323,7 +310,7 @@ module.exports = _basePlugin.ext(function () {
          *
          * @returns {{dependencies: Array}}
          */
-        validate: function() {
+        validate: function () {
             return { dependencies: ["scan", "manager"]};
         }
     };
