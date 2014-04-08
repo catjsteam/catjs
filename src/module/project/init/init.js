@@ -111,6 +111,7 @@ module.exports = function () {
 
                 "source": config.source,
                 "target": config.target,
+                "cattarget": "./",
                 "host": config.host,
                 "port": config.port,
                 "protocol": config.protocol,

@@ -3,6 +3,7 @@
 
     "source": "src/",
     "target": "target/",
+    "cattarget": "{{cattarget}}",
 
     "host": "{{host}}",
     "port": "{{port}}",

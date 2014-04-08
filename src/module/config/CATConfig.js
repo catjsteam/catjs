@@ -27,7 +27,7 @@ var _global = catrequire("cat.global"),
         var me = this,
             idx = 0, size, project, pluginsPath = [],
             dependencies = [],
-            appTargetPath, appPath, projectcopy, customTasks;
+            appTargetPath, appPath, projectcopy, customTasks, cattarget, targetfolder;
 
         /**
          * Extension initialization
@@ -89,7 +89,11 @@ var _global = catrequire("cat.global"),
                     project.addPluginLocations(pluginsPath);
 
                     customTasks = [];
-                    appTargetPath = _path.join("./", _path.relative(_path.resolve("."), project.getInfo("target")), project.name);
+                    targetfolder = project.getInfo("target");
+                    cattarget = (project.getInfo("cattarget") || "./");
+
+                    appTargetPath = _path.join("./", _path.relative(_path.resolve("."), targetfolder), project.name);
+                    console.log("to:" + appTargetPath);
                     appPath = project.getInfo("apppath");
                     if (appPath) {
                         projectcopy= {
@@ -118,7 +122,7 @@ var _global = catrequire("cat.global"),
                                 "path": "./lib"
                             },
                             "to": {
-                                "path": _path.join(appTargetPath, "/cat/lib")
+                                "path": _path.join(appTargetPath, cattarget, "/cat/lib")
                             }
                         },
                         {
@@ -128,13 +132,13 @@ var _global = catrequire("cat.global"),
                                 "path": "./src/config"
                             },
                             "to": {
-                                "path": _path.join(appTargetPath, "/cat/config")
+                                "path": _path.join(appTargetPath, cattarget, "/cat/config")
                             }
                         },
                         {
                             "name": "p@project.minify",
                             "type": "minify",
-                            "path": _path.join(appTargetPath, "/cat/lib"),
+                            "path": _path.join(appTargetPath, cattarget, "/cat/lib"),
                             "filename": "cat.src.js",
                             "src":["./src/**/*.js"]
                         }

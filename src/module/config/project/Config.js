@@ -155,11 +155,12 @@ var _typedas = require('typedas'),
                             configpath = _path.join(sourcefolder, "config");
                             if (!_fs.existsSync(configpath)) {
                                 _utils.mkdirSync(configpath);
-
-                                // copy source's resources to the project
-                                // TODO copy recursive sync...
-                                _utils.copySync(_path.join(_cathome.path, "src/module/project/src/config/testdata.json"), _path.join(configpath, "testdata.json"));
                             }
+
+                            // copy source's resources to the project
+                            // TODO copy recursive sync...
+                            _utils.copySync(_path.join(_cathome.path, "src/module/project/src/config/testdata.json"), _path.join(configpath, "testdata.json"));
+
                         }
 
                         me.info[prop] = sourcefolder;
@@ -185,7 +186,7 @@ var _typedas = require('typedas'),
             _mkEnvDir("target");
 
             // set the info properties incoming from the cat's project
-            _setInfoData(["host", "port", "appserver", "apppath"]);
+            _setInfoData(["host", "port", "appserver", "apppath", "cattarget"]);
 
         }
 
