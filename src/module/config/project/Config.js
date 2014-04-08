@@ -128,7 +128,7 @@ var _typedas = require('typedas'),
                 sourcePath;
 
             function _mkEnvDir(prop) {
-                var commonpath;
+                var commonpath, configpath;
 
                 if (prop) {
                     sourcePath = _utils.resolveObject(data, prop);
@@ -142,6 +142,7 @@ var _typedas = require('typedas'),
 
                         // add common folder for the custom user classes
                         if (prop === "source") {
+                            // copy common
                             commonpath = _path.join(sourcefolder, "common");
                             if (!_fs.existsSync(commonpath)) {
                                 _utils.mkdirSync(commonpath);
@@ -149,6 +150,15 @@ var _typedas = require('typedas'),
                                 // copy source's resources to the project
                                 // TODO copy recursive sync...
                                 _utils.copySync(_path.join(_cathome.path, "src/module/project/src/common/README.txt"), _path.join(commonpath, "README.txt"));
+                            }
+                            // copy config
+                            configpath = _path.join(sourcefolder, "config");
+                            if (!_fs.existsSync(configpath)) {
+                                _utils.mkdirSync(configpath);
+
+                                // copy source's resources to the project
+                                // TODO copy recursive sync...
+                                _utils.copySync(_path.join(_cathome.path, "src/module/project/src/config/testdata.json"), _path.join(configpath, "testdata.json"));
                             }
                         }
 

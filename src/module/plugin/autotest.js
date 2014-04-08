@@ -34,7 +34,7 @@ module.exports = _basePlugin.ext(function () {
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"],
                 workDir = _catglobal.get("home").working.path,
-                catjson = (workDir ? _path.join(workDir, "lib/cat.json") : undefined), catjsondata, args=[];
+                catjson, catjsondata, args=[];
 
             if (!config) {
                 _log.error(errors[1]);
@@ -64,6 +64,7 @@ module.exports = _basePlugin.ext(function () {
                         }
                     });
 
+                    catjson = (workDir ? _path.join(_project.getInfo("source"), "config/cat.json") : undefined)
                     if (catjson) {
                         if (_fs.existsSync(catjson)) {
                             catjsondata = _fs.readFileSync(catjson, "utf8");
@@ -80,11 +81,11 @@ module.exports = _basePlugin.ext(function () {
                     _fs.writeFileSync(catjson, JSON.stringify(catjsondata));
 
                 }
-
-                // done processing notification for the next task to take place
-                _emitter.emit("job.done", {status: "done"});
-
             }
+
+            // done processing notification for the next task to take place
+            _emitter.emit("job.done", {status: "done"});
+
         },
         /**
          * Validate the plugin

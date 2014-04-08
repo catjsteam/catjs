@@ -114,19 +114,27 @@ var _global = catrequire("cat.global"),
                         {
                             "name": "p@lib.copy",
                             "type": "copy",
-                            "dependency": "scan",
-                            "path": "./lib",
                             "from": {
-                                "path": "/"
+                                "path": "./lib"
                             },
                             "to": {
-                                "path": appTargetPath
+                                "path": _path.join(appTargetPath, "/cat/lib")
+                            }
+                        },
+                        {
+                            "name": "p@src.copy",
+                            "type": "copy",
+                            "from": {
+                                "path": "./src/config"
+                            },
+                            "to": {
+                                "path": _path.join(appTargetPath, "/cat/config")
                             }
                         },
                         {
                             "name": "p@project.minify",
                             "type": "minify",
-                            "path": appTargetPath,
+                            "path": _path.join(appTargetPath, "/cat/lib"),
                             "filename": "cat.src.js",
                             "src":["./src/**/*.js"]
                         }

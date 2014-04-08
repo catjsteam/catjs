@@ -94,6 +94,7 @@ module.exports = _basePlugin.ext(function () {
                 manifestFileName = "manifest.json",
                 manifestLib = _path.join(global.catlibs, manifestFileName),
                 catProjectLib,
+                catProjectSrc,
                 catProjectLibName,
                 library, mode,
                 workPath,
@@ -457,7 +458,8 @@ module.exports = _basePlugin.ext(function () {
                             catProjectLibTarget,
                             filename, staticname,
                             // todo reflect the parse flag from the meta data file
-                            parse = true;
+                            parse = true,
+                            catjsonpath;
 
                         if (concatItem) {
                             if (concatItem.value.length > 0) {
@@ -481,8 +483,14 @@ module.exports = _basePlugin.ext(function () {
                                     }
                                 }
                                 // specific condition for cat.json TODO put a generic property
-                                if ( concatItem.key !== "json" || (concatItem.key === "json" && !_fs.existsSync(_path.join(catProjectLibTarget, filename))) ) {
+                                if ( concatItem.key !== "json" ) {
                                     _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue);
+
+                                } else {
+                                    catjsonpath = _path.join(catProjectSrc, "/config/", filename);
+                                    if ( concatItem.key === "json" && !_fs.existsSync(catjsonpath) ) {
+                                        _fs.writeFileSync(catjsonpath, contentValue);
+                                    }
                                 }
 
                             }
@@ -536,6 +544,7 @@ module.exports = _basePlugin.ext(function () {
 
 
                     if (_project) {
+                        catProjectSrc = _project.getInfo("source");
                         catProjectLib = manifest.out.folder;
                         catProjectLibName = manifest.out.name;
 

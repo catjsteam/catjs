@@ -8,18 +8,35 @@ var _jmr = require("test-model-reporter"),
             name: "testsuite"
         }
     }),
+    _catcli = (catrequire ? catrequire("cat.cli") : null),
     _fs = require("fs"),
     _testConfigMap,
     _isAlive = false, //guilty until proven innocent
     _checkIfAlive; //TODO: make this configurable
 
 function readConfig() {
+
     var path = require("path"),
-        configPath = path.resolve("./lib/cat.json"),
+        configPath,
         data,
         testConfig,
         testConfigMap = {},
-        i;
+        i,
+        project, sourceFolder;
+
+    if (_catcli) {
+        project = _catcli.getProject();
+        if (project) {
+            try {
+                sourceFolder = project.getInfo("source");
+                configPath = path.join(sourceFolder, "/config/cat.json");
+            } catch(e) {
+                _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT test project is available.", e);
+            }
+        } else {
+            _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT project is available.");
+        }
+    }
 
     data = _fs.readFileSync(configPath, 'utf8');
     testConfig = JSON.parse(data);

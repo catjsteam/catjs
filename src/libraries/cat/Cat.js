@@ -145,7 +145,7 @@ _cat.core = function () {
 
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
-                url: "/cat.json"
+                url: "cat/config/cat.json"
             });
             if (xmlhttp) {
                 configText = xmlhttp.responseText;

@@ -153,7 +153,7 @@
         },
         {
             "name": "t@autotest",
-            "plugins":["p@autotest.plugin", "p@lib.copy"]
+            "plugins":["p@autotest.plugin", "p@src.copy"]
         },
         {
             "name": "t@wipe",
@@ -193,7 +193,7 @@
         },
         {
             "name": "t@init",
-            "plugins": ["p@project.copy", "p@libraries.build", "p@lib.copy"]
+            "plugins": ["p@project.copy", "p@libraries.build", "p@lib.copy", "p@src.copy"]
         },
         {
             "name": "t@scrap",
