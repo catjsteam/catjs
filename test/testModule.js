@@ -25,11 +25,18 @@ function test(config, callback) {
 
             var catjs =  require(require("path").join(currentpath, "/../../src/module/CATCli.js"));
 
+            // TODO add copy resources module
+            if (config.name === "enyo") {
+
+                require("fs.extra").mkdirpSync('./cat-project/src/config');
+                require("fs").writeFileSync("./cat-project/src/config/cat.json", require("fs").readFileSync("./cat.json", "utf8"));
+            }
+
             if (require("fs").existsSync('./cat-project')) {
 
                 process.chdir('./cat-project');
                 catjs.init({
-                    task: ["t@init", "t@scrap", "t@inject", "t@autotest", "t@server.start", "t@runner.start"],
+                    task: config.tasks,
                     taskcb: function(task) {
                         if (task && task === "t@runner.start") {
 
@@ -73,6 +80,11 @@ module.exports = function () {
                 test(args);
             });
 
+        },
+        run: function(entity) {
+            var testmodule = require("./test.js");
+
+            testmodule.run(entity);
         }
     };
 }();
