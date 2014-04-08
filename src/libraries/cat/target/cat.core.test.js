@@ -8,13 +8,15 @@ var hasPhantomjs = false;
 
 _cat.core = function () {
 
-    var scrapsNameList = [];
-    var scrapsPerformList = [];
-    var scrapsPkgNames = [];
+    var managerScraps = [],
+        testNumber = 0,
+        getScrapTestInfo,
+        addScrapToManager,
+        _vars, _managers, _context,
+        _config, _log;
 
-    var managerScraps = [];
-    var testNumber = 0;
-    var addScrapToManager = function(testsInfo, scrap) {
+
+    addScrapToManager = function (testsInfo, scrap) {
 
         for (var i = 0; i < testsInfo.length; i++) {
             testNumber--;
@@ -26,22 +28,22 @@ _cat.core = function () {
 
             var preformVal = "@@" + scrap.name[0] + " " + testRepeats;
             var pkgNameVal = scrap.pkgName + "$$cat";
-            managerScraps[test.index] = {"preform" : preformVal,
-                "pkgName" : pkgNameVal,
-                "repeat" : testRepeats,
-                "name" : scrap.name[0],
-                "scrap" : scrap};
+            managerScraps[test.index] = {"preform": preformVal,
+                "pkgName": pkgNameVal,
+                "repeat": testRepeats,
+                "name": scrap.name[0],
+                "scrap": scrap};
         }
 
     };
 
-    var getScrapTestInfo = function(tests, scrapName) {
+    getScrapTestInfo = function (tests, scrapName) {
         var scrapTests = [];
         for (var i = 0; i < tests.length; i++) {
             if (tests[i].name === scrapName) {
-                var tempInfo = {"name" : tests[i].name,
-                    "wasRun" : tests[i].wasRun,
-                    "repeat" : tests[i].repeat};
+                var tempInfo = {"name": tests[i].name,
+                    "wasRun": tests[i].wasRun,
+                    "repeat": tests[i].repeat};
                 tempInfo.index = i;
                 scrapTests.push(tempInfo);
             }
@@ -50,57 +52,56 @@ _cat.core = function () {
     };
 
 
+    _vars = {};
+    _managers = {};
+    _context = function () {
 
-    var _vars = {},
-        _managers = {},
-        _context = function () {
+        var _scraps = {};
 
-            var _scraps = {};
+        function _Scrap(config) {
 
-            function _Scrap(config) {
+            var me = this;
 
-                var me = this;
+            (function () {
+                var key;
 
-                (function () {
-                    var key;
+                for (key in config) {
+                    me[key] = config[key];
+                }
+            })();
+        }
 
-                    for (key in config) {
-                        me[key] = config[key];
-                    }
-                })();
+        _Scrap.prototype.get = function (key) {
+            return this[key];
+        };
+
+        _Scrap.prototype.getArg = function (key) {
+            if (this.scrap && this.scrap.arguments) {
+                return this.arguments[this.scrap.arguments[key]];
             }
+        };
 
-            _Scrap.prototype.get = function (key) {
-                return this[key];
-            };
 
-            _Scrap.prototype.getArg = function (key) {
-                if (this.scrap && this.scrap.arguments) {
-                    return this.arguments[this.scrap.arguments[key]];
+        return {
+
+            get: function (pkgName) {
+                if (!pkgName) {
+                    return undefined;
                 }
-            };
+                return _scraps[pkgName];
+            },
 
-
-            return {
-
-                get: function (pkgName) {
-                    if (!pkgName) {
-                        return undefined;
-                    }
-                    return _scraps[pkgName];
-                },
-
-                "$$put": function (config, pkgName) {
-                    if (!pkgName) {
-                        return pkgName;
-                    }
-                    _scraps[pkgName] = new _Scrap(config);
+            "$$put": function (config, pkgName) {
+                if (!pkgName) {
+                    return pkgName;
                 }
-            };
+                _scraps[pkgName] = new _Scrap(config);
+            }
+        };
 
-        }(),
-        _config,
-        _log = console;
+    }();
+
+    _log = console;
 
     (function () {
         if (!String.prototype.trim) {
@@ -111,21 +112,23 @@ _cat.core = function () {
     })();
 
     function Config() {
+
         var innerConfig,
             xmlhttp,
-            configText;
+            configText,
+            getTestsHelper;
 
 
-        var getTestsHelper = function (testList) {
+        getTestsHelper = function (testList) {
 
             var innerConfigMap = [];
             if (testList.tests) {
                 for (var i = 0; i < testList.tests.length; i++) {
                     if (!(testList.tests[i].disable)) {
                         if (testList.tests[i].tests) {
-                            var repeatFlow =  testList.tests[i].repeat ? testList.tests[i].repeat : 1;
+                            var repeatFlow = testList.tests[i].repeat ? testList.tests[i].repeat : 1;
 
-                            for (var j = 0; j < repeatFlow; j++ ) {
+                            for (var j = 0; j < repeatFlow; j++) {
                                 var tempArr = getTestsHelper(testList.tests[i]);
                                 innerConfigMap = innerConfigMap.concat(tempArr);
                             }
@@ -182,7 +185,6 @@ _cat.core = function () {
                 return getTestsHelper(innerConfig);
 
             };
-
 
 
             this.getRunMode = function () {
@@ -421,7 +423,6 @@ _cat.core = function () {
                 tests = catConfig ? catConfig.getTests() : [];
 
 
-
             if ((catConfig) && (catConfig.getRunMode() === 'test-manager')) {
                 // check if the test name is in the cat.json
                 var scrapsTestsInfo = getScrapTestInfo(tests, scrap.name[0]);
@@ -449,7 +450,6 @@ _cat.core = function () {
                         managerScrap.scrap.manager = ["true"];
 
 
-
                         pkgname = managerScrap.scrap.pkgName;
                         if (!pkgname) {
                             _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
@@ -470,8 +470,8 @@ _cat.core = function () {
                             _cat.core.ui.on();
 
                             /*  Manager call  */
-                            (function() {
-                                _cat.core.managerCall(managerScrap.scrap.name[0], function() {
+                            (function () {
+                                _cat.core.managerCall(managerScrap.scrap.name[0], function () {
                                     _cat.utils.Signal.send('TESTEND');
                                 });
                             })();

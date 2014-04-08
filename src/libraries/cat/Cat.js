@@ -109,15 +109,6 @@ _cat.core = function () {
                 return this.replace(/^\s+|\s+$/g, '');
             };
         }
-        xmlhttp = _cat.utils.AJAX.sendRequestSync({
-            url: "cat/config/cat.json"
-        });
-        if (xmlhttp) {
-            configText = xmlhttp.responseText;
-            if (configText) {
-                innerConfig = JSON.parse(configText);
-            }
-        }
     })();
 
     function Config() {
