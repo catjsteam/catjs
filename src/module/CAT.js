@@ -437,11 +437,18 @@ var CAT = function () {
                 }
             }
 
+        },
+
+        getProject: function() {
+            if (_catconfigInternal && _catconfigInternal.externalConfig) {
+                return _catconfigInternal.externalConfig.project;
+            }
+
+            return null;
         }
     };
 
     return _module;
-
 
 };
 

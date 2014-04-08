@@ -44,6 +44,8 @@ module.exports = function () {
                     methodname: "catrequire",
                     basepath: home,
                     data: {
+                        "cat.cli": "src/module/CATCli.js",
+
                         "cat.config": "src/module/config/CATConfig.js",
 
                         "cat": "src/module/CAT.js",
@@ -104,6 +106,10 @@ module.exports = function () {
 
         kill: function(pid) {
             _catjs.kill(pid);
+        },
+
+        getProject: function() {
+            return _catjs.getProject();
         }
     };
 
