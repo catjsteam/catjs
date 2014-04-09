@@ -36,6 +36,7 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": true,
       "singleton": true,
       "arguments": true,
+      "auto": true,
       "id": true,
       "$type": true
     },
@@ -50,10 +51,12 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": -1,
       "singleton": -1,
       "arguments": -1,
+      "auto": -1,
       "id": -1,
       "$type": -1
     },
     "arguments": ["description"],
+    "auto": true,
     "id": "scrap_1",
     "$type": "js",
     "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.app.testButtonListener"
@@ -108,6 +111,7 @@ _cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-p
           "single": true,
           "singleton": true,
           "arguments": true,
+          "auto": true,
           "id": true,
           "$type": true
         },
@@ -122,10 +126,12 @@ _cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-p
           "single": -1,
           "singleton": -1,
           "arguments": -1,
+          "auto": -1,
           "id": -1,
           "$type": -1
         },
         "arguments": ["description"],
+        "auto": true,
         "id": "scrap_1",
         "$type": "js"
       },
@@ -185,6 +191,7 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": true,
       "singleton": true,
       "arguments": true,
+      "auto": true,
       "id": true,
       "$type": true
     },
@@ -200,10 +207,12 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": -1,
       "singleton": -1,
       "arguments": -1,
+      "auto": -1,
       "id": -1,
       "$type": -1
     },
     "arguments": ["testButton"],
+    "auto": true,
     "id": "scrap_2",
     "$type": "js",
     "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.app.testButtonClick"
@@ -257,6 +266,7 @@ _cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-p
           "single": true,
           "singleton": true,
           "arguments": true,
+          "auto": true,
           "id": true,
           "$type": true
         },
@@ -272,10 +282,12 @@ _cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-p
           "single": -1,
           "singleton": -1,
           "arguments": -1,
+          "auto": -1,
           "id": -1,
           "$type": -1
         },
         "arguments": ["testButton"],
+        "auto": true,
         "id": "scrap_2",
         "$type": "js"
       },
@@ -338,6 +350,7 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": true,
       "singleton": true,
       "arguments": true,
+      "auto": true,
       "id": true,
       "$type": true
     },
@@ -353,10 +366,12 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": -1,
       "singleton": -1,
       "arguments": -1,
+      "auto": -1,
       "id": -1,
       "$type": -1
     },
     "arguments": [],
+    "auto": true,
     "id": "scrap_3",
     "$type": "js",
     "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.app.manager"

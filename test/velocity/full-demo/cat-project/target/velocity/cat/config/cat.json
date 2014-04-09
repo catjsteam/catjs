@@ -1,0 +1,16 @@
+{
+    "type": "velocity",
+    "ip": null,
+    "port": null,
+    "tests":[
+        {"tests" :
+            [
+                {"name" : "setUsername", "delay" : 500},
+                {"name" : "setUsername2"}
+            ],
+            "repeat" : 2, "delay" : 5000}
+
+    ],
+    "run-mode": "test-manager",
+    "test-failure-timeout": 30
+}
