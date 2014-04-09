@@ -68,6 +68,12 @@
             "prod" :["chai.js"],
             "dev" :["chai.js"],
             "install": "static"
+        },
+        {
+            "name": "jspath",
+            "prod" :["jspath.min.js"],
+            "dev" :["jspath.min.js"],
+            "install": "static"
         }
     ]
 }

@@ -23,6 +23,10 @@
             "impl": "src/module/extension/webserver/action.js"
         },
         {
+            "name": "runner",
+            "impl": "src/module/extension/runner/action.js"
+        },
+        {
             "name": "phantomjs",
             "impl": "src/module/extension/phantomjs/action.js"
         },    {

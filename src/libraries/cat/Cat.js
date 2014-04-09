@@ -8,56 +8,100 @@ var hasPhantomjs = false;
 
 _cat.core = function () {
 
-    var _vars = {},
-        _managers = {},
-        _context = function () {
+    var managerScraps = [],
+        testNumber = 0,
+        getScrapTestInfo,
+        addScrapToManager,
+        _vars, _managers, _context,
+        _config, _log;
 
-            var _scraps = {};
 
-            function _Scrap(config) {
+    addScrapToManager = function (testsInfo, scrap) {
 
-                var me = this;
+        for (var i = 0; i < testsInfo.length; i++) {
+            testNumber--;
+            var test = testsInfo[i];
 
-                (function () {
-                    var key;
 
-                    for (key in config) {
-                        me[key] = config[key];
-                    }
-                })();
+            var testRepeats = parseInt((test.repeat ? test.repeat : 1));
+            test.repeat = "repeat(" + testRepeats + ")";
+
+            var preformVal = "@@" + scrap.name[0] + " " + testRepeats;
+            var pkgNameVal = scrap.pkgName + "$$cat";
+            managerScraps[test.index] = {"preform": preformVal,
+                "pkgName": pkgNameVal,
+                "repeat": testRepeats,
+                "name": scrap.name[0],
+                "scrap": scrap};
+        }
+
+    };
+
+    getScrapTestInfo = function (tests, scrapName) {
+        var scrapTests = [];
+        for (var i = 0; i < tests.length; i++) {
+            if (tests[i].name === scrapName) {
+                var tempInfo = {"name": tests[i].name,
+                    "wasRun": tests[i].wasRun,
+                    "repeat": tests[i].repeat};
+                tempInfo.index = i;
+                scrapTests.push(tempInfo);
             }
+        }
+        return scrapTests;
+    };
 
-            _Scrap.prototype.get = function (key) {
-                return this[key];
-            };
 
-            _Scrap.prototype.getArg = function (key) {
-                if (this.scrap && this.scrap.arguments) {
-                    return this.arguments[this.scrap.arguments[key]];
+    _vars = {};
+    _managers = {};
+    _context = function () {
+
+        var _scraps = {};
+
+        function _Scrap(config) {
+
+            var me = this;
+
+            (function () {
+                var key;
+
+                for (key in config) {
+                    me[key] = config[key];
                 }
-            };
+            })();
+        }
+
+        _Scrap.prototype.get = function (key) {
+            return this[key];
+        };
+
+        _Scrap.prototype.getArg = function (key) {
+            if (this.scrap && this.scrap.arguments) {
+                return this.arguments[this.scrap.arguments[key]];
+            }
+        };
 
 
-            return {
+        return {
 
-                get: function (pkgName) {
-                    if (!pkgName) {
-                        return undefined;
-                    }
-                    return _scraps[pkgName];
-                },
-
-                "$$put": function (config, pkgName) {
-                    if (!pkgName) {
-                        return pkgName;
-                    }
-                    _scraps[pkgName] = new _Scrap(config);
+            get: function (pkgName) {
+                if (!pkgName) {
+                    return undefined;
                 }
-            };
+                return _scraps[pkgName];
+            },
 
-        }(),
-        _config,
-        _log = console;
+            "$$put": function (config, pkgName) {
+                if (!pkgName) {
+                    return pkgName;
+                }
+                _scraps[pkgName] = new _Scrap(config);
+            }
+        };
+
+    }();
+
+    _log = console;
 
     (function () {
         if (!String.prototype.trim) {
@@ -68,12 +112,43 @@ _cat.core = function () {
     })();
 
     function Config() {
+
         var innerConfig,
             xmlhttp,
-            configText;
+            configText,
+            getTestsHelper;
+
+
+        getTestsHelper = function (testList) {
+
+            var innerConfigMap = [];
+            if (testList.tests) {
+                for (var i = 0; i < testList.tests.length; i++) {
+                    if (!(testList.tests[i].disable)) {
+                        if (testList.tests[i].tests) {
+                            var repeatFlow = testList.tests[i].repeat ? testList.tests[i].repeat : 1;
+
+                            for (var j = 0; j < repeatFlow; j++) {
+                                var tempArr = getTestsHelper(testList.tests[i]);
+                                innerConfigMap = innerConfigMap.concat(tempArr);
+                            }
+
+                        } else {
+
+                            testList.tests[i].wasRun = false;
+                            innerConfigMap.push(testList.tests[i]);
+
+                        }
+                    }
+                }
+            }
+            return innerConfigMap;
+        };
+
+
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
-                url: "cat.json"
+                url: "cat/config/cat.json"
             });
             if (xmlhttp) {
                 configText = xmlhttp.responseText;
@@ -105,18 +180,12 @@ _cat.core = function () {
                 }
             };
 
+
             this.getTests = function () {
-                var innerConfigMap = {};
+                return getTestsHelper(innerConfig);
 
-                if (innerConfig.tests) {
-                    for (var i = 0; i < innerConfig.tests.length; i++) {
-                        innerConfig.tests[i].wasRun = false;
-                        innerConfigMap[innerConfig.tests[i].name] = innerConfig.tests[i];
-                    }
-                }
-
-                return innerConfigMap;
             };
+
 
             this.getRunMode = function () {
                 return innerConfig["run-mode"];
@@ -203,11 +272,11 @@ _cat.core = function () {
                     matchvalues[callsIdx].callback = function () {
                         callbackCounter++;
                         callsIdx++;
-                        if (callsIdx < matchvalues.length + 1) {
+                        if (callsIdx < matchvalues.length) {
                             __callMatchValues(callsIdx, callback);
                         }
 
-                        if (callbackCounter === matchvalues.length + 1) {
+                        if (callbackCounter === matchvalues.length) {
                             if (callback) {
                                 callback.call(this);
                             }
@@ -353,29 +422,90 @@ _cat.core = function () {
 
                 tests = catConfig ? catConfig.getTests() : [];
 
-            //TODO: make this more readable
-            if (typeof catConfig === 'undefined' || catConfig.getRunMode() === 'all' ||
-                (catConfig.getRunMode() === 'test-manager' && tests[scrap.name[0]])) {
-                runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
-                if (runat) {
-                    manager = _cat.core.getManager(runat);
-                    if (manager) {
-                        pkgname = scrap.pkgName;
+
+            if ((catConfig) && (catConfig.getRunMode() === 'test-manager')) {
+                // check if the test name is in the cat.json
+                var scrapsTestsInfo = getScrapTestInfo(tests, scrap.name[0]);
+
+
+                pkgname = scrap.pkgName;
+                _cat.core.defineImpl(pkgname, function () {
+                    _cat.core.actionimpl.apply(this, args);
+                });
+
+                if (scrapsTestsInfo.length !== 0) {
+
+                    // init managerScraps
+                    if (managerScraps.length === 0) {
+                        testNumber = tests.length;
+                        managerScraps = new Array(tests.length);
+                    }
+
+                    addScrapToManager(scrapsTestsInfo, scrap);
+
+                    if (testNumber === 0) {
+                        var managerScrap = managerScraps[managerScraps.length - 1];
+
+                        managerScrap.scrap.catui = ["on"];
+                        managerScrap.scrap.manager = ["true"];
+
+
+                        pkgname = managerScrap.scrap.pkgName;
                         if (!pkgname) {
                             _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
                         } else {
-                            _cat.core.defineImpl(pkgname, function () {
-                                _cat.core.actionimpl.apply(this, args);
-                            });
-                        }
 
+
+                            for (var i = 0; i < managerScraps.length; i++) {
+                                var tempScrap = managerScraps[i];
+                                _cat.core.setManager(managerScrap.scrap.name[0], tempScrap.pkgName);
+                                // set number of repeats for scrap
+                                for (var j = 0; j < tempScrap.repeat; j++) {
+                                    _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.repeat);
+                                }
+                            }
+
+
+                            /*  CAT UI call  */
+                            _cat.core.ui.on();
+
+                            /*  Manager call  */
+                            (function () {
+                                _cat.core.managerCall(managerScrap.scrap.name[0], function () {
+                                    _cat.utils.Signal.send('TESTEND');
+                                });
+                            })();
+
+
+                        }
                     }
-                } else {
-                    _cat.core.actionimpl.apply(this, arguments);
+
                 }
             } else {
-                _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
+
+                if (typeof catConfig === 'undefined' || catConfig.getRunMode() === 'all') {
+                    runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
+                    if (runat) {
+                        manager = _cat.core.getManager(runat);
+                        if (manager) {
+                            pkgname = scrap.pkgName;
+                            if (!pkgname) {
+                                _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
+                            } else {
+                                _cat.core.defineImpl(pkgname, function () {
+                                    _cat.core.actionimpl.apply(this, args);
+                                });
+                            }
+
+                        }
+                    } else {
+                        _cat.core.actionimpl.apply(this, arguments);
+                    }
+                } else {
+                    _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
+                }
             }
+
 
         },
 

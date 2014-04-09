@@ -194,6 +194,7 @@ div#cat-status {
     margin-top: 10px;
     margin-right : 10px;
     display: table;
+    font-family: "HPSimplified, Arial";
 }
 
 div#catHeader {
@@ -203,11 +204,13 @@ div#catHeader {
     margin-left: 60px;
     margin-top: 15px;
     font-size: 1.3em;
-    font-family: "Impact";
+    font-family: "HPSimplified, Arial";
+    font-size: 14px;
 
 
 }
-span#catHeadermask {
+span#catheadermask {
+    font-family: "HPSimplified, Arial";
     font-size:10px;
     color:#444444;
     white-space: nowrap;
@@ -242,6 +245,8 @@ ul#testList li{
 div.text-tips {
     margin-top: 35px;
     padding-left: 10px;
+    font-family: "HPSimplified, Arial";
+    font-size:18px;
 }
 
 li.listImageCheck {

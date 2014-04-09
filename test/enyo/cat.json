@@ -1,0 +1,12 @@
+{
+    "type": "enyo-test",
+    "ip": null,
+    "port": null,
+    "tests":[
+        {"name" : "enyoNext", "repeat" : 2},
+        {"name" : "letsGo", "repeat" : 1}
+    ],
+
+    "run-mode": "test-manager",
+    "test-failure-timeout": 30
+}

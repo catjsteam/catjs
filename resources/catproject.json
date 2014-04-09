@@ -64,6 +64,16 @@
             "set": [{"key": "assert", "var": "assert", "prop":"result"}]
         },
         {
+            "name": "p@project.runner.start",
+            "type": "runner",
+            "action": "start"
+        },
+        {
+            "name": "p@project.runner.stop",
+            "type": "runner",
+            "action": "stop"
+        },
+        {
             "name": "p@project.webserver.stop",
             "type": "webserver",
             "action": "stop"
@@ -72,6 +82,10 @@
             "name": "p@sample.plugin",
             "type": "sample",
             "customAttribute": "Custom attribute test"
+        },
+        {
+            "name": "p@autotest.plugin",
+            "type": "autotest"
         },
         {
             "name": "p@init.scrap",
@@ -138,6 +152,10 @@
             "plugins":["p@lib.copy"]
         },
         {
+            "name": "t@autotest",
+            "plugins":["p@autotest.plugin", "p@src.copy"]
+        },
+        {
             "name": "t@wipe",
             "plugins": ["p@project.clean", "p@project.wipe"]
         },
@@ -158,6 +176,14 @@
             "plugins": ["p@project.webserver.start"]
         },
         {
+            "name": "t@runner.start",
+            "plugins": ["p@project.runner.start"]
+        },
+        {
+            "name": "t@runner.stop",
+            "plugins": ["p@project.runner.stop"]
+        },
+        {
             "name": "t@server.stop",
             "plugins": ["p@project.webserver.stop"]
         },
@@ -167,7 +193,7 @@
         },
         {
             "name": "t@init",
-            "plugins": ["p@project.copy", "p@libraries.build", "p@lib.copy"]
+            "plugins": ["p@project.copy", "p@libraries.build", "p@lib.copy", "p@src.copy"]
         },
         {
             "name": "t@scrap",
