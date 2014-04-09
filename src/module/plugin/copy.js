@@ -201,7 +201,7 @@ module.exports = _basePlugin.ext(function () {
 
             var dependency,
                 frompath, topath, files,
-                stats, counter = 0;
+                stats;
 
             function _copyRecursiveSync(src, dest) {
                 _wrench.mkdirSyncRecursive(dest, 0777);
@@ -258,9 +258,9 @@ module.exports = _basePlugin.ext(function () {
             // initial data binding to 'this'
             _me.dataInit(_data);
 
-            function _copyrec(cb) {
+            function _copyrec(afrompath, cb) {
 
-                _copx(frompath, cb);
+                _copx(afrompath, cb);
 
             }
 
@@ -282,12 +282,26 @@ module.exports = _basePlugin.ext(function () {
 
                 if (topath && frompath) {
 
-                    frompath = _glob.sync(frompath);
+                    if (_typedas.isArray(frompath)) {
 
-                    _copyrec(function () {
-                        _emitter.emit("job.done", {status: "done"});
-                    });
+                        frompath.forEach(function(path) {
 
+                            frompath = _glob.sync(path);
+
+                            _copyrec(frompath, function () {
+                                _emitter.emit("job.done", {status: "done"});
+                            });
+
+                        });
+                     } else {
+
+                        frompath = _glob.sync(frompath);
+
+                        _copyrec(frompath, function () {
+                            _emitter.emit("job.done", {status: "done"});
+                        });
+
+                    }
 
                 } else {
                     _emitter.emit("job.done", {status: "done"});
