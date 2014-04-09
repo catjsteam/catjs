@@ -7,8 +7,7 @@ With simple annotations added to your HTML5 code, an automated functional tests 
 
 
 ### Code once, deploy it anywhere <br/>
-### Code once, deploy it anywhere <br/>
-<sub>sdfsdfsdfsd</sub>
+
 Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner), on any platform that your application supports.    
 CAT runner can deploy your application on multiple devices and desktop browsers.
 
@@ -90,9 +89,6 @@ CAT's annotation term for a single test unit is "Scrap".
 
 1. Try adding your own scrap in your JavaScript file:
 
-        function () {
-            return "sdfsdf";
-        }
         /*
             @[scrap
                 @@name simpleSetText
