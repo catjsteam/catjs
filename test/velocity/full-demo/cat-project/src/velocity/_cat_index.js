@@ -2,7 +2,7 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
   scrap: {
     "name": ["setUsername"],
     "embed": ["true"],
-    "jqm": ["setText(\"username\", \"catjsteam\");"],
+    "jqm": ["setText(\"username\", \"test1\");"],
     "file": "C:/Users/snirr/workspace/CATCore/test/velocity/full-demo/cat-project/target/velocity/index.html",
     "scrapinfo": {
       "start": {
@@ -10,18 +10,18 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
         "col": 18
       },
       "end": {
-        "line": 39,
+        "line": 38,
         "col": 20
       }
     },
     "commentinfo": {
       "start": {
         "line": 33,
-        "col": 0
+        "col": 8
       },
       "end": {
-        "line": 40,
-        "col": 16
+        "line": 39,
+        "col": 11
       }
     },
     "single": {
@@ -34,6 +34,7 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": true,
       "singleton": true,
       "arguments": true,
+      "auto": true,
       "id": true,
       "$type": true
     },
@@ -47,10 +48,12 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": -1,
       "singleton": -1,
       "arguments": -1,
+      "auto": -1,
       "id": -1,
       "$type": -1
     },
     "arguments": [],
+    "auto": true,
     "id": "scrap_5",
     "$type": "html",
     "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setUsername"
@@ -64,35 +67,35 @@ _cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-p
   _cat.core.ui.setContent({
     style: 'color:#0080FF',
     header: 'setUsername',
-    desc: 'setText("username", "catjsteam");',
+    desc: 'setText("username", "test1");',
     tips: ''
   });
-  _cat.core.plugin('jqm').actions.setText("username", "catjsteam");
+  _cat.core.plugin('jqm').actions.setText("username", "test1");
 });
-_cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setPassword$$cat', {
+_cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setUsername2$$cat', {
   scrap: {
-    "name": ["setPassword"],
+    "name": ["setUsername2"],
     "embed": ["true"],
-    "jqm": ["setText(\"password\", \"password\");"],
+    "jqm": ["setText(\"username\", \"test2\");"],
     "file": "C:/Users/snirr/workspace/CATCore/test/velocity/full-demo/cat-project/target/velocity/index.html",
     "scrapinfo": {
       "start": {
-        "line": 48,
+        "line": 42,
         "col": 18
       },
       "end": {
-        "line": 53,
+        "line": 46,
         "col": 20
       }
     },
     "commentinfo": {
       "start": {
-        "line": 47,
-        "col": 2
+        "line": 41,
+        "col": 8
       },
       "end": {
-        "line": 54,
-        "col": 16
+        "line": 47,
+        "col": 11
       }
     },
     "single": {
@@ -105,6 +108,7 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": true,
       "singleton": true,
       "arguments": true,
+      "auto": true,
       "id": true,
       "$type": true
     },
@@ -118,11 +122,235 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": -1,
       "singleton": -1,
       "arguments": -1,
+      "auto": -1,
       "id": -1,
       "$type": -1
     },
     "arguments": [],
+    "auto": true,
     "id": "scrap_6",
+    "$type": "html",
+    "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setUsername2"
+  }
+}, 'scrap');
+_cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setUsername2$$cat", function() {
+
+  var pkgName = "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setUsername2$$cat";
+
+  /* test content in here */
+  _cat.core.ui.setContent({
+    style: 'color:#0080FF',
+    header: 'setUsername2',
+    desc: 'setText("username", "test2");',
+    tips: ''
+  });
+  _cat.core.plugin('jqm').actions.setText("username", "test2");
+});
+_cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setFullname$$cat', {
+  scrap: {
+    "name": ["setFullname"],
+    "embed": ["true"],
+    "jqm": ["setText(\"fullname\", \"this is my name\");"],
+    "file": "C:/Users/snirr/workspace/CATCore/test/velocity/full-demo/cat-project/target/velocity/index.html",
+    "scrapinfo": {
+      "start": {
+        "line": 54,
+        "col": 18
+      },
+      "end": {
+        "line": 58,
+        "col": 20
+      }
+    },
+    "commentinfo": {
+      "start": {
+        "line": 53,
+        "col": 8
+      },
+      "end": {
+        "line": 59,
+        "col": 11
+      }
+    },
+    "single": {
+      "name": true,
+      "embed": true,
+      "jqm": false,
+      "file": true,
+      "scrapinfo": true,
+      "commentinfo": true,
+      "single": true,
+      "singleton": true,
+      "arguments": true,
+      "auto": true,
+      "id": true,
+      "$type": true
+    },
+    "singleton": {
+      "name": -1,
+      "embed": -1,
+      "jqm": -1,
+      "file": -1,
+      "scrapinfo": -1,
+      "commentinfo": -1,
+      "single": -1,
+      "singleton": -1,
+      "arguments": -1,
+      "auto": -1,
+      "id": -1,
+      "$type": -1
+    },
+    "arguments": [],
+    "auto": true,
+    "id": "scrap_7",
+    "$type": "html",
+    "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setFullname"
+  }
+}, 'scrap');
+_cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setFullname$$cat", function() {
+
+  var pkgName = "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setFullname$$cat";
+
+  /* test content in here */
+  _cat.core.ui.setContent({
+    style: 'color:#0080FF',
+    header: 'setFullname',
+    desc: 'setText("fullname", "this is my name");',
+    tips: ''
+  });
+  _cat.core.plugin('jqm').actions.setText("fullname", "this is my name");
+});
+_cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setEmail$$cat', {
+  scrap: {
+    "name": ["setEmail"],
+    "embed": ["true"],
+    "jqm": ["setText(\"email\", \"catjsteam@gmail.com\");"],
+    "file": "C:/Users/snirr/workspace/CATCore/test/velocity/full-demo/cat-project/target/velocity/index.html",
+    "scrapinfo": {
+      "start": {
+        "line": 66,
+        "col": 26
+      },
+      "end": {
+        "line": 70,
+        "col": 28
+      }
+    },
+    "commentinfo": {
+      "start": {
+        "line": 65,
+        "col": 8
+      },
+      "end": {
+        "line": 71,
+        "col": 19
+      }
+    },
+    "single": {
+      "name": true,
+      "embed": true,
+      "jqm": false,
+      "file": true,
+      "scrapinfo": true,
+      "commentinfo": true,
+      "single": true,
+      "singleton": true,
+      "arguments": true,
+      "auto": true,
+      "id": true,
+      "$type": true
+    },
+    "singleton": {
+      "name": -1,
+      "embed": -1,
+      "jqm": -1,
+      "file": -1,
+      "scrapinfo": -1,
+      "commentinfo": -1,
+      "single": -1,
+      "singleton": -1,
+      "arguments": -1,
+      "auto": -1,
+      "id": -1,
+      "$type": -1
+    },
+    "arguments": [],
+    "auto": true,
+    "id": "scrap_8",
+    "$type": "html",
+    "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setEmail"
+  }
+}, 'scrap');
+_cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setEmail$$cat", function() {
+
+  var pkgName = "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setEmail$$cat";
+
+  /* test content in here */
+  _cat.core.ui.setContent({
+    style: 'color:#0080FF',
+    header: 'setEmail',
+    desc: 'setText("email", "catjsteam@gmail.com");',
+    tips: ''
+  });
+  _cat.core.plugin('jqm').actions.setText("email", "catjsteam@gmail.com");
+});
+_cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setPassword$$cat', {
+  scrap: {
+    "name": ["setPassword"],
+    "embed": ["true"],
+    "jqm": ["setText(\"password\", \"123456789\");"],
+    "file": "C:/Users/snirr/workspace/CATCore/test/velocity/full-demo/cat-project/target/velocity/index.html",
+    "scrapinfo": {
+      "start": {
+        "line": 78,
+        "col": 34
+      },
+      "end": {
+        "line": 82,
+        "col": 36
+      }
+    },
+    "commentinfo": {
+      "start": {
+        "line": 77,
+        "col": 8
+      },
+      "end": {
+        "line": 83,
+        "col": 27
+      }
+    },
+    "single": {
+      "name": true,
+      "embed": true,
+      "jqm": false,
+      "file": true,
+      "scrapinfo": true,
+      "commentinfo": true,
+      "single": true,
+      "singleton": true,
+      "arguments": true,
+      "auto": true,
+      "id": true,
+      "$type": true
+    },
+    "singleton": {
+      "name": -1,
+      "embed": -1,
+      "jqm": -1,
+      "file": -1,
+      "scrapinfo": -1,
+      "commentinfo": -1,
+      "single": -1,
+      "singleton": -1,
+      "arguments": -1,
+      "auto": -1,
+      "id": -1,
+      "$type": -1
+    },
+    "arguments": [],
+    "auto": true,
+    "id": "scrap_9",
     "$type": "html",
     "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setPassword"
   }
@@ -135,35 +363,35 @@ _cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-p
   _cat.core.ui.setContent({
     style: 'color:#0080FF',
     header: 'setPassword',
-    desc: 'setText("password", "password");',
+    desc: 'setText("password", "123456789");',
     tips: ''
   });
-  _cat.core.plugin('jqm').actions.setText("password", "password");
+  _cat.core.plugin('jqm').actions.setText("password", "123456789");
 });
-_cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.clickLogin$$cat', {
+_cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setRepeatPassword$$cat', {
   scrap: {
-    "name": ["clickLogin"],
+    "name": ["setRepeatPassword"],
     "embed": ["true"],
-    "jqm": ["clickButton(\"loginBtn\");"],
+    "jqm": ["setText(\"repeatpassword\", \"123456789\");"],
     "file": "C:/Users/snirr/workspace/CATCore/test/velocity/full-demo/cat-project/target/velocity/index.html",
     "scrapinfo": {
       "start": {
-        "line": 62,
-        "col": 18
+        "line": 90,
+        "col": 34
       },
       "end": {
-        "line": 67,
-        "col": 20
+        "line": 94,
+        "col": 36
       }
     },
     "commentinfo": {
       "start": {
-        "line": 61,
-        "col": 2
+        "line": 89,
+        "col": 8
       },
       "end": {
-        "line": 68,
-        "col": 16
+        "line": 95,
+        "col": 27
       }
     },
     "single": {
@@ -176,6 +404,7 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": true,
       "singleton": true,
       "arguments": true,
+      "auto": true,
       "id": true,
       "$type": true
     },
@@ -189,25 +418,27 @@ _cat.core.declare('C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-
       "single": -1,
       "singleton": -1,
       "arguments": -1,
+      "auto": -1,
       "id": -1,
       "$type": -1
     },
     "arguments": [],
-    "id": "scrap_7",
+    "auto": true,
+    "id": "scrap_10",
     "$type": "html",
-    "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.clickLogin"
+    "pkgName": "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setRepeatPassword"
   }
 }, 'scrap');
-_cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.clickLogin$$cat", function() {
+_cat.core.define("C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setRepeatPassword$$cat", function() {
 
-  var pkgName = "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.clickLogin$$cat";
+  var pkgName = "C:.Users.snirr.workspace.CATCore.test.velocity.full-demo.cat-project.target.velocity.index.html.setRepeatPassword$$cat";
 
   /* test content in here */
   _cat.core.ui.setContent({
     style: 'color:#0080FF',
-    header: 'clickLogin',
-    desc: 'clickButton("loginBtn");',
+    header: 'setRepeatPassword',
+    desc: 'setText("repeatpassword", "123456789");',
     tips: ''
   });
-  _cat.core.plugin('jqm').actions.clickButton("loginBtn");
+  _cat.core.plugin('jqm').actions.setText("repeatpassword", "123456789");
 });
