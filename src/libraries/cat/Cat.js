@@ -25,12 +25,13 @@ _cat.core = function () {
 
             var testRepeats = parseInt((test.repeat ? test.repeat : 1));
             test.repeat = "repeat(" + testRepeats + ")";
-
+			var testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
             var preformVal = "@@" + scrap.name[0] + " " + testRepeats;
             var pkgNameVal = scrap.pkgName + "$$cat";
             managerScraps[test.index] = {"preform": preformVal,
                 "pkgName": pkgNameVal,
                 "repeat": testRepeats,
+                "delay" : testDelay,
                 "name": scrap.name[0],
                 "scrap": scrap};
         }
@@ -43,6 +44,7 @@ _cat.core = function () {
             if (tests[i].name === scrapName) {
                 var tempInfo = {"name": tests[i].name,
                     "wasRun": tests[i].wasRun,
+                    "delay" : tests[i].delay,
                     "repeat": tests[i].repeat};
                 tempInfo.index = i;
                 scrapTests.push(tempInfo);
@@ -119,7 +121,7 @@ _cat.core = function () {
             getTestsHelper;
 
 
-        getTestsHelper = function (testList) {
+        getTestsHelper = function (testList, globalDelay) {
 
             var innerConfigMap = [];
             if (testList.tests) {
@@ -129,12 +131,16 @@ _cat.core = function () {
                             var repeatFlow = testList.tests[i].repeat ? testList.tests[i].repeat : 1;
 
                             for (var j = 0; j < repeatFlow; j++) {
-                                var tempArr = getTestsHelper(testList.tests[i]);
+                                var tempArr = getTestsHelper(testList.tests[i], testList.tests[i].delay);
                                 innerConfigMap = innerConfigMap.concat(tempArr);
                             }
 
                         } else {
 
+                            // set the global delay
+                            if (!testList.tests[i].delay && globalDelay) {
+                                testList.tests[i].delay = globalDelay;
+                            }
                             testList.tests[i].wasRun = false;
                             innerConfigMap.push(testList.tests[i]);
 
@@ -461,7 +467,7 @@ _cat.core = function () {
                                 _cat.core.setManager(managerScrap.scrap.name[0], tempScrap.pkgName);
                                 // set number of repeats for scrap
                                 for (var j = 0; j < tempScrap.repeat; j++) {
-                                    _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.repeat);
+                                    _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.delay);
                                 }
                             }
 
