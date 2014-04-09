@@ -110,7 +110,7 @@
 
     "tasks": [
         {
-            "name": "build.cat",
+            "name": "build",
             "plugins": ["p@project.clean", "p@project.wipe",
                 "init.copy.src", "minify", "init.copy.resources", "clean.images", "init.copy.root",
                 "copy.test.enyo", "copy.test.sencha", "copy.test"
