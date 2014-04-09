@@ -8,7 +8,7 @@ With simple annotations added to your HTML5 code, an automated functional tests 
 
 ### Code once, deploy it anywhere <br/>
 
-Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner), on any platform that your application supports.    
+Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner) (That is already part of CAT Core, no need to do any additional installations), on any platform that your application supports.
 CAT runner can deploy your application on multiple devices and desktop browsers.
 
 ### A few facts
@@ -34,12 +34,13 @@ In order to get started, you'll want to install CAT's CLI (command line interfac
 
         catcli --init example
 
-1. Test the application with CAT - build the test application and run CAT server
+1. Test the application with CAT - build the test application, run CAT server and with CAT runner open the browsers and any hooked Android devices
 
-        cd cat-project && catcli -bs
+        cd cat-project && catcli -bsr
 
     * -b stands for build
     * -s stands for running the web-server with the test application deployed
+    * -r stands for cat runner (default configured to run chrome, firefox browsers and any USB hooked Android devices)
 
 1. Open your favorite browser and go to: http://localhost:8089
 
