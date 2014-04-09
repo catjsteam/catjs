@@ -210,7 +210,7 @@ module.exports = _basePlugin.ext(function () {
                     forceDelete: true,
                     preserveFiles: true
                 });
-            };
+            }
 
             function _copx(afrompath, cb) {
 

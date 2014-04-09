@@ -36,7 +36,7 @@ module.exports = function () {
                     "r": ["--task", "t@runner.start"],
                     "m": ["--task", "t@mtest"],
                     "p": ["--project" , "."]
-                });;
+                });
 
             (function () {
 

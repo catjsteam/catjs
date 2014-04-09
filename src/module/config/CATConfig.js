@@ -93,7 +93,6 @@ var _global = catrequire("cat.global"),
                     cattarget = (project.getInfo("cattarget") || "./");
 
                     appTargetPath = _path.join("./", _path.relative(_path.resolve("."), targetfolder), project.name);
-                    console.log("to:" + appTargetPath);
                     appPath = project.getInfo("apppath");
                     if (appPath) {
                         projectcopy= {
@@ -111,7 +110,7 @@ var _global = catrequire("cat.global"),
                         customTasks.push(projectcopy);
 
                     } else  {
-                        _utils.log("error", "[CAT config] 'apppath property is missing or not valid. See catproject.json spec")
+                        _log.log("error", "[CAT config] 'apppath property is missing or not valid. See catproject.json spec");
                     }
 
                     customTasks = customTasks.concat([
