@@ -3,6 +3,9 @@
     "ip": null,
     "port": null,
     "tests":[],
+    "scenarios" : {
+        "general" : []
+    },
     "run-mode": "all",
     "test-failure-timeout": 30
 }
