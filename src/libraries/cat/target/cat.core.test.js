@@ -113,44 +113,71 @@ _cat.core = function () {
         }
     })();
 
+    // singelton class
+    function GetTestsClass(config) {
+        this.globalTests = [];
+        // do this once
+        this.setTests = function (config) {
+            var getSenarioTests =function(testsList, globalDelay) {
+                var innerConfigMap = [];
+                if (testsList.tests) {
+                    for (var i = 0; i < testsList.tests.length; i++) {
+                        if (!(testsList.tests[i].disable)) {
+                            if (testsList.tests[i].tests) {
+                                var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
+
+                                for (var j = 0; j < repeatFlow; j++) {
+                                    var tempArr = getSenarioTests(testsList.tests[i], testsList.tests[i].delay);
+                                    innerConfigMap = innerConfigMap.concat(tempArr);
+                                }
+
+                            } else {
+
+                                // set the global delay
+                                if (!testsList.tests[i].delay && globalDelay) {
+                                    testsList.tests[i].delay = globalDelay;
+                                }
+                                testsList.tests[i].wasRun = false;
+                                innerConfigMap.push(testsList.tests[i]);
+
+                            }
+                        }
+                    }
+                }
+
+                return innerConfigMap;
+
+            };
+            var testsFlow = config.tests;
+            var senarios = config.senarios;
+            for (var i = 0; i < testsFlow.length; i++) {
+                var currTest = testsFlow[i];
+                var senario = senarios[currTest.name];
+                var repeatSenario = (senario.repeat ? senario.repeat : 1);
+                for (var j = 0; j < repeatSenario; j++) {
+                    var temp = (getSenarioTests(senario, senario.delay));
+                    this.globalTests = this.globalTests.concat(temp);
+                }
+            }
+        };
+
+        if ( GetTestsClass._singletonInstance ) {
+            return GetTestsClass._singletonInstance;
+        }
+
+        this.setTests(config);
+
+        GetTestsClass._singletonInstance = this;
+
+        this.getTests = function() { return this.globalTests; };
+    }
+
     function Config() {
 
         var innerConfig,
             xmlhttp,
             configText,
             getTestsHelper;
-
-
-        getTestsHelper = function (testList, globalDelay) {
-
-            var innerConfigMap = [];
-            if (testList.tests) {
-                for (var i = 0; i < testList.tests.length; i++) {
-                    if (!(testList.tests[i].disable)) {
-                        if (testList.tests[i].tests) {
-                            var repeatFlow = testList.tests[i].repeat ? testList.tests[i].repeat : 1;
-
-                            for (var j = 0; j < repeatFlow; j++) {
-                                var tempArr = getTestsHelper(testList.tests[i], testList.tests[i].delay);
-                                innerConfigMap = innerConfigMap.concat(tempArr);
-                            }
-
-                        } else {
-
-                            // set the global delay
-                            if (!testList.tests[i].delay && globalDelay) {
-                                testList.tests[i].delay = globalDelay;
-                            }
-                            testList.tests[i].wasRun = false;
-                            innerConfigMap.push(testList.tests[i]);
-
-                        }
-                    }
-                }
-            }
-            return innerConfigMap;
-        };
-
 
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
@@ -188,10 +215,12 @@ _cat.core = function () {
 
 
             this.getTests = function () {
-                return getTestsHelper(innerConfig);
+
+                var tests = new GetTestsClass(innerConfig);
+
+                return tests.getTests();
 
             };
-
 
             this.getRunMode = function () {
                 return innerConfig["run-mode"];
