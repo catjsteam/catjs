@@ -96,7 +96,7 @@
             "name": "p@libraries.build",
             "type": "libraries",
             "dependency": "manager",
-            "imports": ["chai", "tmr", "cat"],
+            "imports": ["jspath", "chai", "tmr", "cat"],
             "action": "build"
         },
         {
