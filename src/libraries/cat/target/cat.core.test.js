@@ -118,7 +118,7 @@ _cat.core = function () {
         this.globalTests = [];
         // do this once
         this.setTests = function (config) {
-            var getSenarioTests =function(testsList, globalDelay) {
+            var getScenarioTests =function(testsList, globalDelay) {
                 var innerConfigMap = [];
                 if (testsList.tests) {
                     for (var i = 0; i < testsList.tests.length; i++) {
@@ -127,7 +127,7 @@ _cat.core = function () {
                                 var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
 
                                 for (var j = 0; j < repeatFlow; j++) {
-                                    var tempArr = getSenarioTests(testsList.tests[i], testsList.tests[i].delay);
+                                    var tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay);
                                     innerConfigMap = innerConfigMap.concat(tempArr);
                                 }
 
@@ -149,13 +149,13 @@ _cat.core = function () {
 
             };
             var testsFlow = config.tests;
-            var senarios = config.senarios;
+            var scenarios = config.scenarios;
             for (var i = 0; i < testsFlow.length; i++) {
                 var currTest = testsFlow[i];
-                var senario = senarios[currTest.name];
-                var repeatSenario = (senario.repeat ? senario.repeat : 1);
-                for (var j = 0; j < repeatSenario; j++) {
-                    var temp = (getSenarioTests(senario, senario.delay));
+                var scenario = scenarios[currTest.name];
+                var repeatScenario = (scenario.repeat ? scenario.repeat : 1);
+                for (var j = 0; j < repeatScenario; j++) {
+                    var temp = (getScenarioTests(scenario, scenario.delay));
                     this.globalTests = this.globalTests.concat(temp);
                 }
             }
