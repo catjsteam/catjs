@@ -54,7 +54,6 @@ module.exports = _basePlugin.ext(function () {
             if (config && extensionParams) {
 
                 //customAttribute = extensionParams.customAttribute;
-
                 scraps = _Scrap.getScraps();
                 if (scraps) {
 
@@ -70,8 +69,8 @@ module.exports = _basePlugin.ext(function () {
                             catjsondata = _fs.readFileSync(catjson, "utf8");
                             if (catjsondata) {
                                 catjsondata = JSON.parse(catjsondata);
-                                if (catjsondata.tests) {
-                                    catjsondata.tests = args;
+                                if (catjsondata.scenarios.general.tests && catjsondata.tests) {
+                                    catjsondata.scenarios.general.tests = args;
                                 }
                             }
                             catjsondata["run-mode"] = "test-manager";

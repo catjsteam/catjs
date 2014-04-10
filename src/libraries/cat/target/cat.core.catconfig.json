@@ -2,7 +2,14 @@
     "type": "{{project.name}}",
     "ip": null,
     "port": null,
-    "tests":[],
+    "tests":[
+        {"name" : "general"}
+    ],
+    "scenarios" : {
+        "general" : {
+            "tests" : []
+        }
+    },
     "run-mode": "all",
     "test-failure-timeout": 30
 }
