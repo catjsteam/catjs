@@ -26,13 +26,47 @@
             }
         },
         {
+            "name": "clean.images",
+            "type": "clean",
+            "src": ["./target/resources/images"]
+        },
+        {
             "name": "init.copy.root",
             "type": "copy",
             "from": {
-                "path": "./../*.*"
+                "path": ["./../*.js", "./../*.json", "./../*.md" ]
             },
             "to": {
                 "path": "./target/"
+            }
+        },
+        {
+            "name": "copy.test.enyo",
+            "type": "copy",
+            "from": {
+                "path": "./../test/enyo"
+            },
+            "to": {
+                "path": "./target/test/enyo"
+            }
+        },
+        {
+            "name": "copy.test.sencha",
+            "type": "copy",
+            "from": {
+                "path": "./../test/sencha"
+            },
+            "to": {
+                "path": "./target/test/sencha"
+            }
+        },{
+            "name": "copy.test",
+            "type": "copy",
+            "from": {
+                "path": ["./../test/test.js", "./../test/testModule.js"]
+            },
+            "to": {
+                "path": "./target/test/"
             }
         },
         {
@@ -76,8 +110,14 @@
 
     "tasks": [
         {
-            "name": "build.cat",
-            "plugins": ["p@project.clean", "p@project.wipe", "init.copy.src", "minify", "init.copy.resources", "init.copy.root"]
+            "name": "build",
+            "plugins": ["p@project.clean", "p@project.wipe",
+                "init.copy.src", "minify", "init.copy.resources", "clean.images", "init.copy.root",
+                "copy.test.enyo", "copy.test.sencha", "copy.test"
+            ]
+        }, {
+            "name": "clean",
+            "plugins": ["p@project.clean", "p@project.wipe"]
         }
     ]
 

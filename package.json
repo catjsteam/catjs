@@ -1,7 +1,7 @@
 {
   "name": "catjs",
   "description": "(Mobile) Web Automation Framework",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "homepage": "http://catjsteam.github.io",
   "author": {
     "name": "arik",
@@ -35,7 +35,7 @@
   },
   "main": "src/module/CAT",
   "bin": {
-    "catcli": "catcli"
+    "catcli": "catcli.js"
   },
   "scripts": {
     "preinstall": "node precatinstall.js",

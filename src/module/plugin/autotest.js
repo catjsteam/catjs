@@ -64,7 +64,7 @@ module.exports = _basePlugin.ext(function () {
                         }
                     });
 
-                    catjson = (workDir ? _path.join(_project.getInfo("source"), "config/cat.json") : undefined)
+                    catjson = (workDir ? _path.join(_project.getInfo("source"), "config/cat.json") : undefined);
                     if (catjson) {
                         if (_fs.existsSync(catjson)) {
                             catjsondata = _fs.readFileSync(catjson, "utf8");
