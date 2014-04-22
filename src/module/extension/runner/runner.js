@@ -40,6 +40,7 @@ var runner = function () {
                     "devices": [
                         {
                             "type": "localpc",
+                            "disable": "true",
                             "runner": {
                                 "name": "chrome",
                                 "address": "/index.html"
@@ -47,6 +48,7 @@ var runner = function () {
                         },
                         {
                             "type": "localpc",
+                            "disable": "true",
                             "runner": {
                                 "name": "firefox",
                                 "address": "/index.html"
