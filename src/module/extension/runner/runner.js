@@ -40,7 +40,7 @@ var runner = function () {
                     "devices": [
                         {
                             "type": "localpc",
-                            "disable": "true",
+                            "disable": true,
                             "runner": {
                                 "name": "chrome",
                                 "address": "/index.html"
@@ -48,14 +48,13 @@ var runner = function () {
                         },
                         {
                             "type": "localpc",
-                            "disable": "true",
+                            "disable": true,
                             "runner": {
                                 "name": "firefox",
                                 "address": "/index.html"
                             }
                         },
                         {
-                            "disable": "false",
                             "type": "android",
                             "id": "all",
                             "runner": {
@@ -63,7 +62,7 @@ var runner = function () {
                             }
                         },
                         {
-                            "disable": "true",
+                            "disable": true,
                             "type": "iphone",
                             "id": "all",
                             "runner": {
