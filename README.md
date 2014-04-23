@@ -21,6 +21,11 @@ CAT runner can deploy your application on multiple devices and desktop browsers.
 
 [cat.js.team](http://catjsteam.github.io/) @catjsteam
 
+## Blog
+[http://catjs.blogspot.co.il](]http://catjs.blogspot.co.il)  
+* Web Applications that test themselves
+* Web automation testing solution
+
 ## Quick start
 
 ### First, install CAT command line
