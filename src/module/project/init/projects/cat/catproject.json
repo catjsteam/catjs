@@ -8,7 +8,7 @@
     "host": "{{host}}",
     "port": "{{port}}",
     "protocol": "{{protocol}}",
-
+    "analytics" : "{{analytics}}",
     "apppath": "{{appath}}",
     "appserver": {
         "host": "{{appserver.host}}",

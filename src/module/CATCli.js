@@ -38,6 +38,9 @@ module.exports = function () {
                     "p": ["--project" , "."]
                 });
 
+            // save command to global
+            global.catcommand = parsed;
+
             (function () {
 
                 _mapper.init({
