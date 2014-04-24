@@ -1,6 +1,7 @@
 var _flow,
     _prompt = require('prompt'),
-    _jsutils = require("js.utils");
+    _jsutils = require("js.utils"),
+    _analytics = require("./analytics/analytics");
 
 var CAT = function () {
 
@@ -254,6 +255,7 @@ var CAT = function () {
                     appPath;
 
                 function _createProject(args) {
+
                     if (!args.appath) {
                         args.appath = appPath;
                     }
@@ -302,13 +304,13 @@ var CAT = function () {
                                         required: false,
                                         default: "http",
                                         description: "Enter CAT server's protocol"
-                                    })/*,
-                                    appserverhost: new Schema({
+                                    }),
+                                    analytics: new Schema({
                                         type: "string",
                                         required: false,
-                                        default: "localhost",
-                                        description: "Enter your Application server's host name"
-                                    }),
+                                        default: "true",
+                                        description: "Would you like to contribute analytics to CAT"
+                                    })/*,
                                     appserverport: new Schema({
                                         type: "string",
                                         required: false,
@@ -379,6 +381,8 @@ var CAT = function () {
                         });
 
                         if (project) {
+                            // update analytics
+                            _analytics.updateAnalytics(global.catcommand);
 
                             // apply project's tasks
                             if (_targets) {
