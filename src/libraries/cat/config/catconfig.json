@@ -1,4 +1,17 @@
 {
+    "_comment": {
+        "description": "This is the cat test project (for the specification see catjs docs)",
+        "tests": "Put in here all of the test scenarios that you wish to run. Enabled only if run-mode set to test-manager",
+        "scenarios": "Declare your scenarios in here and execute them using the 'tests' property",
+        "run-mode": {
+            "all": "Execute all available tests (ignores 'tests' and 'scenarios' properties)",
+            "test-manager": "Executes only the tests specified in the 'tests' property"
+        },
+        "ui": "Set to true in case you wish to enable catjs ui widget",
+        "report": "In case you wish to get a report data set its 'disable' property to false. Currently catjs supports the junit XML format",
+        "test-failure-timeout": "This is a timeout for failing the tests in case of general application malfunction. Set the timeout in seconds. "
+    },
+
     "type": "{{project.name}}",
     "ip": null,
     "port": null,
@@ -10,6 +23,11 @@
             "tests" : []
         }
     },
-    "run-mode": "test-manager",
+    "ui": true,
+    "report": {
+        "format": "junit",
+        "disable": true
+    },
+    "run-mode": "all",
     "test-failure-timeout": 30
 }
