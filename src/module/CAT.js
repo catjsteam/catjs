@@ -382,7 +382,10 @@ var CAT = function () {
 
                         if (project) {
                             // update analytics
-                            _analytics.updateAnalytics(global.catcommand);
+                            if (project.info.analytics && project.info.analytics == "true") {
+                                _analytics.updateAnalytics(global.catcommand);
+                            }
+
 
                             // apply project's tasks
                             if (_targets) {
