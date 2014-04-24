@@ -53,7 +53,6 @@ var runner = function () {
                             }
                         },
                         {
-                            "disable": "false",
                             "type": "android",
                             "id": "all",
                             "runner": {
@@ -61,7 +60,6 @@ var runner = function () {
                             }
                         },
                         {
-                            "disable": "true",
                             "type": "iphone",
                             "id": "all",
                             "runner": {
