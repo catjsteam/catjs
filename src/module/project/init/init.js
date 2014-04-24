@@ -105,7 +105,6 @@ module.exports = function () {
                     projectPath = _path.resolve(_path.join(currentpath, name));
                 }
             }
-
             args = {
                 "name": config.name,
 
@@ -115,7 +114,7 @@ module.exports = function () {
                 "host": config.host,
                 "port": config.port,
                 "protocol": config.protocol,
-
+                "analytics" : config.analytics,
                 "appserver": {
                     "host": ( config.host),
                     "port": (config.port),
