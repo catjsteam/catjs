@@ -76,7 +76,8 @@
     "jetty": "~0.2.1",
     "winston": "~0.7.2",
     "wrench": "~1.5.8",
-	"nodealytics" : "~0.0.5"
+    "nodealytics": "~0.0.5",
+    "colors": "~0.6.2"
   },
   "keywords": [
     "test",

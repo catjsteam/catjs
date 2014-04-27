@@ -907,7 +907,14 @@ _cat.utils.chai = function () {
 
 }();
 _cat.core.TestManager = function() {
-
+    //GUID generator
+    function S4() {
+        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    }
+    function guid() {
+        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+    }
+    ///
     function _Data(config) {
 
         var me = this;
@@ -1019,12 +1026,16 @@ _cat.core.TestManager = function() {
          */
         generateAssertCall: function(config, testdata) {
 
+            if (typeof _cat.core.TestManager.testSessionId === 'undefined'){
+                _cat.core.TestManager.testSessionId = guid();
+            }
             return "http://" + config.getIp() +  ":" +
                 config.getPort() + "/assert?testName=" +
                 testdata.getName() + "&message=" + testdata.getMessage() +
                 "&status=" + testdata.getStatus() +
                 "&type=" + config.getType() +
                 "&hasPhantom="  + config.hasPhantom() +
+                "&id="  + _cat.core.TestManager.testSessionId +
                 "&cache="+ (new Date()).toUTCString();
 
         }
