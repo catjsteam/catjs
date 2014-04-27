@@ -1,14 +1,14 @@
-CAT Core
+CATJS
 ==============
 
-*CAT Core* is an automation framework for mobile-web applications testing.  
+*CATJS* is an automation framework for (mobile) web applications testing.
 With simple annotations added to your HTML5 code, an automated functional tests will be available as part of your application lifecycle.
 
 
 
 ### Code once, deploy it anywhere <br/>
 
-Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner) (That is already part of CAT Core, no need to do any additional installations), on any platform that your application supports.
+Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner) (That is already part of CATJS, no need to do any additional installations), on any platform that your application supports.
 CAT runner can deploy your application on multiple devices and desktop browsers.
 
 ### A few facts
