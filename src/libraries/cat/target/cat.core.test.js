@@ -1,7 +1,8 @@
 var _cat = {
     utils: {},
     plugins: {},
-    ui: {}
+    ui: {},
+    errors:{}
 };
 
 var hasPhantomjs = false;
@@ -176,8 +177,7 @@ _cat.core = function () {
 
         var innerConfig,
             xmlhttp,
-            configText,
-            getTestsHelper;
+            configText;
 
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
@@ -195,9 +195,11 @@ _cat.core = function () {
         }
 
         if (innerConfig) {
+
             this.getType = function () {
                 return innerConfig.type;
             };
+
             this.getIp = function () {
                 if (innerConfig.ip) {
                     return innerConfig.ip;
@@ -226,6 +228,34 @@ _cat.core = function () {
                 return innerConfig["run-mode"];
             };
 
+            this.isReport = function() {
+
+                if (_cat.utils.Utils.validate(innerConfig, "report") && _cat.utils.Utils.validate(innerConfig.report, "disable", false)) {
+
+                    return true;
+                }
+
+                return false;
+            };
+
+            this.isErrors = function() {
+
+                if (_cat.utils.Utils.validate(innerConfig, "assert") && _cat.utils.Utils.validate(innerConfig.assert, "errors", true)) {
+
+                    return true;
+                }
+
+                return false;
+            };
+
+            this.isUI = function() {
+                if (_cat.utils.Utils.validate(innerConfig, "ui", true)) {
+
+                    return true;
+                }
+
+                return false;
+            };
         }
 
         this.hasPhantom = function () {
@@ -240,6 +270,44 @@ _cat.core = function () {
     return {
 
         log: _log,
+
+        init: function() {
+
+            _config = new Config();
+
+            // display the ui, if you didn't already
+            if (_config.isUI()) {
+                _cat.core.ui.enable();
+                if (!_cat.core.ui.isOpen()) {
+                    _cat.core.ui.on();
+                }
+            } else {
+                _cat.core.ui.disable();
+                _cat.core.ui.off();
+                _cat.core.ui.destroy();
+            }
+
+            if (_config.isErrors()) {
+
+                    // register DOM's error listener
+                    _cat.core.errors.listen(function(message, filename, lineno, colno, error) {
+
+                        var catconfig = _cat.core.getConfig();
+
+                        // create catjs assertion entry
+                        _cat.utils.assert.create({
+                            name: "generalJSError",
+                            displayName:  "General JavaScript Error",
+                            status: "failure",
+                            message: message,
+                            success: false,
+                            ui: catconfig.isUI(),
+                            send: catconfig.isReport()
+                        });
+
+                    });
+            }
+        },
 
         setManager: function (managerKey, pkgName) {
             if (!_managers[managerKey]) {
@@ -545,7 +613,6 @@ _cat.core = function () {
         },
 
         getConfig: function () {
-            _config = new Config();
             return (_config.available() ? _config : undefined);
         },
 
@@ -610,6 +677,107 @@ _cat.core = function () {
 if (typeof exports === "object") {
     module.exports = _cat;
 }
+/**
+ * General error handling for the hosted application
+ * @type {_cat.core.errors}
+ */
+_cat.core.errors = function () {
+
+    var _originalErrorListener,
+        _listeners = [];
+
+    if (window.onerror) {
+        _originalErrorListener = window.onerror;
+    }
+
+    window.onerror = function(message, filename, lineno, colno, error) {
+
+        var me = this;
+
+        // call super
+        if (_originalErrorListener) {
+            _originalErrorListener.call(this, message, filename, lineno, colno, error);
+        }
+
+        // print the error
+        _listeners.forEach(function(listener) {
+            listener.call(me, message, filename, lineno, colno, error);
+        });
+    };
+
+    return {
+
+        listen: function(listener) {
+            _listeners.push(listener);
+        }
+    };
+
+}();
+_cat.utils.assert = function () {
+
+
+    function _sendTestResult(data) {
+
+        var config = _cat.core.getConfig();
+
+        if (config) {
+            _cat.utils.AJAX.sendRequestSync({
+                url: _cat.core.TestManager.generateAssertCall(config, data)
+            });
+        }
+    }
+
+    return {
+
+        /**
+         * Send assert message to the UI and/or to catjs server
+         *
+         * @param config
+         *      name {String} The test name
+         *      displayName {String} The test display name
+         *      status {String} The status of the test (success | failure)
+         *      message {String} The assert message
+         *      success {Boolean} Whether the test succeeded or not
+         *      ui {Boolean} Display the assert data in catjs UI
+         *      send {Boolean} Send the assert data to the server
+         */
+        create: function (config) {
+
+            if (!config) {
+                return;
+            }
+
+            var testdata;
+
+            if (config.status && config.message && config.name && config.displayName) {
+
+
+                testdata = _cat.core.TestManager.addTestData({
+                    name: config.name,
+                    displayName: config.displayName,
+                    status: config.status,
+                    message: config.message,
+                    success: config.status
+                });
+
+                if (config.ui) {
+                    _cat.core.ui.setContent({
+                        style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
+                        header: testdata.getDisplayName(),
+                        desc: testdata.getMessage(),
+                        tips: _cat.core.TestManager.getTestSucceededCount()
+                    });
+                }
+
+                if (config.send) {
+                    _sendTestResult(testdata);
+                }
+            }
+        }
+
+    };
+
+}();
 _cat.utils.chai = function () {
 
     var _chai,
@@ -624,18 +792,6 @@ _cat.utils.chai = function () {
 
         } else {
             _cat.core.log.info("Chai library is not supported, skipping annotation 'assert', consider adding it to the .catproject dependencies");
-        }
-    }
-
-
-    function _sendTestResult(data) {
-
-        var config  = _cat.core.getConfig();
-
-        if (config) {
-            _cat.utils.AJAX.sendRequestSync({
-                url:  _cat.core.TestManager.generateAssertCall(config, data)
-            });
         }
     }
 
@@ -680,11 +836,11 @@ _cat.utils.chai = function () {
                 result,
                 fail,
                 failure,
-                testdata,
                 scrap = config.scrap.config,
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
                 testName = (scrapName || "NA"),
-                key, item, items=[], args=[];
+                key, items=[], args=[],
+                catconfig = _cat.core.getConfig();
 
             if (_chai) {
                 if (config) {
@@ -716,27 +872,19 @@ _cat.utils.chai = function () {
                     }
 
                     if (success) {
-
                         output = "Test Passed";
-
                     }
 
-                    testdata = _cat.core.TestManager.addTestData({
+                    // create catjs assertion entry
+                    _cat.utils.assert.create({
                         name: testName,
-                        displayName: _getDisplayName(testName),
-                        status: success ? "success" : "failure",
+                        displayName:  _getDisplayName(testName),
+                        status: (success ? "success" : "failure"),
                         message: output,
-                        success: success
+                        success: success,
+                        ui: catconfig.isUI(),
+                        send: catconfig.isReport()
                     });
-
-                    _cat.core.ui.setContent({
-                        style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
-                        header: testdata.getDisplayName(),
-                        desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestSucceededCount()
-                    });
-
-                    _sendTestResult(testdata);
 
                     if (!success) {
                         throw new Error((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
@@ -744,6 +892,7 @@ _cat.utils.chai = function () {
                 }
             }
         },
+
 
         /**
          * For the testing environment, set chai handle
@@ -1089,7 +1238,6 @@ _cat.core.ui = function () {
     }
 
     function _getCATElt() {
-        var catElement;
         if (typeof document !== "undefined") {
             return document.getElementById("__catelement");
         }
@@ -1133,15 +1281,28 @@ _cat.core.ui = function () {
 
     var testNumber = 0,
         logoopacity = 0.5,
-        masktipopacity = 1;
+        masktipopacity = 1,
 
-    var _me =  {
+        _disabled = false,
+        _me =  {
+
+        disable: function() {
+            _disabled = true;
+        },
+
+        enable: function() {
+            _disabled = false;
+        },
 
         /**
          * Display the CAT widget (if not created it will be created first)
          *
          */
         on: function () {
+
+            if (_disabled) {
+                return;
+            }
 
             var catElement = _getCATElt();
             if (typeof document !== "undefined") {
@@ -1226,6 +1387,10 @@ _cat.core.ui = function () {
          *
          */
         toggle: function () {
+            if (_disabled) {
+                return;
+            }
+
             var catElement = _getCATElt(),
                 catStatusElt = _getCATStatusElt(),
                 catStatusContentElt = _getCATStatusContentElt();
@@ -1248,8 +1413,7 @@ _cat.core.ui = function () {
 
         isOpen: function() {
             var catElement = _getCATElt(),
-                catStatusElt = _getCATStatusElt(),
-                catStatusContentElt = _getCATStatusContentElt();
+                catStatusElt = _getCATStatusElt();
 
             if (catElement) {
                 catStatusElt = _getCATStatusElt();
@@ -1259,6 +1423,9 @@ _cat.core.ui = function () {
                         return false;
                     }
                 }
+            } else {
+
+                return false;
             }
 
             return true;
@@ -1485,37 +1652,42 @@ _cat.utils.Signal = function () {
 
         TESTEND: function (opt) {
 
-            var timeout = _cat.core.TestManager.getDelay();
+            var timeout = _cat.core.TestManager.getDelay(),
+                config, testdata;
 
-            if (opt) {
-                timeout = (opt["timeout"] || 2000);
+            config = _cat.core.getConfig();
+            // ui signal notification
+            if (config.isReport()) {
+                if (opt) {
+                    timeout = (opt["timeout"] || 2000);
+                }
+
+                setTimeout(function () {
+                    var testCount = _cat.core.TestManager.getTestCount();
+                    _cat.core.ui.setContent({
+                        header: [testCount-1, "Tests complete"].join(" "),
+                        desc: "",
+                        tips: "",
+                        style: "color:green"
+                    });
+
+                }, (timeout));
             }
 
-            setTimeout(function () {
-                var testCount = _cat.core.TestManager.getTestCount();
-                _cat.core.ui.setContent({
-                    header: [testCount-1, "Tests complete"].join(" "),
-                    desc: "",
-                    tips: "",
-                    style: "color:green"
+            // server signal notification
+            if (config.isReport()) {
+                testdata = _cat.core.TestManager.addTestData({
+                    name: "End",
+                    displayName: "End",
+                    status: "End",
+                    message: "End"
                 });
 
-            }, (timeout));
-
-
-            var config = _cat.core.getConfig();
-
-            var testdata = _cat.core.TestManager.addTestData({
-                name: "End",
-                displayName: "End",
-                status: "End",
-                message: "End"
-            });
-
-            if (config) {
-                _cat.utils.AJAX.sendRequestSync({
-                    url: _cat.core.TestManager.generateAssertCall(config, testdata)
-                });
+                if (config) {
+                    _cat.utils.AJAX.sendRequestSync({
+                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                    });
+                }
             }
 
 
@@ -1561,6 +1733,44 @@ _cat.utils.Utils = function () {
 
             return results;
 
+        },
+
+        /**
+         * Validates an object and availability of its properties
+         *
+         */
+        validate: function(obj, key, val) {
+            if (obj) {
+
+                // if key is available
+                if (key !== undefined) {
+
+                    if (key in obj) {
+
+                        if (obj[key] !== undefined) {
+
+                            if (val !== undefined) {
+                                if (obj[key] !== val) {
+                                    return false;
+                                }
+                            }
+
+                            return true;
+                        }
+
+                    }
+
+                    return false;
+
+
+                } else {
+
+                    return true;
+                }
+
+            }
+
+            return false;
         }
     };
 
@@ -2182,3 +2392,6 @@ _cat.plugins.sencha = function () {
     };
 
 }();
+
+// catjs initialization
+_cat.core.init();

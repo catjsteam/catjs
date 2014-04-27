@@ -45,7 +45,6 @@ _cat.core.ui = function () {
     }
 
     function _getCATElt() {
-        var catElement;
         if (typeof document !== "undefined") {
             return document.getElementById("__catelement");
         }
@@ -89,15 +88,28 @@ _cat.core.ui = function () {
 
     var testNumber = 0,
         logoopacity = 0.5,
-        masktipopacity = 1;
+        masktipopacity = 1,
 
-    var _me =  {
+        _disabled = false,
+        _me =  {
+
+        disable: function() {
+            _disabled = true;
+        },
+
+        enable: function() {
+            _disabled = false;
+        },
 
         /**
          * Display the CAT widget (if not created it will be created first)
          *
          */
         on: function () {
+
+            if (_disabled) {
+                return;
+            }
 
             var catElement = _getCATElt();
             if (typeof document !== "undefined") {
@@ -182,6 +194,10 @@ _cat.core.ui = function () {
          *
          */
         toggle: function () {
+            if (_disabled) {
+                return;
+            }
+
             var catElement = _getCATElt(),
                 catStatusElt = _getCATStatusElt(),
                 catStatusContentElt = _getCATStatusContentElt();
@@ -204,8 +220,7 @@ _cat.core.ui = function () {
 
         isOpen: function() {
             var catElement = _getCATElt(),
-                catStatusElt = _getCATStatusElt(),
-                catStatusContentElt = _getCATStatusContentElt();
+                catStatusElt = _getCATStatusElt();
 
             if (catElement) {
                 catStatusElt = _getCATStatusElt();
@@ -215,6 +230,9 @@ _cat.core.ui = function () {
                         return false;
                     }
                 }
+            } else {
+
+                return false;
             }
 
             return true;

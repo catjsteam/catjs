@@ -1,7 +1,8 @@
 var _cat = {
     utils: {},
     plugins: {},
-    ui: {}
+    ui: {},
+    errors:{}
 };
 
 var hasPhantomjs = false;
@@ -176,8 +177,7 @@ _cat.core = function () {
 
         var innerConfig,
             xmlhttp,
-            configText,
-            getTestsHelper;
+            configText;
 
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
@@ -195,9 +195,11 @@ _cat.core = function () {
         }
 
         if (innerConfig) {
+
             this.getType = function () {
                 return innerConfig.type;
             };
+
             this.getIp = function () {
                 if (innerConfig.ip) {
                     return innerConfig.ip;
@@ -226,6 +228,34 @@ _cat.core = function () {
                 return innerConfig["run-mode"];
             };
 
+            this.isReport = function() {
+
+                if (_cat.utils.Utils.validate(innerConfig, "report") && _cat.utils.Utils.validate(innerConfig.report, "disable", false)) {
+
+                    return true;
+                }
+
+                return false;
+            };
+
+            this.isErrors = function() {
+
+                if (_cat.utils.Utils.validate(innerConfig, "assert") && _cat.utils.Utils.validate(innerConfig.assert, "errors", true)) {
+
+                    return true;
+                }
+
+                return false;
+            };
+
+            this.isUI = function() {
+                if (_cat.utils.Utils.validate(innerConfig, "ui", true)) {
+
+                    return true;
+                }
+
+                return false;
+            };
         }
 
         this.hasPhantom = function () {
@@ -240,6 +270,44 @@ _cat.core = function () {
     return {
 
         log: _log,
+
+        init: function() {
+
+            _config = new Config();
+
+            // display the ui, if you didn't already
+            if (_config.isUI()) {
+                _cat.core.ui.enable();
+                if (!_cat.core.ui.isOpen()) {
+                    _cat.core.ui.on();
+                }
+            } else {
+                _cat.core.ui.disable();
+                _cat.core.ui.off();
+                _cat.core.ui.destroy();
+            }
+
+            if (_config.isErrors()) {
+
+                    // register DOM's error listener
+                    _cat.core.errors.listen(function(message, filename, lineno, colno, error) {
+
+                        var catconfig = _cat.core.getConfig();
+
+                        // create catjs assertion entry
+                        _cat.utils.assert.create({
+                            name: "generalJSError",
+                            displayName:  "General JavaScript Error",
+                            status: "failure",
+                            message: message,
+                            success: false,
+                            ui: catconfig.isUI(),
+                            send: catconfig.isReport()
+                        });
+
+                    });
+            }
+        },
 
         setManager: function (managerKey, pkgName) {
             if (!_managers[managerKey]) {
@@ -545,7 +613,6 @@ _cat.core = function () {
         },
 
         getConfig: function () {
-            _config = new Config();
             return (_config.available() ? _config : undefined);
         },
 
