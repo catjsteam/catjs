@@ -31,7 +31,7 @@
     "ui": true,
     "report": {
         "format": "junit",
-        "disable": true
+        "disable": false
     },
     "assert": {
         "errors": true
