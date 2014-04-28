@@ -14,21 +14,24 @@ _cat.core = function () {
         getScrapTestInfo,
         addScrapToManager,
         _vars, _managers, _context,
-        _config, _log;
+        _config, _log,
+        _guid;
 
 
     addScrapToManager = function (testsInfo, scrap) {
 
-        for (var i = 0; i < testsInfo.length; i++) {
+        var i, test, testRepeats,
+            testDelay, preformVal,pkgNameVal;
+
+        for (i = 0; i < testsInfo.length; i++) {
             testNumber--;
-            var test = testsInfo[i];
+            test = testsInfo[i];
 
-
-            var testRepeats = parseInt((test.repeat ? test.repeat : 1));
+            testRepeats = parseInt((test.repeat ? test.repeat : 1));
             test.repeat = "repeat(" + testRepeats + ")";
-			var testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
-            var preformVal = "@@" + scrap.name[0] + " " + testRepeats;
-            var pkgNameVal = scrap.pkgName + "$$cat";
+			testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
+            preformVal = "@@" + scrap.name[0] + " " + testRepeats;
+            pkgNameVal = scrap.pkgName + "$$cat";
             managerScraps[test.index] = {"preform": preformVal,
                 "pkgName": pkgNameVal,
                 "repeat": testRepeats,
@@ -177,7 +180,8 @@ _cat.core = function () {
 
         var innerConfig,
             xmlhttp,
-            configText;
+            configText,
+            me = this;
 
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
@@ -198,6 +202,10 @@ _cat.core = function () {
 
             this.getType = function () {
                 return innerConfig.type;
+            };
+
+            this.getName = function () {
+                return innerConfig.name;
             };
 
             this.getIp = function () {
@@ -226,6 +234,46 @@ _cat.core = function () {
 
             this.getRunMode = function () {
                 return innerConfig["run-mode"];
+            };
+
+            this.isReportType = function(key) {
+                var formats = me.getReportFormats(),
+                    i, size, item;
+
+                if (formats && formats.length > 0) {
+                    size = formats.length;
+                    for (i=0; i<size; i++) {
+                        item = formats[i];
+                        if (item === key) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            };
+
+            this.isJUnitSupport = function() {
+
+                return this.isReportType("junit");
+            };
+            this.isConsoleSupport = function() {
+
+                return this.isReportType("console");
+            };
+
+            this.getReportFormats = function() {
+
+                var format = [],
+                    report;
+
+                if (_cat.utils.Utils.validate(innerConfig, "report") ) {
+
+                    report = innerConfig.report;
+                    format = (report.format ? report.format : format);
+                }
+
+                return format;
             };
 
             this.isReport = function() {
@@ -273,6 +321,8 @@ _cat.core = function () {
 
         init: function() {
 
+            _guid = _cat.utils.Storage.getGUID();
+
             _config = new Config();
 
             // display the ui, if you didn't already
@@ -292,17 +342,22 @@ _cat.core = function () {
                     // register DOM's error listener
                     _cat.core.errors.listen(function(message, filename, lineno, colno, error) {
 
-                        var catconfig = _cat.core.getConfig();
+                        var catconfig = _cat.core.getConfig(),
+                            reportFormats;
+
+                        if (catconfig.isReport()) {
+                            reportFormats = catconfig.getReportFormats();
+                        }
 
                         // create catjs assertion entry
                         _cat.utils.assert.create({
                             name: "generalJSError",
                             displayName:  "General JavaScript Error",
                             status: "failure",
-                            message: message,
+                            message: [message, " ;file: ", filename, " ;line: ", lineno, " ;column:", colno, " ;error:", error ].join(" "),
                             success: false,
                             ui: catconfig.isUI(),
-                            send: catconfig.isReport()
+                            send: reportFormats
                         });
 
                     });
@@ -665,9 +720,13 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                console.log("Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
+                _log.log("Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
+        },
+
+        guid: function() {
+            return _guid;
         }
 
     };
@@ -754,10 +813,13 @@ _cat.utils.assert = function () {
 
                 testdata = _cat.core.TestManager.addTestData({
                     name: config.name,
+                    type: config.type,
                     displayName: config.displayName,
                     status: config.status,
                     message: config.message,
-                    success: config.status
+                    success: config.status,
+                    reportFormats: config.send
+
                 });
 
                 if (config.ui) {
@@ -769,6 +831,7 @@ _cat.utils.assert = function () {
                     });
                 }
 
+                // TODO parse report formats : consider api for getConsole; getJUnit ...
                 if (config.send) {
                     _sendTestResult(testdata);
                 }
@@ -840,7 +903,8 @@ _cat.utils.chai = function () {
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
                 testName = (scrapName || "NA"),
                 key, items=[], args=[],
-                catconfig = _cat.core.getConfig();
+                catconfig = _cat.core.getConfig(),
+                reportFormats;
 
             if (_chai) {
                 if (config) {
@@ -875,6 +939,10 @@ _cat.utils.chai = function () {
                         output = "Test Passed";
                     }
 
+                    if (catconfig.isReport()) {
+                        reportFormats = catconfig.getReportFormats();
+                    }
+
                     // create catjs assertion entry
                     _cat.utils.assert.create({
                         name: testName,
@@ -883,7 +951,7 @@ _cat.utils.chai = function () {
                         message: output,
                         success: success,
                         ui: catconfig.isUI(),
-                        send: catconfig.isReport()
+                        send: reportFormats
                     });
 
                     if (!success) {
@@ -907,14 +975,14 @@ _cat.utils.chai = function () {
 
 }();
 _cat.core.TestManager = function() {
-    //GUID generator
-    function S4() {
-        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-    }
-    function guid() {
-        return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
-    }
-    ///
+
+    var _enum = {
+        TYPE_TEST: "test",
+        TYPE_SIGNAL: "signal"
+    };
+
+
+    // Test Manager data class
     function _Data(config) {
 
         var me = this;
@@ -926,6 +994,12 @@ _cat.core.TestManager = function() {
         (function() {
             var item;
 
+            // defaults \ validation
+            if (!("type" in config) || (("type" in config) && config.type === undefined)) {
+                config.type = _enum.TYPE_TEST;
+            }
+
+            // configuration settings
             for (item in config) {
                 if (config.hasOwnProperty(item)) {
                     me.config[item] = config[item];
@@ -953,6 +1027,14 @@ _cat.core.TestManager = function() {
 
     _Data.prototype.getDisplayName = function() {
         return this.get("displayName");
+    };
+
+    _Data.prototype.getType = function() {
+        return this.get("type");
+    };
+
+    _Data.prototype.getReportFormats = function() {
+        return this.get("reportFormats");
     };
 
     _Data.prototype.set = function(key, value) {
@@ -1026,16 +1108,17 @@ _cat.core.TestManager = function() {
          */
         generateAssertCall: function(config, testdata) {
 
-            if (typeof _cat.core.TestManager.testSessionId === 'undefined'){
-                _cat.core.TestManager.testSessionId = guid();
-            }
+            var reports = testdata.getReportFormats();
+
             return "http://" + config.getIp() +  ":" +
                 config.getPort() + "/assert?testName=" +
                 testdata.getName() + "&message=" + testdata.getMessage() +
                 "&status=" + testdata.getStatus() +
-                "&type=" + config.getType() +
+                "&reports=" + (reports ? reports.join(",") : "") +
+                "&name=" + config.getName() +
+                "&type=" + testdata.getType() +
                 "&hasPhantom="  + config.hasPhantom() +
-                "&id="  + _cat.core.TestManager.testSessionId +
+                "&id="  + _cat.core.guid() +
                 "&cache="+ (new Date()).toUTCString();
 
         }
@@ -1725,6 +1808,51 @@ _cat.utils.Signal = function () {
     };
 
 }();
+_cat.utils.Storage = function () {
+
+
+    function _generateGUID() {
+
+        //GUID generator
+        function S4() {
+            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+        }
+        function guid() {
+            return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+        }
+
+        return guid();
+    }
+
+    var _enum = {
+        guid : "cat.core.guid"
+
+    };
+
+    return {
+
+
+        getGUID: function() {
+
+            var storage = window.sessionStorage,
+                guid;
+
+            if (storage) {
+                guid = (storage[_enum.guid] || _generateGUID());
+                storage[_enum.guid] = guid;
+
+            } else {
+                guid =_generateGUID();
+            }
+
+            return guid;
+
+        }
+
+
+    };
+
+}();
 _cat.utils.Utils = function () {
 
     return {
@@ -1783,6 +1911,7 @@ _cat.utils.Utils = function () {
 
             return false;
         }
+
     };
 
 }();
