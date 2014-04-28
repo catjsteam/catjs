@@ -14,21 +14,24 @@ _cat.core = function () {
         getScrapTestInfo,
         addScrapToManager,
         _vars, _managers, _context,
-        _config, _log;
+        _config, _log,
+        _guid;
 
 
     addScrapToManager = function (testsInfo, scrap) {
 
-        for (var i = 0; i < testsInfo.length; i++) {
+        var i, test, testRepeats,
+            testDelay, preformVal,pkgNameVal;
+
+        for (i = 0; i < testsInfo.length; i++) {
             testNumber--;
-            var test = testsInfo[i];
+            test = testsInfo[i];
 
-
-            var testRepeats = parseInt((test.repeat ? test.repeat : 1));
+            testRepeats = parseInt((test.repeat ? test.repeat : 1));
             test.repeat = "repeat(" + testRepeats + ")";
-			var testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
-            var preformVal = "@@" + scrap.name[0] + " " + testRepeats;
-            var pkgNameVal = scrap.pkgName + "$$cat";
+			testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
+            preformVal = "@@" + scrap.name[0] + " " + testRepeats;
+            pkgNameVal = scrap.pkgName + "$$cat";
             managerScraps[test.index] = {"preform": preformVal,
                 "pkgName": pkgNameVal,
                 "repeat": testRepeats,
@@ -177,7 +180,8 @@ _cat.core = function () {
 
         var innerConfig,
             xmlhttp,
-            configText;
+            configText,
+            me = this;
 
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
@@ -198,6 +202,10 @@ _cat.core = function () {
 
             this.getType = function () {
                 return innerConfig.type;
+            };
+
+            this.getName = function () {
+                return innerConfig.name;
             };
 
             this.getIp = function () {
@@ -226,6 +234,46 @@ _cat.core = function () {
 
             this.getRunMode = function () {
                 return innerConfig["run-mode"];
+            };
+
+            this.isReportType = function(key) {
+                var formats = me.getReportFormats(),
+                    i, size, item;
+
+                if (formats && formats.length > 0) {
+                    size = formats.length;
+                    for (i=0; i<size; i++) {
+                        item = formats[i];
+                        if (item === key) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            };
+
+            this.isJUnitSupport = function() {
+
+                return this.isReportType("junit");
+            };
+            this.isConsoleSupport = function() {
+
+                return this.isReportType("console");
+            };
+
+            this.getReportFormats = function() {
+
+                var format = [],
+                    report;
+
+                if (_cat.utils.Utils.validate(innerConfig, "report") ) {
+
+                    report = innerConfig.report;
+                    format = (report.format ? report.format : format);
+                }
+
+                return format;
             };
 
             this.isReport = function() {
@@ -273,6 +321,8 @@ _cat.core = function () {
 
         init: function() {
 
+            _guid = _cat.utils.Storage.getGUID();
+
             _config = new Config();
 
             // display the ui, if you didn't already
@@ -292,17 +342,22 @@ _cat.core = function () {
                     // register DOM's error listener
                     _cat.core.errors.listen(function(message, filename, lineno, colno, error) {
 
-                        var catconfig = _cat.core.getConfig();
+                        var catconfig = _cat.core.getConfig(),
+                            reportFormats;
+
+                        if (catconfig.isReport()) {
+                            reportFormats = catconfig.getReportFormats();
+                        }
 
                         // create catjs assertion entry
                         _cat.utils.assert.create({
                             name: "generalJSError",
                             displayName:  "General JavaScript Error",
                             status: "failure",
-                            message: message,
+                            message: [message, " ;file: ", filename, " ;line: ", lineno, " ;column:", colno, " ;error:", error ].join(" "),
                             success: false,
                             ui: catconfig.isUI(),
-                            send: catconfig.isReport()
+                            send: reportFormats
                         });
 
                     });
@@ -665,9 +720,13 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                console.log("Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
+                _log.log("Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
+        },
+
+        guid: function() {
+            return _guid;
         }
 
     };
