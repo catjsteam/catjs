@@ -12,7 +12,7 @@
         "test-failure-timeout": "This is a timeout for failing the tests in case of general application malfunction. Set the timeout in seconds. "
     },
 
-    "type":"sencha-test",
+    "name":"sencha-test",
     "ip":null,
     "port":null,
     "tests": [
@@ -30,7 +30,7 @@
     },
     "ui": true,
     "report": {
-        "format": "junit",
+        "format": ["junit"],
         "disable": false
     },
     "assert": {
