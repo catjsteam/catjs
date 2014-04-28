@@ -60,7 +60,8 @@ _cat.utils.chai = function () {
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
                 testName = (scrapName || "NA"),
                 key, items=[], args=[],
-                catconfig = _cat.core.getConfig();
+                catconfig = _cat.core.getConfig(),
+                reportFormats;
 
             if (_chai) {
                 if (config) {
@@ -95,6 +96,10 @@ _cat.utils.chai = function () {
                         output = "Test Passed";
                     }
 
+                    if (catconfig.isReport()) {
+                        reportFormats = catconfig.getReportFormats();
+                    }
+
                     // create catjs assertion entry
                     _cat.utils.assert.create({
                         name: testName,
@@ -103,7 +108,7 @@ _cat.utils.chai = function () {
                         message: output,
                         success: success,
                         ui: catconfig.isUI(),
-                        send: catconfig.isReport()
+                        send: reportFormats
                     });
 
                     if (!success) {
