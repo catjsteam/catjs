@@ -166,7 +166,7 @@ exports.result = function (req, res) {
     file = "./" + reportType + "-" + phantomStatus + id + ".xml";
 
     if (!_reportCreator[id]) {
-        _reportCreator[id] = new ReportCreator(file, id);
+        _reportCreator[id] = new ReportCreator(file, reportType + id);
     }
 
     _reportCreator[id].addTestCase(testName, status, phantomStatus, message);
