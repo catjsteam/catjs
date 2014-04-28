@@ -39,10 +39,13 @@ _cat.utils.assert = function () {
 
                 testdata = _cat.core.TestManager.addTestData({
                     name: config.name,
+                    type: config.type,
                     displayName: config.displayName,
                     status: config.status,
                     message: config.message,
-                    success: config.status
+                    success: config.status,
+                    reportFormats: config.send
+
                 });
 
                 if (config.ui) {
@@ -54,6 +57,7 @@ _cat.utils.assert = function () {
                     });
                 }
 
+                // TODO parse report formats : consider api for getConsole; getJUnit ...
                 if (config.send) {
                     _sendTestResult(testdata);
                 }
