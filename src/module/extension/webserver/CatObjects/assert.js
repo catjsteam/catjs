@@ -42,14 +42,14 @@ function readConfig() {
     return testConfigMap;
 }
 
-function ReportCreator(filename) {
+function ReportCreator(filename, id) {
     this._fileName = filename;
     this._testConfigMap = readConfig();
     this._hasFailed = false;
     this._testsuite = _jmr.create({
         type: "model.testsuite",
         data: {
-            name: "testsuite"
+            name: id
         }
     });
 
@@ -113,7 +113,7 @@ ReportCreator.prototype.addTestCase = function (testName, status, phantomStatus,
         _jmr.write(this._fileName, output);
     } else {
         var result = this._hasFailed ? "failed" : "succeeded";
-        console.log("======== Test End " + result + "========");
+        console.log("======== Test End " + result + " ========");
     }
 };
 
@@ -141,7 +141,7 @@ exports.result = function (req, res) {
         _checkIfAlive = setTimeout(function () {
             _log.info("Tests stopped reporting, probably a network problem, failing the rest of the tests");
             if (_reportCreator == {}) {
-                _reportCreator['notest'] = new ReportCreator("notestname.xml");
+                _reportCreator['notest'] = new ReportCreator("notestname.xml", 'notest');
             }
 
             for (var reportKey in _reportCreator) {
@@ -166,7 +166,7 @@ exports.result = function (req, res) {
     file = "./" + reportType + "-" + phantomStatus + id + ".xml";
 
     if (!_reportCreator[id]) {
-        _reportCreator[id] = new ReportCreator(file);
+        _reportCreator[id] = new ReportCreator(file, id);
     }
 
     _reportCreator[id].addTestCase(testName, status, phantomStatus, message);
