@@ -12,7 +12,7 @@
         "test-failure-timeout": "This is a timeout for failing the tests in case of general application malfunction. Set the timeout in seconds. "
     },
 
-    "type": "{{project.name}}",
+    "name": "{{project.name}}",
     "ip": null,
     "port": null,
     "tests":[
@@ -25,7 +25,7 @@
     },
     "ui": true,
     "report": {
-        "format": "junit",
+        "format": ["console"],
         "disable": false
     },
     "assert": {
