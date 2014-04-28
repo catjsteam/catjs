@@ -60,10 +60,12 @@ ReportCreator.prototype.getTestConfigMap = function () {
     return this._testConfigMap;
 }
 
-ReportCreator.prototype.addTestCase = function (testName, status, phantomStatus, message) {
+ReportCreator.prototype.addTestCase = function (testName, status, phantomStatus, message, reports) {
     var testCase,
         failure,
         result;
+
+    // Todo: call report functionality per-reporty type
 
     testCase = _jmr.create({
         type: "model.testcase",
@@ -128,14 +130,16 @@ exports.result = function (req, res) {
     var testName = req.query.testName,
         message = req.query.message,
         status = req.query.status,
+        reports = req.query.reports,
         reportType = req.query.type,
         hasPhantom = req.query.hasPhantom,
         id = req.query.id,
         file;
 
-    /*  if (status === 'end') {
-     clearInterval(_checkIfAlive);
-     } else {*/
+    if (reports) {
+        reports = reports.split(",");
+    }
+
     clearTimeout(_checkIfAlive);
     if (status !== 'End') {
         _checkIfAlive = setTimeout(function () {
@@ -169,7 +173,7 @@ exports.result = function (req, res) {
         _reportCreator[id] = new ReportCreator(file, reportType + id);
     }
 
-    _reportCreator[id].addTestCase(testName, status, phantomStatus, message);
+    _reportCreator[id].addTestCase(testName, status, phantomStatus, message, reports);
     // }
 };
 
