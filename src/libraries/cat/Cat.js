@@ -32,6 +32,9 @@ _cat.core = function () {
 			testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
             preformVal = "@@" + scrap.name[0] + " " + testRepeats;
             pkgNameVal = scrap.pkgName + "$$cat";
+            if (test.scenario) {
+                scrap.scenario = test.scenario;
+            }
             managerScraps[test.index] = {"preform": preformVal,
                 "pkgName": pkgNameVal,
                 "repeat": testRepeats,
@@ -47,6 +50,7 @@ _cat.core = function () {
         for (var i = 0; i < tests.length; i++) {
             if (tests[i].name === scrapName) {
                 var tempInfo = {"name": tests[i].name,
+                    "scenario": tests[i].scenario,
                     "wasRun": tests[i].wasRun,
                     "delay" : tests[i].delay,
                     "repeat": tests[i].repeat};
@@ -122,7 +126,8 @@ _cat.core = function () {
         this.globalTests = [];
         // do this once
         this.setTests = function (config) {
-            var getScenarioTests =function(testsList, globalDelay) {
+
+            var getScenarioTests =function(testsList, globalDelay, scenarioName) {
                 var innerConfigMap = [];
                 if (testsList.tests) {
                     for (var i = 0; i < testsList.tests.length; i++) {
@@ -142,6 +147,7 @@ _cat.core = function () {
                                     testsList.tests[i].delay = globalDelay;
                                 }
                                 testsList.tests[i].wasRun = false;
+                                testsList.tests[i].scenario = {name: (scenarioName || null)};
                                 innerConfigMap.push(testsList.tests[i]);
 
                             }
@@ -151,16 +157,30 @@ _cat.core = function () {
 
                 return innerConfigMap;
 
-            };
-            var testsFlow = config.tests;
-            var scenarios = config.scenarios;
-            for (var i = 0; i < testsFlow.length; i++) {
-                var currTest = testsFlow[i];
-                var scenario = scenarios[currTest.name];
-                var repeatScenario = (scenario.repeat ? scenario.repeat : 1);
-                for (var j = 0; j < repeatScenario; j++) {
-                    var temp = (getScenarioTests(scenario, scenario.delay));
-                    this.globalTests = this.globalTests.concat(temp);
+            }, i, j, temp,
+                testsFlow, scenarios, scenario,
+                repeatScenario, currTest, currentTestName;
+
+            testsFlow = config.tests;
+            scenarios = config.scenarios;
+            for ( i = 0; i < testsFlow.length; i++) {
+                 currTest = testsFlow[i];
+
+                 if (!currTest || !("name" in currTest)) {
+                     _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                     continue;
+                 }
+                 currentTestName = currTest.name;
+                 scenario = scenarios[currentTestName];
+
+                if (scenario) {
+                    repeatScenario = (scenario.repeat ? scenario.repeat : 1);
+                    for (j = 0; j < repeatScenario; j++) {
+                        temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
+                        this.globalTests = this.globalTests.concat(temp);
+                    }
+                } else {
+                    _log.warn("[CAT] No valid scenario '", currTest.name, "' was found, double check your cat.json project");
                 }
             }
         };
@@ -577,8 +597,8 @@ _cat.core = function () {
                 runat, manager,
                 pkgname, args = arguments,
                 catConfig = _cat.core.getConfig(),
-
-                tests = catConfig ? catConfig.getTests() : [];
+                tests = catConfig ? catConfig.getTests() : [],
+                storageEnum = _cat.utils.Storage.enum;
 
 
             if ((catConfig) && (catConfig.getRunMode() === 'test-manager')) {
@@ -588,6 +608,10 @@ _cat.core = function () {
 
                 pkgname = scrap.pkgName;
                 _cat.core.defineImpl(pkgname, function () {
+                    var scrap = (config ? config.scrap : undefined);
+                    if (scrap && scrap.scenario) {
+                        _cat.utils.Storage.set(storageEnum.CURRENT_SCENARIO, scrap.scenario.name, storageEnum.SESSION);
+                    }
                     _cat.core.actionimpl.apply(this, args);
                 });
 
