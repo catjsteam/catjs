@@ -132,11 +132,14 @@ _cat.core.TestManager = function() {
          */
         generateAssertCall: function(config, testdata) {
 
-            var reports = testdata.getReportFormats();
+            var reports = testdata.getReportFormats(),
+                storageEnum = _cat.utils.Storage.enum;
 
             return "http://" + config.getIp() +  ":" +
-                config.getPort() + "/assert?testName=" +
-                testdata.getName() + "&message=" + testdata.getMessage() +
+                config.getPort() + "/assert?" +
+                "testName=" + testdata.getName() +
+                "&scenario=" + _cat.utils.Storage.get(storageEnum.CURRENT_SCENARIO, storageEnum.SESSION) +
+                "&message=" + testdata.getMessage() +
                 "&status=" + testdata.getStatus() +
                 "&reports=" + (reports ? reports.join(",") : "") +
                 "&name=" + config.getName() +
