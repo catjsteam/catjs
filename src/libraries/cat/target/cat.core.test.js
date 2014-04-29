@@ -32,6 +32,9 @@ _cat.core = function () {
 			testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
             preformVal = "@@" + scrap.name[0] + " " + testRepeats;
             pkgNameVal = scrap.pkgName + "$$cat";
+            if (test.scenario) {
+                scrap.scenario = test.scenario;
+            }
             managerScraps[test.index] = {"preform": preformVal,
                 "pkgName": pkgNameVal,
                 "repeat": testRepeats,
@@ -47,6 +50,7 @@ _cat.core = function () {
         for (var i = 0; i < tests.length; i++) {
             if (tests[i].name === scrapName) {
                 var tempInfo = {"name": tests[i].name,
+                    "scenario": tests[i].scenario,
                     "wasRun": tests[i].wasRun,
                     "delay" : tests[i].delay,
                     "repeat": tests[i].repeat};
@@ -122,7 +126,8 @@ _cat.core = function () {
         this.globalTests = [];
         // do this once
         this.setTests = function (config) {
-            var getScenarioTests =function(testsList, globalDelay) {
+
+            var getScenarioTests =function(testsList, globalDelay, scenarioName) {
                 var innerConfigMap = [];
                 if (testsList.tests) {
                     for (var i = 0; i < testsList.tests.length; i++) {
@@ -142,6 +147,7 @@ _cat.core = function () {
                                     testsList.tests[i].delay = globalDelay;
                                 }
                                 testsList.tests[i].wasRun = false;
+                                testsList.tests[i].scenario = {name: (scenarioName || null)};
                                 innerConfigMap.push(testsList.tests[i]);
 
                             }
@@ -151,16 +157,30 @@ _cat.core = function () {
 
                 return innerConfigMap;
 
-            };
-            var testsFlow = config.tests;
-            var scenarios = config.scenarios;
-            for (var i = 0; i < testsFlow.length; i++) {
-                var currTest = testsFlow[i];
-                var scenario = scenarios[currTest.name];
-                var repeatScenario = (scenario.repeat ? scenario.repeat : 1);
-                for (var j = 0; j < repeatScenario; j++) {
-                    var temp = (getScenarioTests(scenario, scenario.delay));
-                    this.globalTests = this.globalTests.concat(temp);
+            }, i, j, temp,
+                testsFlow, scenarios, scenario,
+                repeatScenario, currTest, currentTestName;
+
+            testsFlow = config.tests;
+            scenarios = config.scenarios;
+            for ( i = 0; i < testsFlow.length; i++) {
+                 currTest = testsFlow[i];
+
+                 if (!currTest || !("name" in currTest)) {
+                     _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                     continue;
+                 }
+                 currentTestName = currTest.name;
+                 scenario = scenarios[currentTestName];
+
+                if (scenario) {
+                    repeatScenario = (scenario.repeat ? scenario.repeat : 1);
+                    for (j = 0; j < repeatScenario; j++) {
+                        temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
+                        this.globalTests = this.globalTests.concat(temp);
+                    }
+                } else {
+                    _log.warn("[CAT] No valid scenario '", currTest.name, "' was found, double check your cat.json project");
                 }
             }
         };
@@ -577,8 +597,8 @@ _cat.core = function () {
                 runat, manager,
                 pkgname, args = arguments,
                 catConfig = _cat.core.getConfig(),
-
-                tests = catConfig ? catConfig.getTests() : [];
+                tests = catConfig ? catConfig.getTests() : [],
+                storageEnum = _cat.utils.Storage.enum;
 
 
             if ((catConfig) && (catConfig.getRunMode() === 'test-manager')) {
@@ -588,6 +608,10 @@ _cat.core = function () {
 
                 pkgname = scrap.pkgName;
                 _cat.core.defineImpl(pkgname, function () {
+                    var scrap = (config ? config.scrap : undefined);
+                    if (scrap && scrap.scenario) {
+                        _cat.utils.Storage.set(storageEnum.CURRENT_SCENARIO, scrap.scenario.name, storageEnum.SESSION);
+                    }
                     _cat.core.actionimpl.apply(this, args);
                 });
 
@@ -1109,6 +1133,8 @@ _cat.core.TestManager = function() {
         generateAssertCall: function(config, testdata) {
 
             var reports = testdata.getReportFormats();
+
+            console.log(" .................... ",  _cat.utils.Storage.get(_cat.utils.Storage.enum.CURRENT_SCENARIO, _cat.utils.Storage.enum.SESSION));
 
             return "http://" + config.getIp() +  ":" +
                 config.getPort() + "/assert?testName=" +
@@ -1810,6 +1836,7 @@ _cat.utils.Signal = function () {
 }();
 _cat.utils.Storage = function () {
 
+    var _catjsLocal, _catjsSession;
 
     function _generateGUID() {
 
@@ -1824,34 +1851,110 @@ _cat.utils.Storage = function () {
         return guid();
     }
 
+    function _getStorage(type) {
+        if (type) {
+            return window[_enum[type]];
+        }
+    }
+
+    function _base(type) {
+        if (!type) {
+            console.warning("[CAT] Storage; 'type' argument is not valid");
+        }
+
+        return _getStorage(type);
+    }
+
     var _enum = {
-        guid : "cat.core.guid"
+        guid : "cat.core.guid",
+        session: "sessionStorage",
+        local: "localStorage"
+    },
+        _storageEnum = {
+            CURRENT_SCENARIO: "current.scenario",
+            SESSION: "session",
+            LOCAL: "local"
+        },
+        _module;
 
-    };
+    function _init() {
+        var localStorage = _getStorage("local"),
+            sessionStorage = _getStorage("session");
 
-    return {
+        if (sessionStorage.catjs) {
+            _catjsSession = JSON.parse(sessionStorage.catjs);
+        }
+        if (localStorage.catjs) {
+            _catjsLocal = JSON.parse(localStorage.catjs);
+        }
+    }
 
+    _init();
+
+    _module =  {
+
+
+        /**
+         *  Set value to a storage
+         *
+         * @param key The key to be stored
+         * @param value The value to set
+         * @param type session | local
+         */
+        set: function(key, value, type) {
+
+            var storage = _base(type);
+            if (storage) {
+                if (!_catjsSession) {
+                    _catjsSession = {};
+                }
+                _catjsSession[key] = value;
+                storage.catjs = JSON.stringify(_catjsSession);
+            }
+        },
+
+        /**
+         *  Get value from the storage
+         *
+         * @param key
+         * @param type session | local
+         */
+        get: function(key, type) {
+
+            var storage = _base(type);
+            if (storage) {
+                if (!storage.catjs) {
+                    return undefined;
+                }
+
+                _catjsSession = JSON.parse(storage.catjs);
+                if (!_catjsSession) {
+                    return undefined;
+                }
+
+                return _catjsSession[key];
+            }
+
+        },
 
         getGUID: function() {
 
-            var storage = window.sessionStorage,
-                guid;
+            var guid = _module.get(_enum.guid, _storageEnum.SESSION);
 
-            if (storage) {
-                guid = (storage[_enum.guid] || _generateGUID());
-                storage[_enum.guid] = guid;
-
-            } else {
+            if (!guid) {
                 guid =_generateGUID();
+                _module.set(_enum.guid, guid, _storageEnum.SESSION);
             }
 
             return guid;
 
-        }
+        },
 
+        enum: _storageEnum
 
     };
 
+    return _module;
 }();
 _cat.utils.Utils = function () {
 
@@ -1911,7 +2014,6 @@ _cat.utils.Utils = function () {
 
             return false;
         }
-
     };
 
 }();
