@@ -4,16 +4,15 @@ var _jmr = require("test-model-reporter"),
     _reportCreator = {},
     _catcli = (catrequire ? catrequire("cat.cli") : null),
     _fs = require("fs"),
-    _checkIfAlive; //TODO: make this configurable
+    _checkIfAlive,
+    _testconfig;
 
-function readConfig() {
+function init() {
 
+    // read configuration
     var path = require("path"),
         configPath,
         data,
-        testConfig,
-        testConfigMap = {},
-        i,
         project, sourceFolder;
 
     if (_catcli) {
@@ -31,20 +30,36 @@ function readConfig() {
     }
 
     data = _fs.readFileSync(configPath, 'utf8');
-    testConfig = JSON.parse(data);
+    _testconfig = JSON.parse(data);
 
-    //TODO: check if there are no tests
-    for (i = 0; i < testConfig.tests.length; i++) {
-        testConfig.tests[i].wasRun = false;
-        testConfigMap[testConfig.tests[i].name] = testConfig.tests[i];
+}
+
+function isManagerRunMode() {
+    return (_testconfig["run-mode"] === "test-manager");
+}
+
+function readTestConfig() {
+
+    var i, testConfigMap = {},
+        scenarios;
+
+    if (isManagerRunMode()) {
+
+        //scenarios
+
+        for (i = 0; i < _testconfig.tests.length; i++) {
+            _testconfig.tests[i].wasRun = false;
+            testConfigMap[_testconfig.tests[i].name] = _testconfig.tests[i];
+        }
+
     }
 
     return testConfigMap;
 }
 
-function ReportCreator(filename, id) {
+function ReportCreator(filename, id, scenario) {
     this._fileName = filename;
-    this._testConfigMap = readConfig();
+    this._testConfigMap = readTestConfig(scenario);
     this._hasFailed = false;
     this._testsuite = _jmr.create({
         type: "model.testsuite",
@@ -53,69 +68,93 @@ function ReportCreator(filename, id) {
         }
     });
 
-    var colorsArray = ['grey', 'cyan', 'grey', 'grey', 'cyan', 'yellow', 'blue'];
-    this._randomColor = colorsArray[Math.floor(Math.random() * colorsArray.length)];
+    this._randomColor = "random";
 }
 ReportCreator.prototype.getTestConfigMap = function () {
     return this._testConfigMap;
 }
 
 ReportCreator.prototype.addTestCase = function (testName, status, phantomStatus, message, reports) {
-    var testCase,
-        failure,
-        result;
+    var failure,
+        result,
+        logmessage, colors,
+        output, symbol,
+        me = this, isjunit = true, isconsole = true;
 
-    // Todo: call report functionality per-reporty type
 
-    testCase = _jmr.create({
-        type: "model.testcase",
-        data: {
-            time: (new Date()).toUTCString()
+
+    // set test color
+    colors = require('colors');
+    colors.setTheme({'info' : this._randomColor});
+
+    function _printTest2Console(msg) {
+        if (isconsole) {
+            console.info(msg);
+            _log.info(msg);
         }
-    });
-    testCase.set("name", phantomStatus + testName);
+    }
 
-    if (status === 'failure') {
-        result = _jmr.create({
-            type: "model.failure",
+    function _createTestCase() {
+        var testCase = _jmr.create({
+            type: "model.testcase",
             data: {
-                message: message,
-                type: status
+                time: (new Date()).toUTCString()
             }
         });
-        testCase.add(result);
+        testCase.set("name", phantomStatus + testName);
+
+        if (status === 'failure') {
+            result = _jmr.create({
+                type: "model.failure",
+                data: {
+                    message: message,
+                    type: status
+                }
+            });
+            testCase.add(result);
+        }
+
+        return testCase;
     }
 
-    if (this._testConfigMap[testName]) {
-        this._testConfigMap[testName].wasRun = true;
+    function _writeTestCase() {
+
+        me._testsuite.add(_createTestCase());
+        output = me._testsuite.compile();
+        if (_fs.existsSync(me._fileName)) {
+            _fs.unlinkSync(me._fileName);
+        }
+        _jmr.write(me._fileName, output);
     }
-    else {
-        _log.info("Test " + testName + " not in test manager");
+
+    if (isManagerRunMode()) {
+        if (this._testConfigMap[testName]) {
+            this._testConfigMap[testName].wasRun = true;
+        }
+        else {
+            _printTest2Console("Test " + testName + " not in test manager");
+        }
     }
 
     if (status !== 'End') {
-        this._testsuite.add(testCase);
 
-        var output = this._testsuite.compile();
+        if (isjunit) {
+            _writeTestCase();
+        }
 
-        var symbol = status === 'failure' ? '✖' : '✓';
+        symbol = status === 'failure' ? '✖' : '✓';
         if (status === 'failure') {
             this._hasFailed = true;
         }
 
-        var colors = require('colors');
-        colors.setTheme({'current' : this._randomColor});
+        logmessage = symbol + "Test " + testName + " " + message;
+        _printTest2Console(logmessage.current);
 
-        var logmessage = symbol + "Test " + testName + " " + message;
-        console.log(logmessage.current);
 
-        if (_fs.existsSync(this._fileName)) {
-            _fs.unlinkSync(this._fileName);
-        }
-        _jmr.write(this._fileName, output);
+
     } else {
         var result = this._hasFailed ? "failed" : "succeeded";
-        console.log("======== Test End " + result + " ========");
+        _printTest2Console("======== Test End " + result + " ========");
     }
 };
 
@@ -125,12 +164,17 @@ if (_jmr === undefined) {
 }
 
 
+// Initialization
+init();
+
+
 exports.result = function (req, res) {
 
     var testName = req.query.testName,
         message = req.query.message,
         status = req.query.status,
         reports = req.query.reports,
+        scenario = req.query.scenario,
         reportType = req.query.type,
         hasPhantom = req.query.hasPhantom,
         id = req.query.id,
@@ -142,10 +186,11 @@ exports.result = function (req, res) {
 
     clearTimeout(_checkIfAlive);
     if (status !== 'End') {
+
         _checkIfAlive = setTimeout(function () {
             _log.info("Tests stopped reporting, probably a network problem, failing the rest of the tests");
             if (_reportCreator == {}) {
-                _reportCreator['notest'] = new ReportCreator("notestname.xml", 'notest');
+                _reportCreator['notest'] = new ReportCreator("notestname.xml", 'notest', scenario);
             }
 
             for (var reportKey in _reportCreator) {
