@@ -15,7 +15,11 @@ _cat.core = function () {
         addScrapToManager,
         _vars, _managers, _context,
         _config, _log,
-        _guid;
+        _guid,
+        _enum = {
+            TEST_MANAGER: "tests",
+            ALL: "all"
+        };
 
 
     addScrapToManager = function (testsInfo, scrap) {
@@ -46,17 +50,33 @@ _cat.core = function () {
     };
 
     getScrapTestInfo = function (tests, scrapName) {
-        var scrapTests = [];
-        for (var i = 0; i < tests.length; i++) {
-            if (tests[i].name === scrapName) {
-                var tempInfo = {"name": tests[i].name,
-                    "scenario": tests[i].scenario,
-                    "wasRun": tests[i].wasRun,
-                    "delay" : tests[i].delay,
-                    "repeat": tests[i].repeat};
-                tempInfo.index = i;
-                scrapTests.push(tempInfo);
+        var scrapTests = [],
+            i, size,
+            validate= 0,
+            tempInfo;
+
+        if (tests && scrapName) {
+            size = tests.length;
+            for (i = 0; i < size; i++) {
+                if (tests[i].name === scrapName) {
+                    tempInfo = {"name": tests[i].name,
+                        "scenario": tests[i].scenario,
+                        "wasRun": tests[i].wasRun,
+                        "delay" : tests[i].delay,
+                        "repeat": tests[i].repeat};
+                    tempInfo.index = i;
+                    scrapTests.push(tempInfo);
+                    validate++;
+                }
             }
+        }
+
+        if (!validate) {
+            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName +"'. Check your cat.json project");
+            if (!_cat.core.ui.isOpen()) {
+                _cat.core.ui.on();
+            }
+            _cat.utils.Signal.send('TESTEND', {error: " CAT project configuration error (cat.json), Failed to match a scrap named: '" + scrapName +"'"});
         }
         return scrapTests;
     };
@@ -601,7 +621,7 @@ _cat.core = function () {
                 storageEnum = _cat.utils.Storage.enum;
 
 
-            if ((catConfig) && (catConfig.getRunMode() === 'test-manager')) {
+            if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
                 // check if the test name is in the cat.json
                 var scrapsTestsInfo = getScrapTestInfo(tests, scrap.name[0]);
 
@@ -665,7 +685,7 @@ _cat.core = function () {
                 }
             } else {
 
-                if (typeof catConfig === 'undefined' || catConfig.getRunMode() === 'all') {
+                if (typeof catConfig === 'undefined' || catConfig.getRunMode() === _enum.ALL) {
                     runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
                     if (runat) {
                         manager = _cat.core.getManager(runat);
@@ -1041,6 +1061,10 @@ _cat.core.TestManager = function() {
         return this.get("message");
     };
 
+    _Data.prototype.getError = function() {
+        return this.get("error");
+    };
+
     _Data.prototype.getStatus = function() {
         return this.get("status");
     };
@@ -1132,13 +1156,15 @@ _cat.core.TestManager = function() {
          */
         generateAssertCall: function(config, testdata) {
 
-            var reports = testdata.getReportFormats();
-
-            console.log(" .................... ",  _cat.utils.Storage.get(_cat.utils.Storage.enum.CURRENT_SCENARIO, _cat.utils.Storage.enum.SESSION));
+            var reports = testdata.getReportFormats(),
+                storageEnum = _cat.utils.Storage.enum;
 
             return "http://" + config.getIp() +  ":" +
-                config.getPort() + "/assert?testName=" +
-                testdata.getName() + "&message=" + testdata.getMessage() +
+                config.getPort() + "/assert?" +
+                "testName=" + testdata.getName() +
+                "&scenario=" + _cat.utils.Storage.get(storageEnum.CURRENT_SCENARIO, storageEnum.SESSION) +
+                "&message=" + testdata.getMessage() +
+                "&error=" + testdata.getError() +
                 "&status=" + testdata.getStatus() +
                 "&reports=" + (reports ? reports.join(",") : "") +
                 "&name=" + config.getName() +
@@ -1775,22 +1801,33 @@ _cat.utils.Signal = function () {
             var timeout = _cat.core.TestManager.getDelay(),
                 config, testdata;
 
+            opt = (opt || {});
             config = _cat.core.getConfig();
+
             // ui signal notification
-            if (config.isReport()) {
-                if (opt) {
-                    timeout = (opt["timeout"] || 2000);
-                }
+            if (config.isUI()) {
+
+                timeout = (opt["timeout"] || 2000);
 
                 setTimeout(function () {
-                    var testCount = _cat.core.TestManager.getTestCount();
-                    _cat.core.ui.setContent({
-                        header: [testCount-1, "Tests complete"].join(" "),
-                        desc: "",
-                        tips: "",
-                        style: "color:green"
-                    });
+                    var testCount;
+                    if (opt.error) {
+                        _cat.core.ui.setContent({
+                            header: "Test failed with an error",
+                            desc:  opt.error,
+                            tips: "",
+                            style: "color:red"
+                        });
 
+                    } else {
+                        testCount = _cat.core.TestManager.getTestCount();
+                        _cat.core.ui.setContent({
+                            header: [testCount-1, "Tests complete"].join(" "),
+                            desc: "",
+                            tips: "",
+                            style: "color:green"
+                        });
+                    }
                 }, (timeout));
             }
 
@@ -1800,7 +1837,8 @@ _cat.utils.Signal = function () {
                     name: "End",
                     displayName: "End",
                     status: "End",
-                    message: "End"
+                    message: "End",
+                    error: (opt.error || "")
                 });
 
                 if (config) {
