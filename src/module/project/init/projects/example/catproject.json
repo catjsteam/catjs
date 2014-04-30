@@ -8,12 +8,43 @@
     "host": "{{host}}",
     "port": "{{port}}",
     "protocol": "{{protocol}}",
-    "analytics" : "{{analytics}}",
+    "analytics": "{{analytics}}",
     "apppath": "{{appath}}",
     "appserver": {
         "host": "{{appserver.host}}",
         "port": "{{appserver.port}}",
         "protocol": "{{appserver.protocol}}"
+    },
+
+    "runner": {
+        "run": {
+            "devices": [
+                {
+                    "type": "localpc",
+                    "runner": {
+                        "name": "chrome",
+                        "address": "/index.html"
+                    }
+                },
+                {
+                    "type": "localpc",
+                    "disable": true,
+                    "runner": {
+                        "name": "firefox",
+                        "address": "/index.html"
+                    }
+                },
+                {
+                    "type": "android",
+                    "disable": true,
+                    "id": "all",
+                    "runner": {
+                        "name": "apk"
+                    }
+                }
+
+            ]
+        }
     },
 
     "plugins": [

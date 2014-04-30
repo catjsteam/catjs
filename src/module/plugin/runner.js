@@ -28,6 +28,7 @@ module.exports = _basePlugin.ext(function () {
                 var  extensionParams = _data.data,
                     runner = config.runner,
                     thiz = config.thiz,
+                    runnerconfig = _project.getRunner(),
                     basePath = _project.getTargetFolder(),
                     path = (extensionParams.path ? _path.join(basePath, extensionParams.path) : basePath),
                     action = extensionParams.action,
@@ -39,7 +40,8 @@ module.exports = _basePlugin.ext(function () {
                             runner.start.call(thiz, {
                                 set: set,
                                 path: path,
-                                port: (extensionParams.port || _project.getPort())
+                                port: (extensionParams.port || _project.getPort()),
+                                runnerconfig: runnerconfig
                             }, function() {
                                 _emitter.emit("job.done", {status: "done"});
                             });

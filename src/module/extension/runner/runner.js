@@ -34,7 +34,7 @@ var runner = function () {
          * @returns {undefined}
          */
         start: function (config, callback) {
-            console.log("mobilerunner");
+
             var runnerConfig = {
                 "run": {
                     "devices": [
@@ -76,6 +76,18 @@ var runner = function () {
                     "port": config.port
                 }
             };
+
+             if (config && config.runnerconfig) {
+                 runnerConfig = config.runnerconfig;
+                 if (runnerConfig.run) {
+                     if (!runnerConfig.server) {
+                         runnerConfig.server = {
+                             "host": "auto",
+                             "port": config.port
+                         }
+                     }
+                 }
+             }
             _mobilerunner.run(runnerConfig);
         },
 
