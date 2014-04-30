@@ -44,7 +44,8 @@ _cat.utils.Signal = function () {
                     displayName: "End",
                     status: "End",
                     message: "End",
-                    error: (opt.error || "")
+                    error: (opt.error || ""),
+                    reportFormats: opt.reportFormats
                 });
 
                 if (config) {
