@@ -1,7 +1,8 @@
 var _cat = {
     utils: {},
     plugins: {},
-    ui: {}
+    ui: {},
+    errors:{}
 };
 
 var hasPhantomjs = false;
@@ -13,21 +14,31 @@ _cat.core = function () {
         getScrapTestInfo,
         addScrapToManager,
         _vars, _managers, _context,
-        _config, _log;
+        _config, _log,
+        _guid,
+        _enum = {
+            TEST_MANAGER: "tests",
+            ALL: "all"
+        };
 
 
     addScrapToManager = function (testsInfo, scrap) {
 
-        for (var i = 0; i < testsInfo.length; i++) {
+        var i, test, testRepeats,
+            testDelay, preformVal,pkgNameVal;
+
+        for (i = 0; i < testsInfo.length; i++) {
             testNumber--;
-            var test = testsInfo[i];
+            test = testsInfo[i];
 
-
-            var testRepeats = parseInt((test.repeat ? test.repeat : 1));
+            testRepeats = parseInt((test.repeat ? test.repeat : 1));
             test.repeat = "repeat(" + testRepeats + ")";
-			var testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
-            var preformVal = "@@" + scrap.name[0] + " " + testRepeats;
-            var pkgNameVal = scrap.pkgName + "$$cat";
+			testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
+            preformVal = "@@" + scrap.name[0] + " " + testRepeats;
+            pkgNameVal = scrap.pkgName + "$$cat";
+            if (test.scenario) {
+                scrap.scenario = test.scenario;
+            }
             managerScraps[test.index] = {"preform": preformVal,
                 "pkgName": pkgNameVal,
                 "repeat": testRepeats,
@@ -39,16 +50,37 @@ _cat.core = function () {
     };
 
     getScrapTestInfo = function (tests, scrapName) {
-        var scrapTests = [];
-        for (var i = 0; i < tests.length; i++) {
-            if (tests[i].name === scrapName) {
-                var tempInfo = {"name": tests[i].name,
-                    "wasRun": tests[i].wasRun,
-                    "delay" : tests[i].delay,
-                    "repeat": tests[i].repeat};
-                tempInfo.index = i;
-                scrapTests.push(tempInfo);
+        var scrapTests = [],
+            i, size,
+            validate= 0,
+            tempInfo,
+            reportFormats;
+
+        if (tests && scrapName) {
+            size = tests.length;
+            for (i = 0; i < size; i++) {
+                if (tests[i].name === scrapName) {
+                    tempInfo = {"name": tests[i].name,
+                        "scenario": tests[i].scenario,
+                        "wasRun": tests[i].wasRun,
+                        "delay" : tests[i].delay,
+                        "repeat": tests[i].repeat};
+                    tempInfo.index = i;
+                    scrapTests.push(tempInfo);
+                    validate++;
+                }
             }
+        }
+
+        if (!validate) {
+            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName +"'. Check your cat.json project");
+            if (!_cat.core.ui.isOpen()) {
+                _cat.core.ui.on();
+            }
+            if (_config.isReport()) {
+                reportFormats = _config.getReportFormats();
+            }
+            _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: " CAT project configuration error (cat.json), Failed to match a scrap named: '" + scrapName +"'"});
         }
         return scrapTests;
     };
@@ -113,44 +145,87 @@ _cat.core = function () {
         }
     })();
 
+    // singelton class
+    function GetTestsClass(config) {
+        this.globalTests = [];
+        // do this once
+        this.setTests = function (config) {
+
+            var getScenarioTests =function(testsList, globalDelay, scenarioName) {
+                var innerConfigMap = [];
+                if (testsList.tests) {
+                    for (var i = 0; i < testsList.tests.length; i++) {
+                        if (!(testsList.tests[i].disable)) {
+                            if (testsList.tests[i].tests) {
+                                var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
+
+                                for (var j = 0; j < repeatFlow; j++) {
+                                    var tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay);
+                                    innerConfigMap = innerConfigMap.concat(tempArr);
+                                }
+
+                            } else {
+
+                                // set the global delay
+                                if (!testsList.tests[i].delay && globalDelay) {
+                                    testsList.tests[i].delay = globalDelay;
+                                }
+                                testsList.tests[i].wasRun = false;
+                                testsList.tests[i].scenario = {name: (scenarioName || null)};
+                                innerConfigMap.push(testsList.tests[i]);
+
+                            }
+                        }
+                    }
+                }
+
+                return innerConfigMap;
+
+            }, i, j, temp,
+                testsFlow, scenarios, scenario,
+                repeatScenario, currTest, currentTestName;
+
+            testsFlow = config.tests;
+            scenarios = config.scenarios;
+            for ( i = 0; i < testsFlow.length; i++) {
+                 currTest = testsFlow[i];
+
+                 if (!currTest || !("name" in currTest)) {
+                     _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                     continue;
+                 }
+                 currentTestName = currTest.name;
+                 scenario = scenarios[currentTestName];
+
+                if (scenario) {
+                    repeatScenario = (scenario.repeat ? scenario.repeat : 1);
+                    for (j = 0; j < repeatScenario; j++) {
+                        temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
+                        this.globalTests = this.globalTests.concat(temp);
+                    }
+                } else {
+                    _log.warn("[CAT] No valid scenario '", currTest.name, "' was found, double check your cat.json project");
+                }
+            }
+        };
+
+        if ( GetTestsClass._singletonInstance ) {
+            return GetTestsClass._singletonInstance;
+        }
+
+        this.setTests(config);
+
+        GetTestsClass._singletonInstance = this;
+
+        this.getTests = function() { return this.globalTests; };
+    }
+
     function Config() {
 
         var innerConfig,
             xmlhttp,
             configText,
-            getTestsHelper;
-
-
-        getTestsHelper = function (testList, globalDelay) {
-
-            var innerConfigMap = [];
-            if (testList.tests) {
-                for (var i = 0; i < testList.tests.length; i++) {
-                    if (!(testList.tests[i].disable)) {
-                        if (testList.tests[i].tests) {
-                            var repeatFlow = testList.tests[i].repeat ? testList.tests[i].repeat : 1;
-
-                            for (var j = 0; j < repeatFlow; j++) {
-                                var tempArr = getTestsHelper(testList.tests[i], testList.tests[i].delay);
-                                innerConfigMap = innerConfigMap.concat(tempArr);
-                            }
-
-                        } else {
-
-                            // set the global delay
-                            if (!testList.tests[i].delay && globalDelay) {
-                                testList.tests[i].delay = globalDelay;
-                            }
-                            testList.tests[i].wasRun = false;
-                            innerConfigMap.push(testList.tests[i]);
-
-                        }
-                    }
-                }
-            }
-            return innerConfigMap;
-        };
-
+            me = this;
 
         try {
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
@@ -168,9 +243,15 @@ _cat.core = function () {
         }
 
         if (innerConfig) {
+
             this.getType = function () {
                 return innerConfig.type;
             };
+
+            this.getName = function () {
+                return innerConfig.name;
+            };
+
             this.getIp = function () {
                 if (innerConfig.ip) {
                     return innerConfig.ip;
@@ -188,15 +269,85 @@ _cat.core = function () {
 
 
             this.getTests = function () {
-                return getTestsHelper(innerConfig);
+
+                var tests = new GetTestsClass(innerConfig);
+
+                return tests.getTests();
 
             };
-
 
             this.getRunMode = function () {
                 return innerConfig["run-mode"];
             };
 
+            this.isReportType = function(key) {
+                var formats = me.getReportFormats(),
+                    i, size, item;
+
+                if (formats && formats.length > 0) {
+                    size = formats.length;
+                    for (i=0; i<size; i++) {
+                        item = formats[i];
+                        if (item === key) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            };
+
+            this.isJUnitSupport = function() {
+
+                return this.isReportType("junit");
+            };
+            this.isConsoleSupport = function() {
+
+                return this.isReportType("console");
+            };
+
+            this.getReportFormats = function() {
+
+                var format = [],
+                    report;
+
+                if (_cat.utils.Utils.validate(innerConfig, "report") ) {
+
+                    report = innerConfig.report;
+                    format = (report.format ? report.format : format);
+                }
+
+                return format;
+            };
+
+            this.isReport = function() {
+
+                if (_cat.utils.Utils.validate(innerConfig, "report") && _cat.utils.Utils.validate(innerConfig.report, "disable", false)) {
+
+                    return true;
+                }
+
+                return false;
+            };
+
+            this.isErrors = function() {
+
+                if (_cat.utils.Utils.validate(innerConfig, "assert") && _cat.utils.Utils.validate(innerConfig.assert, "errors", true)) {
+
+                    return true;
+                }
+
+                return false;
+            };
+
+            this.isUI = function() {
+                if (_cat.utils.Utils.validate(innerConfig, "ui", true)) {
+
+                    return true;
+                }
+
+                return false;
+            };
         }
 
         this.hasPhantom = function () {
@@ -211,6 +362,51 @@ _cat.core = function () {
     return {
 
         log: _log,
+
+        init: function() {
+
+            _guid = _cat.utils.Storage.getGUID();
+
+            _config = new Config();
+
+            // display the ui, if you didn't already
+            if (_config.isUI()) {
+                _cat.core.ui.enable();
+                if (!_cat.core.ui.isOpen()) {
+                    _cat.core.ui.on();
+                }
+            } else {
+                _cat.core.ui.disable();
+                _cat.core.ui.off();
+                _cat.core.ui.destroy();
+            }
+
+            if (_config.isErrors()) {
+
+                    // register DOM's error listener
+                    _cat.core.errors.listen(function(message, filename, lineno, colno, error) {
+
+                        var catconfig = _cat.core.getConfig(),
+                            reportFormats;
+
+                        if (catconfig.isReport()) {
+                            reportFormats = catconfig.getReportFormats();
+                        }
+
+                        // create catjs assertion entry
+                        _cat.utils.assert.create({
+                            name: "generalJSError",
+                            displayName:  "General JavaScript Error",
+                            status: "failure",
+                            message: [message, " ;file: ", filename, " ;line: ", lineno, " ;column:", colno, " ;error:", error ].join(" "),
+                            success: false,
+                            ui: catconfig.isUI(),
+                            send: reportFormats
+                        });
+
+                    });
+            }
+        },
 
         setManager: function (managerKey, pkgName) {
             if (!_managers[managerKey]) {
@@ -425,17 +621,21 @@ _cat.core = function () {
                 runat, manager,
                 pkgname, args = arguments,
                 catConfig = _cat.core.getConfig(),
+                tests = catConfig ? catConfig.getTests() : [],
+                storageEnum = _cat.utils.Storage.enum;
 
-                tests = catConfig ? catConfig.getTests() : [];
 
-
-            if ((catConfig) && (catConfig.getRunMode() === 'test-manager')) {
+            if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
                 // check if the test name is in the cat.json
                 var scrapsTestsInfo = getScrapTestInfo(tests, scrap.name[0]);
 
 
                 pkgname = scrap.pkgName;
                 _cat.core.defineImpl(pkgname, function () {
+                    var scrap = (config ? config.scrap : undefined);
+                    if (scrap && scrap.scenario) {
+                        _cat.utils.Storage.set(storageEnum.CURRENT_SCENARIO, scrap.scenario.name, storageEnum.SESSION);
+                    }
                     _cat.core.actionimpl.apply(this, args);
                 });
 
@@ -478,7 +678,11 @@ _cat.core = function () {
                             /*  Manager call  */
                             (function () {
                                 _cat.core.managerCall(managerScrap.scrap.name[0], function () {
-                                    _cat.utils.Signal.send('TESTEND');
+                                    var reportFormats;
+                                    if (_config.isReport()) {
+                                        reportFormats = _config.getReportFormats();
+                                    }
+                                    _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats});
                                 });
                             })();
 
@@ -489,7 +693,7 @@ _cat.core = function () {
                 }
             } else {
 
-                if (typeof catConfig === 'undefined' || catConfig.getRunMode() === 'all') {
+                if (typeof catConfig === 'undefined' || catConfig.getRunMode() === _enum.ALL) {
                     runat = (("run@" in scrap) ? scrap["run@"][0] : undefined);
                     if (runat) {
                         manager = _cat.core.getManager(runat);
@@ -516,7 +720,6 @@ _cat.core = function () {
         },
 
         getConfig: function () {
-            _config = new Config();
             return (_config.available() ? _config : undefined);
         },
 
@@ -569,9 +772,13 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                console.log("Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
+                _log.log("Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
+        },
+
+        guid: function() {
+            return _guid;
         }
 
     };

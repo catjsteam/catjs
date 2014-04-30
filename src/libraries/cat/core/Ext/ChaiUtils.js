@@ -15,18 +15,6 @@ _cat.utils.chai = function () {
         }
     }
 
-
-    function _sendTestResult(data) {
-
-        var config  = _cat.core.getConfig();
-
-        if (config) {
-            _cat.utils.AJAX.sendRequestSync({
-                url:  _cat.core.TestManager.generateAssertCall(config, data)
-            });
-        }
-    }
-
     function _splitCapilalise(string) {
         if (!string) {
             return string;
@@ -68,11 +56,12 @@ _cat.utils.chai = function () {
                 result,
                 fail,
                 failure,
-                testdata,
                 scrap = config.scrap.config,
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
                 testName = (scrapName || "NA"),
-                key, item, items=[], args=[];
+                key, items=[], args=[],
+                catconfig = _cat.core.getConfig(),
+                reportFormats;
 
             if (_chai) {
                 if (config) {
@@ -104,34 +93,31 @@ _cat.utils.chai = function () {
                     }
 
                     if (success) {
-
                         output = "Test Passed";
-
                     }
 
-                    testdata = _cat.core.TestManager.addTestData({
+                    if (catconfig.isReport()) {
+                        reportFormats = catconfig.getReportFormats();
+                    }
+
+                    // create catjs assertion entry
+                    _cat.utils.assert.create({
                         name: testName,
-                        displayName: _getDisplayName(testName),
-                        status: success ? "success" : "failure",
+                        displayName:  _getDisplayName(testName),
+                        status: (success ? "success" : "failure"),
                         message: output,
-                        success: success
+                        success: success,
+                        ui: catconfig.isUI(),
+                        send: reportFormats
                     });
-
-                    _cat.core.ui.setContent({
-                        style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
-                        header: testdata.getDisplayName(),
-                        desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestSucceededCount()
-                    });
-
-                    _sendTestResult(testdata);
 
                     if (!success) {
-                        throw new Error((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
+                        console.warn((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
                     }
                 }
             }
         },
+
 
         /**
          * For the testing environment, set chai handle

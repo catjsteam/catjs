@@ -4,37 +4,55 @@ _cat.utils.Signal = function () {
 
         TESTEND: function (opt) {
 
-            var timeout = _cat.core.TestManager.getDelay();
+            var timeout = _cat.core.TestManager.getDelay(),
+                config, testdata;
 
-            if (opt) {
+            opt = (opt || {});
+            config = _cat.core.getConfig();
+
+            // ui signal notification
+            if (config.isUI()) {
+
                 timeout = (opt["timeout"] || 2000);
+
+                setTimeout(function () {
+                    var testCount;
+                    if (opt.error) {
+                        _cat.core.ui.setContent({
+                            header: "Test failed with an error",
+                            desc:  opt.error,
+                            tips: "",
+                            style: "color:red"
+                        });
+
+                    } else {
+                        testCount = _cat.core.TestManager.getTestCount();
+                        _cat.core.ui.setContent({
+                            header: [testCount-1, "Tests complete"].join(" "),
+                            desc: "",
+                            tips: "",
+                            style: "color:green"
+                        });
+                    }
+                }, (timeout));
             }
 
-            setTimeout(function () {
-                var testCount = _cat.core.TestManager.getTestCount();
-                _cat.core.ui.setContent({
-                    header: [testCount-1, "Tests complete"].join(" "),
-                    desc: "",
-                    tips: "",
-                    style: "color:green"
+            // server signal notification
+            if (config.isReport()) {
+                testdata = _cat.core.TestManager.addTestData({
+                    name: "End",
+                    displayName: "End",
+                    status: "End",
+                    message: "End",
+                    error: (opt.error || ""),
+                    reportFormats: opt.reportFormats
                 });
 
-            }, (timeout));
-
-
-            var config = _cat.core.getConfig();
-
-            var testdata = _cat.core.TestManager.addTestData({
-                name: "End",
-                displayName: "End",
-                status: "End",
-                message: "End"
-            });
-
-            if (config) {
-                _cat.utils.AJAX.sendRequestSync({
-                    url: _cat.core.TestManager.generateAssertCall(config, testdata)
-                });
+                if (config) {
+                    _cat.utils.AJAX.sendRequestSync({
+                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                    });
+                }
             }
 
 

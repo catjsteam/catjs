@@ -1,5 +1,12 @@
 _cat.core.TestManager = function() {
 
+    var _enum = {
+        TYPE_TEST: "test",
+        TYPE_SIGNAL: "signal"
+    };
+
+
+    // Test Manager data class
     function _Data(config) {
 
         var me = this;
@@ -11,6 +18,12 @@ _cat.core.TestManager = function() {
         (function() {
             var item;
 
+            // defaults \ validation
+            if (!("type" in config) || (("type" in config) && config.type === undefined)) {
+                config.type = _enum.TYPE_TEST;
+            }
+
+            // configuration settings
             for (item in config) {
                 if (config.hasOwnProperty(item)) {
                     me.config[item] = config[item];
@@ -28,6 +41,10 @@ _cat.core.TestManager = function() {
         return this.get("message");
     };
 
+    _Data.prototype.getError = function() {
+        return this.get("error");
+    };
+
     _Data.prototype.getStatus = function() {
         return this.get("status");
     };
@@ -38,6 +55,14 @@ _cat.core.TestManager = function() {
 
     _Data.prototype.getDisplayName = function() {
         return this.get("displayName");
+    };
+
+    _Data.prototype.getType = function() {
+        return this.get("type");
+    };
+
+    _Data.prototype.getReportFormats = function() {
+        return this.get("reportFormats");
     };
 
     _Data.prototype.set = function(key, value) {
@@ -111,12 +136,21 @@ _cat.core.TestManager = function() {
          */
         generateAssertCall: function(config, testdata) {
 
+            var reports = testdata.getReportFormats(),
+                storageEnum = _cat.utils.Storage.enum;
+
             return "http://" + config.getIp() +  ":" +
-                config.getPort() + "/assert?testName=" +
-                testdata.getName() + "&message=" + testdata.getMessage() +
+                config.getPort() + "/assert?" +
+                "testName=" + testdata.getName() +
+                "&scenario=" + _cat.utils.Storage.get(storageEnum.CURRENT_SCENARIO, storageEnum.SESSION) +
+                "&message=" + testdata.getMessage() +
+                "&error=" + testdata.getError() +
                 "&status=" + testdata.getStatus() +
-                "&type=" + config.getType() +
+                "&reports=" + (reports ? reports.join(",") : "") +
+                "&name=" + config.getName() +
+                "&type=" + testdata.getType() +
                 "&hasPhantom="  + config.hasPhantom() +
+                "&id="  + _cat.core.guid() +
                 "&cache="+ (new Date()).toUTCString();
 
         }
