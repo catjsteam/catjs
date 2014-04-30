@@ -53,7 +53,8 @@ _cat.core = function () {
         var scrapTests = [],
             i, size,
             validate= 0,
-            tempInfo;
+            tempInfo,
+            reportFormats;
 
         if (tests && scrapName) {
             size = tests.length;
@@ -76,7 +77,10 @@ _cat.core = function () {
             if (!_cat.core.ui.isOpen()) {
                 _cat.core.ui.on();
             }
-            _cat.utils.Signal.send('TESTEND', {error: " CAT project configuration error (cat.json), Failed to match a scrap named: '" + scrapName +"'"});
+            if (_config.isReport()) {
+                reportFormats = _config.getReportFormats();
+            }
+            _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: " CAT project configuration error (cat.json), Failed to match a scrap named: '" + scrapName +"'"});
         }
         return scrapTests;
     };
@@ -674,7 +678,11 @@ _cat.core = function () {
                             /*  Manager call  */
                             (function () {
                                 _cat.core.managerCall(managerScrap.scrap.name[0], function () {
-                                    _cat.utils.Signal.send('TESTEND');
+                                    var reportFormats;
+                                    if (_config.isReport()) {
+                                        reportFormats = _config.getReportFormats();
+                                    }
+                                    _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats});
                                 });
                             })();
 
@@ -999,7 +1007,7 @@ _cat.utils.chai = function () {
                     });
 
                     if (!success) {
-                        throw new Error((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
+                        console.warn((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
                     }
                 }
             }
@@ -1838,7 +1846,8 @@ _cat.utils.Signal = function () {
                     displayName: "End",
                     status: "End",
                     message: "End",
-                    error: (opt.error || "")
+                    error: (opt.error || ""),
+                    reportFormats: opt.reportFormats
                 });
 
                 if (config) {
