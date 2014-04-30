@@ -7,22 +7,33 @@ _cat.utils.Signal = function () {
             var timeout = _cat.core.TestManager.getDelay(),
                 config, testdata;
 
+            opt = (opt || {});
             config = _cat.core.getConfig();
+
             // ui signal notification
-            if (config.isReport()) {
-                if (opt) {
-                    timeout = (opt["timeout"] || 2000);
-                }
+            if (config.isUI()) {
+
+                timeout = (opt["timeout"] || 2000);
 
                 setTimeout(function () {
-                    var testCount = _cat.core.TestManager.getTestCount();
-                    _cat.core.ui.setContent({
-                        header: [testCount-1, "Tests complete"].join(" "),
-                        desc: "",
-                        tips: "",
-                        style: "color:green"
-                    });
+                    var testCount;
+                    if (opt.error) {
+                        _cat.core.ui.setContent({
+                            header: "Test failed with an error",
+                            desc:  opt.error,
+                            tips: "",
+                            style: "color:red"
+                        });
 
+                    } else {
+                        testCount = _cat.core.TestManager.getTestCount();
+                        _cat.core.ui.setContent({
+                            header: [testCount-1, "Tests complete"].join(" "),
+                            desc: "",
+                            tips: "",
+                            style: "color:green"
+                        });
+                    }
                 }, (timeout));
             }
 
@@ -32,7 +43,8 @@ _cat.utils.Signal = function () {
                     name: "End",
                     displayName: "End",
                     status: "End",
-                    message: "End"
+                    message: "End",
+                    error: (opt.error || "")
                 });
 
                 if (config) {
