@@ -73,7 +73,7 @@ module.exports = _basePlugin.ext(function () {
                                     catjsondata.scenarios.general.tests = args;
                                 }
                             }
-                            catjsondata["run-mode"] = "test-manager";
+                            catjsondata["run-mode"] = "tests";
                         }
                     }
 

@@ -33,7 +33,7 @@ and then
 
 ###run-mode
 * _all_ - run all tests (`tests` property is ignored)
-* _test-manager_ - Run the tests according to `tests` property
+* _tests_ - Run the tests according to `tests` property
 
 ###test-failure-timeout
 The number of the timeout in seconds to wait for an assertion response, if the timeout occurs all the tests that did not run will be failed.
@@ -47,7 +47,7 @@ example:
     "ip": "10.0.0.1",
     "port": "8080",
     "tests": [{"name": "catSenchaText"}, {"name": "catSenchaBtn"}],
-    "run-mode": "test-manager",
+    "run-mode": "tests",
     "test-failure-timeout": 30
 }
 
