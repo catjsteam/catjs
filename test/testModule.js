@@ -40,7 +40,7 @@ function test(config, callback) {
                     taskcb: function(task) {
                         if (task && task === "t@runner.start") {
 
-                            console.log("[CAT build] waiting 60 seconds");
+                            console.log("[CAT build] waiting 30 seconds");
                             setTimeout(function() {
 
 //                                process.chdir('./..');
