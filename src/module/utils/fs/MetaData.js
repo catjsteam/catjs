@@ -147,7 +147,7 @@ module.exports = function () {
 
             try {
                 _fs.writeFileSync(_getMDFile(), _beautify(content, { indent_size: 2 }));
-                _log.debug(_props.get("cat.mdata.write").format("[cat mdata]"));
+
             } catch(e) {
                 _utils.error(_props.get("cat.error").format("[cat mdata]", e));
             }
@@ -160,7 +160,7 @@ module.exports = function () {
             try {
                 if (_fs.existsSync(_getMDFile())) {
                     data = _fs.readFileSync(_getMDFile(), "utf8");
-                    _log.debug(_props.get("cat.mdata.read").format("[cat mdata]"));
+
                 } else {
                     _log.warning(_props.get("cat.mdata.file.not.exists").format("[cat mdata]"));
                 }
