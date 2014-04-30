@@ -24,10 +24,10 @@ function getColorIndex(id) {
         return _colorCell[id];
     }
 
+    _colorIndex++;
     if (_colorIndex > _colorsArray.length-1) {
         _colorIndex=0;
     }
-    _colorIndex++;
 
     if (id !== undefined) {
         _colorCell[id] = _colorIndex;
