@@ -25,7 +25,7 @@
     },
     "ui": true,
     "report": {
-        "format": ["console"],
+        "format": ["console", "junit"],
         "disable": false
     },
     "assert": {
