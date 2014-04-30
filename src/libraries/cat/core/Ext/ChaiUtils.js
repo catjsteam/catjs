@@ -112,7 +112,7 @@ _cat.utils.chai = function () {
                     });
 
                     if (!success) {
-                        throw new Error((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
+                        console.warn((output || "[CAT] Hmmm... It's an error alright, can't find any additional information"), (fail || ""));
                     }
                 }
             }
