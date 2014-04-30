@@ -30,7 +30,7 @@
     },
     "ui": true,
     "report": {
-        "format": ["junit"],
+        "format": ["console", "junit"],
         "disable": false
     },
     "assert": {
