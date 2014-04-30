@@ -12,7 +12,7 @@
             "prod" :[
                 {
                     "name": "cat.core.test.min.js",
-                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js", "CatInit.js"],
                     "type": "js"
                 },
                 {
@@ -29,7 +29,7 @@
             "dev" :[
                 {
                     "name":"cat.core.test.js",
-                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js", "CatInit.js"],
                     "type": "js"
                 },
                 {
