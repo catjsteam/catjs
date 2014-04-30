@@ -8,8 +8,8 @@ var _jmr = require("test-model-reporter"),
     _testconfig,
     _colors,
     _colorsArray = ['blue', 'yellow', 'cyan', 'magenta', 'grey', 'green'],
-    _colorCell={},
-    _colorIndex=-1;
+    _colorCell = {},
+    _colorIndex = -1;
 
 
 /**
@@ -25,8 +25,8 @@ function getColorIndex(id) {
     }
 
     _colorIndex++;
-    if (_colorIndex > _colorsArray.length-1) {
-        _colorIndex=0;
+    if (_colorIndex > _colorsArray.length - 1) {
+        _colorIndex = 0;
     }
 
     if (id !== undefined) {
@@ -41,7 +41,7 @@ function getColorIndex(id) {
 function deleteColor(id) {
 
     if (id !== undefined && typeof _colorCell[id] !== "undefined") {
-        delete _colorCell[id] ;
+        delete _colorCell[id];
     }
 
 }
@@ -143,7 +143,7 @@ ReportCreator.prototype.addTestCase = function (config) {
         result,
         logmessage,
         output, symbol,
-        me = this, isjunit = true, isconsole = true,
+        me = this, isjunit, isconsole,
         testName, status, phantomStatus, message, reports, error, id;
 
     testName = config.testName;
@@ -154,6 +154,9 @@ ReportCreator.prototype.addTestCase = function (config) {
     error = config.error;
     id = config.id;
 
+
+    isjunit = (reports["junit"] === 1);
+    isconsole = (reports["console"] === 1);
 
     function _printTest2Console(msg) {
         var message;
@@ -198,7 +201,7 @@ ReportCreator.prototype.addTestCase = function (config) {
     }
 
     // set console color
-    _colors.setTheme({'current' : _colorsArray[getColorIndex(id)]});
+    _colors.setTheme({'current': _colorsArray[getColorIndex(id)]});
 
     if (isManagerRunMode()) {
         if (this._testConfigMap[testName]) {
@@ -221,11 +224,10 @@ ReportCreator.prototype.addTestCase = function (config) {
         _printTest2Console(logmessage);
 
 
-
     } else {
 
         if (error) {
-            _colors.setTheme({'current' : "red"});
+            _colors.setTheme({'current': "red"});
             result = "Test end with error: " + error;
             result = "======== Test End - " + result + " ========";
 
@@ -254,20 +256,28 @@ init();
 
 exports.result = function (req, res) {
 
-    var testName = req.query.testName,
-        message = req.query.message,
-        error = req.query.error,
-        status = req.query.status,
-        reports = req.query.reports,
-        scenario = req.query.scenario,
-        reportType = req.query.type,
-        hasPhantom = req.query.hasPhantom,
-        id = req.query.id,
-        file,
-        checkIfAliveTimeout = (_testconfig["test-failure-timeout"] || 30) * 1000;
+    var query = req.query,
+        testName = query.testName,
+        message = query.message,
+        error = query.error,
+        status = query.status,
+        reports = query.reports,
+        scenario = query.scenario,
+        reportType = query.type,
+        hasPhantom = query.hasPhantom,
+        id = query.id,
+        file, checkIfAliveTimeout = (_testconfig["test-failure-timeout"] || 30) * 1000,
+        reportsArr = [];
 
     if (reports) {
-        reports = reports.split(",");
+        reportsArr = reports.split(",");
+        reports = {};
+        reportsArr.forEach(function(report) {
+            if (report) {
+                reports[report] = 1;
+            }
+        });
+
     }
 
     clearTimeout(_checkIfAlive);
@@ -288,12 +298,12 @@ exports.result = function (req, res) {
                 for (var key in testConfigMap) {
                     _log.info(testConfigMap[key]);
                     if (!testConfigMap[key].wasRun) {
-                        _reportCreator[reportKey].addTestCase({testName: testConfigMap[key].name, status: 'failure', phantomStatus: '', message:'failed due to network issue', reports:reports, error:error,  id:id});
+                        _reportCreator[reportKey].addTestCase({testName: testConfigMap[key].name, status: 'failure', phantomStatus: '', message: 'failed due to network issue', reports: reports, error: error, id: id});
                     }
                 }
             }
 
-        }, checkIfAliveTimeout); //TODO: make this configurable
+        }, checkIfAliveTimeout);
     }
 
     _log.info("requesting " + testName + message + status);
@@ -308,6 +318,6 @@ exports.result = function (req, res) {
         _reportCreator[id] = new ReportCreator(file, reportType + id, scenario);
     }
 
-    _reportCreator[id].addTestCase({testName:testName, status:status, phantomStatus:phantomStatus, message:message, reports:reports, error:error, id:id});
+    _reportCreator[id].addTestCase({testName: testName, status: status, phantomStatus: phantomStatus, message: message, reports: reports, error: error, id: id});
 };
 
