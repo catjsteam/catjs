@@ -41,6 +41,10 @@ _cat.core.TestManager = function() {
         return this.get("message");
     };
 
+    _Data.prototype.getError = function() {
+        return this.get("error");
+    };
+
     _Data.prototype.getStatus = function() {
         return this.get("status");
     };
@@ -140,6 +144,7 @@ _cat.core.TestManager = function() {
                 "testName=" + testdata.getName() +
                 "&scenario=" + _cat.utils.Storage.get(storageEnum.CURRENT_SCENARIO, storageEnum.SESSION) +
                 "&message=" + testdata.getMessage() +
+                "&error=" + testdata.getError() +
                 "&status=" + testdata.getStatus() +
                 "&reports=" + (reports ? reports.join(",") : "") +
                 "&name=" + config.getName() +
