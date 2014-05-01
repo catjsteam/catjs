@@ -118,7 +118,7 @@ CAT's annotation term for a single test unit is "Scrap".
 
         catcli -bs
 
-### Application Error Assertion [ApplicationErrorAssertion] ###
+[ApplicationErrorAssertion]: ### Application Error Assertion 
 catjs track your application errors and report it to the console/junit. With minimal annotation for catjs library loading you get to track your application errors.
    Combined it with catjs runner you can immediately get report about any errors on different browsers and devices.
 
