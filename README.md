@@ -1,14 +1,14 @@
-CAT Core
+CATJS 0.1.4
 ==============
 
-*CAT Core* is an automation framework for mobile-web applications testing.  
+*CATJS* is an automation framework for (mobile) web applications testing.
 With simple annotations added to your HTML5 code, an automated functional tests will be available as part of your application lifecycle.
 
 
 
 ### Code once, deploy it anywhere <br/>
 
-Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner) (That is already part of CAT Core, no need to do any additional installations), on any platform that your application supports.
+Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner) (That is already part of CATJS, no need to do any additional installations), on any platform that your application supports.
 CAT runner can deploy your application on multiple devices and desktop browsers.
 
 ### A few facts
@@ -22,11 +22,12 @@ CAT runner can deploy your application on multiple devices and desktop browsers.
 [cat.js.team](http://catjsteam.github.io/) @catjsteam
 
 ## Blog
-[http://catjs.blogspot.co.il](]http://catjs.blogspot.co.il)  
+[http://catjs.blogspot.co.il](]http://catjs.blogspot.co.il)
 * Web Applications that test themselves
 * Web automation testing solution
 
 ## Quick start
+You can visit our [catjs forum](https://groups.google.com/forum/#!forum/catjs). Comments and questions are more than welcome, our team can help and consult about how to test your web application.
 
 ### First, install CAT command line
 In order to get started, you'll want to install CAT's CLI (command line interface) globally. `catcli` command will be set into your system path.
@@ -117,6 +118,10 @@ CAT's annotation term for a single test unit is "Scrap".
 
         catcli -bs
 
+### Application Error Assertion
+catjs track your application errors and report it to the console/junit. With minimal annotation for catjs library loading you get to track your application errors.
+   Combined it with catjs runner you can immediately get report about any errors on different browsers and devices.
+
 ### Next step  
 Below you can find a more in depth content that will be continuously updated.   
 Also you can find information in our [site](http://catjsteam.github.io/) @catjsteam    
@@ -199,6 +204,9 @@ This file contains the metadata about the project. The following configuration i
         "host": "localhost",
         "port": "8089",
         "protocol": "http",
+
+        /* The application path (can be set relative to cat-project) */
+        "apppath": "./../app",
 
         /* Application server details (CAT's server as defaults)*/
         "appserver": {
