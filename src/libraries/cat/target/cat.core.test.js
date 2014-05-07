@@ -2260,9 +2260,6 @@ _cat.plugins.jqm = function () {
             scrollTop: function () {
 
                 $(document).ready(function(){
-
-
-
                     $('html, body').animate({scrollTop : 0},1000);
                 });
 
@@ -2422,7 +2419,25 @@ _cat.plugins.jqm = function () {
                     setBoarder( $('#' + idName).eq(0)[0]);
                 });
 
+            },
+
+            backClick : function () {
+                $(document).ready(function(){
+                    $('[data-rel="back"]')[0].click();
+                });
+            },
+
+            searchInListView : function (listViewId, newValue) {
+                $(document).ready(function(){
+                    var listView = $('#' + listViewId)[0];
+                    var parentElements = listView.parentElement.children;
+                    var form = parentElements[$.inArray( listView, parentElements ) - 1];
+                    $( form ).find( "input" ).focus();
+                    $( form ).find( "input" ).val(newValue);
+                    $( form ).find( "input" ).trigger( 'change' );
+                });
             }
+
 
         }
 

@@ -178,6 +178,23 @@ module.exports = function () {
                                 });
                             }
 
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "backClick",
+                                    apiname: "backClick",
+                                    exp: jqm
+                                });
+                            }
+                            if (!match) {
+                                match = _scraputils.generate({
+                                    api: "searchInListView",
+                                    apiname: "searchInListView",
+                                    exp: jqm
+                                });
+                            }
+
+
+
                             if (match) {
                                 me.print("_cat.core.plugin('jqm').actions."+ match);
                             }
