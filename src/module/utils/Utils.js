@@ -16,7 +16,7 @@ module.exports = function () {
         if (!_fs.existsSync(folder)) {
             try {
                 _fs.mkdirRecursiveSync(folder);
-                _log.debug("[copy action] target folder was created: " + folder);
+                //_log.debug("[copy action] target folder was created: " + folder);
 
             } catch (e) {
                 _log.error("[copy action] failed to create target dir: " + folder);
