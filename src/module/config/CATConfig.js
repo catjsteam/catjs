@@ -27,7 +27,7 @@ var _global = catrequire("cat.global"),
         var me = this,
             idx = 0, size, project, pluginsPath = [],
             dependencies = [],
-            appTargetPath, appPath, projectcopy, customTasks, cattarget, targetfolder;
+            appTargetPath, appPath, appfilter, projectcopy, customTasks, cattarget, targetfolder;
 
         /**
          * Extension initialization
@@ -94,6 +94,7 @@ var _global = catrequire("cat.global"),
 
                     appTargetPath = _path.join("./", _path.relative(_path.resolve("."), targetfolder), project.name);
                     appPath = project.getInfo("apppath");
+                    appfilter = project.getInfo("appfilter");
                     if (appPath) {
                         projectcopy= {
                             "name": "p@project.copy",
@@ -107,6 +108,9 @@ var _global = catrequire("cat.global"),
                                 "path": appTargetPath
                             }
                         };
+                        if (appfilter) {
+                            projectcopy.filter = appfilter;
+                        }
                         customTasks.push(projectcopy);
 
                     } else  {
