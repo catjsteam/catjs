@@ -537,8 +537,12 @@ module.exports = _basePlugin.ext(function () {
                                 }
                             }
 
+                        } else {
+                            emitter.emit("job.done", {status: "done"});
                         }
                     });
+                } else {
+                    emitter.emit("job.done", {status: "done"});
                 }
             }
         };

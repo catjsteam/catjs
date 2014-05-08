@@ -179,12 +179,13 @@ module.exports = function () {
                         _utils.error(_props.get("cat.error").format("[cat mdata]", err));
                     } else {
                         _log.debug(_props.get("cat.mdata.read").format("[cat mdata]"));
-                        callback.call({data: data});
                     }
+                    callback.call({data: data});
                 });
 
             } else {
                 _log.warning(_props.get("cat.mdata.file.not.exists").format("[cat mdata]"));
+                callback.call({data: null});
             }
 
         }

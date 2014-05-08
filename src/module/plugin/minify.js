@@ -21,8 +21,8 @@ module.exports = _basePlugin.ext(function () {
             jshint = config.jshint,
             exclude, excludes = config.excludes,
             src = config.src,
-            srcexcludes=[], srcexclude, counter,
-            idx=0, size=0;
+            srcexcludes = [], srcexclude, counter,
+            idx = 0, size = 0;
 
         if (!src || !path || !name) {
             _log.error("[CAT minify plugin] src, name, path are required properties ");
@@ -31,37 +31,37 @@ module.exports = _basePlugin.ext(function () {
 
         try {
 
-           task = _jsutils.Task[mode];
+            task = _jsutils.Task[mode];
             if (task) {
                 if (excludes) {
                     size = excludes.length;
-                    for (idx=0; idx<size;idx++){
+                    for (idx = 0; idx < size; idx++) {
                         exclude = excludes[idx];
                         if (exclude) {
                             if (_typedas.isArray(src)) {
-                                counter=0;
-                                src.forEach(function(item){
-                                    if (_minimatch(item, exclude,  { matchBase: true })) {
+                                counter = 0;
+                                src.forEach(function (item) {
+                                    if (_minimatch(item, exclude, { matchBase: true })) {
                                         srcexcludes.push(counter);
                                     }
                                     counter++;
                                 });
-                            } else  if (!_typedas.isArray(src)) {
-                                if (_minimatch(src, exclude,  { matchBase: true })) {
+                            } else if (!_typedas.isArray(src)) {
+                                if (_minimatch(src, exclude, { matchBase: true })) {
                                     return undefined;
                                 }
                             }
                         }
                     }
                     if (_typedas.isArray(src) && srcexcludes.length > 0) {
-                        srcexcludes.forEach(function(srcexclude){
+                        srcexcludes.forEach(function (srcexclude) {
                             src = src.splice(srcexclude, 1);
                         });
                     }
                 }
                 task({
                     src: src,
-                    out:{
+                    out: {
                         name: name,
                         path: path
                     },
@@ -92,7 +92,7 @@ module.exports = _basePlugin.ext(function () {
                 });
             }
 
-        } catch(e) {
+        } catch (e) {
             _log.error("[CAT minify plugin] failed with errors, file:", src);
             _log.error("[CAT minify plugin] failed with errors: ", e);
         }
@@ -120,7 +120,7 @@ module.exports = _basePlugin.ext(function () {
         init: function (config) {
 
             var src,
-                srcs=[],
+                srcs = [],
                 path,
                 name,
                 mode,
@@ -157,36 +157,38 @@ module.exports = _basePlugin.ext(function () {
 
 
                 if (src) {
+                    src.forEach(function (item) {
+                        srcs = srcs.concat(_glob.sync(item));
+                    });
 
-                    if (isolate) {
-                        src.forEach(function(item) {
-                            srcs = srcs.concat(_glob.sync(item));
-                        });
+                    if (srcs && srcs.length > 0) {
+                        if (isolate) {
 
-                        srcs.forEach(function(item) {
-                            var basename = _path.basename(item);
-                            if (basename.indexOf(".catmin") === -1) {
-                                name = _path.basename(item, _path.extname(item)) +  _path.extname(item);
-                            }
+                            srcs.forEach(function (item) {
+                                var basename = _path.basename(item);
+                                if (basename.indexOf(".catmin") === -1) {
+                                    name = _path.basename(item, _path.extname(item)) + _path.extname(item);
+                                }
+                                _minify({
+                                    src: item,
+                                    name: name,
+                                    path: _path.dirname(item),
+                                    mode: mode,
+                                    excludes: excludes,
+                                    jshint: jshint
+                                });
+                            });
+                        } else {
+                            // TODO remove the hardcoded dev and get dev/prod
                             _minify({
-                                src: item,
+                                src: src,
                                 name: name,
-                                path:  _path.dirname(item),
+                                path: path,
                                 mode: mode,
                                 excludes: excludes,
                                 jshint: jshint
                             });
-                        });
-                    } else {
-                        // TODO remove the hardcoded dev and get dev/prod
-                        _minify({
-                            src: src,
-                            name:name,
-                            path: path,
-                            mode: mode,
-                            excludes: excludes,
-                            jshint: jshint
-                        });
+                        }
                     }
                 } else {
                     _log.error("[CAT clean plugin] 'src' property is required ");
@@ -204,7 +206,7 @@ module.exports = _basePlugin.ext(function () {
          *
          * @returns {{dependencies: Array}}
          */
-        validate: function() {
+        validate: function () {
             return { dependencies: ["manager"]};
         }
 
