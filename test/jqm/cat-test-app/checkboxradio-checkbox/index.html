@@ -35,7 +35,7 @@
                          @@name appMenuClick
                          @@run@ scrapCheckboxManager
                          @@embed true
-                         @@jqm clickRef("appMenu");
+                         @@jqm clickRef("#appMenu");
                       ]@
                     -->
 		<a id="appMenu" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
@@ -76,7 +76,7 @@
                       @@name checkboxVerticalScroll
                       @@run@ scrapCheckboxManager
                       @@embed true
-                      @@jqm scrollTo("checkboxVertical");
+                      @@jqm scrollTo("#checkboxVertical");
                    ]@
               -->
 
@@ -90,7 +90,7 @@
                       @@name checkboxVerticalGroupScroll
                       @@run@ scrapCheckboxManager
                       @@embed true
-                      @@jqm scrollTo("checkboxVerticalGroup");
+                      @@jqm scrollTo("#checkboxVerticalGroup");
                    ]@
               -->
 
@@ -99,7 +99,7 @@
                       @@name setCheckC
                       @@run@ scrapCheckboxManager
                       @@embed true
-                      @@jqm setCheck("checkbox-v-2c");
+                      @@jqm setCheck("#checkbox-v-2c");
                       @@assert ok($('#checkbox-v-2c').is(':checked'),'checkbox-v-2c is checked')
                    ]@
               -->
@@ -110,7 +110,7 @@
                      @@name setCheckB
                      @@run@ scrapCheckboxManager
                      @@embed true
-                     @@jqm setCheck("checkbox-v-2b");
+                     @@jqm setCheck("#checkbox-v-2b");
                      @@assert ok($('#checkbox-v-2b').is(':checked'),'checkbox-v-2b is checked')
                   ]@
              -->
@@ -135,7 +135,7 @@
                       @@name checkboxHorizontalScroll
                       @@run@ scrapCheckboxManager
                       @@embed true
-                      @@jqm scrollTo("checkboxHorizontal");
+                      @@jqm scrollTo("#checkboxHorizontal");
                    ]@
               -->
 
@@ -150,7 +150,7 @@
                       @@name setHCheckC
                       @@run@ scrapCheckboxManager
                       @@embed true
-                      @@jqm setCheck("checkbox-h-2a");
+                      @@jqm setCheck("#checkbox-h-2a");
                       @@assert ok($('#checkbox-h-2a').is(':checked'),'checkbox-h-2a is checked')
                    ]@
               -->
@@ -161,7 +161,7 @@
                      @@name setHCheckB
                      @@run@ scrapCheckboxManager
                      @@embed true
-                     @@jqm setCheck("checkbox-h-2c");
+                     @@jqm setCheck("#checkbox-h-2c");
                      @@assert ok($('#checkbox-h-2c').is(':checked'),'checkbox-h-2c is checked')
                   ]@
              -->
@@ -386,7 +386,7 @@
                       @@name sliderScroll1
                       @@run@ scrapCheckboxManager
                       @@embed true
-                      @@jqm scrollTo("sliderWidget");
+                      @@jqm scrollTo("#sliderWidget");
                    ]@
               -->
     <!--
@@ -394,7 +394,7 @@
                          @@name sliderMenuClick
                          @@run@ scrapCheckboxManager
                          @@embed true
-                         @@jqm click("sliderWidget");
+                         @@jqm click("#sliderWidget");
                       ]@
                     -->
 
@@ -403,7 +403,7 @@
                       @@name sliderScroll2
                       @@run@ scrapCheckboxManager
                       @@embed true
-                      @@jqm scrollTo("sliderWidget");
+                      @@jqm scrollTo("#sliderWidget");
                    ]@
               -->
 
@@ -412,7 +412,7 @@
                      @@name sliderRef
                      @@run@ scrapCheckboxManager
                      @@embed true
-                     @@jqm clickRef("sliderRef");
+                     @@jqm clickRef("#sliderRef");
                   ]@
                 -->
 

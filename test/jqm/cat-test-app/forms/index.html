@@ -32,7 +32,7 @@
                          @@name appMenuFormClick
                          @@run@ scrapFormManager
                          @@embed true
-                         @@jqm clickRef("appMenuForm");
+                         @@jqm clickRef("#appMenuForm");
                       ]@
                     -->
 			<a href="#" id="appMenuForm" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
@@ -202,7 +202,7 @@
                      @@name checkbox-radioHScroll
                      @@run@ scrapFormManager
                      @@embed true
-                     @@jqm scrollTo("checkbox-radioH");
+                     @@jqm scrollTo("#checkbox-radioH");
                   ]@
              -->
         <!--
@@ -297,7 +297,7 @@
                      @@name formTextScroll
                      @@run@ scrapFormManager
                      @@embed true
-                     @@jqm scrollTo("formText");
+                     @@jqm scrollTo("#formText");
                   ]@
              -->
 
@@ -310,7 +310,7 @@
                      @@name setTextForm
                      @@run@ scrapFormManager
                      @@embed true
-                     @@jqm setText("text-basic", "hello world");
+                     @@jqm setText("#text-basic", "hello world");
                      @@assert ok($('#text-basic').val()=='hello world','text-basic text == hello world')
                   ]@
              -->
@@ -335,7 +335,7 @@
                             @@name formDateScroll
                             @@run@ scrapFormManager
                             @@embed true
-                            @@jqm scrollTo("dateDiv");
+                            @@jqm scrollTo("#dateDiv");
                          ]@
                     -->
 
@@ -344,7 +344,7 @@
                      @@name setDate
                      @@run@ scrapFormManager
                      @@embed true
-                     @@jqm setText("date", "2014-02-27");
+                     @@jqm setText("#date", "2014-02-27");
                      @@assert ok($('#date').val()=='2014-02-27','date == 2014-02-27')
                   ]@
              -->
@@ -589,7 +589,7 @@ $( document ).bind( "mobileinit", function() {
                     @@name gridsMenuScroll
                     @@run@ scrapFormManager
                     @@embed true
-                    @@jqm scrollTo("gridsMenu");
+                    @@jqm scrollTo("#gridsMenu");
                  ]@
             -->
 
@@ -598,7 +598,7 @@ $( document ).bind( "mobileinit", function() {
                         @@name gridsMenuClick
                         @@run@ scrapFormManager
                         @@embed true
-                        @@jqm click("gridsMenu");
+                        @@jqm click("#gridsMenu");
                      ]@
                    -->
 
@@ -607,7 +607,7 @@ $( document ).bind( "mobileinit", function() {
                       @@name gridsMenuScroll2
                       @@run@ scrapFormManager
                       @@embed true
-                      @@jqm scrollTo("gridsMenu");
+                      @@jqm scrollTo("#gridsMenu");
                    ]@
               -->
 
@@ -616,7 +616,7 @@ $( document ).bind( "mobileinit", function() {
                      @@name gridsRef
                      @@run@ scrapFormManager
                      @@embed true
-                     @@jqm clickRef("gridsPageLink");
+                     @@jqm clickRef("#gridsPageLink");
                   ]@
                 -->
 	<h3 id="gridsMenu">Grids</h3>

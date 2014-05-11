@@ -32,7 +32,7 @@
                        @@name appMenuSelectClick
                        @@run@ selectManager
                        @@embed true
-                       @@jqm clickRef("appMenuSelect");
+                       @@jqm clickRef("#appMenuSelect");
                     ]@
                   -->
         <a id="appMenuSelect" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
@@ -54,7 +54,7 @@
                    @@name basicSelectScroll
                    @@run@ selectManager
                    @@embed true
-                   @@jqm scrollTo("basicSelect");
+                   @@jqm scrollTo("#basicSelect");
 
                 ]@
            -->
@@ -67,7 +67,7 @@
                      @@name selectMenu3
                      @@run@ selectManager
                      @@embed true
-                     @@jqm selectMenu("select-native-1", 3);
+                     @@jqm selectMenu("#select-native-1", 3);
                      @@assert ok($('#select-native-1  option:selected').val() == '3','select-native-1 selected : 3')
                   ]@
              -->
@@ -77,7 +77,7 @@
                      @@name selectMenu2
                      @@run@ selectManager
                      @@embed true
-                     @@jqm selectMenu("select-native-1", 2);
+                     @@jqm selectMenu("#select-native-1", 2);
                      @@assert ok($('#select-native-1  option:selected').val() == '2','select-native-1 selected : 2')
                   ]@
              -->
@@ -188,7 +188,7 @@
                    @@name verticalGroupScroll
                    @@run@ selectManager
                    @@embed true
-                   @@jqm scrollTo("verticalGroup");
+                   @@jqm scrollTo("#verticalGroup");
 
                 ]@
            -->
@@ -205,7 +205,7 @@
                      @@name selectGroupMenu5
                      @@run@ selectManager
                      @@embed true
-                     @@jqm selectMenu("select-native-5", "twoOption");
+                     @@jqm selectMenu("#select-native-5", "twoOption");
                      @@assert ok($('#select-native-5  option:selected')[0].id == 'twoOption','select-native-5 selected : twoOption')
                   ]@
              -->
@@ -214,7 +214,7 @@
                      @@name selectGroupMenu7
                      @@run@ selectManager
                      @@embed true
-                     @@jqm selectMenu("select-native-7", "threeOption");
+                     @@jqm selectMenu("#select-native-7", "threeOption");
                      @@assert ok($('#select-native-7  option:selected')[0].id == 'threeOption','select-native-7 selected : threeOption')
                   ]@
              -->
@@ -223,7 +223,7 @@
                      @@name selectGroupMenu6
                      @@run@ selectManager
                      @@embed true
-                     @@jqm selectMenu("select-native-6", "threeOption2");
+                     @@jqm selectMenu("#select-native-6", "threeOption2");
                      @@assert ok($('#select-native-6  option:selected')[0].id == 'threeOption2','select-native-6 selected : threeOption2')
                   ]@
              -->
@@ -285,7 +285,7 @@
                   @@name horGroupScroll
                   @@run@ selectManager
                   @@embed true
-                  @@jqm scrollTo("horGroup");
+                  @@jqm scrollTo("#horGroup");
 
                ]@
           -->
@@ -295,7 +295,7 @@
                     @@name selectGroupMenu11
                     @@run@ selectManager
                     @@embed true
-                    @@jqm selectMenu("select-native-11", "twoOptionHor");
+                    @@jqm selectMenu("#select-native-11", "twoOptionHor");
                     @@assert ok($('#select-native-11  option:selected')[0].id == 'twoOptionHor','select-native-11 selected : twoOptionHor')
                  ]@
             -->
@@ -304,7 +304,7 @@
              @@name selectGroupMenu12
              @@run@ selectManager
              @@embed true
-             @@jqm selectMenu("select-native-12", "oneOptionHor");
+             @@jqm selectMenu("#select-native-12", "oneOptionHor");
              @@assert ok($('#select-native-12 option:selected')[0].id == 'oneOptionHor','select-native-12 selected : oneOptionHor')
           ]@
      -->
@@ -313,7 +313,7 @@
              @@name selectGroupMenu13
              @@run@ selectManager
              @@embed true
-             @@jqm selectMenu("select-native-13", "threeOptionHor");
+             @@jqm selectMenu("#select-native-13", "threeOptionHor");
              @@assert ok($('#select-native-13 option:selected')[0].id == 'threeOptionHor','select-native-13 selected : oneOptionHor')
           ]@
      -->
@@ -554,7 +554,7 @@
     @@name tabsMenuScroll
     @@run@ selectManager
     @@embed true
-    @@jqm scrollTo("tabsRef");
+    @@jqm scrollTo("#tabsRef");
  ]@
 -->
 
@@ -563,7 +563,7 @@
                     @@name tabsMenuClick
                     @@run@ selectManager
                     @@embed true
-                    @@jqm clickRef("tabsRef");
+                    @@jqm clickRef("#tabsRef");
                  ]@
                -->
 

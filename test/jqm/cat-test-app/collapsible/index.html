@@ -37,7 +37,7 @@
                        @@name appMenuCollapsibleClick
                        @@run@ collapsibleManager
                        @@embed true
-                       @@jqm clickRef("appMenuCollapsible");
+                       @@jqm clickRef("#appMenuCollapsible");
                     ]@
                   -->
         <a id="appMenuCollapsible" href="#" class="jqm-navmenu-link ui-btn ui-btn-icon-notext ui-corner-all ui-icon-bars ui-nodisc-icon ui-alt-icon ui-btn-left">Menu</a>
@@ -58,7 +58,7 @@
                      @@name basicCollapsibleScroll
                      @@run@ collapsibleManager
                      @@embed true
-                     @@jqm scrollTo("basicCollapsibleScroll");
+                     @@jqm scrollTo("#basicCollapsibleScroll");
                   ]@
              -->
 
@@ -67,7 +67,7 @@
                         @@name basicCollapsibleClick
                         @@run@ collapsibleManager
                         @@embed true
-                        @@jqm collapsible("basicCollapsible");
+                        @@jqm collapsible("#basicCollapsible");
                         @@assert ok(!$('#basicCollapsible').collapsible( 'option' ).collapsed,'radio-choice-v-2c is checked')
 
 
@@ -163,7 +163,7 @@
                          @@name legendScroll
                          @@run@ collapsibleManager
                          @@embed true
-                         @@jqm scrollTo("legend");
+                         @@jqm scrollTo("#legend");
                       ]@
                  -->
 
@@ -176,7 +176,7 @@
                         @@name legendClick
                         @@run@ collapsibleManager
                         @@embed true
-                        @@jqm collapsible("legendClick");
+                        @@jqm collapsible("#legendClick");
                         @@assert ok(!$('#basicCollapsible').collapsible( 'option' ).collapsed,'radio-choice-v-2c is checked')
                      ]@
                    -->
@@ -186,7 +186,7 @@
                     @@name setTextLegend
                     @@run@ collapsibleManager
                     @@embed true
-                    @@jqm setText("textinput-f", "hello from legend");
+                    @@jqm setText("#textinput-f", "hello from legend");
                      @@assert ok($('#textinput-f').val()=='hello from legend','textinput-f text is correct')
                  ]@
             -->
@@ -197,7 +197,7 @@
                      @@name setCheckCollaps3
                      @@run@ collapsibleManager
                      @@embed true
-                     @@jqm setCheck("checkbox-3-a");
+                     @@jqm setCheck("#checkbox-3-a");
                      @@assert ok($('#checkbox-3-a').is(':checked'),'checkbox-3-a is checked')
                   ]@
              -->
@@ -208,7 +208,7 @@
                      @@name setCheckCollaps1
                      @@run@ collapsibleManager
                      @@embed true
-                     @@jqm setCheck("checkbox-1-a");
+                     @@jqm setCheck("#checkbox-1-a");
                      @@assert ok($('#checkbox-1-a').is(':checked'),'checkbox-1-a is checked')
                   ]@
              -->
@@ -218,7 +218,7 @@
                         @@name legendUnClick
                         @@run@ collapsibleManager
                         @@embed true
-                        @@jqm collapsible("legendClick");
+                        @@jqm collapsible("#legendClick");
                         @@assert ok($('#legendClick').collapsible( 'option' ).collapsed,'legendClick is checked')
                      ]@
                    -->
@@ -473,7 +473,7 @@
                     @@name selectMenuScroll
                     @@run@ collapsibleManager
                     @@embed true
-                    @@jqm scrollTo("selectMenu");
+                    @@jqm scrollTo("#selectMenu");
                  ]@
             -->
 
@@ -482,7 +482,7 @@
                         @@name selectMenuClick
                         @@run@ collapsibleManager
                         @@embed true
-                        @@jqm click("selectMenu");
+                        @@jqm click("#selectMenu");
                      ]@
                    -->
 
@@ -491,7 +491,7 @@
                       @@name selectMenuScroll2
                       @@run@ collapsibleManager
                       @@embed true
-                      @@jqm scrollTo("selectMenu");
+                      @@jqm scrollTo("#selectMenu");
                    ]@
               -->
 
@@ -500,7 +500,7 @@
                      @@name selectmenuRef
                      @@run@ collapsibleManager
                      @@embed true
-                     @@jqm clickRef("selectmenuRef");
+                     @@jqm clickRef("#selectmenuRef");
                   ]@
                 -->
 
