@@ -30,7 +30,7 @@ module.exports = _basePlugin.ext(function () {
          */
         init: function (config) {
 
-            var pattern, flags, files, replace, applyto,
+            var pattern, flags, files, replace, applyto, bak,
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"];
 
@@ -57,6 +57,7 @@ module.exports = _basePlugin.ext(function () {
                 flags = extensionParams.flags;
                 // optional types : [filename / content]
                 applyto = extensionParams.applyto;
+                bak = extensionParams.backup;
 
                 if (!applyto) {
                     applyto = ["content"];
@@ -75,8 +76,10 @@ module.exports = _basePlugin.ext(function () {
                                 }
                             }
 
-                            // save backup
-                            _fs.renameSync(file, [file, ".catreplace"].join(""));
+                            if (bak) {
+                              // save backup
+                             _fs.renameSync(file, [file, ".catreplace"].join(""));
+                            }
 
                             fileName = _path.basename(file);
                             if (_utils.contains(applyto, "filename")) {
