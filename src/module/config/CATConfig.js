@@ -27,7 +27,7 @@ var _global = catrequire("cat.global"),
         var me = this,
             idx = 0, size, project, pluginsPath = [],
             dependencies = [],
-            appTargetPath, appPath, appfilter, projectcopy, customTasks, cattarget, targetfolder;
+            appTargetPath, appPath, scrapfilter, projectcopy, scrapscan, customPlugins, cattarget, targetfolder;
 
         /**
          * Extension initialization
@@ -88,13 +88,13 @@ var _global = catrequire("cat.global"),
                     });
                     project.addPluginLocations(pluginsPath);
 
-                    customTasks = [];
+                    customPlugins = [];
                     targetfolder = project.getInfo("target");
                     cattarget = (project.getInfo("cattarget") || "./");
 
                     appTargetPath = _path.join("./", _path.relative(_path.resolve("."), targetfolder), project.name);
                     appPath = project.getInfo("apppath");
-                    appfilter = project.getInfo("appfilter");
+
                     if (appPath) {
                         projectcopy= {
                             "name": "p@project.copy",
@@ -108,16 +108,25 @@ var _global = catrequire("cat.global"),
                                 "path": appTargetPath
                             }
                         };
-                        if (appfilter) {
-                            projectcopy.filter = appfilter;
-                        }
-                        customTasks.push(projectcopy);
+                        customPlugins.push(projectcopy);
 
                     } else  {
                         _log.log("error", "[CAT config] 'apppath property is missing or not valid. See catproject.json spec");
                     }
 
-                    customTasks = customTasks.concat([
+                    scrapscan =   {
+                        "name": "p@init.scrap",
+                        "type": "scrap",
+                        "dependency": "scan"
+                    };
+
+                    scrapfilter = project.getInfo("scrapfilter");
+                    if (scrapfilter) {
+                        scrapscan.filters = scrapfilter;
+                    }
+                    customPlugins.push(scrapscan);
+
+                    customPlugins = customPlugins.concat([
                         {
                             "name": "p@lib.copy",
                             "type": "copy",
@@ -127,6 +136,16 @@ var _global = catrequire("cat.global"),
                             "to": {
                                 "path": _path.join(appTargetPath, cattarget, "/cat/lib")
                             }
+                        },
+                        {
+                            "name": "p@lib.parse",
+                            "type": "fileparse",
+                            "dependency": "manager",
+                            "files": [_path.join(appTargetPath, cattarget, "/cat/lib/cat.js")],
+                            "pattern": "_getBase=\"(.*)\";",
+                            "replace": "_getBase=\"" + cattarget + "\";",
+                            "applyto":["content"],
+                            "flags": "g"
                         },
                         {
                             "name": "p@src.copy",
@@ -146,7 +165,7 @@ var _global = catrequire("cat.global"),
                             "src":["./src/**/*.js"]
                         }
                         ]);
-                    project.appendEntity("plugins", customTasks);
+                    project.appendEntity("plugins", customPlugins);
 
 
                 } else {

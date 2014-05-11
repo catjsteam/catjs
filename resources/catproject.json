@@ -88,11 +88,6 @@
             "type": "autotest"
         },
         {
-            "name": "p@init.scrap",
-            "type": "scrap",
-            "dependency": "scan"
-        },
-        {
             "name": "p@libraries.build",
             "type": "libraries",
             "dependency": "manager",
@@ -193,7 +188,7 @@
         },
         {
             "name": "t@init",
-            "plugins": ["p@project.copy", "p@libraries.build", "p@lib.copy", "p@src.copy"]
+            "plugins": ["p@project.copy", "p@libraries.build", "p@lib.copy", "p@lib.parse", "p@src.copy"]
         },
         {
             "name": "t@scrap",
