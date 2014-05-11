@@ -53,7 +53,8 @@ _cat.utils.assert = function () {
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestSucceededCount()
+                        tips: _cat.core.TestManager.getTestSucceededCount(),
+                        elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
                     });
                 }
 
