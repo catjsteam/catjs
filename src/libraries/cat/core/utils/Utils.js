@@ -2,6 +2,10 @@ _cat.utils.Utils = function () {
 
     return {
 
+        getType: function (obj) {
+            return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+
+        },
         getMatchValue: function (pattern, text) {
 
             var regexp = new RegExp(pattern),
@@ -23,7 +27,7 @@ _cat.utils.Utils = function () {
          * Validates an object and availability of its properties
          *
          */
-        validate: function(obj, key, val) {
+        validate: function (obj, key, val) {
             if (obj) {
 
                 // if key is available
