@@ -3,10 +3,6 @@ var animation = false;
 
 _cat.plugins.dom = function () {
 
-    function _type(o) {
-        return !!o && Object.prototype.toString.call(o).match(/(\w+)\]/)[1];
-    }
-
     function _fireEvent(name, elt) {
 
         var clickEvent;
@@ -48,11 +44,11 @@ _cat.plugins.dom = function () {
         if (!idName) {
             return undefined;
         }
-        if (_type(idName) === "String") {
+        if (_cat.utils.Utils.getType(idName) === "String") {
             // try resolving by id
             elt = document.getElementById(idName);
 
-        } else if (_type(idName).indexOf("Element") !== -1) {
+        } else if (_cat.utils.Utils.getType(idName).indexOf("Element") !== -1) {
             // try getting the element
             elt = idName;
         }
