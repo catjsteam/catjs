@@ -12,20 +12,49 @@ _cat.plugins.jqm = function () {
         element.className = element.className + " markedElement";
         oldElement = element;
         
-    }, toType = function(obj) {
-        return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
     };
 
     function _getElt(val) {
         var sign;
-        if (toType(val) === "string") {
+        if (_cat.utils.Utils.getType(val) === "string") {
             val = val.trim();
             sign = val.charAt(0);
 
             return ($ ? $(val) : undefined);
 
-        } else if (toType(val) === "object") {
+        } else if (_cat.utils.Utils.getType(val) === "object") {
             return val;
+        }
+    }
+
+    /**
+     * Trigger an event with a given object
+     *
+     * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
+     * @param eventType {String} The event type name
+     *
+     * @private
+     */
+    function _trigger() {
+        var e, idx= 0, size,
+            args = arguments,
+            elt = (args ? _getElt(args[0]) : undefined),
+            eventType = (args ? args[1] : undefined),
+            typeOfEventArgument = _cat.utils.Utils.getType(eventType);
+
+        if (elt && eventType) {
+            if (typeOfEventArgument === "string") {
+                elt.trigger(eventType);
+
+            } else  if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
+                size = typeOfEventArgument.length;
+                for (idx=0; idx<size; idx++) {
+                    e = eventType[idx];
+                    if (e) {
+                        elt.trigger(e);
+                    }
+                }
+            }
         }
     }
 
@@ -197,10 +226,24 @@ _cat.plugins.jqm = function () {
                 $(document).ready(function(){
                     var elt = _getElt(idName);
 
-                    elt.focus();
+                    _trigger(elt, "mouseenter");
+                    _trigger(elt, "mouseover");
+                    _trigger(elt, "mousemove");
+                    _trigger(elt, "focus");
+                    _trigger(elt, "mousedown");
+                    _trigger(elt, "mouseup");
+                    _trigger(elt, "click");
                     elt.val(value);
-                    elt.trigger( 'change' );
-                    elt.blur();
+                    _trigger(elt, "keydown");
+                    _trigger(elt, "keypress");
+                    _trigger(elt, "input");
+                    _trigger(elt, "keyup");
+                    _trigger(elt, "mousemove");
+                    _trigger(elt, "mouseleave");
+                    _trigger(elt, "mouseout");
+                    _trigger(elt, "blur");
+
+
 
                     setBoarder( elt.eq(0)[0]);
                 });
