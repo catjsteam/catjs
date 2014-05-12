@@ -250,10 +250,14 @@ _cat.core = function () {
             xmlhttp,
             configText,
             me = this,
-            url, catjson = "cat/config/cat.json";
+            url, catjson = "cat/config/cat.json",
+            baseurl = _getBaseUrl();
 
         try {
-            url = [_getBaseUrl() , catjson].join("");
+            if (baseurl && baseurl.charAt(baseurl.length-1) !== "/") {
+                baseurl += "/";
+            }
+            url = [baseurl , catjson].join("");
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
                 url: url
             });
@@ -2033,6 +2037,10 @@ _cat.utils.Utils = function () {
 
     return {
 
+        getType: function (obj) {
+            return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+
+        },
         getMatchValue: function (pattern, text) {
 
             var regexp = new RegExp(pattern),
@@ -2054,7 +2062,7 @@ _cat.utils.Utils = function () {
          * Validates an object and availability of its properties
          *
          */
-        validate: function(obj, key, val) {
+        validate: function (obj, key, val) {
             if (obj) {
 
                 // if key is available
@@ -2094,10 +2102,6 @@ var animation = false;
 
 
 _cat.plugins.dom = function () {
-
-    function _type(o) {
-        return !!o && Object.prototype.toString.call(o).match(/(\w+)\]/)[1];
-    }
 
     function _fireEvent(name, elt) {
 
@@ -2140,11 +2144,11 @@ _cat.plugins.dom = function () {
         if (!idName) {
             return undefined;
         }
-        if (_type(idName) === "String") {
+        if (_cat.utils.Utils.getType(idName) === "String") {
             // try resolving by id
             elt = document.getElementById(idName);
 
-        } else if (_type(idName).indexOf("Element") !== -1) {
+        } else if (_cat.utils.Utils.getType(idName).indexOf("Element") !== -1) {
             // try getting the element
             elt = idName;
         }
@@ -2263,20 +2267,49 @@ _cat.plugins.jqm = function () {
         element.className = element.className + " markedElement";
         oldElement = element;
         
-    }, toType = function(obj) {
-        return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
     };
 
     function _getElt(val) {
         var sign;
-        if (toType(val) === "string") {
+        if (_cat.utils.Utils.getType(val) === "string") {
             val = val.trim();
             sign = val.charAt(0);
 
             return ($ ? $(val) : undefined);
 
-        } else if (toType(val) === "object") {
+        } else if (_cat.utils.Utils.getType(val) === "object") {
             return val;
+        }
+    }
+
+    /**
+     * Trigger an event with a given object
+     *
+     * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
+     * @param eventType {String} The event type name
+     *
+     * @private
+     */
+    function _trigger() {
+        var e, idx= 0, size,
+            args = arguments,
+            elt = (args ? _getElt(args[0]) : undefined),
+            eventType = (args ? args[1] : undefined),
+            typeOfEventArgument = _cat.utils.Utils.getType(eventType);
+
+        if (elt && eventType) {
+            if (typeOfEventArgument === "string") {
+                elt.trigger(eventType);
+
+            } else  if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
+                size = typeOfEventArgument.length;
+                for (idx=0; idx<size; idx++) {
+                    e = eventType[idx];
+                    if (e) {
+                        elt.trigger(e);
+                    }
+                }
+            }
         }
     }
 
@@ -2448,10 +2481,24 @@ _cat.plugins.jqm = function () {
                 $(document).ready(function(){
                     var elt = _getElt(idName);
 
-                    elt.focus();
+                    _trigger(elt, "mouseenter");
+                    _trigger(elt, "mouseover");
+                    _trigger(elt, "mousemove");
+                    _trigger(elt, "focus");
+                    _trigger(elt, "mousedown");
+                    _trigger(elt, "mouseup");
+                    _trigger(elt, "click");
                     elt.val(value);
-                    elt.trigger( 'change' );
-                    elt.blur();
+                    _trigger(elt, "keydown");
+                    _trigger(elt, "keypress");
+                    _trigger(elt, "input");
+                    _trigger(elt, "keyup");
+                    _trigger(elt, "mousemove");
+                    _trigger(elt, "mouseleave");
+                    _trigger(elt, "mouseout");
+                    _trigger(elt, "blur");
+
+
 
                     setBoarder( elt.eq(0)[0]);
                 });
