@@ -250,10 +250,14 @@ _cat.core = function () {
             xmlhttp,
             configText,
             me = this,
-            url, catjson = "cat/config/cat.json";
+            url, catjson = "cat/config/cat.json",
+            baseurl = _getBaseUrl();
 
         try {
-            url = [_getBaseUrl() , catjson].join("");
+            if (baseurl && baseurl.charAt(baseurl.length-1) !== "/") {
+                baseurl += "/";
+            }
+            url = [baseurl , catjson].join("");
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
                 url: url
             });
