@@ -1,1 +1,323 @@
-function getColorIndex(e){return void 0!==e&&"undefined"!=typeof _colorCell[e]?_colorCell[e]:(_colorIndex++,_colorIndex>_colorsArray.length-1&&(_colorIndex=0),void 0!==e&&(_colorCell[e]=_colorIndex),_colorIndex)}function deleteColor(e){void 0!==e&&"undefined"!=typeof _colorCell[e]&&delete _colorCell[e]}function init(){_colors=require("colors");var e,t,r,o,s=require("path");if(_catcli)if(r=_catcli.getProject())try{o=r.getInfo("source"),e=s.join(o,"/config/cat.json")}catch(a){_log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT test project is available.",a)}else _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT project is available.");t=_fs.readFileSync(e,"utf8"),_testconfig=JSON.parse(t)}function isManagerRunMode(){return"tests"===_testconfig["run-mode"]}function readTestConfig(e){var t,r,o,s,a,n={};if(isManagerRunMode()&&(e||_log.warning("[CAT] Current scenario argument is required for run-mode: tests "),r=_testconfig.scenarios))if(o=r[e])if(s=o.tests)for(a=s.length,t=0;a>t;t++)s[t].wasRun=!1,n[s[t].name]=s[t];else _log.warning("[CAT] No valid tests was found for scenario '"+e+"' ");else _log.warning("[CAT] No valid test scenario '"+e+"' was found");return n}function ReportCreator(e,t,r){this._fileName=e,this._testConfigMap=readTestConfig(r),this._hasFailed=!1,this._testsuite=_jmr.create({type:"model.testsuite",data:{name:t}})}var _jmr=require("test-model-reporter"),_global=catrequire("cat.global"),_log=_global.log(),_reportCreator={},_catcli=catrequire?catrequire("cat.cli"):null,_fs=require("fs"),_checkIfAlive,_testconfig,_colors,_colorsArray=["blue","yellow","cyan","magenta","grey","green"],_colorCell={},_colorIndex=-1;ReportCreator.prototype.getTestConfigMap=function(){return this._testConfigMap},ReportCreator.prototype.addTestCase=function(e){function t(e){var t;c&&(t="["+m+"] "+e,console.info(t.current),_log.info(t))}function r(){var e=_jmr.create({type:"model.testcase",data:{time:(new Date).toUTCString()}});return e.set("name",f+d),"failure"===u&&(s=_jmr.create({type:"model.failure",data:{message:_,type:u}}),e.add(s)),e}function o(){C._testsuite.add(r()),n=C._testsuite.compile(),_fs.existsSync(C._fileName)&&_fs.unlinkSync(C._fileName),_jmr.write(C._fileName,n)}var s,a,n,i,l,c,d,u,f,_,p,g,m,C=this;d=e.testName,u=e.status,f=e.phantomStatus,_=e.message,p=e.reports,g=e.error,m=e.id,l=1===p.junit,c=1===p.console,_colors.setTheme({current:_colorsArray[getColorIndex(m)]}),isManagerRunMode()&&this._testConfigMap[d]&&(this._testConfigMap[d].wasRun=!0),"End"!==u?(l&&o(),i="failure"===u?"✖":"✓","failure"===u&&(this._hasFailed=!0),a=i+"Test "+d+" "+_,t(a)):(g?(_colors.setTheme({current:"red"}),s="Test end with error: "+g,s="======== Test End - "+s+" ========"):(s=this._hasFailed?"failed":"succeeded",s="======== Test End - "+s+" ========"),t(s),deleteColor(m))},void 0===_jmr&&_log.info("Test Unit Reporter is not supported, consider adding it to the .catproject dependencies"),init(),exports.result=function(e,t){var r,o=e.query,s=o.testName,a=o.message,n=o.error,i=o.status,l=o.reports,c=o.scenario,d=o.type,u=o.hasPhantom,f=o.id,_=1e3*(_testconfig["test-failure-timeout"]||30),p=[];l&&(p=l.split(","),l={},p.forEach(function(e){e&&(l[e]=1)})),clearTimeout(_checkIfAlive),"End"!==i&&(_checkIfAlive=setTimeout(function(){_reportCreator==={}?(_reportCreator.notest=new ReportCreator("notestname.xml","notest",c),_log.info("[CAT] No asserts received, probably a network problem, failing the rest of the tests ")):_log.info("[CAT] Tests stopped reporting, probably a network problem, failing the rest of the tests");for(var e in _reportCreator){var t=_reportCreator[e].getTestConfigMap();for(var r in t)_log.info(t[r]),t[r].wasRun||_reportCreator[e].addTestCase({testName:t[r].name,status:"failure",phantomStatus:"",message:"failed due to network issue",reports:l,error:n,id:f})}},_)),_log.info("requesting "+s+a+i),t.setHeader("Content-Type","text/javascript;charset=UTF-8"),t.send({testName:s,message:a,status:i});var g="true"===u?"phantom":"";r="./"+d+"-"+g+f+".xml",_reportCreator[f]||(_reportCreator[f]=new ReportCreator(r,d+f,c)),_reportCreator[f].addTestCase({testName:s,status:i,phantomStatus:g,message:a,reports:l,error:n,id:f})};
+var _jmr = require("test-model-reporter"),
+    _global = catrequire("cat.global"),
+    _log = _global.log(),
+    _reportCreator = {},
+    _catcli = (catrequire ? catrequire("cat.cli") : null),
+    _fs = require("fs"),
+    _checkIfAlive,
+    _testconfig,
+    _colors,
+    _colorsArray = ['blue', 'yellow', 'cyan', 'magenta', 'grey', 'green'],
+    _colorCell = {},
+    _colorIndex = -1;
+
+
+/**
+ * Get color index
+ *
+ * @param id {String} The id of the running test
+ * @returns {*}
+ */
+function getColorIndex(id) {
+
+    if (id !== undefined && typeof _colorCell[id] !== "undefined") {
+        return _colorCell[id];
+    }
+
+    _colorIndex++;
+    if (_colorIndex > _colorsArray.length - 1) {
+        _colorIndex = 0;
+    }
+
+    if (id !== undefined) {
+        _colorCell[id] = _colorIndex;
+    }
+    return _colorIndex;
+}
+
+/**
+ * Remove the color from the pool according to the test id
+ */
+function deleteColor(id) {
+
+    if (id !== undefined && typeof _colorCell[id] !== "undefined") {
+        delete _colorCell[id];
+    }
+
+}
+
+/**
+ * Initial settings
+ * - Loading colors module
+ * - Loading cat configuration
+ */
+function init() {
+
+    // set test color
+    _colors = require('colors');
+
+    // read configuration
+    var path = require("path"),
+        configPath,
+        data,
+        project, sourceFolder;
+
+    if (_catcli) {
+        project = _catcli.getProject();
+        if (project) {
+            try {
+                sourceFolder = project.getInfo("source");
+                configPath = path.join(sourceFolder, "/config/cat.json");
+            } catch (e) {
+                _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT test project is available.", e);
+            }
+        } else {
+            _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT project is available.");
+        }
+    }
+
+    data = _fs.readFileSync(configPath, 'utf8');
+    _testconfig = JSON.parse(data);
+
+}
+
+function isManagerRunMode() {
+    return (_testconfig["run-mode"] === "tests");
+}
+
+function readTestConfig(scenario) {
+
+    var i, testConfigMap = {},
+        scenarios, currentScenario, currentTests,
+        size;
+
+    if (isManagerRunMode()) {
+
+        if (!scenario) {
+            _log.warning("[CAT] Current scenario argument is required for run-mode: tests ");
+        }
+
+        //scenarios
+        scenarios = _testconfig.scenarios;
+        if (scenarios) {
+            currentScenario = scenarios[scenario];
+            if (currentScenario) {
+                currentTests = currentScenario.tests;
+
+                if (currentTests) {
+                    size = currentTests.length;
+                    for (i = 0; i < size; i++) {
+                        currentTests[i].wasRun = false;
+                        testConfigMap[currentTests[i].name] = currentTests[i];
+                    }
+                } else {
+                    _log.warning("[CAT] No valid tests was found for scenario '" + scenario + "' ");
+                }
+
+            } else {
+                _log.warning("[CAT] No valid test scenario '" + scenario + "' was found");
+            }
+        }
+    }
+
+    return testConfigMap;
+}
+
+function ReportCreator(filename, id, scenario) {
+    this._fileName = filename;
+    this._testConfigMap = readTestConfig(scenario);
+    this._hasFailed = false;
+    this._testsuite = _jmr.create({
+        type: "model.testsuite",
+        data: {
+            name: id
+        }
+    });
+}
+ReportCreator.prototype.getTestConfigMap = function () {
+    return this._testConfigMap;
+}
+
+ReportCreator.prototype.addTestCase = function (config) {
+    var failure,
+        result,
+        logmessage,
+        output, symbol,
+        me = this, isjunit, isconsole,
+        testName, status, phantomStatus, message, reports, error, id;
+
+    testName = config.testName;
+    status = config.status;
+    phantomStatus = config.phantomStatus;
+    message = config.message;
+    reports = config.reports;
+    error = config.error;
+    id = config.id;
+
+
+    isjunit = (reports["junit"] === 1);
+    isconsole = (reports["console"] === 1);
+
+    function _printTest2Console(msg) {
+        var message;
+        if (isconsole) {
+            message = "[" + id + "] " + msg;
+            console.info(message.current);
+            _log.info(message);
+        }
+    }
+
+    function _createTestCase() {
+        var testCase = _jmr.create({
+            type: "model.testcase",
+            data: {
+                time: (new Date()).toUTCString()
+            }
+        });
+        testCase.set("name", phantomStatus + testName);
+
+        if (status === 'failure') {
+            result = _jmr.create({
+                type: "model.failure",
+                data: {
+                    message: message,
+                    type: status
+                }
+            });
+            testCase.add(result);
+        }
+
+        return testCase;
+    }
+
+    function _writeTestCase() {
+
+        me._testsuite.add(_createTestCase());
+        output = me._testsuite.compile();
+        if (_fs.existsSync(me._fileName)) {
+            _fs.unlinkSync(me._fileName);
+        }
+        _jmr.write(me._fileName, output);
+    }
+
+    // set console color
+    _colors.setTheme({'current': _colorsArray[getColorIndex(id)]});
+
+    if (isManagerRunMode()) {
+        if (this._testConfigMap[testName]) {
+            this._testConfigMap[testName].wasRun = true;
+        }
+    }
+
+    if (status !== 'End') {
+
+        if (isjunit) {
+            _writeTestCase();
+        }
+
+        symbol = status === 'failure' ? '✖' : '✓';
+        if (status === 'failure') {
+            this._hasFailed = true;
+        }
+
+        logmessage = symbol + "Test " + testName + " " + message;
+        _printTest2Console(logmessage);
+
+
+    } else {
+
+        if (error) {
+            _colors.setTheme({'current': "red"});
+            result = "Test end with error: " + error;
+            result = "======== Test End - " + result + " ========";
+
+        } else {
+            result = this._hasFailed ? "failed" : "succeeded";
+            result = "======== Test End - " + result + " ========";
+        }
+
+        // print to console the test info
+        _printTest2Console(result);
+
+        // delete the color on test end
+        deleteColor(id);
+    }
+};
+
+
+if (_jmr === undefined) {
+    _log.info("Test Unit Reporter is not supported, consider adding it to the .catproject dependencies");
+}
+
+
+// Initialization
+init();
+
+
+exports.result = function (req, res) {
+
+    var query = req.query,
+        testName = query.testName,
+        message = query.message,
+        error = query.error,
+        status = query.status,
+        reports = query.reports,
+        scenario = query.scenario,
+        reportType = query.type,
+        hasPhantom = query.hasPhantom,
+        id = query.id,
+        file, checkIfAliveTimeout = (_testconfig["test-failure-timeout"] || 30) * 1000,
+        reportsArr = [];
+
+    if (reports) {
+        reportsArr = reports.split(",");
+        reports = {};
+        reportsArr.forEach(function(report) {
+            if (report) {
+                reports[report] = 1;
+            }
+        });
+
+    }
+
+    clearTimeout(_checkIfAlive);
+    if (status !== 'End') {
+
+        _checkIfAlive = setTimeout(function () {
+            if (_reportCreator == {}) {
+                _reportCreator['notest'] = new ReportCreator("notestname.xml", 'notest', scenario);
+                _log.info("[CAT] No asserts received, probably a network problem, failing the rest of the tests ");
+
+            } else {
+                _log.info("[CAT] Tests stopped reporting, probably a network problem, failing the rest of the tests");
+            }
+
+            for (var reportKey in _reportCreator) {
+                var testConfigMap = _reportCreator[reportKey].getTestConfigMap();
+
+                for (var key in testConfigMap) {
+                    _log.info(testConfigMap[key]);
+                    if (!testConfigMap[key].wasRun) {
+                        _reportCreator[reportKey].addTestCase({testName: testConfigMap[key].name, status: 'failure', phantomStatus: '', message: 'failed due to network issue', reports: reports, error: error, id: id});
+                    }
+                }
+            }
+
+        }, checkIfAliveTimeout);
+    }
+
+    _log.info("requesting " + testName + message + status);
+    res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+    res.send({"testName": testName, "message": message, "status": status});
+
+
+    var phantomStatus = (hasPhantom === "true" ? "phantom" : "");
+    file = "./" + reportType + "-" + phantomStatus + id + ".xml";
+
+    if (!_reportCreator[id]) {
+        _reportCreator[id] = new ReportCreator(file, reportType + id, scenario);
+    }
+
+    _reportCreator[id].addTestCase({testName: testName, status: status, phantomStatus: phantomStatus, message: message, reports: reports, error: error, id: id});
+};
+

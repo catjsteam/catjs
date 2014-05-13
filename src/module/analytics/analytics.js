@@ -1,1 +1,28 @@
-var NA=require("nodealytics");NA.initialize("UA-48103058-1","catjsteam.github.io",function(){}),exports.updateAnalytics=function(n){var i=require("child_process").exec,t=i("npm config get proxy");t.stdout.on("data",function(i){if(0===i.indexOf("null")){var t=n.task?n.task.join(", "):"undefined_task",a=n.argv&&n.argv.original?n.argv.original.join(", "):"undefined_args";NA.trackEvent("CAT",a,t,function(n,i){!n&&i&&200===i.statusCode&&console.log("Thank you for contribute to CAT analytics")})}})};
+var NA = require("nodealytics");
+NA.initialize('UA-48103058-1', 'catjsteam.github.io', function () {
+});
+
+
+
+exports.updateAnalytics = function(catCommand) {
+
+    var exec = require('child_process').exec,
+        command    = exec('npm config get proxy');
+
+    command.stdout.on('data', function (data) {
+        if (data.indexOf("null") == 0){
+            var label = catCommand.task ? catCommand.task.join(", ") : "undefined_task";
+            var action = (catCommand.argv && catCommand.argv.original) ? catCommand.argv.original.join(", ") : "undefined_args";
+
+
+            NA.trackEvent('CAT', action, label, function (err, resp) {
+
+                if (!err && resp && resp.statusCode === 200) {
+                    console.log('Thank you for contribute to CAT analytics');
+                }
+            });
+        } 
+    });
+
+
+};

@@ -1,0 +1,24 @@
+{
+    "actions": [
+        {
+            "type": "copy",
+            "filters": [
+                {
+                    "type": "file",
+                    "ext": [".txt"],
+                    "exclude": true
+                }
+            ]
+        },
+        {
+            "type": "comment",
+            "filters": [
+                {
+                    "type": "file",
+                    "ext": [".js"],
+                    "parser" : ["*"]
+                }
+            ]
+        }
+    ]
+}

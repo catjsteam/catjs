@@ -1,1 +1,66 @@
-var _fs=require("fs.extra"),_path=require("path"),_global=catrequire("cat.global"),_log=_global.log(),_utils=catrequire("cat.utils"),_typedas=require("typedas"),_props=catrequire("cat.props"),_basePlugin=require("./../Base.js"),_phantomBridge=require("./phantom-bridge.js");module.exports=_basePlugin.ext(function(){var t=this,i={watch:function(){},apply:function(i){{var e=i?i.path:void 0,a="[Scan Ext] no valid configuration for 'apply' functionality";t.getEmitter()}t.apply(i),e||_utils.error(a),t.getEmitter().emit("phantomjs",{thiz:t,phantomjs:_phantomBridge})},init:function(i,e){t.initialize(i,e)}};return i});
+var _fs = require('fs.extra'),
+    _path = require('path'),
+    _global = catrequire("cat.global"),
+    _log = _global.log(),
+    _utils = catrequire("cat.utils"),
+    _typedas = require("typedas"),
+    _props = catrequire("cat.props"),
+    _basePlugin = require("./../Base.js"),
+    _phantomBridge = require("./phantom-bridge.js");
+
+/**
+ * Clean extension for CAT
+ *
+ * @type {module.exports}
+ */
+module.exports = _basePlugin.ext(function () {
+
+    var _me = this,
+
+        _module = {
+
+            watch: function() {
+
+            },
+
+            /**
+             * Apply the clean extension.
+             *
+             * @param config
+             *      path - The base path to clean from
+             */
+            apply: function (config) {
+
+                var dirs = (config ? config.path : undefined),
+                    error = "[Scan Ext] no valid configuration for 'apply' functionality",
+                    emitter = _me.getEmitter();
+
+                _me.apply(config);
+
+                if (!dirs) {
+                    _utils.error(error);
+                }
+
+                _me.getEmitter().emit("phantomjs", {thiz: _me, phantomjs: _phantomBridge});
+
+            },
+
+            /**
+             * Plugin initialization
+             *
+             * @param config The passed arguments
+             *          project - The project configuration object
+             *          grunt - The grunt handle
+             *          emitter - The emitter handle
+             *
+             * @param ext The extension properties
+             */
+            init: function (config, ext) {
+                _me.initialize(config, ext);
+
+            }
+        };
+
+    return _module;
+
+});

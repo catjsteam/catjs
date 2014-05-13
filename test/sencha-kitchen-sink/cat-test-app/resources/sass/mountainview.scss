@@ -1,0 +1,15 @@
+@import 'sencha-touch/mountainview';
+@import 'sencha-touch/mountainview/all';
+@import 'shared';
+
+#touchpad {
+	background-color: rgb(100,100,100);
+}
+
+#touchinfopanel {
+	background-color: #333;
+}
+
+.card .x-innerhtml {
+	color: white;
+}

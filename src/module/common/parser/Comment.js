@@ -1,1 +1,124 @@
-var _lineReader=require("line-reader"),_fs=require("fs.extra");module.exports=function(){var e=this,n=[],i={},r=function(r){var t=["/*","<!--"],u=["*/","-->"],l=r.file,s=r.callback;i[l]={lineNumber:1,comment:[],comments:[],opened:0},_lineReader.eachLine(l,function(e){var n=i[l].lineNumber,r=e.indexOf(t[0]),s=e.indexOf(t[1]),m=e.indexOf(u[0]),o=e.indexOf(u[1]),c=0,f=i[l].comment,h=i[l].comments;(-1!==r||-1!==s)&&(i[l].opened=1,c=1,-1!==r&&f.push({line:e.substring(r),number:n,col:r}),-1!==s&&f.push({line:e.substring(s),number:n,col:s})),!i[l].opened||-1===m&&-1===o||(i[l].opened=0,f.length>1&&(-1!==m&&f.push({line:e.substring(0,m+u[0].length),number:n,col:m+u[0].length}),-1!==o&&f.push({line:e.substring(0,o+u[1].length),number:n,col:o+u[1].length})),h.push(f.slice(0)),i[l].comment=[]),i[l].opened&&(c?c=0:f.push({line:e,number:n,col:0})),i[l].lineNumber++}).then(function(){i[l].lineNumber--,n.push(i[l].comment),s.call(e,i[l].comments)})};return{parse:function(e){var n=e.file;n&&_fs.existsSync(n)&&r(e)},getComments:function(){return n}}}();
+var _lineReader = require('line-reader'),
+    _fs = require("fs.extra");
+
+module.exports = function () {
+
+    var me = this,
+        _comments = [],
+        _records = {},
+
+        /**
+         *  Going over the file lines, looking for comments
+         *
+         *  @return comments of Array type, each cell comprised of:
+         *      line - The line data
+         *      number - The line number that was found in the file
+         *      pos - The pos of the first character on that line
+         */
+         _commentParser = function (config) {
+
+            var openBlock = ["/*", "<!--"],
+                closeBlock = ["*/", "-->"],
+                single = ["//"],
+                file = config.file,
+                cb = config.callback;
+
+            _records[file] = {lineNumber: 1, comment: [], comments: [], opened: 0};
+
+            _lineReader.eachLine(file,function (line) {
+
+                var lineNumber = _records[file].lineNumber,
+                    typeOpenAPos = line.indexOf(openBlock[0]),
+                    typeOpenBPos = line.indexOf(openBlock[1]),
+                    typeCloseAPos = line.indexOf(closeBlock[0]),
+                    typeCloseBPos = line.indexOf(closeBlock[1]),
+                    collected = 0,
+                    comment = _records[file].comment,
+                    comments = _records[file].comments;
+
+                if ((typeOpenAPos !== -1 || typeOpenBPos !== -1)) {
+                    _records[file].opened = 1;
+                    collected = 1;
+                    if (typeOpenAPos !== -1) {
+                        //comment.push(line.substring(typeOpenAPos));
+                        comment.push({
+                            line: line.substring(typeOpenAPos),
+                            number: lineNumber,
+                            col: typeOpenAPos
+                        });
+                    }
+                    if (typeOpenBPos !== -1) {
+                        //comment.push(line.substring(typeOpenBPos));
+                        comment.push({
+                            line: line.substring(typeOpenBPos),
+                            number: lineNumber,
+                            col: typeOpenBPos
+                        });
+                    }
+                }
+                if (_records[file].opened && (typeCloseAPos !== -1 || typeCloseBPos !== -1)) {
+                    _records[file].opened = 0;
+                    if (comment.length > 1) {
+                        if (typeCloseAPos !== -1) {
+//                        comment.push(line.substring(0, (typeCloseAPos + closeBlock[0].length)));
+                            comment.push({
+                                line: line.substring(0, (typeCloseAPos + closeBlock[0].length)),
+                                number: lineNumber,
+                                col: (typeCloseAPos + closeBlock[0].length)
+                            });
+                        }
+                        if (typeCloseBPos !== -1) {
+                            //comment.push(line.substring(0, (typeCloseBPos + closeBlock[1].length)));
+                            comment.push({
+                                line: line.substring(0, (typeCloseBPos + closeBlock[1].length)),
+                                number: lineNumber,
+                                col: (typeCloseBPos + closeBlock[1].length)
+                            });
+                        }
+                    }
+                    comments.push(comment.slice(0));
+                    _records[file].comment = [];
+
+                }
+
+
+                if (_records[file].opened) {
+                    if (collected) {
+                        collected = 0;
+                    } else {
+                        comment.push({
+                            line: line,
+                            number: lineNumber,
+                            col: 0
+                        });
+                    }
+                }
+
+                // use 'return false' to stop this madness
+                _records[file].lineNumber++;
+
+            }).then(function () {
+                    _records[file].lineNumber--;
+                    _comments.push(_records[file].comment);
+                    cb.call(me, _records[file].comments);
+
+                });
+
+
+        };
+
+    return {
+
+        parse: function (config) {
+
+            var file = config.file;
+            if (file && _fs.existsSync(file)) {
+                _commentParser(config);
+            }
+        },
+
+        getComments: function () {
+            return _comments;
+        }
+    };
+}();

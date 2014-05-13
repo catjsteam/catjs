@@ -1,1 +1,579 @@
-var _catglobal=catrequire("cat.global"),_log=_catglobal.log(),_path=require("path"),_props=catrequire("cat.props"),_basePlugin=catrequire("cat.plugin.base"),_utils=catrequire("cat.utils"),_spawn=catrequire("cat.plugin.spawn"),_fs=require("fs.extra"),_typedas=require("typedas"),_bower=require("bower"),_jsutils=require("js.utils");module.exports=_basePlugin.ext(function(){function t(){this.concats={},this.names={},this.putName=function(t,n){this.names[t]=n},this.getName=function(t){return this.names[t]},this.add=function(t,n){this.concats[t]||(this.concats[t]=[]),this.concats[t].push(n)},this.get=function(t){return this.concats[t]},this.all=function(){var t,n=[];for(t in this.concats)this.concats.hasOwnProperty(t)&&n.push({key:t,value:this.get(t)});return n}}var n,e,a,i,s,r=this,o=new t;return{init:function(t){function c(){function t(t,e){function a(t){var n=_path.extname(t||"").split(".");return n[n.length-1]}var i,s,r,c,l="static-names"in m?m["static-names"]:void 0;try{e?(c=_typedas.isObject(e)&&"name"in e?e.name:e,n=t?_path.join(b,t,c):_path.join(b,c),i=_fs.readFileSync(n,"utf8"),i&&(s=a(n),r=_path.basename(n),s&&(o.add(s,i),_jsutils.Object.contains(l,r)&&o.putName(s,r)))):_log.warning(_props.get("cat.plugin.libraries.config.missing").format("[libraries ext]",m.name))}catch(u){_log.error(_props.get("cat.file.copy.failed").format("[libraries]",n,u))}}if(!_)return void _log.error(_props.get("cat.error.config.missing").format("[libraries ext]","lib"));var n,e=m[g];e&&_typedas.isArray(e)&&e.forEach(function(n){t(m.base||void 0,n)})}function l(){function t(){c(),l()}var e,a,i={},s=_path.join(_,x),r=!1;m=j[C],u&&m&&(r=_typedas.isArray(u)?_utils.contains(u,m.name):!0),b=m?_path.join(y,m.name):void 0;try{_fs.existsSync(k)&&_fs.existsSync(s)&&_utils.copySync(k,s)}catch(f){_log.error(_props.get("cat.file.copy.failed").format("[libraries]",s,f))}return i.install=function(){function a(n,e){function a(t){if(!t)return void 0;var n=t.src,e=t.type,a=t.path,i=t.name,o={_baseCopy:function(t){var n=t.src,e=t.path,a=t.name,i=t.content;n?(n=_utils.globmatch({src:n}),n.forEach(function(t){t&&_utils.copySync(t,_path.join(e,a))})):i&&_fs.writeFileSync(_path.join(e,a),i)},json:function(t){var n=("parse"in t?t.parse:void 0,"src"in t&&t.src),e=t.path,a=t.name;n&&(n=_utils.globmatch({src:n}),n.forEach(function(t){var n;t&&(n=_fs.readFileSync(t,"utf8"),n&&o._baseCopy({content:n,name:a,path:e}))}))},css:function(t){o._baseCopy(t)},js:function(t){var n=t.src,e=t.path,a=t.name;s.dev({src:n,out:{name:a,path:e},jshint:{opt:{evil:!0,strict:!1,curly:!0,eqeqeq:!0,immed:!1,latedef:!0,newcap:!1,noarg:!0,sub:!0,undef:!0,boss:!0,eqnull:!0,node:!0,es5:!1},globals:{XMLHttpRequest:!0,document:!0,_cat:!0,$:!0,Ext:!0,window:!0,chai:!0,phantom:!0}}})}};n&&e&&a&&i||_log.error("[CAT libraries install] Not valid argument(s) 'src' / 'type' / 'path' / 'name' "),r=[],n.forEach(function(t){r.push(_path.join(b,t))}),t.src=r,o[e].call(this,t)}var i,s=_jsutils.Task,r=[],o=m.base;e in m&&m[e]&&(i=m[e],o=_path.join(b,o),o&&(_fs.existsSync(o)||_fs.mkdirpSync(o)),_typedas.isArray(i)?(i.forEach(function(t){t.path=o,a(t)}),t()):_log.error("[CAT libraries install] library's dev property should be of 'Array' type"))}var i={cwd:y};"static"===m.install?t():"internal"===m.install?a(m,"dev"):"bower"===m.install&&(_utils.isWindows()?(e=_spawn().spawn({command:"bowerutils.bat",args:["install",m.name],options:i,emitter:n}),e.on("close",function(n){0!==n?_log.info("[spawn close] exited with code "+n):(_log.info("[bower] library "+m.name+" Installed"),t())})):_bower.commands.install([m.name],{},i).on("end",function(){_log.info("[bower] library "+m.name+" Installed"),t()}))},i.clean=function(){var t=m.base;"internal"===m.install?(t=_path.join(b,t),_utils.deleteSync(t),l()):"bower"===m.install&&(_utils.deleteSync(_path.join(y,m.name)),l())},i.build=function(){t()},C++,C>j.length?(_fs.existsSync(_)||_fs.mkdirSync(_),a=o.all(),a.forEach(function(t){var n,e,a,i,s,r=!0;t&&t.value.length>0&&(e=_,i=o.getName(t.key),n=t.value.join(""),a=i?i:[d,".",t.key].join(""),"json"===t.key&&r&&(n=_jsutils.Template.template({content:n,data:{project:w}})),"json"!==t.key?_fs.writeFileSync(_path.join(e,a),n):(s=_path.join(h,"/config/",a),"json"!==t.key||_fs.existsSync(s)||_fs.writeFileSync(s,n)))}),void(n&&n.emit("job.done",{status:"done"}))):void(r&&i[p]?i[p].call(this):l())}var u,p,f,_,h,d,m,g,y,b,v,j,w=t.internalConfig?t.internalConfig.getProject():void 0,S=!1,q=["[libraries plugin] No valid configuration"],x="manifest.json",k=_path.join(global.catlibs,x),C=0;_fs.existsSync(k)&&(v=_fs.readFileSync(k,"utf8")),t||(_log.error(q[1]),r.setDisabled(!0)),n=t.emitter,e=t.global,a=t.data,i=t.internalConfig,s=i?i.getProject():void 0,r.dataInit(a),f=a.data,u=f.imports||"*",p=f.action,S="true"===f.wipe?!0:!1,t&&f&&v&&(v=JSON.parse(v),j=v.libraries,g=v.mode,s&&(h=s.getInfo("source"),_=v.out.folder,d=v.out.name,y=_path.join(cathome,s.getInfo("libraries").path)),j&&_typedas.isArray(j)&&j.length>0&&l())},validate:function(){return{dependencies:["manager"]}}}});
+var _catglobal = catrequire("cat.global"),
+    _log = _catglobal.log(),
+    _path = require("path"),
+    _props = catrequire("cat.props"),
+    _basePlugin = catrequire("cat.plugin.base"),
+    _utils = catrequire("cat.utils"),
+    _spawn = catrequire("cat.plugin.spawn"),
+    _fs = require("fs.extra"),
+    _typedas = require("typedas"),
+    _bower = require('bower'),
+    _jsutils = require("js.utils");
+
+module.exports = _basePlugin.ext(function () {
+
+    function _Concat() {
+
+        // save the content per file type
+        this.concats = {};
+        // map the static names
+        this.names = {};
+
+        /**
+         * Note: Only one name can be set per type
+         *
+         * @param key
+         * @param value
+         */
+        this.putName = function(key, value) {
+            this.names[key] = value;
+        };
+
+        this.getName = function(key) {
+            return this.names[key];
+        };
+
+        this.add = function(key, concat) {
+            if (!this.concats[key]) {
+                this.concats[key] = [];
+            }
+
+            this.concats[key].push(concat);
+        };
+
+        this.get = function(key) {
+            return this.concats[key];
+        };
+
+        this.all = function() {
+            var result = [],
+                key;
+
+            for (key in this.concats) {
+                if (this.concats.hasOwnProperty(key)) {
+                    result.push({
+                        key: key,
+                        value: this.get(key)
+                    });
+                }
+            }
+
+            return result;
+        };
+    }
+
+    var _emitter,
+        _global,
+        _data,
+        _internalConfig,
+        _project,
+        _me = this,
+        concatenated = new _Concat();
+
+
+    return {
+
+        /**
+         *  Initial plugin function
+         *
+         * @param config The configuration:
+         *          data - The configuration data
+         *          emitter - The emitter reference
+         *          global - The global data configuration
+         *          internalConfig - CAT internal configuration
+         */
+        init: function (config) {
+
+
+            var project = (config.internalConfig ? config.internalConfig.getProject() : undefined),
+                imports,
+                action,
+                wipe = false,
+                extensionParams,
+                errors = ["[libraries plugin] No valid configuration"],
+                manifestFileName = "manifest.json",
+                manifestLib = _path.join(global.catlibs, manifestFileName),
+                catProjectLib,
+                catProjectSrc,
+                catProjectLibName,
+                library, mode,
+                workPath,
+                libWorkPath,
+                manifest,
+                libraries,
+                slot = 0,
+                envinfo;
+
+            if (_fs.existsSync(manifestLib)) {
+                manifest = _fs.readFileSync(manifestLib, "utf8");
+            }
+
+            function _copyResource() {
+
+
+                if (!catProjectLib) {
+                    _log.error(_props.get("cat.error.config.missing").format("[libraries ext]", "lib"));
+                    return undefined;
+                }
+                var from,
+                    artifact = library[mode];
+
+                /**
+                 * Copy resource synchronously
+                 *
+                 * @param item The artifact file name
+                 * @param base The base path
+                 * @private
+                 */
+                function _copy(base, item) {
+
+                    function _getExtension(filename) {
+                        var ext = _path.extname(filename||'').split('.');
+                        return ext[ext.length - 1];
+                    }
+
+                    var content, filetype, basename,
+                        itemName,
+                        staticnames = ('static-names' in library ? library["static-names"] : undefined);
+
+
+                    // copy the library to the current cat project
+                    try {
+                        // copy dev
+                        if (item) {
+
+                            itemName = (_typedas.isObject(item) && ("name" in item) ? item.name : item);
+                            from = (base ? _path.join(libWorkPath, base, itemName) : _path.join(libWorkPath, itemName));
+
+                            /* Copy all of the artifacts to the project's library
+                                to = _path.join(catProjectLib, item);
+                                _utils.copySync(from, to); */
+
+                            // concatenation
+                            content = _fs.readFileSync(from, "utf8");
+                            if (content) {
+
+                                filetype = _getExtension(from);
+                                basename = _path.basename(from);
+
+                                if (filetype) {
+                                    concatenated.add(filetype, content);
+                                    if (_jsutils.Object.contains(staticnames, basename)) {
+                                        concatenated.putName(filetype, basename);
+                                    }
+                                }
+                            }
+
+
+                        } else {
+                            _log.warning(_props.get("cat.plugin.libraries.config.missing").format("[libraries ext]", library.name));
+                        }
+                    } catch (e) {
+                        _log.error(_props.get("cat.file.copy.failed").format("[libraries]", from, e));
+                    }
+                }
+
+                if (artifact && _typedas.isArray(artifact)) {
+                    artifact.forEach(function (item) {
+                        // copy artifacts
+                        _copy((library.base || undefined), item);
+                    });
+                }
+            }
+
+            function _exec() {
+
+                var actions = {},
+                    process1,
+                    targetManifestPath = _path.join(catProjectLib, manifestFileName),
+                    doImport = false,
+                    concatsByType;
+
+                function _copydone() {
+
+                    _copyResource();
+                    _exec();
+
+                }
+
+                library = libraries[slot];
+
+
+                if (imports && library){
+                    if (_typedas.isArray(imports)) {
+                        doImport = _utils.contains(imports, library.name);
+                    } else {
+                        // we are installing all libraries ignore the import stuff
+                        doImport = true;
+                    }
+                }
+
+                libWorkPath = (library ? _path.join(workPath, library.name) : undefined);
+
+                // copy the manifest file
+                try {
+                    if (_fs.existsSync(manifestLib) && _fs.existsSync(targetManifestPath)) {
+                        _utils.copySync(manifestLib, targetManifestPath);
+                    }
+                } catch (e) {
+                    _log.error(_props.get("cat.file.copy.failed").format("[libraries]", targetManifestPath, e));
+                }
+
+                actions.install = function () {
+
+                    var bowerConfig = {cwd: workPath};
+
+                    function _installLibs(lib, mode) {
+
+                        function __installLib(data) {
+
+                            if (!data) {
+                                return undefined;
+                            }
+
+                            var src = data.src,
+                                type = data.type,
+                                path = data.path,
+                                name = data.name,
+                                funcs = {
+                                    "_baseCopy": function(config) {
+                                        var src = config.src,
+                                            path = config.path,
+                                            name = config.name,
+                                            content = config.content;
+
+                                        if (src) {
+                                            src = _utils.globmatch({src: src});
+
+                                            src.forEach(function(item) {
+                                                if (item) {
+                                                    _utils.copySync(item, _path.join(path, name));
+                                                }
+                                            });
+                                        } else if (content) {
+                                            _fs.writeFileSync(_path.join(path, name), content);
+                                        }
+                                    },
+
+                                    "json": function(config) {
+
+                                        var parse = ('parse' in config ? config.parse : undefined),
+                                            src = "src" in config && config.src,
+                                            path = config.path,
+                                            name = config.name;
+
+                                        if (src) {
+                                            src = _utils.globmatch({src: src});
+
+                                            src.forEach(function(item) {
+                                                var content;
+
+                                                if (item) {
+                                                    content = _fs.readFileSync(item, "utf8");
+                                                    if (content) {
+                                                        funcs._baseCopy({
+                                                            content: content,
+                                                            name: name,
+                                                            path: path
+                                                        });
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    },
+
+                                    "css": function(config) {
+
+                                        funcs._baseCopy(config);
+                                    },
+
+                                    "js" : function(config) {
+
+                                        var src = config.src,
+                                            path = config.path,
+                                            name = config.name;
+
+                                        jsutils.dev({
+                                            src: src,
+                                            out:{
+                                                name: name,
+                                                path: path
+                                            },
+                                            jshint: {
+                                                opt: {
+                                                    "evil": true,
+                                                    "strict": false,
+                                                    "curly": true,
+                                                    "eqeqeq": true,
+                                                    "immed": false,
+                                                    "latedef": true,
+                                                    "newcap": false,
+                                                    "noarg": true,
+                                                    "sub": true,
+                                                    "undef": true,
+                                                    "boss": true,
+                                                    "eqnull": true,
+                                                    "node": true,
+                                                    "es5": false
+                                                },
+                                                "globals": {
+                                                    XMLHttpRequest: true,
+                                                    document: true,
+                                                    _cat: true,
+                                                    $ : true,
+                                                    Ext : true,
+                                                    window : true,
+                                                    chai: true,
+                                                    phantom: true
+                                                }
+                                            }
+                                        });
+                                    }
+                                };
+
+                            if (!src || !type || !path || !name) {
+                                _log.error("[CAT libraries install] Not valid argument(s) 'src' / 'type' / 'path' / 'name' ");
+                            }
+
+                            resolvedSrcs = [];
+                            src.forEach(function(item) {
+                                resolvedSrcs.push(_path.join(libWorkPath, item));
+                            });
+
+                            data.src = resolvedSrcs;
+                            funcs[type].call(this, data);
+
+
+                        }
+
+                        var jsutils = _jsutils.Task,
+                            src,
+                            resolvedSrcs = [],
+                            targetPath = library.base,
+                            libData;
+
+                        // init
+                        // TODO TBD ... DEV is hard coded
+                        if (mode in library && library[mode]) {
+                            libData = library[mode];
+                            targetPath = _path.join(libWorkPath, targetPath);
+                            if (targetPath) {
+                                // create internal project library folder if not exists
+                                if (!_fs.existsSync(targetPath)) {
+                                    _fs.mkdirpSync(targetPath);
+                                }
+                            }
+
+                            if (_typedas.isArray(libData)) {
+                                libData.forEach(function(data) {
+                                    data.path = targetPath;
+                                    __installLib(data);
+                                });
+
+                                _copydone();
+
+                            } else {
+                                _log.error("[CAT libraries install] library's dev property should be of 'Array' type");
+
+                            }
+                        }
+
+                    }
+
+                    if (library.install === "static") {
+
+                        _copydone();
+
+
+                    } else if (library.install === "internal") {
+
+                         _installLibs(library, "dev");
+
+
+                    } else if (library.install === "bower") {
+
+                        if (!_utils.isWindows()) {
+                            _bower.commands.install([library.name], {}, bowerConfig)
+                                .on('end', function (installed) {
+                                    _log.info('[bower] library ' + library.name + ' Installed');
+                                    _copydone();
+                                });
+
+                        } else {
+
+                            /* on windows we have an issue related to git <> bower
+                             thus we are running custom spawn
+                             */
+                            process1 = _spawn().spawn({
+                                command: "bowerutils.bat",
+                                args: ["install", library.name],
+                                options: bowerConfig,
+                                emitter: _emitter
+                            });
+
+                            process1.on('close', function (code) {
+                                if (code !== 0) {
+                                    _log.info('[spawn close] exited with code ' + code);
+                                } else {
+                                    _log.info('[bower] library ' + library.name + ' Installed');
+                                    _copydone();
+                                }
+                            });
+                        }
+                    }
+                };
+
+
+                actions.clean = function () {
+                    var path = library.base;
+
+                    if (library.install === "internal") {
+                        path = _path.join(libWorkPath, path);
+                        _utils.deleteSync(path);
+                        _exec();
+                    } else if (library.install === "bower") {
+                        _utils.deleteSync(_path.join(workPath, library.name));
+                        _exec();
+                    }
+                };
+
+
+                actions.build = function() {
+                    _copydone();
+                };
+
+                slot++;
+                if (slot > libraries.length) {
+
+                    // create project's library folder if not exists
+                    if (!_fs.existsSync(catProjectLib)) {
+                        _fs.mkdirSync(catProjectLib);
+                    }
+
+                    // concat artifact files
+                    concatsByType = concatenated.all();
+
+                    concatsByType.forEach(function(concatItem) {
+                        var contentValue,
+                            catProjectLibTarget,
+                            filename, staticname,
+                            // todo reflect the parse flag from the meta data file
+                            parse = true,
+                            catjsonpath;
+
+                        if (concatItem) {
+                            if (concatItem.value.length > 0) {
+                                catProjectLibTarget = catProjectLib;
+
+
+                                staticname = concatenated.getName(concatItem.key);
+                                contentValue = concatItem.value.join("");
+                                // set the static name if found or else generate the name according to the project env
+                                filename = (staticname ? staticname : [catProjectLibName, ".", concatItem.key].join(""));
+
+                                if (concatItem.key === "json") {
+                                    // parse content..
+                                    if (parse) {
+                                        contentValue = _jsutils.Template.template({
+                                            content: contentValue,
+                                            data: {
+                                                project: project
+                                            }
+                                        });
+                                    }
+                                }
+                                // specific condition for cat.json TODO put a generic property
+                                if ( concatItem.key !== "json" ) {
+                                    _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue);
+
+                                } else {
+                                    catjsonpath = _path.join(catProjectSrc, "/config/", filename);
+                                    if ( concatItem.key === "json" && !_fs.existsSync(catjsonpath) ) {
+                                        _fs.writeFileSync(catjsonpath, contentValue);
+                                    }
+                                }
+
+                            }
+                        }
+                    });
+
+                    if (_emitter) {
+                        _emitter.emit("job.done", {status: "done"});
+                    }
+
+                    return undefined;
+                }
+
+                if ( doImport && actions[action]) {
+                    actions[action].call(this);
+                } else {
+                    _exec();
+                }
+
+            }
+
+            if (!config) {
+                _log.error(errors[1]);
+                _me.setDisabled(true);
+            }
+
+            _emitter = config.emitter;
+            _global = config.global;
+            _data = config.data;
+            _internalConfig = config.internalConfig;
+            _project = (_internalConfig ? _internalConfig.getProject() : undefined);
+
+            // initial data binding to 'this'
+            _me.dataInit(_data);
+            extensionParams = _data.data;
+
+            imports = (extensionParams.imports || "*");
+            action = extensionParams.action;
+            wipe = ((extensionParams.wipe === "true") ? true : false);
+
+            if (config && extensionParams) {
+
+                // prepare libraries
+                if (manifest) {
+
+                    manifest = JSON.parse(manifest);
+
+
+                    libraries = manifest.libraries;
+                    mode = manifest.mode;
+
+
+                    if (_project) {
+                        catProjectSrc = _project.getInfo("source");
+                        catProjectLib = manifest.out.folder;
+                        catProjectLibName = manifest.out.name;
+
+                        workPath = _path.join(cathome, _project.getInfo("libraries").path);
+                    }
+
+                    if (libraries &&
+                        _typedas.isArray(libraries)) {
+
+                        if (libraries.length > 0) {
+                            _exec();
+                        }
+                    }
+                }
+
+            }
+        },
+
+        /**
+         * Validate the plugin
+         *
+         *      dependencies {Array} The array of the supported dependencies types
+         *
+         * @returns {{dependencies: Array}}
+         */
+        validate: function() {
+            return { dependencies: ["manager"]};
+        }
+
+    };
+
+});

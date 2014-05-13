@@ -1,1 +1,121 @@
-var _catglobal=catrequire("cat.global"),_log=_catglobal.log(),_path=require("path"),_props=catrequire("cat.props"),_basePlugin=catrequire("cat.plugin.base"),_utils=catrequire("cat.utils"),_fs=require("fs.extra"),_typedas=require("typedas");module.exports=_basePlugin.ext(function(){function r(r){var e;return r?(r=_utils.globmatch({src:r}),void(r&&r.forEach(function(r){if(r&&_fs.existsSync(r)){e=_fs.lstatSync(r);try{e.isDirectory()?_fs.rmrfSync(r):e.isFile()&&_fs.unlinkSync(r)}catch(t){_log.error("[CAT clean plugin] failed with errors: ",t)}}}))):void 0}var e,t,i,a,n,o=this;return{init:function(s){var l,c,u=["[libraries plugin] No valid configuration"];s||(_log.error(u[1]),o.setDisabled(!0)),e=s.emitter,t=s.global,i=s.data,a=s.internalConfig,n=a?a.getProject():void 0,o.dataInit(i),c=i.data,s&&c&&(l="src"in c&&c.src,l?_typedas.isArray(l)?l.forEach(function(e){r(e)}):_typedas.isString(l)?r(l):_log.error("[CAT clean plugin] 'src' was found but not valid"):_log.error("[CAT clean plugin] 'src' property is required "),e.emit("job.done",{status:"done"}))},validate:function(){return{dependencies:["manager"]}}}});
+var _catglobal = catrequire("cat.global"),
+    _log = _catglobal.log(),
+    _path = require("path"),
+    _props = catrequire("cat.props"),
+    _basePlugin = catrequire("cat.plugin.base"),
+    _utils = catrequire("cat.utils"),
+    _fs = require("fs.extra"),
+    _typedas = require("typedas");
+
+module.exports = _basePlugin.ext(function () {
+
+    function _rm(src) {
+
+        var stats;
+
+        if (!src) {
+            return undefined;
+        }
+
+        src = _utils.globmatch({src: src});
+
+        if (src) {
+            src.forEach(function(item) {
+
+                if (item && _fs.existsSync(item)) {
+                    stats = _fs.lstatSync(item);
+                    try {
+                        if (stats.isDirectory()) {
+                            _fs.rmrfSync(item);
+
+                        } else if (stats.isFile()) {
+                            _fs.unlinkSync(item);
+
+                        }
+                    } catch(e) {
+                        _log.error("[CAT clean plugin] failed with errors: ", e);
+                    }
+                }
+            });
+        }
+    }
+
+    var _emitter,
+        _global,
+        _data,
+        _internalConfig,
+        _project,
+        _me = this;
+
+    return {
+
+        /**
+         *  Initial plugin function
+         *
+         * @param config The configuration:
+         *          data - The configuration data
+         *          emitter - The emitter reference
+         *          global - The global data configuration
+         *          internalConfig - CAT internal configuration
+         */
+        init: function (config) {
+
+            var src,
+                extensionParams,
+                errors = ["[libraries plugin] No valid configuration"];
+
+            if (!config) {
+                _log.error(errors[1]);
+                _me.setDisabled(true);
+            }
+
+            _emitter = config.emitter;
+            _global = config.global;
+            _data = config.data;
+            _internalConfig = config.internalConfig;
+            _project = (_internalConfig ? _internalConfig.getProject() : undefined);
+
+            // initial data binding to 'this'
+            _me.dataInit(_data);
+            extensionParams = _data.data;
+
+            if (config && extensionParams) {
+
+                src = ("src" in extensionParams && extensionParams.src);
+
+                if (src) {
+                    if (_typedas.isArray(src)) {
+                        src.forEach(function(item) {
+                           _rm(item);
+                        });
+
+                    } else if(_typedas.isString(src)) {
+                        _rm(src);
+
+                    } else {
+                        _log.error("[CAT clean plugin] 'src' was found but not valid");
+                    }
+
+                } else {
+                    _log.error("[CAT clean plugin] 'src' property is required ");
+                }
+
+                // done processing notification for the next task to take place
+                _emitter.emit("job.done", {status: "done"});
+
+            }
+        },
+        /**
+         * Validate the plugin
+         *
+         *      dependencies {Array} The array of the supported dependencies types
+         *
+         * @returns {{dependencies: Array}}
+         */
+        validate: function() {
+            return { dependencies: ["manager"]};
+        }
+
+    };
+
+});

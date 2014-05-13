@@ -1,1 +1,12 @@
-module.exports=function(){return{get:function(e){return require("./"+e)}}}();
+
+
+module.exports = function() {
+
+    return  {
+
+        get: function(parser) {
+            return require("./" + parser);
+        }
+    };
+
+}();

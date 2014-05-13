@@ -19,8 +19,32 @@ _cat.core = function () {
         _enum = {
             TEST_MANAGER: "tests",
             ALL: "all"
-        };
+        },
+        _getBase,
+        _getBaseUrl;
 
+    _getBase="/";
+
+    _getBaseUrl = function() {
+        var base;
+
+        if (!_getBase) {
+            base = "/";
+
+        } else {
+            if (_getBase.trim) {
+                _getBase = _getBase.trim();
+            }
+            if (_getBase.charAt(0) === ".") {
+                base = _getBase.slice(1);
+            }
+            if (!base) {
+                base = "/";
+            }
+        }
+
+        return base;
+    };
 
     addScrapToManager = function (testsInfo, scrap) {
 
@@ -225,11 +249,17 @@ _cat.core = function () {
         var innerConfig,
             xmlhttp,
             configText,
-            me = this;
+            me = this,
+            url, catjson = "cat/config/cat.json",
+            baseurl = _getBaseUrl();
 
         try {
+            if (baseurl && baseurl.charAt(baseurl.length-1) !== "/") {
+                baseurl += "/";
+            }
+            url = [baseurl , catjson].join("");
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
-                url: "cat/config/cat.json"
+                url: url
             });
             if (xmlhttp) {
                 configText = xmlhttp.responseText;
@@ -403,7 +433,6 @@ _cat.core = function () {
                             ui: catconfig.isUI(),
                             send: reportFormats
                         });
-
                     });
             }
         },

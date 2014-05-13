@@ -1,1 +1,43 @@
-var _parsers=[];!function(){var r=["SimpleParser","SimpleSingleParser"];r.forEach(function(r){_parsers.push(require(["./",r].join("")))})}(),module.exports=function(){return{parse:function(r){var e,n=[];return _parsers.forEach(function(a){a&&(e=a.parse(r),e&&(n=n.concat(e)))}),n}}}();
+var _parsers = [];
+
+(function(){
+    var parsers = [
+        "SimpleParser",
+        "SimpleSingleParser"
+    ];
+
+    parsers.forEach(function(parser) {
+        _parsers.push(require(["./",parser].join("")));
+    });
+
+})();
+
+/**
+ * TODO create a base class
+ *
+ * @type {module.exports}
+ */
+module.exports = function() {
+
+    return  {
+
+        parse: function(scrapCommentBlock) {
+
+            var scraps = [],
+                scrap;
+
+            _parsers.forEach(function(parser){
+                if (parser) {
+                    scrap = parser.parse(scrapCommentBlock);
+                    if (scrap) {
+                        scraps = scraps.concat(scrap);
+                    }
+                }
+            });
+
+            return scraps;
+
+        }
+    };
+
+}();

@@ -1,1 +1,156 @@
-var _fs=require("fs"),_global=catrequire("cat.global"),_home=_global.get("home"),_workingDir,_fileName;_home&&_home.working&&(_workingDir=_home.working.path),_fileName=[_workingDir,".cat"].join("/"),module.exports=function(){function n(n,e){e=e||"appendFileSync";try{e&&_fs[e](_fileName,n,"utf8")}catch(i){console.log("[catcli] ",i)}}function e(){try{return _fs.readFileSync(_fileName,"utf8")}catch(n){console.log("[catcli] ",n)}}function i(n){var i,t,o=e(),r=0;o&&(i=o.split("\n"),i.forEach(function(e){r++,t={row:e,line:r},n.call(t)}))}return{set:function(e,i){var t=[e,i].join("=");-1===t.indexOf("\n")&&(t+="\n"),n(t)},get:function(n){var e=[];return i(function(){var i=this.row,t=this.line;i&&0===i.trim().indexOf(n)&&e.push({row:i,line:t})}),e},remove:function(e){function t(n){n.trim()&&(-1===n.indexOf("\n")&&(n+="\n"),o.push(n))}var o=[],r=0,l=e&&e.length?e.length:0;l&&(i(function(){var n,i=this.row,o=this.line,c=0;for(r=0;l>r;r++)if(n=e[r],o===n){c++;break}0===c&&(t(i),c=0)}),o&&o.length>0&&n(o.join(""),"writeFileSync"))},removeByKey:function(n,e){var i=this.get(n),t=[],o=[];return i.forEach(function(n){(!e||e&&n.row&&-1===n.row.indexOf(e))&&(t.push(n.line),o.push(n.row.trim().split("=")[1]))}),t&&t.length&&t.length>0&&this.remove(t),o}}}();
+var _fs = require("fs"),
+    _global = catrequire("cat.global"),
+    _home = _global.get("home"),
+    _workingDir,
+    _fileName;
+
+if (_home && _home.working) {
+    _workingDir = _home.working.path;
+}
+
+_fileName = [_workingDir, ".cat"].join("/");
+
+/**
+ * Persist a property style data (key=value) to a file named .cat
+ *
+ * @type {module.exports}
+ */
+module.exports = function () {
+
+    function _store(data, option) {
+        option = (option || "appendFileSync");
+        try {
+            if (option) {
+                _fs[option](_fileName, data, "utf8");
+            }
+        } catch (e) {
+            console.log("[catcli] ", e);
+        }
+    }
+
+    function _load() {
+        try {
+            return _fs.readFileSync(_fileName, "utf8");
+
+        } catch (e) {
+            console.log("[catcli] ", e);
+        }
+    }
+
+    function _inspect(callback) {
+        var content = _load(),
+            rows,
+            lineCounter = 0,
+            obj;
+
+        if (content) {
+            rows = content.split("\n");
+            rows.forEach(function (row) {
+                lineCounter++;
+                obj = {row: row, line: lineCounter};
+                callback.call(obj);
+            });
+        }
+    }
+
+    return {
+
+        /**
+         * Append new line comprised of the key, value [key=value\n]
+         *
+         * @param key
+         * @param value
+         */
+        set: function (key, value) {
+            var data = [key, value].join("=");
+            if (data.indexOf("\n") === -1) {
+                data += "\n";
+            }
+            _store(data);
+        },
+
+        /**
+         * Get lines that match the key.
+         *
+         * @param key
+         * @returns {Array} The matched lines
+         */
+        get: function (key) {
+            var data = [];
+
+            _inspect(function () {
+                var row = this.row,
+                    line = this.line;
+
+                if (row && row.trim().indexOf(key) === 0) {
+                    data.push({row: row, line: line});
+                }
+            });
+
+            return data;
+        },
+
+        remove: function (lines) {
+            var rows = [],
+                idx = 0, size = ((lines && lines.length) ? lines.length : 0);
+
+            function _addRow(row) {
+                if (row.trim()) {
+                    if (row.indexOf("\n") === -1) {
+                        row += "\n";
+                    }
+                    rows.push(row);
+                }
+
+            }
+
+            if (size) {
+                _inspect(function () {
+                    var row = this.row,
+                        lineNumber,
+                        line = this.line,
+                        validate = 0;
+
+                    for (idx = 0; idx<size; idx++) {
+                        lineNumber = lines[idx];
+                        if (line === lineNumber) {
+                            validate++;
+                            break;
+                        }
+                    }
+
+                    // add the row if no remove have been requested
+                    if (validate === 0) {
+                        _addRow(row);
+                        validate = 0;
+                    }
+
+                });
+
+                if (rows && rows.length > 0) {
+                    _store((rows.join("")), "writeFileSync");
+                }
+            }
+        },
+
+        removeByKey: function(key, value, kill) {
+            var rows = this.get(key),
+                lines=[],
+                values = [];
+
+            rows.forEach(function(row){
+                if (!value || (value && row.row && row.row.indexOf(value) === -1)) {
+                    lines.push(row.line);
+                    values.push((row.row.trim().split("="))[1]);
+                }
+            });
+            if (lines && lines.length && lines.length > 0) {
+                this.remove(lines);
+            }
+
+            return values;
+        }
+
+    };
+
+}();

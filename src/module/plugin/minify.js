@@ -1,1 +1,215 @@
-var _catglobal=catrequire("cat.global"),_log=_catglobal.log(),_path=require("path"),_props=catrequire("cat.props"),_basePlugin=catrequire("cat.plugin.base"),_utils=catrequire("cat.utils"),_fs=require("fs.extra"),_typedas=require("typedas"),_jsutils=require("js.utils"),_glob=require("glob"),_minimatch=require("minimatch");module.exports=_basePlugin.ext(function(){function e(e){var i,a,t,r=e.mode,n=e.path,o=e.name,s=e.jshint,l=e.excludes,c=e.src,u=[],d=0,p=0;if(!c||!n||!o)return void _log.error("[CAT minify plugin] src, name, path are required properties ");try{if(i=_jsutils.Task[r]){if(l){for(p=l.length,d=0;p>d;d++)if(a=l[d])if(_typedas.isArray(c))t=0,c.forEach(function(e){_minimatch(e,a,{matchBase:!0})&&u.push(t),t++});else if(!_typedas.isArray(c)&&_minimatch(c,a,{matchBase:!0}))return void 0;_typedas.isArray(c)&&u.length>0&&u.forEach(function(e){c=c.splice(e,1)})}i({src:c,out:{name:o,path:n},jshint:s||{opt:{evil:!0,strict:!1,curly:!0,eqeqeq:!0,immed:!1,latedef:!0,newcap:!1,noarg:!0,sub:!0,undef:!0,boss:!0,eqnull:!0,node:!0,es5:!1},globals:{XMLHttpRequest:!0,document:!0,_cat:!0,chai:!0}}})}}catch(h){_log.error("[CAT minify plugin] failed with errors, file:",c),_log.error("[CAT minify plugin] failed with errors: ",h)}}var i,a,t,r,n,o=this;return{init:function(s){var l,c,u,d,p,h,m,f,_=[],g=["[libraries plugin] No valid configuration"];s||(_log.error(g[1]),o.setDisabled(!0)),i=s.emitter,a=s.global,t=s.data,r=s.internalConfig,n=r?r.getProject():void 0,o.dataInit(t),f=t.data,s&&f&&(l="src"in f?f.src:void 0,p="jshint"in f?f.jshint:void 0,u="filename"in f?f.filename:void 0,c=("path"in f?f.path:void 0)||".",d=("mode"in f?f.mode:void 0)||"dev",m="excludes"in f?f.excludes:void 0,h=("isolate"in f?"true"===f.isolate?!0:!1:void 0)||!1,l?h?(l.forEach(function(e){_=_.concat(_glob.sync(e))}),_.forEach(function(i){var a=_path.basename(i);-1===a.indexOf(".catmin")&&(u=_path.basename(i,_path.extname(i))+_path.extname(i)),e({src:i,name:u,path:_path.dirname(i),mode:d,excludes:m,jshint:p})})):e({src:l,name:u,path:c,mode:d,excludes:m,jshint:p}):_log.error("[CAT clean plugin] 'src' property is required "),i.emit("job.done",{status:"done"}))},validate:function(){return{dependencies:["manager"]}}}});
+var _catglobal = catrequire("cat.global"),
+    _log = _catglobal.log(),
+    _path = require("path"),
+    _props = catrequire("cat.props"),
+    _basePlugin = catrequire("cat.plugin.base"),
+    _utils = catrequire("cat.utils"),
+    _fs = require("fs.extra"),
+    _typedas = require("typedas"),
+    _jsutils = require("js.utils"),
+    _glob = require("glob"),
+    _minimatch = require("minimatch");
+
+module.exports = _basePlugin.ext(function () {
+
+    function _minify(config) {
+
+        var task,
+            mode = config.mode,
+            path = config.path,
+            name = config.name,
+            jshint = config.jshint,
+            exclude, excludes = config.excludes,
+            src = config.src,
+            srcexcludes = [], srcexclude, counter,
+            idx = 0, size = 0;
+
+        if (!src || !path || !name) {
+            _log.error("[CAT minify plugin] src, name, path are required properties ");
+            return undefined;
+        }
+
+        try {
+
+            task = _jsutils.Task[mode];
+            if (task) {
+                if (excludes) {
+                    size = excludes.length;
+                    for (idx = 0; idx < size; idx++) {
+                        exclude = excludes[idx];
+                        if (exclude) {
+                            if (_typedas.isArray(src)) {
+                                counter = 0;
+                                src.forEach(function (item) {
+                                    if (_minimatch(item, exclude, { matchBase: true })) {
+                                        srcexcludes.push(counter);
+                                    }
+                                    counter++;
+                                });
+                            } else if (!_typedas.isArray(src)) {
+                                if (_minimatch(src, exclude, { matchBase: true })) {
+                                    return undefined;
+                                }
+                            }
+                        }
+                    }
+                    if (_typedas.isArray(src) && srcexcludes.length > 0) {
+                        srcexcludes.forEach(function (srcexclude) {
+                            src = src.splice(srcexclude, 1);
+                        });
+                    }
+                }
+                task({
+                    src: src,
+                    out: {
+                        name: name,
+                        path: path
+                    },
+                    jshint: (jshint || {
+                        opt: {
+                            "evil": true,
+                            "strict": false,
+                            "curly": true,
+                            "eqeqeq": true,
+                            "immed": false,
+                            "latedef": true,
+                            "newcap": false,
+                            "noarg": true,
+                            "sub": true,
+                            "undef": true,
+                            "boss": true,
+                            "eqnull": true,
+                            "node": true,
+                            "es5": false
+                        },
+                        "globals": {
+                            XMLHttpRequest: true,
+                            document: true,
+                            _cat: true,
+                            chai: true
+                        }
+                    })
+                });
+            }
+
+        } catch (e) {
+            _log.error("[CAT minify plugin] failed with errors, file:", src);
+            _log.error("[CAT minify plugin] failed with errors: ", e);
+        }
+
+    }
+
+    var _emitter,
+        _global,
+        _data,
+        _internalConfig,
+        _project,
+        _me = this;
+
+    return {
+
+        /**
+         *  Initial plugin function
+         *
+         * @param config The configuration:
+         *          data - The configuration data
+         *          emitter - The emitter reference
+         *          global - The global data configuration
+         *          internalConfig - CAT internal configuration
+         */
+        init: function (config) {
+
+            var src,
+                srcs = [],
+                path,
+                name,
+                mode,
+                jshint,
+                isolate,
+                excludes,
+                extensionParams,
+                errors = ["[libraries plugin] No valid configuration"];
+
+            if (!config) {
+                _log.error(errors[1]);
+                _me.setDisabled(true);
+            }
+
+            _emitter = config.emitter;
+            _global = config.global;
+            _data = config.data;
+            _internalConfig = config.internalConfig;
+            _project = (_internalConfig ? _internalConfig.getProject() : undefined);
+
+            // initial data binding to 'this'
+            _me.dataInit(_data);
+            extensionParams = _data.data;
+
+            if (config && extensionParams) {
+
+                src = ("src" in extensionParams ? extensionParams.src : undefined);
+                jshint = ("jshint" in extensionParams ? extensionParams.jshint : undefined);
+                name = ("filename" in extensionParams ? extensionParams.filename : undefined);
+                path = (("path" in extensionParams ? extensionParams.path : undefined) || ".");
+                mode = ( ("mode" in extensionParams ? extensionParams.mode : undefined) || "dev");
+                excludes = ("excludes" in extensionParams ? extensionParams.excludes : undefined);
+                isolate = ( ("isolate" in extensionParams ? (extensionParams.isolate === "true" ? true : false) : undefined) || false);
+
+
+                if (src) {
+                    src.forEach(function (item) {
+                        srcs = srcs.concat(_glob.sync(item));
+                    });
+
+                    if (srcs && srcs.length > 0) {
+                        if (isolate) {
+
+                            srcs.forEach(function (item) {
+                                var basename = _path.basename(item);
+                                if (basename.indexOf(".catmin") === -1) {
+                                    name = _path.basename(item, _path.extname(item)) + _path.extname(item);
+                                }
+                                _minify({
+                                    src: item,
+                                    name: name,
+                                    path: _path.dirname(item),
+                                    mode: mode,
+                                    excludes: excludes,
+                                    jshint: jshint
+                                });
+                            });
+                        } else {
+                            // TODO remove the hardcoded dev and get dev/prod
+                            _minify({
+                                src: src,
+                                name: name,
+                                path: path,
+                                mode: mode,
+                                excludes: excludes,
+                                jshint: jshint
+                            });
+                        }
+                    }
+                } else {
+                    _log.error("[CAT clean plugin] 'src' property is required ");
+                }
+
+                // done processing notification for the next task to take place
+                _emitter.emit("job.done", {status: "done"});
+
+            }
+        },
+        /**
+         * Validate the plugin
+         *
+         *      dependencies {Array} The array of the supported dependencies types
+         *
+         * @returns {{dependencies: Array}}
+         */
+        validate: function () {
+            return { dependencies: ["manager"]};
+        }
+
+    };
+
+});

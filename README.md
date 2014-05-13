@@ -4,8 +4,6 @@ CATJS 0.1.5
 *CATJS* is an automation framework for (mobile) web applications testing.
 With simple annotations added to your HTML5 code, an automated functional tests will be available as part of your application lifecycle.
 
-
-
 ### Code once, deploy it anywhere <br/>
 
 Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner) (That is already part of CATJS, no need to do any additional installations), on any platform that your application supports.
@@ -118,7 +116,7 @@ CAT's annotation term for a single test unit is "Scrap".
 
         catcli -bs
 
-### Application Error Assertion
+### Application Error Assertion ###
 catjs track your application errors and report it to the console/junit. With minimal annotation for catjs library loading you get to track your application errors.
    Combined it with catjs runner you can immediately get report about any errors on different browsers and devices.
 

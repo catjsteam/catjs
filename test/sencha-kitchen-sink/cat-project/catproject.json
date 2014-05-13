@@ -1,0 +1,23 @@
+{
+    "name": "sencha-kitchen-sink",
+
+    "source": "src/",
+    "target": "target/",
+    "host": "localhost",
+    "port": "8089",
+    "protocol": "http",
+
+    "apppath": "./../cat-test-app",
+    "appserver": {
+        "host": "localhost",
+        "port": "8089",
+        "protocol": "http"
+    },
+
+    "plugins": [
+    ],
+
+    "tasks": [
+    ]
+}
+

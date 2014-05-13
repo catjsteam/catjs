@@ -1,0 +1,56 @@
+************ Node Modules usage
+(i) init (s) scrap (j) inject
+catcli -isj
+
+
+
+************ CAT Phantom test usage
+    cat command:  catcli -t
+
+************ CAT Mobile test usage
+    cat command:  catcli -m
+
+
+Install CAT as NPM for development environment
+==============================================
+
+== Ubuntu
+
+add a symbolic link:
+--------------------
+:/usr/bin$ sudo ln -s ~/dev/projects/lastboy/HPSoftware/CATCore/catcli.js ./catcli
+
+remove symbolic link:
+---------------------
+:/usr/bin$ sudo unlink catcli
+
+check exiting symbolic links:
+-----------------------------
+:/usr/bin$ ls -lah | grep ^l | grep cat
+
+
+== Windows
+
+add shortcut:
+-------------
+create catcli.cmd file under folder: C:\Users\[windows user]\AppData\Roaming\npm\
+
+:: Created by npm, please don't edit manually.
+@IF EXIST "%~dp0\node.exe" (
+  "%~dp0\node.exe"  "[path_to_catcli_file]\catcli" %*
+) ELSE (
+  node  "[path_to_catcli_file]\catcli" %*
+)
+
+
+== As a Module
+ var log = require("./src/module/CATGlob.js").log(),
+            isasync;
+
+        // Tell grunt this task is asynchronous.
+        isasync = this.async();
+
+        log.info("[Grunt] default task; initialized");
+        var x = require("./src/module/CAT.js");
+        x.init({target: 'scan', grunt: grunt});
+

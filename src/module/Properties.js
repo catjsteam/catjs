@@ -1,1 +1,42 @@
-var _properties=require("properties"),_global=require("./CATGlob.js"),_log=_global.log();module.exports=function(){var o={comment:"# ",separator:" = ",sections:!1};return{init:function(r){_properties.load([cathome,"resources/log.properties"].join("/"),o,r)},all:global&&global.CAT?global.CAT.props:void 0,get:function(o){return o?global.CAT.props[o]:void 0}}}();
+var _properties = require("properties"),
+    _global = require("./CATGlob.js"),
+    _log =  _global.log();
+
+/**
+ * Loading property file for internal use
+ * Currently support only log.properties for log messages.
+ *
+ * TODO load property files according to a given path
+ *
+ * @type {module.exports}
+ */
+module.exports = function () {
+
+    var config = {
+        comment: "# ",
+        separator: " = ",
+        sections: false
+    }, properties;
+
+
+    return {
+
+        init: function (callback) {
+            _properties.load([cathome, "resources/log.properties"].join("/"),
+                config,
+                callback);
+
+        },
+
+        all: ( (global && global.CAT) ? global.CAT.props : undefined ),
+
+        get: function (key) {
+            if (key) {
+                return global.CAT.props[key];
+            }
+
+            return undefined;
+        }
+
+    };
+}();

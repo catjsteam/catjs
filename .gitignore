@@ -10,3 +10,4 @@ build/src
 *.xml
 test/enyo/cat-project/
 test/sencha/cat-project/
+test/init-test/cat-project/

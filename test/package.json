@@ -1,0 +1,19 @@
+{
+  "name": "cat-builder",
+  "description": "Cat Builder",
+  "version": "0.0.1",
+  "author": {
+    "name": "arik",
+    "email": "lewin.arik@gmail.com"
+  },
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt": "~0.4.1",
+    "package-script": "0.0.7"
+  },
+  "peerDependencies": {}
+}

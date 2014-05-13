@@ -1,1 +1,284 @@
-var _global=catrequire("cat.global"),_utils=catrequire("cat.utils"),_log=_global.log(),_path=require("path"),_fsconfig=catrequire("cat.config.utils"),_typedas=require("typedas"),_props=catrequire("cat.props"),_watch=catrequire("cat.watch"),_catconfig,_loadCATConfig,_CATConfig=function(t,e){function n(e){e&&e.name&&(e.getPhase=function(){return e.phase||"default"},g._extmap[e.name]={externalConfig:t,ext:e,ref:null})}var o,i,a,r,p,s,c,f,g=this,h=0,l=[],u=[];if(this._extmap={},this._watch={},this.extensions=e.extensions,this.plugins=e.plugins,this.externalConfig=t,this.extensions){if(_typedas.isArray(this.extensions))for(o=this.extensions.length;o>h;h++)n(this.extensions[h]);this.env=e.env,this.externalConfig&&(i=this.externalConfig.project,i?(e&&e.extensions&&(e.extensions.forEach(function(t){t&&t.name&&u.push({name:t.name,type:t.name})}),i.appendEntity("dependencies",u)),i.setInfo("template",this.env.template),i.setInfo("libraries",this.env.libraries),this.plugins.forEach(function(t){l.push(_path.join(cathome,t))}),i.addPluginLocations(l),s=[],f=i.getInfo("target"),c=i.getInfo("cattarget")||"./",a=_path.join("./",_path.relative(_path.resolve("."),f),i.name),r=i.getInfo("apppath"),r?(p={name:"p@project.copy",type:"copy",dependency:"scan",path:r,from:{path:"/"},to:{path:a}},s.push(p)):_log.log("error","[CAT config] 'apppath property is missing or not valid. See catproject.json spec"),s=s.concat([{name:"p@lib.copy",type:"copy",from:{path:"./lib"},to:{path:_path.join(a,c,"/cat/lib")}},{name:"p@src.copy",type:"copy",from:{path:"./src/config"},to:{path:_path.join(a,c,"/cat/config")}},{name:"p@project.minify",type:"minify",path:_path.join(a,c,"/cat/lib"),filename:"cat.src.js",src:["./src/**/*.js"]}]),i.appendEntity("plugins",s)):_log.warning(_props.get("cat.project.env.failed").format("[CAT Config Loader]")))}};_CATConfig.prototype.watch=function(t){this._watch.impl=t.impl},_CATConfig.prototype.getWatch=function(){return this._watch.impl},_CATConfig.prototype.isWatch=function(){return this._watch.impl?!0:!1},_CATConfig.prototype.getExtension=function(t){return t&&this._extmap?this._extmap[t]:void 0},_CATConfig.prototype.getProject=function(){return this.externalConfig?this.externalConfig.project:void 0},_CATConfig.prototype.getGrunt=function(){return this.externalConfig?this.externalConfig.grunt:void 0},_CATConfig.prototype.getEmitter=function(){return this.externalConfig?this.externalConfig.emitter:void 0},_loadCATConfig=function(t,e){try{new _fsconfig(e,function(e){e?_catconfig=new _CATConfig(t,e):_log.error(_props.get("cat.error.config").format("[CAT Config Loader]"))})}catch(n){_log.error(_props.get("cat.error.config").format("[CAT Config Loader]"),n)}return _catconfig},module.exports=function(){return{load:function(t){var e=[cathome,"resources/cat.json"].join("/");return _loadCATConfig(t,e)}}}();
+var _global = catrequire("cat.global"),
+    _utils = catrequire("cat.utils"),
+    _log = _global.log(),
+    _path = require("path"),
+    _fsconfig = catrequire("cat.config.utils"),
+    _typedas = require("typedas"),
+    _props = catrequire("cat.props"),
+    _watch = catrequire("cat.watch"),
+    _catconfig,
+    _loadCATConfig,
+
+    /**
+     * CAT Configuration class
+     *
+     * Loads CAT internal configuration from resources/cat.json file
+     *  and creates a configuration instance
+     *
+     * @param externalConfig The passed configuration
+     *          emitter - The emitter reference
+     *          project - Cat project
+     *          grunt - The grunt reference (if available)
+     *
+     * @param data The incoming row configuration data
+     */
+     _CATConfig = function (externalConfig, data) {
+
+        var me = this,
+            idx = 0, size, project, pluginsPath = [],
+            dependencies = [],
+            appTargetPath, appPath, scrapfilter, projectcopy, scrapscan, customPlugins, cattarget, targetfolder;
+
+        /**
+         * Extension initialization
+         *
+         * @param ext
+         * @private
+         */
+        function _extension(ext) {
+            if (ext && ext.name) {
+
+                ext.getPhase = function() {
+                    return (ext.phase || "default");
+                };
+                me._extmap[ext.name] = {externalConfig: externalConfig, ext: ext, ref: null};
+            }
+        }
+
+        this._extmap = {};
+        this._watch = {};
+        this.extensions = data.extensions;
+        this.plugins = data.plugins;
+        this.externalConfig = externalConfig;
+
+        if (this.extensions) {
+
+            if (_typedas.isArray(this.extensions)) {
+                // Index the extensions entries
+                size = this.extensions.length;
+                for (; idx < size; idx++) {
+                    _extension(this.extensions[idx]);
+                }
+            }
+
+            // load CAT environment variables and update the project class
+            this.env = data.env;
+            if (this.externalConfig) {
+                project = this.externalConfig.project;
+                if (project) {
+
+                    if (data && data.extensions) {
+                        data.extensions.forEach(function(ext) {
+                            if (ext && ext.name) {
+                                dependencies.push({
+                                    name: ext.name,
+                                    type: ext.name
+                                });
+                            }
+                        });
+                        // add internal extensions info
+                        project.appendEntity("dependencies", dependencies);
+                    }
+
+                    // set environment info
+                    project.setInfo("template", this.env.template);
+                    project.setInfo("libraries", this.env.libraries);
+                    this.plugins.forEach(function(path){
+                        pluginsPath.push(_path.join(cathome, path));
+                    });
+                    project.addPluginLocations(pluginsPath);
+
+                    customPlugins = [];
+                    targetfolder = project.getInfo("target");
+                    cattarget = (project.getInfo("cattarget") || "./");
+
+                    appTargetPath = _path.join("./", _path.relative(_path.resolve("."), targetfolder), project.name);
+                    appPath = project.getInfo("apppath");
+
+                    if (appPath) {
+                        projectcopy= {
+                            "name": "p@project.copy",
+                            "type": "copy",
+                            "dependency": "scan",
+                            "path": appPath,
+                            "from": {
+                                "path": "/"
+                            },
+                            "to": {
+                                "path": appTargetPath
+                            }
+                        };
+                        customPlugins.push(projectcopy);
+
+                    } else  {
+                        _log.log("error", "[CAT config] 'apppath property is missing or not valid. See catproject.json spec");
+                    }
+
+                    scrapscan =   {
+                        "name": "p@init.scrap",
+                        "type": "scrap",
+                        "dependency": "scan"
+                    };
+
+                    scrapfilter = project.getInfo("scrapfilter");
+                    if (scrapfilter) {
+                        scrapscan.filters = scrapfilter;
+                    }
+                    customPlugins.push(scrapscan);
+
+                    customPlugins = customPlugins.concat([
+                        {
+                            "name": "p@lib.copy",
+                            "type": "copy",
+                            "from": {
+                                "path": "./lib"
+                            },
+                            "to": {
+                                "path": _path.join(appTargetPath, cattarget, "/cat/lib")
+                            }
+                        },
+                        {
+                            "name": "p@lib.parse",
+                            "type": "fileparse",
+                            "dependency": "manager",
+                            "files": [_path.join(appTargetPath, cattarget, "/cat/lib/cat.js")],
+                            "pattern": "_getBase=\"(.*)\";",
+                            "replace": "_getBase=\"" + cattarget + "\";",
+                            "applyto":["content"],
+                            "flags": "g"
+                        },
+                        {
+                            "name": "p@src.copy",
+                            "type": "copy",
+                            "from": {
+                                "path": "./src/config"
+                            },
+                            "to": {
+                                "path": _path.join(appTargetPath, cattarget, "/cat/config")
+                            }
+                        },
+                        {
+                            "name": "p@project.minify",
+                            "type": "minify",
+                            "path": _path.join(appTargetPath, cattarget, "/cat/lib"),
+                            "filename": "cat.src.js",
+                            "src":["./src/**/*.js"]
+                        }
+                        ]);
+                    project.appendEntity("plugins", customPlugins);
+
+
+                } else {
+                    _log.warning(_props.get("cat.project.env.failed").format("[CAT Config Loader]"));
+                }
+            }
+
+        }
+    };
+
+    /**
+     *  Sync configuration for a single task.
+     *  e.g. scan that applied for scanning a deep folder gets to process one file.
+     *
+     * @param config
+     */
+    _CATConfig.prototype.watch = function(config) {
+        this._watch.impl = config.impl;
+    };
+
+    _CATConfig.prototype.getWatch = function() {
+        return this._watch.impl;
+    };
+
+    _CATConfig.prototype.isWatch = function() {
+        return (this._watch.impl ? true : false);
+    };
+
+    _CATConfig.prototype.getExtension = function (key) {
+        if (key && this._extmap) {
+            return this._extmap[key];
+        }
+    };
+
+    /**
+     *  TODO move any externalConfig direct access properties to use this function
+     *
+     * @returns {*}
+     */
+    _CATConfig.prototype.getProject = function () {
+        if ( this.externalConfig) {
+            return  this.externalConfig.project;
+        }
+    };
+
+    /**
+     *  TODO move any externalConfig direct access properties to use this function
+     *
+     * @returns {*}
+     */
+    _CATConfig.prototype.getGrunt = function () {
+        if ( this.externalConfig) {
+            return  this.externalConfig.grunt;
+        }
+    };
+
+    /**
+     *  TODO move any externalConfig direct access properties to use this function
+     *
+     * @returns {*}
+     */
+    _CATConfig.prototype.getEmitter = function () {
+        if ( this.externalConfig) {
+            return  this.externalConfig.emitter;
+        }
+    };
+
+
+/**
+ * Load cat.json internal configuration file
+ * CAT configuration include the internal extensions meta data.
+ *
+ * @param externalConfig
+ * @param path
+ * @returns {*}
+ * @private
+ */
+_loadCATConfig = function (externalConfig, path) {
+
+    try {
+        (new _fsconfig(path, function (data) {
+            if (data) {
+
+                _catconfig = new _CATConfig(externalConfig, data);
+
+            } else {
+                _log.error(_props.get("cat.error.config").format("[CAT Config Loader]"));
+            }
+        }));
+    } catch (e) {
+        _log.error(_props.get("cat.error.config").format("[CAT Config Loader]"), e);
+    }
+
+    return _catconfig;
+};
+
+
+module.exports = function () {
+
+    return {
+        /**
+         * Loading internal CAT configuration
+         *
+         * @param externalConfig The configuration to be passed for all config classes
+         *      - emitter The emitter reference
+         *      - grunt The grunt reference
+         *      - project The current running project
+         */
+        load: function (externalConfig) {
+
+            var path = [cathome, "resources/cat.json"].join("/");
+
+            return _loadCATConfig(externalConfig, path);
+        }
+    };
+}();

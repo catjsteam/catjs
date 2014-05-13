@@ -1,1 +1,49 @@
-module.exports={cat:{comment:function(n,t){function o(n,t){return t in n&&n[t]?n[t]:void 0}var c=[],e=0;return n&&(t?n.forEach(function(){0===e&&(c[e]=o(t,"prefix")+n[e]),e===n.length-1&&(c[e]=n[e]+o(t,"suffix")),e>0&&e<n.length-1&&(c[e]=n[e]),c[e]+="\n",e++}):c=c.concat(n)),c}}};
+module.exports = {
+
+    cat: {
+
+        comment: function (lines, mark) {
+
+            var newlines = [], counter = 0;
+
+            function _getValue(obj, key) {
+                if (key in obj && obj[key]) {
+                    return obj[key];
+                }
+                return;
+            }
+
+            if (lines) {
+
+                if (mark) {
+
+                    lines.forEach(function (line) {
+
+                        if (counter === 0) {
+                            newlines[counter] = _getValue(mark, "prefix") + lines[counter];
+
+                        }
+
+                        if (counter === lines.length - 1) {
+                            newlines[counter] = lines[counter] + _getValue(mark, "suffix");
+
+                        }
+
+                        if (counter > 0 && counter < lines.length - 1) {
+                            newlines[counter] = lines[counter];
+                        }
+
+                        newlines[counter] += "\n";
+                        counter++;
+                    });
+
+                } else {
+                    newlines = newlines.concat(lines);
+
+                }
+            }
+
+            return newlines;
+        }
+    }
+};

@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Getting Started Extension's Popup</title>
+		<style>
+			body {
+				min-width:350px;
+				max-width:350px;
+				min-height:250px;
+				max-height:250px;
+				overflow-x:hidden;
+				font-family:Arial;
+				font-size:12px;
+				background:transparent url('CatIcon.jpg') no-repeat left bottom;
+				line-height:24px;
+			}
+			span{padding-top:7px;display:inline-block;}
+			h3{
+				background-color:#dedede;
+				margin:0;padding:5px;
+			}
+			#canRun{font-size:10px;color:#f00;line-height:28px;padding-right:20px;float:left;}
+			select{min-width:150px;}
+		</style>
+
+		<!-- JavaScript and HTML must be in separate files for security. -->
+		<script src="popup.js"></script>
+
+	</head>
+	<body>
+		<div><h3>CAT - Ninja testing</h3></div>
+		<div>
+			<span><input type="checkbox" id="showConsole"><label for="showConsole"> Show console</label></span>
+		</div>
+		<div>
+			<span>Select test #</span>
+			<select id="testSelection"></select>
+		</div>
+		<div>
+			<span><input type="checkbox" id="previewMode"><label for="previewMode"> Run test in "Preview Mode"</label></span>
+		</div>
+		<div style="text-align:right;position:absolute;bottom:0;right:5px;">
+			<span>
+				<div id="canRun">Test cannot run on this page...</div>
+				<input type="button" value="Run Test" id="btnGo" disabled="true"/>
+			</span>
+		</div>
+		
+	</body>
+</html>

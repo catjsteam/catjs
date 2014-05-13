@@ -1,1 +1,75 @@
-var _watch=require("watch"),_cat=catrequire("cat"),_fs=require("fs");module.exports=function(){var t=function(t){_cat.watch(t)};return{init:function(e){var c=this;e=e||"/home/arik/dev/projects/cat/test/test-project",e&&_watch.createMonitor(e,function(e){console.log(" -- > "+process.getuid()),e.on("created",function(e,i){e&&!_fs.existsSync(e)&&t({impl:new c.createWatch({file:e,stat:i,crud:"c"})})}),e.on("changed",function(e,i,n){i.mtime-n.mtime&&t({impl:new c.createWatch({file:e,crud:"u"})})}),e.on("removed",function(e,i){e&&_fs.existsSync(e)&&t({impl:new c.createWatch({file:e,stat:i,crud:"d"})})})})},createWatch:function(t){this.config=t,t&&(this.file=t.file,this.stat=t.stat,this.crud=t.crud),this.get=function(t){return t?this[t]:void 0},this.getConfig=function(){return this.config}}}}();
+var _watch = require("watch"),
+    _cat = catrequire("cat"),
+    _fs = require("fs");
+
+module.exports = function () {
+
+    var _apply = function(config) {
+        _cat.watch(config);
+    };
+
+    return {
+
+        init: function (path) {
+
+            var me = this;
+            path = (path || "/home/arik/dev/projects/cat/test/test-project");
+
+            if (path) {
+                _watch.createMonitor(path, function (monitor) {
+
+                    console.log(" -- > " + process.getuid());
+
+                    // monitor.files['./**/*.js'];
+
+                    monitor.on("created", function (f, stat) {
+                        // Handle new files
+                        if (f && !_fs.existsSync(f)){
+                            _apply({impl: new me.createWatch({file: f, stat: stat, "crud": "c"})});
+                        }
+                    });
+
+                    monitor.on("changed", function (f, curr, prev) {
+                        // Handle file changes
+                        if (curr.mtime - prev.mtime) {
+                            _apply({impl: new me.createWatch({file: f, "crud": "u"})});
+                        }
+                    });
+
+                    monitor.on("removed", function (f, stat) {
+                        // Handle removed files
+                        if (f && _fs.existsSync(f)){
+                            _apply({impl: new me.createWatch({file: f, stat: stat, "crud": "d"})});
+                        }
+                    });
+
+                });
+            }
+        },
+
+        /**
+         * Create a Watch class
+         *
+         * @param config The initial configuration
+         */
+        createWatch: function(config) {
+
+            this.config = config;
+
+            if (config) {
+                this.file = config.file;
+                this.stat = config.stat;
+                this.crud = config.crud;
+            }
+
+            this.get = function(key) {
+                return (key ? this[key] : undefined);
+            };
+
+            this.getConfig = function() {
+                return this.config;
+            };
+        }
+    };
+
+}();

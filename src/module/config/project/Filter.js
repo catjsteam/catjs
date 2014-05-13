@@ -1,1 +1,20 @@
-var _path=require("path");module.exports=function(t){var e=this;t&&(this.type=t.type||void 0,this.pattern=t.pattern||void 0,this.ext=t.ext||void 0,this.exclude=t.exclude||void 0,this.apply=function(t){return t.call(this,e)})};
+var _path = require("path");
+
+module.exports = function (config) {
+
+    var me = this;
+
+    if (config) {
+        this.type = (config.type || undefined);
+        this.pattern = (config.pattern || undefined);
+        this.ext = (config.ext || undefined);
+        this.exclude = (config.exclude || undefined);
+
+        this.apply = function (callback) {
+            return callback.call(this, me);
+        };
+
+
+    }
+
+};

@@ -1,0 +1,202 @@
+{
+    /**
+     * The application's namespace, used by Sencha Command to generate classes
+     */
+    "name": "KitchenSink",
+
+    /**
+     * The file path to this application's front HTML document, relative to this app.json file
+     */
+    "indexHtmlPath": "index.html",
+
+    /**
+     * The absolute URL to this application in development environment, i.e: the URL to run this application
+     * on your web browser during development, e.g: "http://localhost/myapp/index.html".
+     *
+     * This value is needed when build to resolve your application's dependencies if it requires server-side resources
+     * that are not accessible via file system protocol.
+     */
+    "url": null,
+
+    /**
+     * List of all JavaScript assets in the right execution order.
+     * Each item is an object with the following format:
+     *      {
+     *          "path": "path/to/script.js" // Path to file, if local file it must be relative to this app.json file
+     *          "remote": true              // (Optional)
+     *                                      // - Defaults to undefined (falsey) to signal a local file which will be copied
+     *                                      // - Specify true if this file is a remote file which will not to be copied
+     *          "update": "delta"           // (Optional)
+     *                                      //  - If not specified, this file will only be loaded once, and
+     *                                      //    cached inside localStorage until this value is changed.
+     *                                      //  - "delta" to enable over-the-air delta update for this file
+     *                                      //  - "full" means full update will be made when this file changes
+     *          "x-bootstrap": true         // (Optional)
+     *                                      // Indicates a development mode only dependency.
+     *                                      // These files will not be copied into the build directory or referenced
+     *                                      // in the generate app.json manifest for the micro loader.
+     *
+     *      }
+     */
+    "js": [
+        {
+            "path": "../../sencha-touch-all-debug.js",
+            "x-bootstrap": true
+        },
+        {
+            "path": "bootstrap.js",
+            "x-bootstrap": true
+        },
+        {
+            "path": "app.js",
+            "bundle": true,  /* Indicates that all class dependencies are concatenated into this file when build */
+            "update": "delta"
+        }
+    ],
+
+    /**
+     * List of all CSS assets in the right inclusion order.
+     * Each item is an object with the following format:
+     *      {
+     *          "path": "path/to/item.css" // Path to file, if local file it must be relative to this app.json file
+     *          "remote": true             // (Optional)
+     *                                     // - Defaults to undefined (falsey) to signal a local file which will be copied
+     *                                     // - Specify true if this file is a remote file which will not to be copied
+     *          "update": "delta"          // (Optional)
+     *                                     //  - If not specified, this file will only be loaded once, and
+     *                                     //    cached inside localStorage until this value is changed to either one below
+     *                                     //  - "delta" to enable over-the-air delta update for this file
+     *                                     //  - "full" means full update will be made when this file changes
+     *
+     *      }
+     */
+    "css": [
+        {
+            "path": "../../resources/css/base.css",
+            "platform": ["base"],
+            "update": "delta"
+        },
+        {
+            "path": "resources/css/sencha-touch.css",
+            "platform": ["desktop", "firefox"],
+            "exclude": ["ie10", "windows", "tizen"],
+            "theme": "Default",
+            "update": "delta"
+        },
+        {
+            "path": "resources/css/wp.css",
+            "platform": ["ie10", "windows"],
+            "theme": "Windows",
+            "update": "delta"
+        },
+        {
+            "path": "resources/css/bb10.css",
+            "platform": ["blackberry"],
+            "theme": "Blackberry",
+            "update": "delta"
+        },
+        {
+            "path": "resources/css/cupertino.css",
+            "platform": ["ios"],
+            "theme": "Cupertino",
+            "update": "delta"
+        },
+        {
+            "path": "resources/css/cupertino-classic.css",
+            "platform": ["ios-classic"],
+            "theme": "CupertinoClassic",
+            "update": "delta"
+        },
+        {
+            "path": "resources/css/mountainview.css",
+            "platform": ["android"],
+            "theme": "MountainView",
+            "update": "delta"
+        },
+        {
+            "path": "resources/css/tizen.css",
+            "platform": ["tizen"],
+            "theme": "Tizen",
+            "update": "delta"
+        }
+    ],
+
+    /**
+     * Used to automatically generate cache.manifest (HTML 5 application cache manifest) file when you build
+     */
+    "appCache": {
+        /**
+         * List of items in the CACHE MANIFEST section
+         */
+        "cache": [
+            "index.html",
+            "carregions.json",
+            "test.json",
+            "userData.json",
+            "feed.js",
+            "resources/images/circle-touch.png",
+            "resources/images/circle-performance.png",
+            "resources/images/circle-architecture.png",
+            "resources/images/circle-native.png",
+            "resources/images/circle-learn.png",
+            "resources/images/circle-touch.png",
+            "resources/images/noise.gif",
+            "resources/images/sencha_small.png"
+        ],
+        /**
+         * List of items in the NETWORK section
+         */
+        "network": [
+            "*"
+        ],
+        /**
+         * List of items in the FALLBACK section
+         */
+        "fallback": []
+    },
+
+    /**
+     * Extra resources to be copied along when build
+     */
+    "extras": [
+        "carregions.json",
+        "test.json",
+        "userData.json",
+        "feed.js",
+        "resources/images",
+        "resources/icons",
+        "resources/loading"
+    ],
+
+    /**
+     * File / directory name matchers to ignore when copying to the builds, must be valid regular expressions
+     */
+    "ignore": [
+        "\.svn$"
+    ],
+
+    /**
+     * Directory path to store all previous production builds. Note that the content generated inside this directory
+     * must be kept intact for proper generation of deltas between updates
+     */
+    "archivePath": "archive",
+
+    "buildOptions": {
+        "product": "touch",
+        "minVersion": 3,
+        "debug": false,
+        "logger": "no"
+    },
+
+    /**
+     * List of package names to require for the cmd build process
+     */
+    "requires": [
+    ],
+
+    /**
+     * Uniquely generated id for this application, used as prefix for localStorage keys.
+     * Normally you should never change this value.
+     */
+    "id": "3a867610-670a-11e1-a90e-4318029d18bb"
+}

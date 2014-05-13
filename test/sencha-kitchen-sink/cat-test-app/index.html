@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html manifest="" lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Kitchen Sink</title>
+    <script id="microloader" type="text/javascript" src=".sencha/app/microloader/development.js"></script>
+    <script src="js/jquery.js"></script>
+
+    <script src="js/jquery.mobile-1.4.0.min.js"></script>
+    <!--
+    @[scrap
+       @@name catImport
+       @@import[
+            cat/lib/cat.css
+            cat/lib/cat.js
+            cat/lib/cat.src.js
+       ]
+    ]@
+    -->
+
+    <!--
+     @[scrap
+        @@name catScriptBlock
+        @@embed true
+        @@code console.log('@Scrap test@  embed script block test');
+        @@asset ok(true, '@CAT assert test@ falsely test');
+     ]@
+-->
+</head>
+<body></body>
+</html>

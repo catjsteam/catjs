@@ -1,1 +1,129 @@
-var _log=catrequire("cat.global").log(),_path=require("path"),_props=catrequire("cat.props"),_basePlugin=catrequire("cat.plugin.base"),_utils=catrequire("cat.utils"),_emitter,_global,_data,_internalConfig,_project;module.exports=_basePlugin.ext(function(){var t=this,e={_runner:function(t){if(!t)return void 0;var r=_data.data,n=t.runner,a=t.thiz,i=_project.getRunner(),o=_project.getTargetFolder(),l=r.path?_path.join(o,r.path):o,s=r.action,u=r.set;try{n&&("start"===s?n.start.call(a,{set:u,path:l,port:r.port||_project.getPort(),runnerconfig:i},function(){_emitter.emit("job.done",{status:"done"})}):"stop"===s&&n.stop.call(a,function(){_emitter.emit("job.done",{status:"done"})}))}catch(_){_utils.error(_props.get("cat.error").format("[spawn]",_))}_emitter.removeListener("runner",e._runner)},getListeners:function(e){return t.isDisabled()?void 0:_emitter.listeners(e)},init:function(r){var n=["[spawn plugin] spawn operation disabled, No valid configuration"];r||(_log.error(n[1]),t.setDisabled(!0)),_emitter=r.emitter,_global=r.global,_data=r.data,_internalConfig=r.internalConfig,_project=_internalConfig.externalConfig.project,t.dataInit(_data),_emitter?_emitter.on("runner",e._runner):_log.warning("[Scrap plugin] No valid emitter, failed to assign listeners")},validate:function(){return{dependencies:["runner"]}}};return e});
+/**
+ * Created by retyk on 27/03/14.
+ */
+var _log = catrequire("cat.global").log(),
+    _path = require("path"),
+    _props = catrequire("cat.props"),
+    _basePlugin = catrequire("cat.plugin.base"),
+    _utils = catrequire("cat.utils"),
+
+    _emitter,
+    _global,
+    _data,
+    _internalConfig,
+    _project;
+
+
+module.exports = _basePlugin.ext(function () {
+    var _me = this,
+
+        _module = {
+
+            _runner: function(config) {
+
+                if (!config) {
+                    return undefined;
+                }
+
+                var  extensionParams = _data.data,
+                    runner = config.runner,
+                    thiz = config.thiz,
+                    runnerconfig = _project.getRunner(),
+                    basePath = _project.getTargetFolder(),
+                    path = (extensionParams.path ? _path.join(basePath, extensionParams.path) : basePath),
+                    action = extensionParams.action,
+                    set = extensionParams.set;
+
+                try {
+                    if (runner) {
+                        if (action === "start") {
+                            runner.start.call(thiz, {
+                                set: set,
+                                path: path,
+                                port: (extensionParams.port || _project.getPort()),
+                                runnerconfig: runnerconfig
+                            }, function() {
+                                _emitter.emit("job.done", {status: "done"});
+                            });
+                        } else if (action === "stop") {
+                            runner.stop.call(thiz, function() {
+                                _emitter.emit("job.done", {status: "done"});
+                            });
+                        }
+                    }
+
+                } catch (e) {
+                    _utils.error(_props.get("cat.error").format("[spawn]", e));
+                }
+
+                // we're done, remove the listener we might add another later on...
+                _emitter.removeListener("runner", _module._runner);
+
+            },
+
+            /**
+             * Get All listeners
+             *
+             * @param eventName
+             * @returns {*}
+             */
+            getListeners: function (eventName) {
+                if (_me.isDisabled()) {
+                    return undefined;
+                }
+                return _emitter.listeners(eventName);
+
+            },
+
+            /**
+             *
+             *
+             * @param config The configuration:
+             *          data - The configuration data
+             *          emitter - The emitter reference
+             *          global - The global data configuration
+             *          internalConfig - CAT internal configuration
+             */
+            init: function (config) {
+
+
+                // TODO extract messages to resource bundle with message format
+                var errors = ["[spawn plugin] spawn operation disabled, No valid configuration"];
+
+                if (!config) {
+                    _log.error(errors[1]);
+                    _me.setDisabled(true);
+                }
+
+                _emitter = config.emitter;
+                _global = config.global;
+                _data = config.data;
+                _internalConfig = config.internalConfig;
+                _project = _internalConfig.externalConfig.project;
+
+                // initial data binding to 'this'
+                _me.dataInit(_data);
+
+                // Listen to the process emitter
+                if (_emitter) {
+                    _emitter.on("runner", _module._runner);
+
+                } else {
+                    _log.warning("[Scrap plugin] No valid emitter, failed to assign listeners");
+                }
+            },
+
+            /**
+             * Validate the plugin
+             *
+             *      dependencies {Array} The array of the supported dependencies types
+             *
+             * @returns {{dependencies: Array}}
+             */
+            validate: function() {
+                return { dependencies: ["runner"]};
+            }
+        };
+
+    return _module;
+});

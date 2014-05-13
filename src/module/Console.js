@@ -1,1 +1,5 @@
-module.exports=function(){return console}();
+module.exports = function() {
+
+    return console;
+
+}();

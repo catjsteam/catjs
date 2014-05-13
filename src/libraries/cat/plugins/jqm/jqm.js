@@ -11,7 +11,52 @@ _cat.plugins.jqm = function () {
         }
         element.className = element.className + " markedElement";
         oldElement = element;
+        
     };
+
+    function _getElt(val) {
+        var sign;
+        if (_cat.utils.Utils.getType(val) === "string") {
+            val = val.trim();
+            sign = val.charAt(0);
+
+            return ($ ? $(val) : undefined);
+
+        } else if (_cat.utils.Utils.getType(val) === "object") {
+            return val;
+        }
+    }
+
+    /**
+     * Trigger an event with a given object
+     *
+     * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
+     * @param eventType {String} The event type name
+     *
+     * @private
+     */
+    function _trigger() {
+        var e, idx= 0, size,
+            args = arguments,
+            elt = (args ? _getElt(args[0]) : undefined),
+            eventType = (args ? args[1] : undefined),
+            typeOfEventArgument = _cat.utils.Utils.getType(eventType);
+
+        if (elt && eventType) {
+            if (typeOfEventArgument === "string") {
+                elt.trigger(eventType);
+
+            } else  if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
+                size = typeOfEventArgument.length;
+                for (idx=0; idx<size; idx++) {
+                    e = eventType[idx];
+                    if (e) {
+                        elt.trigger(e);
+                    }
+                }
+            }
+        }
+    }
 
     return {
 
@@ -21,11 +66,13 @@ _cat.plugins.jqm = function () {
             scrollTo: function (idName) {
 
                 $(document).ready(function(){
-                    var stop = $('#' + idName).offset().top;
-                    var delay = 1000;
+                    var elt = _getElt(idName),
+                        stop = elt.offset().top,
+                        delay = 1000;
+
                     $('body,html').animate({scrollTop: stop}, delay);
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    setBoarder( elt.eq(0)[0]);
                 });
 
             },
@@ -35,9 +82,6 @@ _cat.plugins.jqm = function () {
             scrollTop: function () {
 
                 $(document).ready(function(){
-
-
-
                     $('html, body').animate({scrollTop : 0},1000);
                 });
 
@@ -46,20 +90,24 @@ _cat.plugins.jqm = function () {
             scrollToWithRapper : function (idName, rapperId) {
 
                 $(document).ready(function(){
-                    var stop = $('#' + idName).offset().top;
-                    var delay = 1000;
-                    $('#' + rapperId).animate({scrollTop: stop}, delay);
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    var elt = _getElt(idName),
+                        stop = elt.offset().top,
+                        delay = 1000;
+
+                    _getElt(rapperId).animate({scrollTop: stop}, delay);
+                    setBoarder( _getElt(idName).eq(0)[0]);
                 });
 
             },
 
             clickRef: function (idName) {
                 $(document).ready(function(){
-                    $('#' + idName).trigger('click');
-                    window.location = $('#' + idName).attr('href');
+                    var elt = _getElt(idName);
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    elt.trigger('click');
+                    window.location = elt.attr('href');
+
+                    setBoarder( elt.eq(0)[0]);
                 });
 
             },
@@ -67,20 +115,23 @@ _cat.plugins.jqm = function () {
 
             clickButton: function (idName) {
                 $(document).ready(function(){
-                    $('.ui-btn').removeClass('ui-focus');
-                    $('#' + idName).trigger('click');
-                    $('#' + idName).closest('.ui-btn').addClass('ui-focus');
+                    var elt = _getElt(idName);
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    $('.ui-btn').removeClass('ui-focus');
+                    elt.trigger('click');
+                    elt.closest('.ui-btn').addClass('ui-focus');
+
+                    setBoarder( elt.eq(0)[0]);
                 });
 
             },
 
             selectTab: function (idName) {
                 $(document).ready(function(){
-                    $('#' + idName).trigger('click');
+                    var elt = _getElt(idName);
+                    elt.trigger('click');
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    setBoarder( elt.eq(0)[0]);
                 });
 
             },
@@ -89,34 +140,36 @@ _cat.plugins.jqm = function () {
 
             selectMenu : function (selectId, value) {
                 $(document).ready(function(){
+                    var elt = _getElt(selectId);
                     if (typeof value === 'number') {
-                        $("#" + selectId + " option[value=" + value + "]").attr('selected','selected');
+                        elt.find(" option[value=" + value + "]").attr('selected','selected');
                     } else if (typeof value === 'string') {
-                        $("#" + selectId + " option[id=" + value + "]").attr('selected','selected');
+                        elt.find(" option[id=" + value + "]").attr('selected','selected');
                     }
-                    $( "#" + selectId).selectmenu("refresh", true);
+                    elt.selectmenu("refresh", true);
 
-                    setBoarder( $('#' + selectId).eq(0)[0]);
+                    setBoarder( elt.eq(0)[0]);
                 });
 
             },
 
 
-
             swipeItemLeft : function(idName) {
                 $(document).ready(function(){
-                    $("#" + idName).swipeleft();
+                    var elt = _getElt(idName);
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    elt.swipeleft();
+                    setBoarder( elt.eq(0)[0]);
                 });
             },
 
 
             swipeItemRight : function(idName) {
                 $(document).ready(function(){
-                    $("#" + idName).swiperight();
+                    var elt = _getElt(idName);
+                    elt.swiperight();
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    setBoarder( elt.eq(0)[0]);
                 });
             },
 
@@ -142,38 +195,57 @@ _cat.plugins.jqm = function () {
 
             click: function (idName) {
                 $(document).ready(function(){
-                    $('#' + idName).trigger('click');
+                    var elt = _getElt(idName);
+                    elt.trigger('click');
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    setBoarder( elt.eq(0)[0]);
                 });
 
             },
 
             setCheck: function (idName) {
                 $(document).ready(function(){
-                    $("#"+ idName).prop("checked",true).checkboxradio("refresh");
+                    var elt = _getElt(idName);
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    elt.prop("checked",true).checkboxradio("refresh");
+                    setBoarder( elt.eq(0)[0]);
                 });
 
             },
 
             slide : function (idName, value) {
                 $(document).ready(function(){
-                    $("#"+ idName).val(value).slider("refresh");
+                    var elt = _getElt(idName);
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    elt.val(value).slider("refresh");
+                    setBoarder( elt.eq(0)[0]);
                 });
             },
 
             setText : function (idName, value) {
                 $(document).ready(function(){
-                    $("#"+ idName).focus();
-                    $("#"+ idName).val(value);
-                    $("#"+ idName).trigger( 'change' );
-                    $("#"+ idName).blur();
+                    var elt = _getElt(idName);
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    _trigger(elt, "mouseenter");
+                    _trigger(elt, "mouseover");
+                    _trigger(elt, "mousemove");
+                    _trigger(elt, "focus");
+                    _trigger(elt, "mousedown");
+                    _trigger(elt, "mouseup");
+                    _trigger(elt, "click");
+                    elt.val(value);
+                    _trigger(elt, "keydown");
+                    _trigger(elt, "keypress");
+                    _trigger(elt, "input");
+                    _trigger(elt, "keyup");
+                    _trigger(elt, "mousemove");
+                    _trigger(elt, "mouseleave");
+                    _trigger(elt, "mouseout");
+                    _trigger(elt, "blur");
+
+
+
+                    setBoarder( elt.eq(0)[0]);
                 });
             },
 
@@ -192,12 +264,33 @@ _cat.plugins.jqm = function () {
 
             collapsible : function(idName) {
                 $(document).ready(function(){
-                    $('#' + idName).children( ".ui-collapsible-heading" ).children(".ui-collapsible-heading-toggle").click();
+                    var elt = _getElt(idName);
 
-                    setBoarder( $('#' + idName).eq(0)[0]);
+                    elt.children( ".ui-collapsible-heading" ).children(".ui-collapsible-heading-toggle").click();
+                    setBoarder( elt.eq(0)[0]);
                 });
 
+            },
+
+            backClick : function () {
+                $(document).ready(function(){
+                    $('[data-rel="back"]')[0].click();
+                });
+            },
+
+            searchInListView : function (listViewId, newValue) {
+                $(document).ready(function(){
+                    var elt = _getElt(listViewId),
+                        listView = elt[0],
+                        parentElements = listView.parentElement.children,
+                        form = parentElements[$.inArray( listView, parentElements ) - 1];
+
+                    $( form ).find( "input" ).focus();
+                    $( form ).find( "input" ).val(newValue);
+                    $( form ).find( "input" ).trigger( 'change' );
+                });
             }
+
 
         }
 

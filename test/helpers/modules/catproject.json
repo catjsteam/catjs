@@ -1,0 +1,47 @@
+{
+    "name": "test-bundle",
+
+    "env": {
+        "source": "src/",
+        "target": "target/",
+        "lib": {
+            "name": "cat.test",
+            "source": "lib/",
+            "target": "lib/target/",
+            "copyto": "./target/test-bundle/"
+        }
+    },
+
+    "dependencies": [
+        {
+            "name": "dependency.loader",
+            "type": "loader",
+            "path": ["./plugins/"]
+        }
+    ],
+
+    "plugins": [
+        {
+            "name": "target.libraries",
+            "type": "libraries",
+            "dependency": "dependency.loader",
+            "imports": ["cat", "chai"],
+            "action": "install"
+        }, {
+            "name": "target.libraries.clean",
+            "type": "libraries",
+            "dependency": "dependency.loader",
+            "imports": ["cat", "chai"],
+            "action": "clean"
+        }
+    ],
+
+    "tasks": [
+        {
+            "name": "lib",
+            "plugins":["target.libraries"]
+        }
+    ]
+
+
+}
