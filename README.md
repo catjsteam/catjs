@@ -2,6 +2,7 @@ CATJS 0.1.6
 ==============
 
 *CATJS* is an automation framework for (mobile) web applications testing.
+It offers a new technology that makes testing easy, we don't do WebDriver like the other technologies, in our case the applications test themselves.
 With simple annotations added to your HTML5 code, an automated functional tests will be available as part of your application lifecycle.
 
 ### Code once, deploy it anywhere <br/>
