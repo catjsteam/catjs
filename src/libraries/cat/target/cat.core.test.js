@@ -21,7 +21,9 @@ _cat.core = function () {
             ALL: "all"
         },
         _getBase,
-        _getBaseUrl;
+        _getBaseUrl,
+        _runModeValidation,
+        _runModeValidationRetry=0;
 
     _getBase="/";
 
@@ -78,11 +80,14 @@ _cat.core = function () {
             i, size,
             validate= 0,
             tempInfo,
-            reportFormats;
+            testsNames = [],
+            testsname;
 
         if (tests && scrapName) {
             size = tests.length;
             for (i = 0; i < size; i++) {
+                testsname = tests[i].name;
+                testsNames.push(testsname);
                 if (tests[i].name === scrapName) {
                     tempInfo = {"name": tests[i].name,
                         "scenario": tests[i].scenario,
@@ -96,15 +101,21 @@ _cat.core = function () {
             }
         }
 
+        if (!_cat.core.ui.isOpen()) {
+            _cat.core.ui.on();
+        }
+
         if (!validate) {
-            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName +"'. Check your cat.json project");
-            if (!_cat.core.ui.isOpen()) {
-                _cat.core.ui.on();
-            }
-            if (_config.isReport()) {
-                reportFormats = _config.getReportFormats();
-            }
-            _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: " CAT project configuration error (cat.json), Failed to match a scrap named: '" + scrapName +"'"});
+            _log.log("[CAT Info] skipping scrap: '" + scrapName + ";  Not included in the test project: [ " + (tests && testsNames ? testsNames.join(", ") : "" ) +  "]");
+            /*
+                if (!_cat.core.ui.isOpen()) {
+                    _cat.core.ui.on();
+                }
+                if (_config.isReport()) {
+                    reportFormats = _config.getReportFormats();
+                }
+                _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: " CAT project configuration error (cat.json), Failed to match a scrap named: '" + scrapName +"'"});
+            */
         }
         return scrapTests;
     };
@@ -154,6 +165,10 @@ _cat.core = function () {
                     return pkgName;
                 }
                 _scraps[pkgName] = new _Scrap(config);
+            },
+
+            getAll: function() {
+                return _scraps;
             }
         };
 
@@ -251,7 +266,8 @@ _cat.core = function () {
             configText,
             me = this,
             url, catjson = "cat/config/cat.json",
-            baseurl = _getBaseUrl();
+            baseurl = _getBaseUrl(),
+            tests, testManager;
 
         try {
             if (baseurl && baseurl.charAt(baseurl.length-1) !== "/") {
@@ -289,6 +305,7 @@ _cat.core = function () {
                     return  document.location.hostname;
                 }
             };
+
             this.getPort = function () {
                 if (innerConfig.port) {
                     return innerConfig.port;
@@ -296,7 +313,6 @@ _cat.core = function () {
                     return  document.location.port;
                 }
             };
-
 
             this.getTests = function () {
 
@@ -307,7 +323,19 @@ _cat.core = function () {
             };
 
             this.getRunMode = function () {
-                return innerConfig["run-mode"];
+                return (innerConfig["run-mode"] || "all");
+            };
+
+            this.getTimeout = function () {
+                var timeout = innerConfig["test-failure-timeout"];
+                if (timeout) {
+                    timeout = parseInt(timeout);
+                    if (isNaN(timeout)) {
+                        timeout = 30;
+                    }
+                }
+                timeout = timeout * 1000;
+                return timeout;
             };
 
             this.isReportType = function(key) {
@@ -331,6 +359,7 @@ _cat.core = function () {
 
                 return this.isReportType("junit");
             };
+
             this.isConsoleSupport = function() {
 
                 return this.isReportType("console");
@@ -378,6 +407,36 @@ _cat.core = function () {
 
                 return false;
             };
+
+            /*  take care of run-mode === tests
+                we need to make sure that it get to run */
+            if (this.getRunMode() === _enum.TEST_MANAGER) {
+                tests = this.getTests();
+                if (tests) {
+                    testManager = (tests[tests.length-1].name || "NA");
+                }
+                _runModeValidation = setInterval(function() {
+                    var reportFormats,
+                        err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
+
+                    if (_runModeValidationRetry < 3) {
+                        _log.log("[CAT] run-mode=tests waiting for catjs manager: '" + testManager + "' .... retry");
+                        _runModeValidationRetry++;
+
+                    } else {
+                        clearInterval(_runModeValidation);
+                        _log.log("[CAT] " + err);
+                        if (!_cat.core.ui.isOpen()) {
+                            _cat.core.ui.on();
+                        }
+                        if (_config.isReport()) {
+                            reportFormats = _config.getReportFormats();
+                        }
+                        _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: err});
+
+                    }
+                }, this.getTimeout() / 3);
+            }
         }
 
         this.hasPhantom = function () {
@@ -651,7 +710,9 @@ _cat.core = function () {
                 pkgname, args = arguments,
                 catConfig = _cat.core.getConfig(),
                 tests = catConfig ? catConfig.getTests() : [],
-                storageEnum = _cat.utils.Storage.enum;
+                storageEnum = _cat.utils.Storage.enum,
+                managerScrap, tempScrap,
+                i, j;
 
 
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
@@ -679,7 +740,11 @@ _cat.core = function () {
                     addScrapToManager(scrapsTestsInfo, scrap);
 
                     if (testNumber === 0) {
-                        var managerScrap = managerScraps[managerScraps.length - 1];
+                        managerScrap = managerScraps[managerScraps.length - 1];
+
+                        // clear run-mode validation
+                        clearInterval(_runModeValidation);
+
 
                         managerScrap.scrap.catui = ["on"];
                         managerScrap.scrap.manager = ["true"];
@@ -691,11 +756,11 @@ _cat.core = function () {
                         } else {
 
 
-                            for (var i = 0; i < managerScraps.length; i++) {
-                                var tempScrap = managerScraps[i];
+                            for (i = 0; i < managerScraps.length; i++) {
+                                tempScrap = managerScraps[i];
                                 _cat.core.setManager(managerScrap.scrap.name[0], tempScrap.pkgName);
                                 // set number of repeats for scrap
-                                for (var j = 0; j < tempScrap.repeat; j++) {
+                                for (j = 0; j < tempScrap.repeat; j++) {
                                     _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.delay);
                                 }
                             }
@@ -801,7 +866,7 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                _log.log("Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
+                _log.log("[CAT] Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
         },
