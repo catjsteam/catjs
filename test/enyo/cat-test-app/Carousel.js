@@ -117,7 +117,7 @@ enyo.kind({
            @[scrap
                 @@name letsGo
                 @@context btn
-                @@enyo waterfall(btn, 'ontap')
+                @@enyo waterfall(btn, "ontap")
                 @@assert ok(true, "Fake test")
            ]@
 

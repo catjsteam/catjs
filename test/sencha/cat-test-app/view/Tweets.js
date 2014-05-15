@@ -24,7 +24,7 @@
          @[scrap
              @@name catSenchaText
              @@context emailField
-             @@sencha setText(emailField, 'this is a check');
+             @@sencha setText(emailField, "this is a check");
              @@assert ok(true, "@CAT Assertion 2");
          ]@
          */
