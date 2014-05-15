@@ -1,14 +1,26 @@
 ************ Node Modules usage
-(i) init (s) scrap (j) inject
-catcli -isj
+(i) init
+(b) build
+(s) local catjs server
+(c) clean
+(r) runner
+(t) phantom tests
+(m) mobile tests
 
+catcli -cbs
 
 
 ************ CAT Phantom test usage
-    cat command:  catcli -t
+$catcli -t
 
 ************ CAT Mobile test usage
-    cat command:  catcli -m
+$catcli -m
+
+
+NPM Test
+==============================================
+$npm test (build and runt all the involves tests applications)
+$sudo node ./test/test.js clean (cleans  all the involves tests applications)
 
 
 Install CAT as NPM for development environment
@@ -42,8 +54,9 @@ create catcli.cmd file under folder: C:\Users\[windows user]\AppData\Roaming\npm
   node  "[path_to_catcli_file]\catcli" %*
 )
 
+======================================= Code Examples
 
-== As a Module
+== CATJS Module Example
  var log = require("./src/module/CATGlob.js").log(),
             isasync;
 
