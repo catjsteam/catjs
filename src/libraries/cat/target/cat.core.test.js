@@ -88,8 +88,8 @@ _cat.core = function () {
             for (i = 0; i < size; i++) {
                 testsname = tests[i].name;
                 testsNames.push(testsname);
-                if (tests[i].name === scrapName) {
-                    tempInfo = {"name": tests[i].name,
+                if (testsname === scrapName) {
+                    tempInfo = {"name": testsname,
                         "scenario": tests[i].scenario,
                         "wasRun": tests[i].wasRun,
                         "delay" : tests[i].delay,
@@ -107,15 +107,6 @@ _cat.core = function () {
 
         if (!validate) {
             _log.log("[CAT Info] skipping scrap: '" + scrapName + ";  Not included in the test project: [ " + (tests && testsNames ? testsNames.join(", ") : "" ) +  "]");
-            /*
-                if (!_cat.core.ui.isOpen()) {
-                    _cat.core.ui.on();
-                }
-                if (_config.isReport()) {
-                    reportFormats = _config.getReportFormats();
-                }
-                _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: " CAT project configuration error (cat.json), Failed to match a scrap named: '" + scrapName +"'"});
-            */
         }
         return scrapTests;
     };
@@ -2520,7 +2511,15 @@ _cat.plugins.jqm = function () {
 
                     setBoarder( elt.eq(0)[0]);
                 });
+            },
 
+            tap: function (idName) {
+                $(document).ready(function(){
+                    var elt = _getElt(idName);
+                    elt.trigger('tap');
+
+                    setBoarder( elt.eq(0)[0]);
+                });
             },
 
             setCheck: function (idName) {
