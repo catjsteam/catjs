@@ -1,6 +1,7 @@
 function test(config, callback) {
 
-    var currentpath;
+    var currentpath,
+        catjsmain;
 
     if (config && config.dir) {
         process.chdir(config.dir);
@@ -8,7 +9,14 @@ function test(config, callback) {
 
     currentpath = require("path").resolve(".");
     console.log(config.name + " directory: ", currentpath);
-    var catjsmain = require(require("path").join(currentpath, "/../../src/module/CATCli.js"));
+
+    if (!config.init) {
+        // clean the project
+        require("wrench").rmdirSyncRecursive('./cat-project',{ forceDelete: true});
+        process.send({status: "done"});
+    }
+
+    catjsmain = require(require("path").join(currentpath, "/../../src/module/CATCli.js"));
 
     catjsmain.init({
         init: "cat",
@@ -23,7 +31,7 @@ function test(config, callback) {
         },
         callback: function () {
 
-            var catjs =  require(require("path").join(currentpath, "/../../src/module/CATCli.js"));
+            var catjs = require(require("path").join(currentpath, "/../../src/module/CATCli.js"));
 
             // TODO add copy resources module
             if (config.name === "enyo") {
@@ -37,11 +45,11 @@ function test(config, callback) {
                 process.chdir('./cat-project');
                 catjs.init({
                     task: config.tasks,
-                    taskcb: function(task) {
+                    taskcb: function (task) {
                         if (task && task === "t@runner.start") {
 
                             console.log("[CAT build] waiting 30 seconds");
-                            setTimeout(function() {
+                            setTimeout(function () {
 
 //                                process.chdir('./..');
 //                                require("fs.extra").rmrf('./cat-project', function (err) {
@@ -50,11 +58,11 @@ function test(config, callback) {
 //                                    }
 
 
-                                    if (callback) {
-                                        callback.call();
-                                    }
+                                if (callback) {
+                                    callback.call();
+                                }
 
-                                    process.send({status: "done"});
+                                process.send({status: "done"});
 
 //                                });
 
@@ -73,15 +81,15 @@ function test(config, callback) {
 
 module.exports = function () {
     return {
-        test: function() {
+        test: function () {
 
-            process.on('message', function(args) {
+            process.on('message', function (args) {
                 console.log("Arguments: ", args);
                 test(args);
             });
 
         },
-        run: function(entity) {
+        run: function (entity) {
             var testmodule = require("./test.js");
 
             testmodule.run(entity);

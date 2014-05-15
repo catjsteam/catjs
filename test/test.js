@@ -1,4 +1,5 @@
-var child_process = require('child_process'),
+var args = process.argv.slice(2),
+    child_process = require('child_process'),
     testdata = [
         {
             name: "sencha",
@@ -26,6 +27,12 @@ function task(counter) {
     tests[counter] = child_process.fork("./build.js", ["all"], {
         cwd: data.cwd
     });
+
+    if (args && args[0] && args[0] === "clean") {
+        data.init = false;
+    } else {
+        data.init = true;
+    }
     tests[counter].send(data);
     tests[counter].on ("message", function (obj){
        if (obj.status === "done") {
