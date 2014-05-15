@@ -22,184 +22,209 @@ module.exports = function () {
                 single: false,
 
                 func: function (config) {
+
                     var jqmRows,
-                        jqm,
                         me = this,
-                        validcode = false;
+                        generate = function (jqmRow) {
+
+                            var jqm;
+                            jqmRow = _utils.prepareCode(jqmRow);
+
+                            if (jqmRow && jqmRow.join) {
+                                jqm = jqmRow.join("\n");
+                            } else {
+                                jqm = jqmRow;
+                            }
+
+                            if (jqm) {
+
+                                var match = _scraputils.generate({
+                                    api: "scrollTo",
+                                    apiname: "scrollTo",
+                                    exp: jqm
+                                });
+
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "scrollToWithRapper",
+                                        apiname: "scrollToWithRapper",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "tap",
+                                        apiname: "tap",
+                                        exp: jqm
+                                    });
+                                }
+
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "clickRef",
+                                        apiname: "clickRef",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "click",
+                                        apiname: "click",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "clickButton",
+                                        apiname: "clickButton",
+                                        exp: jqm
+                                    });
+                                }
+
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "setCheck",
+                                        apiname: "setCheck",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "slide",
+                                        apiname: "slide",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "setText",
+                                        apiname: "setText",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "checkRadio",
+                                        apiname: "checkRadio",
+                                        exp: jqm
+                                    });
+                                }
+
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "scrollTop",
+                                        apiname: "scrollTop",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "collapsible",
+                                        apiname: "collapsible",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "selectMenu",
+                                        apiname: "selectMenu",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "selectTab",
+                                        apiname: "selectTab",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "swipeItemRight",
+                                        apiname: "swipeItemRight",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "swipeItemLeft",
+                                        apiname: "swipeItemLeft",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "swipePageRight",
+                                        apiname: "swipePageRight",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "swipePageLeft",
+                                        apiname: "swipePageLeft",
+                                        exp: jqm
+                                    });
+                                }
+
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "backClick",
+                                        apiname: "backClick",
+                                        exp: jqm
+                                    });
+                                }
+                                if (!match) {
+                                    match = _scraputils.generate({
+                                        api: "searchInListView",
+                                        apiname: "searchInListView",
+                                        exp: jqm
+                                    });
+                                }
+
+
+                                if (match) {
+                                    me.print("_cat.core.plugin('jqm').actions." + match);
+                                }
+
+                            }
+                        };
 
                     jqmRows = this.get("jqm");
-                    var scrapConf = me.config;
+                    var scrapConf = me.config,
+                        scrap = scrapConf,
+                        scrapName;
 
                     if (jqmRows) {
-                        _utils.prepareCode(jqmRows);
-                        jqm = jqmRows.join("\n");
-                        var scrap = scrapConf,
-                            scrapName = (scrap.name ? scrap.name[0] : undefined);
+                        scrap = scrapConf;
+                        scrapName = (scrap.name ? scrap.name[0] : undefined);
 
-                        if (jqm) {
-
-                            me.print("_cat.core.ui.setContent({style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqm + "',tips: ''});");
-
-                            var match = _scraputils.generate({
-                                api: "scrollTo",
-                                apiname: "scrollTo",
-                                exp: jqm
-                            });
-
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "scrollToWithRapper",
-                                    apiname: "scrollToWithRapper",
-                                    exp: jqm
-                                });
-                            }
-
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "clickRef",
-                                    apiname: "clickRef",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "click",
-                                    apiname: "click",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "clickButton",
-                                    apiname: "clickButton",
-                                    exp: jqm
-                                });
-                            }
-
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "setCheck",
-                                    apiname: "setCheck",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "slide",
-                                    apiname: "slide",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "setText",
-                                    apiname: "setText",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "checkRadio",
-                                    apiname: "checkRadio",
-                                    exp: jqm
-                                });
-                            }
-
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "scrollTop",
-                                    apiname: "scrollTop",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "collapsible",
-                                    apiname: "collapsible",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "selectMenu",
-                                    apiname: "selectMenu",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "selectTab",
-                                    apiname: "selectTab",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "swipeItemRight",
-                                    apiname: "swipeItemRight",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "swipeItemLeft",
-                                    apiname: "swipeItemLeft",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "swipePageRight",
-                                    apiname: "swipePageRight",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "swipePageLeft",
-                                    apiname: "swipePageLeft",
-                                    exp: jqm
-                                });
-                            }
-
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "backClick",
-                                    apiname: "backClick",
-                                    exp: jqm
-                                });
-                            }
-                            if (!match) {
-                                match = _scraputils.generate({
-                                    api: "searchInListView",
-                                    apiname: "searchInListView",
-                                    exp: jqm
-                                });
-                            }
-
-
-
-                            if (match) {
-                                me.print("_cat.core.plugin('jqm').actions."+ match);
-                            }
-
+                        if (jqmRows && jqmRows.join) {
+                            me.print("_cat.core.ui.setContent({style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqmRows + "',tips: ''});");
                         }
+
+                        jqmRows.forEach(function (jqmRow) {
+                            if (jqmRow) {
+                                generate(jqmRow);
+                            }
+                        });
                     }
                 }
             });

@@ -200,7 +200,15 @@ _cat.plugins.jqm = function () {
 
                     setBoarder( elt.eq(0)[0]);
                 });
+            },
 
+            tap: function (idName) {
+                $(document).ready(function(){
+                    var elt = _getElt(idName);
+                    elt.trigger('tap');
+
+                    setBoarder( elt.eq(0)[0]);
+                });
             },
 
             setCheck: function (idName) {
