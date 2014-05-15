@@ -80,13 +80,12 @@ module.exports = function () {
 
                     var codeRows,
                         code,
-                        me = this,
-                        validcode = false;
+                        me = this;
 
                     codeRows = this.get("code");
 
                     if (codeRows) {
-                        _utils.prepareCode(codeRows);
+                        codeRows = _utils.prepareCode(codeRows);
                         code = codeRows.join("\n");
 
                         if (code) {
@@ -143,8 +142,8 @@ module.exports = function () {
                     logRow = this.get("log");
 
                     if (logRow) {
-                        _utils.prepareCode(logRow);
 
+                        logRow = _utils.prepareCode(logRow);
                         code = ['console.log(', logRow, ");"];
 
                         me.print(_tplutils.template({

@@ -225,16 +225,33 @@ module.exports = function () {
          * @param codeRows
          */
         prepareCode: function (codeRows) {
-            var row, rowTrimmed, size = (codeRows ? codeRows.length : 0), idx = 0;
+            var row,
+                size = (codeRows && _typedas.isArray(codeRows) ? codeRows.length : 0), idx = 0;
 
-            for (; idx < size; idx++) {
-                row = codeRows[idx];
+            function _row(row, ref, idx) {
+                var rowTrimmed;
+
                 if (row) {
-                    rowTrimmed = row.trim();
-                    if (rowTrimmed.indexOf(";") !== rowTrimmed.length - 1) {
-                        codeRows[idx] += ";";
+                    rowTrimmed = (row.trim ? row.trim() : row);
+                    if (rowTrimmed.charAt(rowTrimmed.length - 1) !== ";") {
+                        if (idx) {
+                            ref[idx] += ";";
+                        } else {
+                            ref += ";"
+                        }
                     }
                 }
+
+                return ref;
+            }
+
+            if (size) {
+                for (; idx < size; idx++) {
+                    row = codeRows[idx];
+                    codeRows = _row(row, codeRows, idx);
+                }
+            } else {
+                codeRows = _row(codeRows, codeRows);
             }
 
             return codeRows;

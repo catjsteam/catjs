@@ -285,6 +285,7 @@ module.exports = _basePlugin.ext(function () {
                                     data: {param1: param1.join(",")}
                                 }
                             );
+                            content = (_utils.prepareCode(content) || "");
                         } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
                             // Embed Javascript block for HTML file
                             content = _tplutils.template({
@@ -302,10 +303,10 @@ module.exports = _basePlugin.ext(function () {
 
                             // Inject the scrap line to the file untouched
                             content = scraplcl.generate();
+                            content = (_utils.prepareCode(content) || "");
 
                         }
 
-                        content = (_utils.prepareCode(content) || "");
                         if (prevCommentInfo) {
                             line = [line.substring(0, prevCommentInfo.end.col), content , line.substring(prevCommentInfo.end.col, line.length)].join("");
                         } else {

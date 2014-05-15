@@ -34,7 +34,7 @@ module.exports = function () {
                     mockRows = this.get("mock");
 
                     if (mockRows) {
-                        _utils.prepareCode(mockRows);
+                        mockRows = _utils.prepareCode(mockRows);
                         mock = mockRows.join("\n");
 
 

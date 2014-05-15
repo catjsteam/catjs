@@ -30,7 +30,7 @@ module.exports = function () {
                     var scrapConf = me.config;
 
                     if (domRows) {
-                        _utils.prepareCode(domRows);
+                        domRows = _utils.prepareCode(domRows);
                         dom = domRows.join("\n");
                         var scrap = scrapConf,
                             scrapName = (scrap.name ? scrap.name[0] : undefined);
