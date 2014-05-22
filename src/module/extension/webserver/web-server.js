@@ -9,6 +9,7 @@ var _http = require("http"),
     _server,
     _utils  = catrequire("cat.utils"),
      _winston = require('winston'),
+    _projectmanager = require('../projectmanager/action'),
     vars = {
         assert: require('./CatObjects/assert')
     };
@@ -100,6 +101,14 @@ var webserver  = function() {
                 res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
                 res.send('{"exit": 1}');
                 process.exit(1);
+            });
+
+            _server.get('/scraps', function(req, res){
+                if (req.query && req.query.scrap) {
+                    _projectmanager.checkScrap(req,res);
+                } else {
+                    res.send({"error" : "invalid"} );
+                }
 
             });
 

@@ -64,7 +64,7 @@ _cat.utils.AJAX = function () {
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         // _cat.core.log("completed\n" + xmlhttp.responseText);
                         if ("callback" in config && config.callback) {
-                            config.callback.call(xmlhttp);
+                            config.callback.call(this, xmlhttp);
                         }
                     }
                 };
