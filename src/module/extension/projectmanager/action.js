@@ -11,12 +11,13 @@ var readProject  = function() {
         scrapsObj,
         mainProject,
         scrapsOrder,
-        resQueue,
         emptyQueue,
         getScrap,
-        scrapReadyIndex;
 
-    scrapReadyIndex = 0;
+        devicesTests;
+
+    devicesTests = {};
+
     globalTests = [];
     scrapsObj = {};
 
@@ -126,36 +127,50 @@ var readProject  = function() {
         }
     })();
 
-    resQueue = [];
-    emptyQueue = function() {
 
-        var tempQueue = [];
+    emptyQueue = function(testId) {
 
-        for (var indexRes in resQueue) {
-            var scrapElement = resQueue[indexRes];
+        var tempQueue = [],
+            testsConfig = devicesTests[testId],
+            tests = testsConfig.tests,
+            resQueue = testsConfig.resQueue,
+            indexRes,
+            result,
+            scrapElement,
+            scrapReadyIndex = testsConfig.scrapReadyIndex;
+
+        for (indexRes in resQueue) {
+            scrapElement = resQueue[indexRes];
             if (scrapElement.scrap.index <= scrapReadyIndex) {
 
-                globalTests[scrapElement.scrap.index].run = true;
+                tests[scrapElement.scrap.index].run = true;
 
-                var result = {"readyScrap " : globalTests[scrapReadyIndex],
-                    "scrapInfo" : globalTests[scrapElement.scrap.index]};
+                result = {
+                    "readyScrap " : tests[scrapReadyIndex],
+                    "scrapInfo" : tests[scrapElement.scrap.index]
+                };
 
                 scrapElement.response.send(result);
                 scrapReadyIndex++;
+                devicesTests[testId].scrapReadyIndex = scrapReadyIndex;
+
             } else {
                 tempQueue.push(scrapElement);
             }
 
         }
-        resQueue = tempQueue;
+        devicesTests[testId].resQueue = tempQueue;
 
     }
 
 
-    getScrap = function(scrapName) {
+    getScrap = function(scrapName, testId) {
+        var indexTests,
+            tests = devicesTests[testId].tests,
+            tempScrap;
 
-        for (var indexGlobal in globalTests) {
-            var tempScrap = globalTests[indexGlobal];
+        for (indexTests in tests) {
+            tempScrap = tests[indexTests];
             if (tempScrap.name == scrapName && !(tempScrap.run)) {
                 return tempScrap;
             }
@@ -176,32 +191,52 @@ var readProject  = function() {
         checkScrap : function(req, res) {
             var scrapName,
                 scrap,
-                result;
+                result,
+                testId,
+                currTest,
+                currReadyIndex,
+                testsConfig,
+                cloneGlobalTests;
 
+            testId = req.query.testId;
+            if (!devicesTests[testId]) {
+                cloneGlobalTests = JSON.parse(JSON.stringify(globalTests));
+                devicesTests[testId] = {
+                    "scrapReadyIndex" : 0,
+                    "tests" : cloneGlobalTests,
+                    "resQueue" : []
+                }
+            }
+
+            testsConfig = devicesTests[testId];
             if (req.query && req.query.scrap && scrapsObj[req.query.scrap]) {
 
                 scrapName  = req.query.scrap;
-                scrap = getScrap(scrapName);
+                scrap = getScrap(scrapName, testId);
 
-                globalTests[scrap.index].signed = true;
+                // test data for the test id
+                currTest = testsConfig.tests;
+                currTest[scrap.index].signed = true;
+                currReadyIndex = testsConfig.scrapReadyIndex;
+
                 // if this is the next scrap
-                if (scrap.index <= scrapReadyIndex) {
-                    globalTests[scrap.index].run = true;
+                if (scrap.index <= currReadyIndex) {
+                    currTest[scrap.index].run = true;
 
                     result = {
-                        "readyScrap" : globalTests[scrapReadyIndex],
-                        "scrapInfo" : globalTests[scrap.index]
+                        "readyScrap" : currTest[currReadyIndex],
+                        "scrapInfo" : currTest[scrap.index]
                     };
 
                     res.send(result);
-                    scrapReadyIndex++;
+                    devicesTests[testId].scrapReadyIndex++;
 
-                    emptyQueue();
+                    emptyQueue(testId);
 
                 } else {
 
-                    resQueue.push({
-                        "scrap" : globalTests[scrap.index],
+                    testsConfig.resQueue.push({
+                        "scrap" : currTest[scrap.index],
                         "request" : req,
                         "response" : res
                     });

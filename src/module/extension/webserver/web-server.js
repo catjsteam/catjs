@@ -60,7 +60,7 @@ var webserver  = function() {
             var logger = new (_winston.Logger)({
                 transports: [
                    //new (_winston.transports.Console)({ level: 'verbose', json: false}),
-                    new (_winston.transports.File)({ filename: 'express_server.log',  level: 'verbose', json: false })
+                    new (_winston.transports.File)({ filename: 'express_server.log',  level: 'info', json: false })
                 ]
             });
 
@@ -104,7 +104,8 @@ var webserver  = function() {
             });
 
             _server.get('/scraps', function(req, res){
-                if (req.query && req.query.scrap) {
+                if (req.query && req.query.scrap
+                        && req.query.testId) {
                     _projectmanager.checkScrap(req,res);
                 } else {
                     res.send({"error" : "invalid"} );

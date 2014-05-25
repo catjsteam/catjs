@@ -11,6 +11,8 @@ _cat.core.clientmanager = function () {
             infoIndex,
             repeatIndex;
 
+
+
         scrapInfoArr = getScrapTestInfo(scrap.name[0]);
 
         for (infoIndex in scrapInfoArr) {
@@ -62,22 +64,39 @@ _cat.core.clientmanager = function () {
         return scrapTests;
     };
 
+    var checkIfExists = function(scrapName, tests) {
+
+        var indexScrap;
+        for (indexScrap in tests) {
+            if (tests[indexScrap].name === scrapName) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     return {
-        signScrap : function(scrap, args, _tests) {
+        signScrap : function(scrap, catConfig, args, _tests) {
             var urlAddress,
                 config;
 
             tests = _tests;
-            urlAddress = "http://localhost:8089/scraps?scrap=" + scrap.name[0];
-            config = {
-                url : urlAddress,
-                callback : function(xmlrequest) {
-                    var response = JSON.parse(xmlrequest.responseText);
-                    commitScrap(scrap, args, response);
-                }
-            };
 
-            _cat.utils.AJAX.sendRequestAsync(config);
+            if (checkIfExists(scrap.name[0], tests)) {
+
+                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrap.name[0] + "&" + "testId=" + _cat.core.guid();
+
+                config = {
+                    url : urlAddress,
+                    callback : function() {
+                        var response = JSON.parse(this.responseText);
+                        commitScrap(scrap, args, response);
+                    }
+                };
+
+                _cat.utils.AJAX.sendRequestAsync(config);
+            }
+
         }
     };
 }();
