@@ -19,7 +19,7 @@ _cat.core = function () {
         _enum = {
             TEST_MANAGER: "tests",
             ALL: "all",
-            SLAVE_MANAGER : "slave"
+            TEST_MANAGER_OFFLINE : "offline"
         },
         _getBase,
         _getBaseUrl,
@@ -706,11 +706,11 @@ _cat.core = function () {
                 managerScrap, tempScrap,
                 i, j;
 
-            if ((catConfig) && (catConfig.getRunMode() === _enum.SLAVE_MANAGER)) {
-                _cat.core.clientmanager.signScrap(scrap, arguments, tests);
+            if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
+                _cat.core.clientmanager.signScrap(scrap, catConfig, arguments, tests);
 
             } else {
-                if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
+                if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER_OFFLINE)) {
                     // check if the test name is in the cat.json
                     var scrapsTestsInfo = getScrapTestInfo(tests, scrap.name[0]);
 
