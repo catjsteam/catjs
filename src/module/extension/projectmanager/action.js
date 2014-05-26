@@ -146,7 +146,7 @@ var readProject  = function() {
                 tests[scrapElement.scrap.index].run = true;
 
                 result = {
-                    "readyScrap " : tests[scrapReadyIndex],
+                    "readyScrap" : tests[scrapReadyIndex],
                     "scrapInfo" : tests[scrapElement.scrap.index]
                 };
 
@@ -199,7 +199,8 @@ var readProject  = function() {
                 cloneGlobalTests;
 
             testId = req.query.testId;
-            if (!devicesTests[testId]) {
+            if (!devicesTests[testId] ||
+                (devicesTests[testId] && globalTests.length === devicesTests[testId].scrapReadyIndex)) {
                 cloneGlobalTests = JSON.parse(JSON.stringify(globalTests));
                 devicesTests[testId] = {
                     "scrapReadyIndex" : 0,
@@ -215,9 +216,10 @@ var readProject  = function() {
                 scrap = getScrap(scrapName, testId);
 
                 // test data for the test id
+                currReadyIndex = testsConfig.scrapReadyIndex;
+
                 currTest = testsConfig.tests;
                 currTest[scrap.index].signed = true;
-                currReadyIndex = testsConfig.scrapReadyIndex;
 
                 // if this is the next scrap
                 if (scrap.index <= currReadyIndex) {
