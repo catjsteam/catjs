@@ -37,8 +37,8 @@ module.exports = function () {
                             }
 
                             if (jqm) {
-
-                                var match = _scraputils.generate({
+                                var commandCode,
+                                match = _scraputils.generate({
                                     api: "scrollTo",
                                     apiname: "scrollTo",
                                     exp: jqm
@@ -201,7 +201,11 @@ module.exports = function () {
 
 
                                 if (match) {
-                                    me.print("_cat.core.plugin('jqm').actions." + match);
+                                    commandCode = '_cat.core.plugin("jqm").actions.' + match;
+                                   // me.print("_cat.core.plugin('jqm').actions." + match);
+//                                    me.print("_cat.core.clientmanager.delayManager(" + commandCode + ")")
+                                    me.print("_cat.core.clientmanager.delayManager('" + commandCode +"');");
+
                                 }
 
                             }
