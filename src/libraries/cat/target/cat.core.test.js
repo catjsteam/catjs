@@ -405,6 +405,13 @@ _cat.core = function () {
                 clearInterval(_runModeValidation);
             };
 
+
+
+            this.getTestsTypes = function() {
+                return _enum;
+            };
+
+
             /*  take care of run-mode === tests
                 we need to make sure that it get to run */
             if (this.getRunMode() === _enum.TEST_MANAGER) {
@@ -1237,11 +1244,31 @@ _cat.core.clientmanager = function () {
 
         },
 
-        delayManager : function(temp) {
-            setTimeout(function() {
-                eval(temp);
-            }, totalDelay);
-            totalDelay += 4000;
+        delayManager : function(codeCommands) {
+            var catConfig = _cat.core.getConfig(),
+                _enum = catConfig.getTestsTypes(),
+                executeCode;
+
+            executeCode = function(codeCommands) {
+                var indexCommand,
+                    commandObj,
+                    tempCommand;
+
+                for (indexCommand in codeCommands) {
+                    commandObj = codeCommands[indexCommand];
+                    tempCommand = commandObj.command + commandObj.onObject;
+                    eval(tempCommand);
+                }
+            };
+
+            if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
+                setTimeout(function() {
+                    executeCode(codeCommands);
+                }, totalDelay);
+                totalDelay += 4000;
+            } else {
+                executeCode(codeCommands);
+            }
 
         }
     };
