@@ -32,6 +32,8 @@
 				@@name setUsername
                 @@embed true
                 @@jqm setText("#username", "catjs");
+                @@jqm setText("#username", "catjs1");
+                @@jqm setText("#username", "catjs2");
 			]@
         -->
 
@@ -39,7 +41,17 @@
             <label for="username">Username:</label>
             <input type="text" name="username" id="username" value="">
         </div>
+        <script>
+            setTimeout(function() {
+                /*
+                    @[scrap
+                        @@name setPassword
+                        @@jqm setText("#password", "123456789");
+                    ]@
+                */
+            }, 5000);
 
+        </script>
         <!--
             @[scrap
 				@@name setEmail
