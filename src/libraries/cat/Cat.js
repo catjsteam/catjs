@@ -405,6 +405,13 @@ _cat.core = function () {
                 clearInterval(_runModeValidation);
             };
 
+
+
+            this.getTestsTypes = function() {
+                return _enum;
+            };
+
+
             /*  take care of run-mode === tests
                 we need to make sure that it get to run */
             if (this.getRunMode() === _enum.TEST_MANAGER) {
