@@ -2,7 +2,9 @@ _cat.core.clientmanager = function () {
 
     var tests,
         commitScrap,
-        getScrapTestInfo;
+        getScrapTestInfo,
+        totalDelay,
+        checkIfExists;
 
     commitScrap = function (scrap, args, res) {
         var scrapInfo,
@@ -64,7 +66,7 @@ _cat.core.clientmanager = function () {
         return scrapTests;
     };
 
-    var checkIfExists = function(scrapName, tests) {
+    checkIfExists = function(scrapName, tests) {
 
         var indexScrap;
         for (indexScrap in tests) {
@@ -74,6 +76,8 @@ _cat.core.clientmanager = function () {
         }
         return false;
     };
+
+    totalDelay = 0;
 
     return {
         signScrap : function(scrap, catConfig, args, _tests) {
@@ -89,12 +93,49 @@ _cat.core.clientmanager = function () {
                 config = {
                     url : urlAddress,
                     callback : function() {
-                        var response = JSON.parse(this.responseText);
+                        var response = JSON.parse(this.responseText),
+                            scrapReadyIndex;
+
+                        scrapReadyIndex = parseInt(response.readyScrap.index) + 1;
                         commitScrap(scrap, args, response);
+
+                        if (scrapReadyIndex === tests.length) {
+                            console.log(catConfig);
+                            catConfig.endTest();
+
+                        }
                     }
                 };
 
                 _cat.utils.AJAX.sendRequestAsync(config);
+            }
+
+        },
+
+        delayManager : function(codeCommands) {
+            var catConfig = _cat.core.getConfig(),
+                _enum = catConfig.getTestsTypes(),
+                executeCode;
+
+            executeCode = function(codeCommands) {
+                var indexCommand,
+                    commandObj,
+                    tempCommand;
+
+                for (indexCommand in codeCommands) {
+                    commandObj = codeCommands[indexCommand];
+                    tempCommand = commandObj.command + commandObj.onObject;
+                    eval(tempCommand);
+                }
+            };
+
+            if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
+                setTimeout(function() {
+                    executeCode(codeCommands);
+                }, totalDelay);
+                totalDelay += 4000;
+            } else {
+                executeCode(codeCommands);
             }
 
         }

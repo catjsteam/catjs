@@ -400,6 +400,18 @@ _cat.core = function () {
                 return false;
             };
 
+
+            this.endTest = function() {
+                clearInterval(_runModeValidation);
+            };
+
+
+
+            this.getTestsTypes = function() {
+                return _enum;
+            };
+
+
             /*  take care of run-mode === tests
                 we need to make sure that it get to run */
             if (this.getRunMode() === _enum.TEST_MANAGER) {
@@ -416,7 +428,8 @@ _cat.core = function () {
                         _runModeValidationRetry++;
 
                     } else {
-                        clearInterval(_runModeValidation);
+                        this.endTest();
+
                         _log.log("[CAT] " + err);
                         if (!_cat.core.ui.isOpen()) {
                             _cat.core.ui.on();

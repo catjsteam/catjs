@@ -1,0 +1,28 @@
+{
+    "name": "catexample",
+
+    "source": "src/",
+    "target": "target/",
+    "cattarget": "./",
+
+    "host": "localhost",
+    "port": "8089",
+    "protocol": "http",
+    "analytics" : "true",
+    "apppath": "./../app",
+    "appserver": {
+        "host": "localhost",
+        "port": "8089",
+        "protocol": "http"
+    },
+
+    "plugins": [
+
+    ],
+
+    "tasks": [
+
+    ]
+
+
+}

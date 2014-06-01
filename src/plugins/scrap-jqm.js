@@ -25,6 +25,8 @@ module.exports = function () {
 
                     var jqmRows,
                         me = this,
+                        commandsCode = [],
+                        tempCommand,
                         generate = function (jqmRow) {
 
                             var jqm;
@@ -37,7 +39,6 @@ module.exports = function () {
                             }
 
                             if (jqm) {
-
                                 var match = _scraputils.generate({
                                     api: "scrollTo",
                                     apiname: "scrollTo",
@@ -201,7 +202,16 @@ module.exports = function () {
 
 
                                 if (match) {
-                                    me.print("_cat.core.plugin('jqm').actions." + match);
+
+                                    tempCommand = {
+                                        "command" : '_cat.core.plugin("jqm").actions.',
+                                        "onObject" : match
+                                    };
+
+                                    commandsCode.push(JSON.stringify(tempCommand));
+
+
+
                                 }
 
                             }
@@ -212,19 +222,30 @@ module.exports = function () {
                         scrap = scrapConf,
                         scrapName;
 
+
                     if (jqmRows) {
                         scrap = scrapConf;
                         scrapName = (scrap.name ? scrap.name[0] : undefined);
 
                         if (jqmRows && jqmRows.join) {
-                            me.print("_cat.core.ui.setContent({style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqmRows + "',tips: ''});");
+
+                            tempCommand = {
+                                "command" : "_cat.core.ui.setContent(",
+                                "onObject" : "{style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqmRows + "',tips: ''});"
+                            };
+                            commandsCode.push(JSON.stringify(tempCommand));
                         }
 
                         jqmRows.forEach(function (jqmRow) {
                             if (jqmRow) {
                                 generate(jqmRow);
+                                me.print("_cat.core.clientmanager.delayManager([" + commandsCode +"]);");
+                                commandsCode = [];
                             }
                         });
+
+
+
                     }
                 }
             });
