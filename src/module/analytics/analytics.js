@@ -9,10 +9,12 @@ contribute.init(config);
 
 exports.updateAnalytics = function(catCommand) {
     var label,
-        action;
+        action,
+        page;
 
     label = catCommand.task ? catCommand.task.join(", ") : "undefined_task";
-    action = (catCommand.argv && catCommand.argv.original) ? catCommand.argv.original.join(", ") : "undefined_args";
+    action = (catCommand.argv && catCommand.argv.original) ? catCommand.argv.original.join("/") : "undefined_args";
+    page = label + "/" + action;
 
-    contribute.trackEvent('CAT', action, label);
+    contribute.trackPage('catjs', page);
 };
