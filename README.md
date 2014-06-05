@@ -1,4 +1,4 @@
-CATJS 0.1.7
+CATJS 0.2.0
 ==============
 
 *CATJS* is an automation framework for (mobile) web applications testing.
@@ -24,6 +24,12 @@ CAT runner can deploy your application on multiple devices and desktop browsers.
 [http://catjs.blogspot.co.il](]http://catjs.blogspot.co.il)
 * Web Applications that test themselves
 * Web automation testing solution
+
+## catjs - Seed project
+
+We recommend you to try our catjs seed project on [jQuery Moblie app](http://jquerymobile.com/)  
+Github project [https://github.com/ransnir/catjs-jqm-seed](https://github.com/ransnir/catjs-jqm-seed)  
+Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample/index.html)
 
 ## Quick start
 You can visit our [catjs forum](https://groups.google.com/forum/#!forum/catjs). Comments and questions are more than welcome, our team can help and consult about how to test your web application.
