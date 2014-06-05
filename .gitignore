@@ -11,3 +11,5 @@ build/src
 test/enyo/cat-project/
 test/sencha/cat-project/
 test/init-test/cat-project/
+test/catjs_example/cat-project/
+test/jqm/cat-project/

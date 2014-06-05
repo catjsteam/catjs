@@ -308,8 +308,8 @@ var CAT = function () {
                                     analytics: new Schema({
                                         type: "string",
                                         required: false,
-                                        default: "true",
-                                        description: "Would you like to contribute analytics to CAT"
+                                        default: "Y",
+                                        description: "May catjs anonymously report usage statistics to improve the tool over time?"
                                     })/*,
                                     appserverport: new Schema({
                                         type: "string",
@@ -382,7 +382,7 @@ var CAT = function () {
 
                         if (project) {
                             // update analytics
-                            if (project.info.analytics && project.info.analytics == "true") {
+                            if (project.info.analytics && project.info.analytics == "Y") {
                                 _analytics.updateAnalytics(global.catcommand);
                             }
 
