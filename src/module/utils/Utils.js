@@ -226,6 +226,8 @@ module.exports = function () {
          */
         prepareCode: function (codeRows) {
             var row,
+                nextText,
+                patt,
                 size = (codeRows && _typedas.isArray(codeRows) ? codeRows.length : 0), idx = 0;
 
             function _row(row, ref, idx) {
@@ -253,6 +255,12 @@ module.exports = function () {
             } else {
                 codeRows = _row(codeRows, codeRows);
             }
+
+
+
+
+            patt = new RegExp("@d.","gi");
+            codeRows = codeRows.replace(patt, "_cat.utils.TestsDB.getData().");
 
             return codeRows;
         },
