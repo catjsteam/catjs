@@ -1,3 +1,4 @@
+
 _cat.utils.TestsDB = function() {
 
     var _data;
@@ -75,12 +76,16 @@ _cat.utils.TestsDB = function() {
         },
 
         get : function(field) {
-            var temp = " _data." + field;
+            var temp = " _data" + field;
             return eval(temp);
         },
 
         set : function(field, value) {
             return TestDB.set(field, value);
+        },
+        find : function(field) {
+            var temp = "JSPath.apply('" + field + "', _data);";
+            return eval(temp);
         }
     };
 }();
