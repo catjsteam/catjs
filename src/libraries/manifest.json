@@ -11,34 +11,34 @@
             "base": "target",
             "prod" :[
                 {
-                    "name": "cat.core.test.min.js",
+                    "name": "cat.js",
                     "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js", "CatInit.js"],
                     "type": "js"
                 },
                 {
-                    "name": "cat.core.test.min.css",
+                    "name": "cat.css",
                     "src": ["css/*.css"],
                     "type": "css"
                 },
                 {
-                    "name": "cat.core.catconfig.json",
+                    "name": "cat.json",
                     "src": ["config/catconfig.json"],
                     "type": "json"
                 }
             ],
             "dev" :[
                 {
-                    "name":"cat.core.test.js",
+                    "name":"cat.js",
                     "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js", "CatInit.js"],
                     "type": "js"
                 },
                 {
-                    "name": "cat.core.test.css",
+                    "name": "cat.css",
                     "src": ["css/*.css"],
                     "type": "css"
                 },
                 {
-                    "name": "cat.core.catconfig.json",
+                    "name": "cat.json",
                     "src": ["config/catconfig.json"],
                     "type": "json",
                     "parse": true
@@ -51,16 +51,16 @@
             "name": "requirejs",
             "address": "local",
             "base": ".",
-            "prod" :["requirejs-min.js"],
-            "dev" :["requirejs-min.js"],
+            "prod" :["requirejs.js"],
+            "dev" :["requirejs.js"],
             "install" : "static"
         },
         {
             "name": "tmr",
             "address": "local",
             "base": ".",
-            "prod" :["tmr-min-all.js"],
-            "dev" :["tmr-min-all.js"],
+            "prod" :["tmr.js"],
+            "dev" :["tmr.js"],
             "install" : "static"
         },
         {
@@ -71,8 +71,8 @@
         },
         {
             "name": "jspath",
-            "prod" :["jspath.min.js"],
-            "dev" :["jspath.min.js"],
+            "prod" :["jspath.js"],
+            "dev" :["jspath.js"],
             "install": "static"
         }
     ]
