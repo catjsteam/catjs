@@ -132,7 +132,11 @@ module.exports = _basePlugin.ext(function () {
                         return ext[ext.length - 1];
                     }
 
-                    var content, filetype, basename,
+                    function _getFileName(filename) {
+                        return _path.basename(filename);
+                    }
+
+                    var content, filetype, filename, basename,
                         itemName,
                         staticnames = ('static-names' in library ? library["static-names"] : undefined);
 
@@ -154,12 +158,14 @@ module.exports = _basePlugin.ext(function () {
                             if (content) {
 
                                 filetype = _getExtension(from);
+                                filename = _getFileName(from);
                                 basename = _path.basename(from);
 
                                 if (filetype) {
-                                    concatenated.add(filetype, content);
+                                    //concatenated.add(filetype, content);
+                                    concatenated.add(filename, content);
                                     if (_jsutils.Object.contains(staticnames, basename)) {
-                                        concatenated.putName(filetype, basename);
+                                        concatenated.putName(filename, basename);
                                     }
                                 }
                             }
@@ -469,9 +475,9 @@ module.exports = _basePlugin.ext(function () {
                                 staticname = concatenated.getName(concatItem.key);
                                 contentValue = concatItem.value.join("");
                                 // set the static name if found or else generate the name according to the project env
-                                filename = (staticname ? staticname : [catProjectLibName, ".", concatItem.key].join(""));
+                                filename = (staticname ? staticname : [concatItem.key].join(""));
 
-                                if (concatItem.key === "json") {
+                                if (concatItem.key === "cat.json") {
                                     // parse content..
                                     if (parse) {
                                         contentValue = _jsutils.Template.template({
@@ -483,12 +489,12 @@ module.exports = _basePlugin.ext(function () {
                                     }
                                 }
                                 // specific condition for cat.json TODO put a generic property
-                                if ( concatItem.key !== "json" ) {
+                                if ( concatItem.key !== "cat.json" ) {
                                     _fs.writeFileSync(_path.join(catProjectLibTarget, filename), contentValue);
 
                                 } else {
                                     catjsonpath = _path.join(catProjectSrc, "/config/", filename);
-                                    if ( concatItem.key === "json" && !_fs.existsSync(catjsonpath) ) {
+                                    if ( concatItem.key === "cat.json" && !_fs.existsSync(catjsonpath) ) {
                                         _fs.writeFileSync(catjsonpath, contentValue);
                                     }
                                 }

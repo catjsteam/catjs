@@ -27,7 +27,15 @@ var _global = catrequire("cat.global"),
         var me = this,
             idx = 0, size, project, pluginsPath = [],
             dependencies = [],
-            appTargetPath, appPath, scrapfilter, projectcopy, scrapscan, customPlugins, cattarget, targetfolder;
+            librariesConfig = [],
+            librariesDefault = ["chai", "jspath", "tmr", "cat"],
+            libraryBuildConfig, dependenciesInfo,
+            appTargetPath, appPath,
+            scrapfilter, projectcopy,
+            scrapscan, customPlugins,
+            cattarget, targetfolder,
+            libIdx= 0,
+            rmIdx=-1;
 
         /**
          * Extension initialization
@@ -89,6 +97,7 @@ var _global = catrequire("cat.global"),
                     project.addPluginLocations(pluginsPath);
 
                     customPlugins = [];
+                    librariesConfig = ["cat"];
                     targetfolder = project.getInfo("target");
                     cattarget = (project.getInfo("cattarget") || "./");
 
@@ -165,6 +174,45 @@ var _global = catrequire("cat.global"),
                             "src":["./src/**/*.js"]
                         }
                         ]);
+
+                    dependenciesInfo = project.getInfo("dependencies");
+                    if (!dependenciesInfo) {
+                        librariesConfig = librariesDefault;
+
+                    } else {
+                        librariesConfig = dependenciesInfo;
+                        if (!librariesConfig || (!_typedas.isArray(librariesConfig))) {
+                            librariesConfig = librariesDefault;
+
+                        } else {
+                            libIdx= 0;
+                            rmIdx=-1;
+
+                            librariesConfig.forEach(function(item) {
+                                if (item === "cat") {
+                                    rmIdx = libIdx;
+                                }
+                                libIdx++;
+                            });
+
+                            // remove "cat" if was found
+                            if (rmIdx > -1) {
+                                librariesConfig.splice(rmIdx, 1);
+                            }
+
+                            // set "cat" to be last
+                            librariesConfig.push("cat");
+                        }
+                    }
+                    libraryBuildConfig = {
+                        "name": "p@libraries.build",
+                        "type": "libraries",
+                        "dependency": "manager",
+                        "imports": librariesConfig,
+                        "action": "build"
+                    };
+                    customPlugins.push(libraryBuildConfig);
+
                     project.appendEntity("plugins", customPlugins);
 
 
