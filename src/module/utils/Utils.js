@@ -258,9 +258,11 @@ module.exports = function () {
 
 
 
+            patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*[a-z])\\)(.*)","g");
 
-            patt = new RegExp("@d.","gi");
-            codeRows = codeRows.replace(patt, "_cat.utils.TestsDB.getData().");
+            while (codeRows.match(patt)) {
+                codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2'.$3')$4");
+            }
 
             return codeRows;
         },
