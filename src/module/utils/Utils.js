@@ -227,7 +227,7 @@ module.exports = function () {
         prepareCode: function (codeRows) {
             var row,
                 nextText,
-                patt,
+
                 size = (codeRows && _typedas.isArray(codeRows) ? codeRows.length : 0), idx = 0;
 
             function _row(row, ref, idx) {
@@ -247,6 +247,17 @@ module.exports = function () {
                 return ref;
             }
 
+            function convertTestDataRexp(codeRows) {
+                var patt;
+                patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*)(\\).*\\).*)","g");
+
+                while (codeRows.match(patt)) {
+                    codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2'.$3'$4");
+                }
+
+                return codeRows;
+            }
+
             if (size) {
                 for (; idx < size; idx++) {
                     row = codeRows[idx];
@@ -256,14 +267,7 @@ module.exports = function () {
                 codeRows = _row(codeRows, codeRows);
             }
 
-
-
-            patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*[a-z])\\)(.*)","g");
-
-            while (codeRows.match(patt)) {
-                codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2'.$3')$4");
-            }
-
+            codeRows = convertTestDataRexp(codeRows);
             return codeRows;
         },
 
