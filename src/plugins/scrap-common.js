@@ -143,7 +143,7 @@ module.exports = function () {
 
                     if (logRow) {
 
-                        logRow = _utils.prepareCode(logRow);
+                        //logRow = _utils.prepareCode(logRow);
                         code = ['console.log(', logRow, ");"];
 
                         me.print(_tplutils.template({

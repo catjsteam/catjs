@@ -33,7 +33,7 @@
         {
             "name": "p@project.clean",
             "type": "clean",
-            "src": ["target", "_cat_md.json"]
+            "src": ["target", "_cat_md.json", "lib"]
         },
         {
             "name": "p@project.wipe",
@@ -86,13 +86,6 @@
         {
             "name": "p@autotest.plugin",
             "type": "autotest"
-        },
-        {
-            "name": "p@libraries.build",
-            "type": "libraries",
-            "dependency": "manager",
-            "imports": ["jspath", "chai", "tmr", "cat"],
-            "action": "build"
         },
         {
             "name": "p@scrap.common",

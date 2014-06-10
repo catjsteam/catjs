@@ -186,7 +186,7 @@ var _typedas = require('typedas'),
             _mkEnvDir("target");
 
             // set the info properties incoming from the cat's project
-            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "cattarget", "analytics", "runner"]);
+            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "cattarget", "analytics", "runner", "dependencies"]);
 
         }
 
