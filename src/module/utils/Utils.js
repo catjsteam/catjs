@@ -236,12 +236,14 @@ module.exports = function () {
                 if (row) {
                     rowTrimmed = (row.trim ? row.trim() : row);
                     if (rowTrimmed.charAt(rowTrimmed.length - 1) !== ";") {
-                        if (idx) {
+                        if (idx !== undefined) {
                             ref[idx] += ";";
                         } else {
                             ref += ";"
                         }
                     }
+
+                    ref[idx] = convertTestDataRexp(idx !== undefined ? ref[idx] : ref);
                 }
 
                 return ref;
@@ -249,6 +251,7 @@ module.exports = function () {
 
             function convertTestDataRexp(codeRows) {
                 var patt;
+
                 patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*)(\\).*\\).*)","g");
 
                 while (codeRows.match(patt)) {
@@ -267,7 +270,6 @@ module.exports = function () {
                 codeRows = _row(codeRows, codeRows);
             }
 
-            codeRows = convertTestDataRexp(codeRows);
             return codeRows;
         },
 
