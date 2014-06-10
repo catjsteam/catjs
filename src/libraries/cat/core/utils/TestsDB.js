@@ -5,7 +5,7 @@ _cat.utils.TestsDB = function() {
 
     (function() {
         _cat.utils.AJAX.sendRequestAsync({
-            url : "tests_db.json",
+            url : "/cat/config/testdata.json",
             callback : {
                 call : function(check) {
                     _data = JSON.parse(check.response);
