@@ -217,8 +217,8 @@ module.exports = function () {
             config.scrapinfo = fileinfo;
             config.commentinfo = commentinfo;
             if (!config.name) {
-                _utils.log("error", _props.get("cat.error.scrap.property.required").format("[scrap entity]", 'name'));
-                return undefined;
+                //_utils.log("error", _props.get("cat.error.scrap.property.required").format("[scrap entity]", 'name'));
+                //return undefined;
             }
             scrap = new _clazz(config);
             if (scrap) {

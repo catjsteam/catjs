@@ -6,12 +6,12 @@ var _utils = catrequire("cat.utils"),
     _scrapEnum = require("./ScrapEnum.js"),
     _ScrapConfigItem = require("./ScrapConfigItem.js"),
     _ScrapContext = require("./Context.js"),
+    _catlibtils = catrequire("cat.lib.utils"),
     _scraputils = catrequire("cat.scrap.utils"),
     _jsutils = require("js.utils"),
-    __id = 0,
 
     _scrapId = function () {
-        __id++;
+        var __id = _catlibtils.generateGUID();
         return ["scrap", __id].join("_");
     },
 
@@ -140,6 +140,12 @@ _clazz = function (config) {
     }
 
 
+    function _nameValidation(config, value) {
+        if (!("name" in config && config.name && config.name[0])) {
+           config.name = value;
+        }
+    }
+
     if (!config) {
         _utils.error(_props.get("cat.error.config").format("[scrap class]"));
     }
@@ -163,12 +169,16 @@ _clazz = function (config) {
     // defaults
     (function () {
 
+        var idArg = _scrapId();
+
+        _nameValidation(config, idArg);
+
         // set default values
         _init("single", {});
         _init("singleton", {});
         _init("arguments", []);
         _init("auto", true);
-        _init("id", _scrapId());
+        _init("id", idArg);
         _init("$type", _scrapEnum.scrapEnum.defaultFileType);
 
         // set/generate config values/functionality
