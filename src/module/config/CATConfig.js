@@ -177,7 +177,7 @@ var _global = catrequire("cat.global"),
 
                     dependenciesInfo = project.getInfo("dependencies");
                     if (!dependenciesInfo) {
-                        librariesConfig = librariesDefault;
+                        librariesConfig = dependenciesInfo = librariesDefault;
 
                     } else {
                         librariesConfig = dependenciesInfo;
@@ -204,6 +204,12 @@ var _global = catrequire("cat.global"),
                             librariesConfig.push("cat");
                         }
                     }
+
+                    librariesConfig.push("cat.src.js");
+                    librariesConfig.push("cat.css");
+
+                    project.setInfo("dependencies", librariesConfig);
+
                     libraryBuildConfig = {
                         "name": "p@libraries.build",
                         "type": "libraries",

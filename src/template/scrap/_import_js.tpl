@@ -1,1 +1,1 @@
-<script src="{{src}}"></script>
+<script src="{{src}}" onload="_cat.core.onload('{{args}}')"></script>

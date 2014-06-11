@@ -428,7 +428,7 @@ _cat.core = function () {
                         _runModeValidationRetry++;
 
                     } else {
-                        this.endTest();
+                        me.endTest();
 
                         _log.log("[CAT] " + err);
                         if (!_cat.core.ui.isOpen()) {
@@ -453,9 +453,46 @@ _cat.core = function () {
         };
     }
 
+    function _import(query) {
+
+        var type = _cat.utils.Utils.querystring("type", query),
+            basedir = _cat.utils.Utils.querystring("basedir", query),
+            libs = _cat.utils.Utils.querystring("libs", query),
+            idx= 0, size;
+
+        function extExists(value) {
+            var pos;
+            if (value) {
+                pos = value.lastIndexOf(".");
+                if (pos !== -1) {
+                    if (value.lastIndexOf(".js") !== -1 || value.lastIndexOf(".css") !== -1) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        if (type === "import") {
+            libs = libs.split(",");
+            size = libs.length;
+            for (; idx<size; idx++) {
+
+                libs[idx] = [basedir, libs[idx], (extExists(libs[idx]) ? "" : ".js")].join("");
+            }
+            _cat.utils.Loader.requires(libs);
+        }
+
+    }
+
     return {
 
         log: _log,
+
+        onload: function(libs) {
+            _import(libs);
+        },
 
         init: function() {
 
