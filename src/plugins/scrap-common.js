@@ -319,7 +319,7 @@ module.exports = function () {
                         codeSnippetObject,
                         context,
                         contextargs = "",
-                        counter= 0,
+                        counter = 0,
                         size;
 
                     codeRows = this.get("assert");
@@ -341,8 +341,8 @@ module.exports = function () {
                         if (context) {
                             size = context.length;
                             contextargs += "{";
-                            context.forEach(function(arg) {
-                                contextargs += arg + ":" + arg + (counter < size-1 ? ",": "");
+                            context.forEach(function (arg) {
+                                contextargs += arg + ":" + arg + (counter < size - 1 ? "," : "");
                                 counter++;
                             });
                             contextargs += "}";
@@ -392,7 +392,20 @@ module.exports = function () {
 
                     function _printByType(type, value) {
 
+                        function _isCatjs(lib) {
+                            if (lib) {
+                                lib = _path.basename(lib);
+                                lib = lib.trim();
+                                if (lib === "cat.js" || lib === "cat") {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+
                         var contentByType,
+                            libs, basedir, args,
                             contents = {
                                 "js": importJSTpl,
                                 "css": importCSSTpl
@@ -402,10 +415,21 @@ module.exports = function () {
                         }
 
                         if (contentByType && value) {
+
+                            if ( _isCatjs(value)) {
+                                // handle cat library
+                                libs = catrequire("cat.cli").getProject().getInfo("dependencies");
+                                basedir = _path.dirname(value) + "/";
+                                if (libs && libs.length > 0) {
+                                    args = ["?type=import&basedir=", basedir ,"&libs=", libs.join(",")].join("")
+                                }
+                            }
+
                             me.print(_tplutils.template({
                                 content: contentByType,
                                 data: {
-                                    src: value
+                                    src: value,
+                                    args: (args || "")
                                 }
                             }));
                         }
