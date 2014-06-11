@@ -2,19 +2,6 @@ _cat.utils.Storage = function () {
 
     var _catjsLocal, _catjsSession;
 
-    function _generateGUID() {
-
-        //GUID generator
-        function S4() {
-            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-        }
-        function guid() {
-            return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
-        }
-
-        return guid();
-    }
-
     function _getStorage(type) {
         if (type) {
             return window[_enum[type]];
@@ -106,7 +93,7 @@ _cat.utils.Storage = function () {
             var guid = _module.get(_enum.guid, _storageEnum.SESSION);
 
             if (!guid) {
-                guid =_generateGUID();
+                guid =_cat.utils.Utils.generateGUID();
                 _module.set(_enum.guid, guid, _storageEnum.SESSION);
             }
 

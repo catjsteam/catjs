@@ -1,65 +1,111 @@
-_cat.utils.Utils = function () {
+if (typeof(_cat) !== "undefined") {
 
-    return {
+    _cat.utils.Utils = function () {
 
-        getType: function (obj) {
-            return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+        return {
 
-        },
-        getMatchValue: function (pattern, text) {
+            querystring: function(name, query){
+                var re, r=[], m;
 
-            var regexp = new RegExp(pattern),
-                results;
-
-            if (regexp) {
-                results = regexp.exec(text);
-                if (results &&
-                    results.length > 1) {
-                    return results[1];
+                re = new RegExp('(?:\\?|&)' + name + '=(.*?)(?=&|$)','gi');
+                while ((m=re.exec(query  || document.location.search)) != null) {
+                    r[r.length]=m[1];
                 }
-            }
+                return (r && r[0] ? r[0] : undefined);
+            },
 
-            return results;
+            getType: function (obj) {
+                return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 
-        },
+            },
 
-        /**
-         * Validates an object and availability of its properties
-         *
-         */
-        validate: function (obj, key, val) {
-            if (obj) {
+            getMatchValue: function (pattern, text) {
 
-                // if key is available
-                if (key !== undefined) {
+                var regexp = new RegExp(pattern),
+                    results;
 
-                    if (key in obj) {
+                if (regexp) {
+                    results = regexp.exec(text);
+                    if (results &&
+                        results.length > 1) {
+                        return results[1];
+                    }
+                }
 
-                        if (obj[key] !== undefined) {
+                return results;
 
-                            if (val !== undefined) {
-                                if (obj[key] !== val) {
-                                    return false;
+            },
+
+            /**
+             * Validates an object and availability of its properties
+             *
+             */
+            validate: function (obj, key, val) {
+                if (obj) {
+
+                    // if key is available
+                    if (key !== undefined) {
+
+                        if (key in obj) {
+
+                            if (obj[key] !== undefined) {
+
+                                if (val !== undefined) {
+                                    if (obj[key] !== val) {
+                                        return false;
+                                    }
                                 }
+
+                                return true;
                             }
 
-                            return true;
                         }
 
+                        return false;
+
+
+                    } else {
+
+                        return true;
                     }
 
-                    return false;
-
-
-                } else {
-
-                    return true;
                 }
 
+                return false;
             }
+        };
 
-            return false;
+    }();
+
+
+} else {
+
+    var _cat = {
+        utils:{
+            Utils:{}
         }
     };
 
-}();
+}
+_cat.utils.Utils.generateGUID = function () {
+
+    //GUID generator
+    function S4() {
+        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    }
+    function guid() {
+        return [S4(),S4(),"-",S4(),"-",S4(),"-",S4(),"-",S4(),S4(),S4()].join("");
+    }
+
+    return guid();
+};
+
+if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+        // nodejs support
+
+        module.exports.generateGUID = _cat.utils.Utils.generateGUID;
+
+    }
+}
+
