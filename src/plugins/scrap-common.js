@@ -409,7 +409,7 @@ module.exports = function () {
                             contents = {
                                 "js": importJSTpl,
                                 "css": importCSSTpl
-                            };
+                            }, catlibidx = -1, libcounter = 0;
                         if (type) {
                             contentByType = contents[type];
                         }
@@ -419,6 +419,17 @@ module.exports = function () {
                             if ( _isCatjs(value)) {
                                 // handle cat library
                                 libs = catrequire("cat.cli").getProject().getInfo("dependencies");
+
+                                libs.forEach(function(lib) {
+                                    if (lib === "cat") {
+                                        catlibidx = libcounter;
+                                    }
+                                    libcounter++;
+                                });
+                                if (catlibidx !== -1) {
+                                    libs = libs.splice(catlibidx, 1);
+                                }
+
                                 basedir = _path.dirname(value) + "/";
                                 if (libs && libs.length > 0) {
                                     args = ["?type=import&basedir=", basedir ,"&libs=", libs.join(",")].join("")
