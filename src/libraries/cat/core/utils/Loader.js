@@ -1,6 +1,6 @@
 _cat.utils.Loader = function () {
 
-    return {
+    var _module = {
 
         require: function (file) {
 
@@ -39,27 +39,28 @@ _cat.utils.Loader = function () {
         },
 
         requires: function () {
-            var index = 0,
-                me = this;
+
+            var index = 0;
 
             return function (files, callback) {
                 index += 1;
-                me.require(files[index - 1]);
+                _module.require(files[index - 1]);
 
                 if (index === files.length) {
                     index = 0;
-                    callback();
+                    if (callback) {
+                        callback.call({index:index});
+                    }
                 } else {
-                    me.requires(files, callback);
+                    _module.requires(files, callback);
                 }
             };
 
         }()
 
-//        load dependencies from catproject
-//        load catjs first and then others
-
     };
+
+    return _module;
 
 }();
 
