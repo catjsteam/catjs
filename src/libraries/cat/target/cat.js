@@ -428,7 +428,7 @@ _cat.core = function () {
                         _runModeValidationRetry++;
 
                     } else {
-                        this.endTest();
+                        me.endTest();
 
                         _log.log("[CAT] " + err);
                         if (!_cat.core.ui.isOpen()) {
@@ -453,9 +453,46 @@ _cat.core = function () {
         };
     }
 
+    function _import(query) {
+
+        var type = _cat.utils.Utils.querystring("type", query),
+            basedir = _cat.utils.Utils.querystring("basedir", query),
+            libs = _cat.utils.Utils.querystring("libs", query),
+            idx= 0, size;
+
+        function extExists(value) {
+            var pos;
+            if (value) {
+                pos = value.lastIndexOf(".");
+                if (pos !== -1) {
+                    if (value.lastIndexOf(".js") !== -1 || value.lastIndexOf(".css") !== -1) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        if (type === "import") {
+            libs = libs.split(",");
+            size = libs.length;
+            for (; idx<size; idx++) {
+
+                libs[idx] = [basedir, libs[idx], (extExists(libs[idx]) ? "" : ".js")].join("");
+            }
+            _cat.utils.Loader.requires(libs);
+        }
+
+    }
+
     return {
 
         log: _log,
+
+        onload: function(libs) {
+            _import(libs);
+        },
 
         init: function() {
 
@@ -1244,30 +1281,32 @@ _cat.core.clientmanager = function () {
 
         },
 
-        delayManager : function(codeCommands) {
+        delayManager : function(codeCommands, context) {
             var catConfig = _cat.core.getConfig(),
                 _enum = catConfig.getTestsTypes(),
                 executeCode;
 
-            executeCode = function(codeCommands) {
+            executeCode = function(codeCommands, context) {
                 var indexCommand,
                     commandObj,
+
                     tempCommand;
 
                 for (indexCommand in codeCommands) {
                     commandObj = codeCommands[indexCommand];
-                    tempCommand = commandObj.command + commandObj.onObject;
-                    eval(tempCommand);
+                    tempCommand = commandObj.command + commandObj.args + commandObj.end;
+
+                    new Function("context", "return " + tempCommand).apply(this, [context]);
                 }
             };
 
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
                 setTimeout(function() {
-                    executeCode(codeCommands);
+                    executeCode(codeCommands, context);
                 }, totalDelay);
                 totalDelay += 4000;
             } else {
-                executeCode(codeCommands);
+                executeCode(codeCommands, context);
             }
 
         }
@@ -1890,6 +1929,78 @@ _cat.utils.AJAX = function () {
     };
 
 }();
+_cat.utils.Loader = function () {
+
+    var _module = {
+
+        require: function (file) {
+
+            function _css(file) {
+                var node = document.createElement('link'),
+                    head = (document.head || document);
+
+                node.rel = 'stylesheet';
+                node.type = 'text/css';
+                node.href = file;
+                document.head.appendChild(node);
+            }
+
+            function _js(file) {
+                var node = document.createElement('script'),
+                    head = (document.head || document);
+
+                node.type = "text/javascript";
+                node.src = file;
+
+                head.appendChild(node);
+            }
+
+            var jsfile_extension = /(.js)$/i,
+                cssfile_extension = /(.css)$/i;
+
+            if (jsfile_extension.test(file)) {
+                _js(file);
+
+            } else if (cssfile_extension.test(file)) {
+                _css(file);
+
+            } else {
+                console.warn("[catjs] no valid file was found ", (file || "NA"));
+            }
+        },
+
+        requires: function () {
+
+            var index = 0;
+
+            return function (files, callback) {
+                index += 1;
+                _module.require(files[index - 1]);
+
+                if (index === files.length) {
+                    index = 0;
+                    if (callback) {
+                        callback.call({index:index});
+                    }
+                } else {
+                    _module.requires(files, callback);
+                }
+            };
+
+        }()
+
+    };
+
+    return _module;
+
+}();
+
+
+//Utilities.requires(["cat.css", "cat.js", "chai.js"], function(){
+//    //Call the init function in the loaded file.
+//    console.log("generation done");
+//})
+
 _cat.utils.Signal = function () {
 
     var _funcmap = {
@@ -1974,19 +2085,6 @@ _cat.utils.Signal = function () {
 _cat.utils.Storage = function () {
 
     var _catjsLocal, _catjsSession;
-
-    function _generateGUID() {
-
-        //GUID generator
-        function S4() {
-            return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-        }
-        function guid() {
-            return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
-        }
-
-        return guid();
-    }
 
     function _getStorage(type) {
         if (type) {
@@ -2079,7 +2177,7 @@ _cat.utils.Storage = function () {
             var guid = _module.get(_enum.guid, _storageEnum.SESSION);
 
             if (!guid) {
-                guid =_generateGUID();
+                guid =_cat.utils.Utils.generateGUID();
                 _module.set(_enum.guid, guid, _storageEnum.SESSION);
             }
 
@@ -2184,141 +2282,117 @@ _cat.utils.TestsDB = function() {
         }
     };
 }();
-_cat.utils.Utils = function () {
+if (typeof(_cat) !== "undefined") {
 
-    return {
+    _cat.utils.Utils = function () {
 
-        getType: function (obj) {
-            return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+        return {
 
-        },
-        getMatchValue: function (pattern, text) {
+            querystring: function(name, query){
+                var re, r=[], m;
 
-            var regexp = new RegExp(pattern),
-                results;
-
-            if (regexp) {
-                results = regexp.exec(text);
-                if (results &&
-                    results.length > 1) {
-                    return results[1];
+                re = new RegExp('(?:\\?|&)' + name + '=(.*?)(?=&|$)','gi');
+                while ((m=re.exec(query  || document.location.search)) != null) {
+                    r[r.length]=m[1];
                 }
-            }
+                return (r && r[0] ? r[0] : undefined);
+            },
 
-            return results;
+            getType: function (obj) {
+                return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 
-        },
+            },
 
-        /**
-         * Validates an object and availability of its properties
-         *
-         */
-        validate: function (obj, key, val) {
-            if (obj) {
+            getMatchValue: function (pattern, text) {
 
-                // if key is available
-                if (key !== undefined) {
+                var regexp = new RegExp(pattern),
+                    results;
 
-                    if (key in obj) {
+                if (regexp) {
+                    results = regexp.exec(text);
+                    if (results &&
+                        results.length > 1) {
+                        return results[1];
+                    }
+                }
 
-                        if (obj[key] !== undefined) {
+                return results;
 
-                            if (val !== undefined) {
-                                if (obj[key] !== val) {
-                                    return false;
+            },
+
+            /**
+             * Validates an object and availability of its properties
+             *
+             */
+            validate: function (obj, key, val) {
+                if (obj) {
+
+                    // if key is available
+                    if (key !== undefined) {
+
+                        if (key in obj) {
+
+                            if (obj[key] !== undefined) {
+
+                                if (val !== undefined) {
+                                    if (obj[key] !== val) {
+                                        return false;
+                                    }
                                 }
+
+                                return true;
                             }
 
-                            return true;
                         }
 
+                        return false;
+
+
+                    } else {
+
+                        return true;
                     }
 
-                    return false;
-
-
-                } else {
-
-                    return true;
                 }
 
+                return false;
             }
+        };
 
-            return false;
+    }();
+
+
+} else {
+
+    var _cat = {
+        utils:{
+            Utils:{}
         }
     };
 
-}();
-_cat.utils.Loader = function () {
+}
+_cat.utils.Utils.generateGUID = function () {
 
-    return {
+    //GUID generator
+    function S4() {
+        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    }
+    function guid() {
+        return [S4(),S4(),"-",S4(),"-",S4(),"-",S4(),"-",S4(),S4(),S4()].join("");
+    }
 
-        require: function (file) {
+    return guid();
+};
 
-            function _css(file) {
-                var node = document.createElement('link'),
-                    head = (document.head || document);
+if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+        // nodejs support
 
-                node.rel = 'stylesheet';
-                node.type = 'text/css';
-                node.href = file;
-                document.head.appendChild(node);
-            }
+        module.exports.generateGUID = _cat.utils.Utils.generateGUID;
 
-            function _js(file) {
-                var node = document.createElement('script'),
-                    head = (document.head || document);
+    }
+}
 
-                node.type = "text/javascript";
-                node.src = file;
-
-                head.appendChild(node);
-            }
-
-            var jsfile_extension = /(.js)$/i,
-                cssfile_extension = /(.css)$/i;
-
-            if (jsfile_extension.test(file)) {
-                _js(file);
-
-            } else if (cssfile_extension.test(file)) {
-                _css(file);
-
-            } else {
-                console.warn("[catjs] no valid file was found ", (file || "NA"));
-            }
-        },
-
-        requires: function () {
-            var index = 0,
-                me = this;
-
-            return function (files, callback) {
-                index += 1;
-                me.require(files[index - 1]);
-
-                if (index === files.length) {
-                    index = 0;
-                    callback();
-                } else {
-                    me.requires(files, callback);
-                }
-            };
-
-        }()
-
-//        load dependencies from catproject
-//        load catjs first and then others
-
-    };
-
-}();
-
-
-//Utilities.requires(["cat.css", "cat.js", "chai.js"], function(){
-//    //Call the init function in the loaded file.
-//    console.log("generation done");
-//})
 
 var animation = false;
 
