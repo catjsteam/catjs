@@ -63,6 +63,7 @@ module.exports = function () {
                         "cat.watch": "src/module/Watch.js",
                         "cat.cache": "src/module/Cache.js",
 
+                        "cat.lib.utils": "src/libraries/cat/core/utils/Utils.js",
                         "cat.utils": "src/module/utils/Utils.js",
                         "cat.ext.utils": "src/module/utils/ExtUtils.js",
                         "cat.tpl.utils": "src/module/utils/TemplateUtils.js",
