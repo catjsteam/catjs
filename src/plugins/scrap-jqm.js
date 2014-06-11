@@ -205,7 +205,8 @@ module.exports = function () {
 
                                     tempCommand = {
                                         "command" : '_cat.core.plugin("jqm").actions.',
-                                        "onObject" : match
+                                        "args" : match,
+                                        "end" : ""
                                     };
 
                                     commandsCode.push(JSON.stringify(tempCommand));
@@ -231,7 +232,8 @@ module.exports = function () {
 
                             tempCommand = {
                                 "command" : "_cat.core.ui.setContent(",
-                                "onObject" : "{style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqmRows + "',tips: ''});"
+                                "args" : "{style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqmRows + "',tips: ''}",
+                                "end" : ");"
                             };
                             commandsCode.push(JSON.stringify(tempCommand));
                         }

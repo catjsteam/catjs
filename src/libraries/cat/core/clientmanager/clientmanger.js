@@ -112,30 +112,32 @@ _cat.core.clientmanager = function () {
 
         },
 
-        delayManager : function(codeCommands) {
+        delayManager : function(codeCommands, context) {
             var catConfig = _cat.core.getConfig(),
                 _enum = catConfig.getTestsTypes(),
                 executeCode;
 
-            executeCode = function(codeCommands) {
+            executeCode = function(codeCommands, context) {
                 var indexCommand,
                     commandObj,
+
                     tempCommand;
 
                 for (indexCommand in codeCommands) {
                     commandObj = codeCommands[indexCommand];
-                    tempCommand = commandObj.command + commandObj.onObject;
-                    eval(tempCommand);
+                    tempCommand = commandObj.command + commandObj.args + commandObj.end;
+
+                    new Function("context", "return " + tempCommand).apply(this, [context]);
                 }
             };
 
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
                 setTimeout(function() {
-                    executeCode(codeCommands);
+                    executeCode(codeCommands, context);
                 }, totalDelay);
                 totalDelay += 4000;
             } else {
-                executeCode(codeCommands);
+                executeCode(codeCommands, context);
             }
 
         }
