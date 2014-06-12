@@ -401,7 +401,11 @@ _cat.core = function () {
             };
 
 
-            this.endTest = function() {
+            this.endTest = function(opt) {
+
+                _cat.utils.Signal.send('TESTEND', opt);
+
+
                 clearInterval(_runModeValidation);
             };
 
@@ -420,24 +424,16 @@ _cat.core = function () {
                     testManager = (tests[tests.length-1].name || "NA");
                 }
                 _runModeValidation = setInterval(function() {
-                    var reportFormats,
-                        err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
-
                     if (_runModeValidationRetry < 3) {
                         _log.log("[CAT] run-mode=tests waiting for catjs manager: '" + testManager + "' .... retry");
                         _runModeValidationRetry++;
 
                     } else {
-                        me.endTest();
+                        var reportFormats,
+                            err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
 
                         _log.log("[CAT] " + err);
-                        if (!_cat.core.ui.isOpen()) {
-                            _cat.core.ui.on();
-                        }
-                        if (_config.isReport()) {
-                            reportFormats = _config.getReportFormats();
-                        }
-                        _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: err});
+                        me.endTest({reportFormats: reportFormats, error: err});
 
                     }
                 }, this.getTimeout() / 3);
@@ -1173,7 +1169,15 @@ _cat.core.clientmanager = function () {
         commitScrap,
         getScrapTestInfo,
         totalDelay,
+        runStatus,
         checkIfExists;
+
+    runStatus = {
+        "scrapReady" : 0,
+        "subscrapReady" : 0,
+        "numRanSubscrap" : 0,
+        "scrapsNumber" : 0
+    };
 
     commitScrap = function (scrap, args, res) {
         var scrapInfo,
@@ -1203,6 +1207,7 @@ _cat.core.clientmanager = function () {
             i, size,
             validate= 0,
             tempInfo,
+
             reportFormats;
 
         if (tests && scrapName) {
@@ -1227,10 +1232,6 @@ _cat.core.clientmanager = function () {
             if (!_cat.core.ui.isOpen()) {
                 _cat.core.ui.on();
             }
-//            if (_config.isReport()) {
-//                reportFormats = _config.getReportFormats();
-//            }
-//            _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: " CAT project configuration error (cat.json), Failed to match a scrap named: '" + scrapName +"'"});
         }
         return scrapTests;
     };
@@ -1252,7 +1253,7 @@ _cat.core.clientmanager = function () {
         signScrap : function(scrap, catConfig, args, _tests) {
             var urlAddress,
                 config;
-
+            runStatus.scrapsNumber = _tests.length;
             tests = _tests;
 
             if (checkIfExists(scrap.name[0], tests)) {
@@ -1265,14 +1266,9 @@ _cat.core.clientmanager = function () {
                         var response = JSON.parse(this.responseText),
                             scrapReadyIndex;
 
-                        scrapReadyIndex = parseInt(response.readyScrap.index) + 1;
+                        runStatus.scrapReady = parseInt(response.readyScrap.index) + 1;
                         commitScrap(scrap, args, response);
 
-                        if (scrapReadyIndex === tests.length) {
-                            console.log(catConfig);
-                            catConfig.endTest();
-
-                        }
                     }
                 };
 
@@ -1297,8 +1293,24 @@ _cat.core.clientmanager = function () {
                     tempCommand = commandObj.command + commandObj.args + commandObj.end;
 
                     new Function("context", "return " + tempCommand).apply(this, [context]);
+
+
                 }
+
+                runStatus.numRanSubscrap = runStatus.numRanSubscrap + codeCommands.length;
+
+                if ((runStatus.numRanSubscrap === runStatus.subscrapReady) && runStatus.scrapReady === runStatus.scrapsNumber) {
+                    var reportFormats;
+                    if (catConfig.isReport()) {
+                        reportFormats = catConfig.getReportFormats();
+                    }
+                    catConfig.endTest({reportFormats: reportFormats});
+                }
+
             };
+
+
+            runStatus.subscrapReady = runStatus.subscrapReady + codeCommands.length;
 
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
                 setTimeout(function() {
