@@ -401,7 +401,11 @@ _cat.core = function () {
             };
 
 
-            this.endTest = function() {
+            this.endTest = function(opt) {
+
+                _cat.utils.Signal.send('TESTEND', opt);
+
+
                 clearInterval(_runModeValidation);
             };
 
@@ -420,24 +424,16 @@ _cat.core = function () {
                     testManager = (tests[tests.length-1].name || "NA");
                 }
                 _runModeValidation = setInterval(function() {
-                    var reportFormats,
-                        err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
-
                     if (_runModeValidationRetry < 3) {
                         _log.log("[CAT] run-mode=tests waiting for catjs manager: '" + testManager + "' .... retry");
                         _runModeValidationRetry++;
 
                     } else {
-                        me.endTest();
+                        var reportFormats,
+                            err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
 
                         _log.log("[CAT] " + err);
-                        if (!_cat.core.ui.isOpen()) {
-                            _cat.core.ui.on();
-                        }
-                        if (_config.isReport()) {
-                            reportFormats = _config.getReportFormats();
-                        }
-                        _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats, error: err});
+                        me.endTest({reportFormats: reportFormats, error: err});
 
                     }
                 }, this.getTimeout() / 3);
