@@ -4,11 +4,10 @@ var _Scrap = catrequire("cat.common.scrap"),
     _uglifyutils = catrequire("cat.uglify.utils"),
     _typedas = require("typedas"),
     _behavior = require("./Behavior.js"),
-    _jshint = require("jshint").JSHINT,
-    _scraputils = catrequire("cat.scrap.utils"),
     _path = require("path"),
     _global = catrequire("cat.global"),
-    _log = _global.log();
+    _log = _global.log(),
+    _catlibtils = catrequire("cat.lib.utils");
 
 
 module.exports = function () {
@@ -16,7 +15,21 @@ module.exports = function () {
     var funcSnippetTpl = _tplutils.readTemplateFile("scrap/_func_snippet"),
         assertCallTpl = _tplutils.readTemplateFile("scrap/_assert_call"),
         importJSTpl = _tplutils.readTemplateFile("scrap/_import_js"),
+        requireJSTpl = _tplutils.readTemplateFile("scrap/_require_js"),
         importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css");
+
+
+    function _isCatjs(lib) {
+        if (lib) {
+            lib = _path.basename(lib);
+            lib = lib.trim();
+            if (lib === "cat.js" || lib === "cat") {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     return {
 
@@ -360,6 +373,99 @@ module.exports = function () {
                     }
                 }});
 
+            /**
+             * Annotation for require a javascript file on requirejs environment
+             * Currently support for catjs and its dependencies, for adding your require configuration use the applications'
+             *
+             *  properties:
+             *  name    - require
+             *  single  - true
+             *  $type   - js
+             */
+            _Scrap.add({name: "require",
+
+                func: function (config) {
+
+                    this.setSingle("inject", true);
+                    this.set("injectcode", true);
+                    this.set("auto", false);
+
+                    var requirerows = this.get("require"),
+                        me = this,
+                        basedir, libs, code,
+                        requirelist=[],
+                        requirecsslist = [],
+                        config = {
+                            shim: {
+                                catjs: {
+                                    exports: '_cat'
+                                },
+                                "catsrc": {
+                                    deps: [
+                                        "cat"
+                                    ]
+                                }
+                            },
+                            paths: {
+
+                            }
+                        };
+
+                    if (requirerows) {
+                        if (!_typedas.isArray(requirerows)) {
+                            requirerows = [requirerows];
+                        }
+                        requirerows.forEach(function (lib) {
+
+                            if (lib &&  _isCatjs(lib)) {
+
+                                libs = catrequire("cat.cli").getProject().getInfo("dependencies");
+                                basedir = _path.dirname(lib) + "/";
+
+                                if (requirerows) {
+                                    requirerows = _utils.prepareCode(requirerows);
+                                    code = requirerows.join("\n");
+
+                                    if (code) {
+
+                                        libs.forEach(function(lib) {
+                                            var fullpathlib,
+                                                key;
+
+                                            if (lib) {
+                                                lib = lib.split(".js").join("");
+                                                fullpathlib = basedir + lib;
+
+                                                if (_catlibtils.extExists(lib)) {
+                                                    if (lib.lastIndexOf(".css") !== -1) {
+                                                        requirecsslist.push(basedir + lib);
+                                                        return undefined;
+                                                    }
+                                                }
+
+                                                key = lib.split(".").join("");
+                                                config.paths[key] = fullpathlib;
+                                                requirelist.push(key);
+                                            }
+                                        });
+
+                                        me.print(_tplutils.template({
+                                            content: requireJSTpl,
+                                            data: {
+                                                comment: " catjs require configuration - for additional require config use your application's ",
+                                                config: JSON.stringify(config),
+                                                require: JSON.stringify(requirelist),
+                                                cssfiles: JSON.stringify(requirecsslist)
+                                            }
+                                        }));
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            });
 
             /**
              * Annotation for importing javascript file within HTML page
@@ -373,11 +479,6 @@ module.exports = function () {
                 single: false,
                 func: function (config) {
 
-                    /**
-                     * TODO This is a lame impl that need to be replaced
-                     * TODO for getting the type out of the import variable
-                     *
-                     */
                     function _getType(value) {
 
                         var values,
@@ -392,24 +493,13 @@ module.exports = function () {
 
                     function _printByType(type, value) {
 
-                        function _isCatjs(lib) {
-                            if (lib) {
-                                lib = _path.basename(lib);
-                                lib = lib.trim();
-                                if (lib === "cat.js" || lib === "cat") {
-                                    return true;
-                                }
-                            }
-
-                            return false;
-                        }
-
                         var contentByType,
                             libs, basedir, args,
                             contents = {
                                 "js": importJSTpl,
                                 "css": importCSSTpl
                             }, catlibidx = -1, libcounter = 0;
+
                         if (type) {
                             contentByType = contents[type];
                         }
