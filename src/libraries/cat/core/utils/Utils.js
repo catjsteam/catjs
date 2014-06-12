@@ -111,7 +111,7 @@ _cat.utils.Utils.extExists = function(value) {
         }
     }
     return false;
-}
+};
 
 if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
