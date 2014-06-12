@@ -128,7 +128,8 @@ var _typedas = require('typedas'),
                 sourcePath;
 
             function _mkEnvDir(prop) {
-                var commonpath, configpath;
+                var commonpath, configpath,
+                    testdatapath;
 
                 if (prop) {
                     sourcePath = _utils.resolveObject(data, prop);
@@ -159,7 +160,10 @@ var _typedas = require('typedas'),
 
                             // copy source's resources to the project
                             // TODO copy recursive sync...
-                            _utils.copySync(_path.join(_cathome.path, "src/module/project/src/config/testdata.json"), _path.join(configpath, "testdata.json"));
+                            testdatapath = _path.join(configpath, "testdata.json");
+                            if (!_fs.existsSync(testdatapath)) {
+                                _utils.copySync(_path.join(_cathome.path, "src/module/project/src/config/testdata.json"), testdatapath);
+                            }
 
                         }
 
