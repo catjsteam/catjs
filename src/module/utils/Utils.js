@@ -243,9 +243,13 @@ module.exports = function () {
                         }
                     }
 
-                    ref[idx] = convertTestDataRexp(idx !== undefined ? ref[idx] : ref);
-                }
+                    if (idx !== undefined) {
+                        ref[idx] = convertTestDataRexp(ref[idx]);
+                    } else {
+                        ref = convertTestDataRexp(ref);
+                    }
 
+                }
                 return ref;
             }
 
@@ -257,7 +261,6 @@ module.exports = function () {
                 while (codeRows.match(patt)) {
                     codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2'.$3'$4");
                 }
-
                 return codeRows;
             }
 
@@ -269,7 +272,6 @@ module.exports = function () {
             } else {
                 codeRows = _row(codeRows, codeRows);
             }
-
             return codeRows;
         },
 
