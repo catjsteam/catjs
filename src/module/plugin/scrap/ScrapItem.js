@@ -178,6 +178,7 @@ _clazz = function (config) {
         _init("singleton", {});
         _init("arguments", []);
         _init("auto", true);
+        _init("injectcode", false);
         _init("id", idArg);
         _init("$type", _scrapEnum.scrapEnum.defaultFileType);
 
@@ -288,6 +289,9 @@ _clazz.prototype.$getEngine = function () {
 
     var $type = this.config["$type"];
     if ($type === "js") {
+        if (this.get("injectcode")) {
+            return _scrapEnum.scrapEnum.engines.JS_EMBED_INSERT;
+        }
         return _scrapEnum.scrapEnum.engines.JS;
 
     } else if ($type === "html") {
@@ -296,8 +300,14 @@ _clazz.prototype.$getEngine = function () {
 
         } else if (this.get("embed")) {
             return _scrapEnum.scrapEnum.engines.HTML_EMBED_JS;
+
+        } else if (this.get("injectcode")) {
+            return _scrapEnum.scrapEnum.engines.HTML_EMBED_INSERT;
         }
+
     } else if ($type === "*") {
+
+        // TODO backward computability support .. need to be removed (use type:html, inject: true)
         if (this.get("inject")) {
             return _scrapEnum.scrapEnum.engines.HTML_EMBED_INSERT;
         }

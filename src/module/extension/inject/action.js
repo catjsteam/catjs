@@ -230,7 +230,6 @@ module.exports = _basePlugin.ext(function () {
                  *  Info for all the scrap related to that comment.
                  */
                 var prevCommentInfo,
-                    size = commentinfos.length,
                     counter = 0;
 
                 commentinfos.forEach(function (info) {
@@ -295,9 +294,13 @@ module.exports = _basePlugin.ext(function () {
                             );
 
                         } else if (engine === _scrapEnum.engines.HTML_IMPORT_JS) {
-                            // HTML import javascript file
-                            content = scraplcl.generate();
 
+                            content = scraplcl.generate();
+                            content = (_utils.prepareCode(content) || "");
+
+                        } else if (engine === _scrapEnum.engines.JS_EMBED_INSERT) {
+                            content = scraplcl.generate();
+                            content = (_utils.prepareCode(content) || "");
 
                         } else if (engine === _scrapEnum.engines.HTML_EMBED_INSERT) {
 
@@ -321,7 +324,7 @@ module.exports = _basePlugin.ext(function () {
                         if (prevCommentInfo) {
                             prevCommentInfo = {start: {line: lineNumber, col: prevCommentInfo.end.col}, end: {line: lineNumber, col: (prevCommentInfo.end.col + content.length)}};
                         } else {
-                            prevCommentInfo = {start: {line: lineNumber, col: info.col}, end: {line: lineNumber, col: (info.col + content.length)}};
+                            prevCommentInfo = {start: {line: lineNumber, col: info.col}, end: {line: lineNumber, col: (info.col + (content ? content.length: 0))}};
                         }
                         scraplcl.set("injectinfo", prevCommentInfo);
                     }
@@ -339,6 +342,10 @@ module.exports = _basePlugin.ext(function () {
 
                             if (engine === _scrapEnum.engines.JS) {
                                 // JS file type call
+                                mark = markDefault;
+
+                            } else if (engine === _scrapEnum.engines.JS_EMBED_INSERT) {
+                                // Embed Javascript block for JS file
                                 mark = markDefault;
 
                             } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
@@ -452,7 +459,6 @@ module.exports = _basePlugin.ext(function () {
              * @param config
              */
             watch: function (config) {
-                console.log("inject");
 
                 var emitter = _me.getEmitter();
 

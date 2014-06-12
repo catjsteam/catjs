@@ -40,7 +40,8 @@ module.exports = function () {
             JS: "js",
             HTML_IMPORT_JS: "htmlijs",
             HTML_EMBED_JS: "htmlejs",
-            HTML_EMBED_INSERT: "stringinsert"
+            HTML_EMBED_INSERT: "stringinsert",
+            JS_EMBED_INSERT: "stringjsinsert"
         },
 
         // default file type

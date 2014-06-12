@@ -100,11 +100,25 @@ _cat.utils.Utils.generateGUID = function () {
     return guid();
 };
 
+_cat.utils.Utils.extExists = function(value) {
+    var pos;
+    if (value) {
+        pos = value.lastIndexOf(".");
+        if (pos !== -1) {
+            if (value.lastIndexOf(".js") !== -1 || value.lastIndexOf(".css") !== -1) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
         // nodejs support
 
         module.exports.generateGUID = _cat.utils.Utils.generateGUID;
+        module.exports.extExists = _cat.utils.Utils.extExists;
 
     }
 }
