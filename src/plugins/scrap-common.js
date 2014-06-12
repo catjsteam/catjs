@@ -340,10 +340,13 @@ module.exports = function () {
 
                     if (codeRows) {
                         codeSnippet = codeRows[0];
+
                         if (codeSnippet) {
                             try {
+                                codeSnippet = _utils.prepareCode(codeSnippet);
                                 // try to understand the code
                                 codeSnippetObject = _uglifyutils.getCodeSnippet({code: codeSnippet});
+
 
                             } catch (e) {
                                 // TODO use uglifyjs to see if there was any error in the code.
@@ -361,6 +364,8 @@ module.exports = function () {
                             contextargs += "}";
 
                         }
+
+
                         me.print(_tplutils.template({
                             content: assertCallTpl,
                             data: {

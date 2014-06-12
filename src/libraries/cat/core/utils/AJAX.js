@@ -25,7 +25,8 @@ _cat.utils.AJAX = function () {
         sendRequestSync: function (config) {
 
             var xmlhttp = new XMLHttpRequest();
-
+            // TODO
+            // config.url = encodeURI(config.url);
             _cat.core.log.info("Sending REST request: " + config.url);
 
             try {

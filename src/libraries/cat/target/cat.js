@@ -1102,7 +1102,14 @@ _cat.utils.chai = function () {
                                     items.push(config.args[key]);
                                 }
                             }
-                            result = new Function(args, "return " + code).apply(this, items);
+
+                            if (code.indexOf("JSPath.") !== -1) {
+                                items.push((typeof JSPath !== "undefined" ? JSPath : undefined));
+                                args.push("JSPath");
+                                result =  new Function(args, "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, items);
+                            } else {
+                                result =  new Function(args, "return " + code).apply(this, items);
+                            }
 
                         } catch (e) {
                             success = false;
@@ -1870,7 +1877,7 @@ _cat.utils.AJAX = function () {
         sendRequestSync: function (config) {
 
             var xmlhttp = new XMLHttpRequest();
-
+            config.url = encodeURI(config.url);
             _cat.core.log.info("Sending REST request: " + config.url);
 
             try {
@@ -2275,8 +2282,9 @@ _cat.utils.TestsDB = function() {
             return TestDB.set(field, value);
         },
         find : function(field) {
-            var temp = "JSPath.apply('" + field + "', _data);";
-            return eval(temp);
+            var code = "JSPath.apply('" + field + "', _data);";
+
+            return new Function("JSPath", "_data", "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, [(typeof JSPath !== "undefined" ? JSPath : undefined), _data]);
         }
     };
 }();

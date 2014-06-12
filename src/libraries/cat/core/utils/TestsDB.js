@@ -84,8 +84,9 @@ _cat.utils.TestsDB = function() {
             return TestDB.set(field, value);
         },
         find : function(field) {
-            var temp = "JSPath.apply('" + field + "', _data);";
-            return eval(temp);
+            var code = "JSPath.apply('" + field + "', _data);";
+
+            return new Function("JSPath", "_data", "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, [(typeof JSPath !== "undefined" ? JSPath : undefined), _data]);
         }
     };
 }();

@@ -330,7 +330,8 @@ module.exports = _basePlugin.ext(function () {
                                                     Ext : true,
                                                     window : true,
                                                     chai: true,
-                                                    phantom: true
+                                                    phantom: true,
+                                                    JSPath: true
                                                 }
                                             }
                                         });

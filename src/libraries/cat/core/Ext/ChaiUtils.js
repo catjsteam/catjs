@@ -84,7 +84,14 @@ _cat.utils.chai = function () {
                                     items.push(config.args[key]);
                                 }
                             }
-                            result = new Function(args, "return " + code).apply(this, items);
+
+                            if (code.indexOf("JSPath.") !== -1) {
+                                items.push((typeof JSPath !== "undefined" ? JSPath : undefined));
+                                args.push("JSPath");
+                                result =  new Function(args, "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, items);
+                            } else {
+                                result =  new Function(args, "return " + code).apply(this, items);
+                            }
 
                         } catch (e) {
                             success = false;
