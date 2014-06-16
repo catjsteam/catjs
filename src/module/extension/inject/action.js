@@ -261,12 +261,20 @@ module.exports = _basePlugin.ext(function () {
                      */
                     function processSingleLine() {
 
+                        function setActualMeArg(param1) {
+                            // me === this
+                            if (param1 && param1[1] && param1[1] === "thi$") {
+                                param1[1] = "this";
+                            }
+                        }
+
                         scrapCtxArguments = scraplcl.generateCtxArguments();
                         param1 = [["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")];
 
                         // add context arguments if exists
                         if (scrapCtxArguments && scrapCtxArguments.length > 0) {
                             param1 = param1.concat(scrapCtxArguments);
+                            setActualMeArg(param1);
                         }
                         // we need to reevaluate the injected calls
                         if (injectinfo) {

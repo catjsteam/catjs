@@ -177,6 +177,7 @@ _clazz = function (config) {
         _init("single", {});
         _init("singleton", {});
         _init("arguments", []);
+        _init("context", ["thi$"]);
         _init("auto", true);
         _init("injectcode", false);
         _init("id", idArg);
