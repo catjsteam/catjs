@@ -33,11 +33,13 @@
         {
             "name": "p@project.clean",
             "type": "clean",
+            "dependency": "manager",
             "src": ["target", "_cat_md.json", "lib"]
         },
         {
             "name": "p@project.wipe",
             "type": "clean",
+            "dependency": "manager",
             "src": ["src", "lib", "*.log", "*.xml", "phantom/app-view.png"]
         },
         {
