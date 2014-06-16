@@ -454,12 +454,18 @@ module.exports = function () {
                                             }
                                         });
 
+                                        // override configuration
+                                        if (config.paths.chai) {
+                                            config.shim.catjs.deps = ["chai"];
+                                        }
+
                                         me.print(_tplutils.template({
                                             content: requireJSTpl,
                                             data: {
                                                 comment: " catjs require configuration - for additional require config use your application's ",
                                                 config: JSON.stringify(config),
                                                 require: JSON.stringify(requirelist),
+                                                requirerefs: requirelist.join(",").split('"').join(""),
                                                 cssfiles: JSON.stringify(requirecsslist)
                                             }
                                         }));
