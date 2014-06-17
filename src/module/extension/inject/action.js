@@ -263,8 +263,12 @@ module.exports = _basePlugin.ext(function () {
 
                         function setActualMeArg(param1) {
                             // me === this
-                            if (param1 && param1[1] && param1[1] === "thi$") {
-                                param1[1] = "this";
+                            if (param1 && param1[1]) {
+                                if (param1[1].split) {
+                                    param1[1] = param1[1].split("thi$").join("this");
+                                } else if (param1[1] === "thi$") {
+                                    param1[1] = "this";
+                                }
                             }
                         }
 
