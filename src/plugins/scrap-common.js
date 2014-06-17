@@ -59,6 +59,7 @@ module.exports = function () {
                 }});
 
 
+
             /**
              * Annotation for javascript code
              *
@@ -313,9 +314,26 @@ module.exports = function () {
                     }
                 }});
 
+            /**
+             * Annotation for description (aimed for the ui)
+             *
+             *  properties:
+             *  name    - description
+             *  single  - false
+             *  $type   - js
+             */
+            _Scrap.add({name: "description",
+                single: true,
+                singleton: 1,
+                func: function (config) {
+
+
+
+                }
+            });
 
             /**
-             * Annotation for chai
+             * Annotation for an assertion
              *
              *  properties:
              *  name    - chai
