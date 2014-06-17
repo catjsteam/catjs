@@ -238,13 +238,26 @@ module.exports = function () {
                             commandsCode.push(JSON.stringify(tempCommand));
                         }
 
+
+
                         jqmRows.forEach(function (jqmRow) {
                             if (jqmRow) {
                                 generate(jqmRow);
-                                me.print("_cat.core.clientmanager.delayManager([" + commandsCode +"]);");
-                                commandsCode = [];
+
+                                if (me.config.numCommands) {
+                                    me.config.numCommands += commandsCode.length;
+                                } else {
+                                    me.config.numCommands = commandsCode.length;
+                                }
+
+                                me.print("_cat.core.clientmanager.delayManager([" + commandsCode +"], {'scrap' : " + JSON.stringify({"config" : scrap}) + "});");
+
                             }
+
+                            commandsCode = [];
                         });
+
+
 
 
 
