@@ -1074,15 +1074,13 @@ _cat.utils.chai = function () {
                 result,
                 fail,
                 failure,
-                scrap = config.scrap.config,
+                scrap = config.scrap,
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
                 scrapDescription = (scrap.description ? scrap.description[0] : undefined),
                 testName = (scrapName || "NA"),
                 key, items=[], args=[],
                 catconfig = _cat.core.getConfig(),
                 reportFormats;
-
-            console.log(".... ", scrapDescription);
 
             if (_chai) {
                 if (config) {
