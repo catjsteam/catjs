@@ -1076,10 +1076,13 @@ _cat.utils.chai = function () {
                 failure,
                 scrap = config.scrap.config,
                 scrapName = (scrap.name ? scrap.name[0] : undefined),
+                scrapDescription = (scrap.description ? scrap.description[0] : undefined),
                 testName = (scrapName || "NA"),
                 key, items=[], args=[],
                 catconfig = _cat.core.getConfig(),
                 reportFormats;
+
+            console.log(".... ", scrapDescription);
 
             if (_chai) {
                 if (config) {
@@ -1093,7 +1096,6 @@ _cat.utils.chai = function () {
                     var output;
                     if (code) {
                         try {
-                            //eval(code);
                             args.push("assert");
                             items.push(assert);
                             for (key in config.args) {
@@ -1128,7 +1130,7 @@ _cat.utils.chai = function () {
                     // create catjs assertion entry
                     _cat.utils.assert.create({
                         name: testName,
-                        displayName:  _getDisplayName(testName),
+                        displayName:  (scrapDescription || _getDisplayName(testName)),
                         status: (success ? "success" : "failure"),
                         message: output,
                         success: success,
