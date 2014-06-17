@@ -1,6 +1,6 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
-    _scraputils = require("./Utils"),
+    _scraputils = require("./utils/Utils"),
     _Faker = require('Faker');
 //var _tplutils = catrequire("cat.tpl.utils");
 //var importJSTpl = _tplutils.readTemplateFile("scrap/_import_js");

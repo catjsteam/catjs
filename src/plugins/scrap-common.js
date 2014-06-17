@@ -7,7 +7,8 @@ var _Scrap = catrequire("cat.common.scrap"),
     _path = require("path"),
     _global = catrequire("cat.global"),
     _log = _global.log(),
-    _catlibtils = catrequire("cat.lib.utils");
+    _catlibtils = catrequire("cat.lib.utils"),
+    _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 
 module.exports = function () {
@@ -347,14 +348,9 @@ module.exports = function () {
                     var codeRows,
                         me = this,
                         codeSnippet,
-                        codeSnippetObject,
-                        context,
-                        contextargs = "",
-                        counter = 0,
-                        size;
+                        codeSnippetObject;
 
                     codeRows = this.get("assert");
-                    context = this.get("context");
 
                     if (codeRows) {
                         codeSnippet = codeRows[0];
@@ -372,25 +368,12 @@ module.exports = function () {
                             }
                         }
 
-                        if (context) {
-                            size = context.length;
-                            contextargs += "{";
-                            context.forEach(function (arg) {
-                                contextargs += arg + ":" + arg + (counter < size - 1 ? "," : "");
-                                counter++;
-                            });
-                            contextargs += "}";
-
-                        }
-
 
                         me.print(_tplutils.template({
                             content: assertCallTpl,
                             data: {
                                 expression: JSON.stringify(["assert", codeSnippetObject].join(".")),
-                                fail: true,
-                                scrap: JSON.stringify(me),
-                                param1: (contextargs || "{}")
+                                fail: true
                             }
                         }));
                     }

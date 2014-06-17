@@ -1,7 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _tplutils = catrequire("cat.tpl.utils"),
-    _scraputils = require("./Utils");
+    _scraputils = require("./utils/Utils");
 
 module.exports = function () {
 

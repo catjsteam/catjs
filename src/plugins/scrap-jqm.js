@@ -1,6 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
-    _scraputils = require("./Utils");
+    _scraputils = require("./utils/Utils"),
+    _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 var tipNum = 1;
 module.exports = function () {
@@ -27,9 +28,11 @@ module.exports = function () {
                         me = this,
                         commandsCode = [],
                         tempCommand,
+
                         generate = function (jqmRow) {
 
                             var jqm;
+
                             jqmRow = _utils.prepareCode(jqmRow);
 
                             if (jqmRow && jqmRow.join) {
@@ -209,20 +212,21 @@ module.exports = function () {
                                         "end" : ""
                                     };
 
-                                    commandsCode.push(JSON.stringify(tempCommand));
-
-
-
+                                    return JSON.stringify(tempCommand);
                                 }
-
                             }
-                        };
+
+                            return undefined;
+                        },
+                        scrapConf = me.config,
+                        scrap = scrapConf,
+                        scrapName,
+                        dm;
 
                     jqmRows = this.get("jqm");
-                    var scrapConf = me.config,
-                        scrap = scrapConf,
-                        scrapName;
-
+                    dm = new _delayManagerUtils({
+                        scrap: me
+                    });
 
                     if (jqmRows) {
                         scrap = scrapConf;
@@ -230,36 +234,25 @@ module.exports = function () {
 
                         if (jqmRows && jqmRows.join) {
 
-                            tempCommand = {
-                                "command" : "_cat.core.ui.setContent(",
-                                "args" : "{style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqmRows + "',tips: ''}",
-                                "end" : ");"
-                            };
-                            commandsCode.push(JSON.stringify(tempCommand));
+                            dm.add({
+                                rows:[{
+                                    "command" : "_cat.core.ui.setContent(",
+                                    "args" : "{style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqmRows + "',tips: ''}",
+                                    "end" : ");"
+                                }]
+
+                            }, function(row) {
+                                return JSON.stringify(row);
+                            });
                         }
 
 
+                        dm.add({
+                            rows:jqmRows
 
-                        jqmRows.forEach(function (jqmRow) {
-                            if (jqmRow) {
-                                generate(jqmRow);
-
-                                if (me.config.numCommands) {
-                                    me.config.numCommands += commandsCode.length;
-                                } else {
-                                    me.config.numCommands = commandsCode.length;
-                                }
-
-                                me.print("_cat.core.clientmanager.delayManager([" + commandsCode +"], {'scrap' : " + JSON.stringify({"config" : scrap}) + "});");
-
-                            }
-
-                            commandsCode = [];
+                        }, function(row) {
+                            return generate(row);
                         });
-
-
-
-
 
                     }
                 }
