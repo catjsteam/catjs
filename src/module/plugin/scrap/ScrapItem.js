@@ -108,10 +108,59 @@ _clazz = function (config) {
     var me = this;
 
     function _init(name, defaultValue) {
+        var items,
+            value,
+            values=[];
+
+        function _defaultvalues(validateItems) {
+
+            var idx= 0, size=validateItems.length,
+                item;
+
+            if (!defaultValue || (defaultValue && _typedas.isArray(defaultValue) && defaultValue.length === 0)) {
+                return;
+            }
+
+            for (; idx<size; idx++) {
+                item = validateItems[idx];
+                if (_typedas.isArray(defaultValue)) {
+                    if (_jsutils.Object.contains(defaultValue, item)) {
+                        defaultValue.splice(defaultValue.indexOf(item), 1);
+                    }
+                } else {
+                    if (item === defaultValue) {
+                        return undefined;
+                    }
+                }
+            };
+
+            if (_typedas.isArray(defaultValue)) {
+                if (defaultValue.length > 0) {
+                    values = values.concat(defaultValue);
+                }
+            } else {
+                values.push(defaultValue);
+            }
+        }
+
 
         // set default values
         if (me.config[name] === undefined) {
             me.set(name, defaultValue);
+
+        } else {
+            items = me.config[name];
+            if (_typedas.isArray(items)) {
+                if (_ScrapConfigItem.instanceOf(items[0])) {
+                    value = items[0].getValue();
+                    _defaultvalues([value]);
+                    values.push(value);
+                } else {
+                    _defaultvalues(items);
+                    values = values.concat(items);
+                }
+                me.set(name, values);
+            }
         }
     }
 
