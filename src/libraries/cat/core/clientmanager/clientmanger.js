@@ -5,14 +5,67 @@ _cat.core.clientmanager = function () {
         getScrapTestInfo,
         totalDelay,
         runStatus,
-        checkIfExists;
-
+        checkIfExists,
+        updateTimeouts,
+        catConfig,
+        startInterval,
+        getScrapInterval,
+        setupInterval;
     runStatus = {
         "scrapReady" : 0,
         "subscrapReady" : 0,
         "numRanSubscrap" : 0,
         "scrapsNumber" : 0
+
     };
+
+    getScrapInterval = function(scrap) {
+        var scrapId = scrap.id,
+            numCommands = (scrap.numCommands ? scrap.numCommands : 1);
+
+        if (!runStatus.intervalObj) {
+            runStatus.intervalObj = {
+                "interval" : undefined,
+                "counter" : 0,
+                "numCommands" : numCommands,
+                "signScrapId" : scrapId
+
+
+            };
+        }
+        return runStatus.intervalObj;
+    };
+
+
+    setupInterval = function(config, scrap) {
+        var tests,
+            scrapId = scrap.id,
+            intervalObj = getScrapInterval(scrap),
+            testManager;
+        tests = config.getTests();
+        if (tests) {
+            testManager = (tests[tests.length-1].name || "NA");
+        }
+
+
+        intervalObj.interval  = setInterval(function() {
+
+            if (intervalObj.counter < intervalObj.numCommands) {
+                intervalObj.counter++;
+
+            } else {
+                var reportFormats,
+                    err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
+
+                console.log("[CAT] " + err);
+                config.endTest({reportFormats: reportFormats, error: err}, intervalObj.interval);
+
+            }
+        }, config.getTimeout() / 3);
+        return;
+    };
+
+
 
     commitScrap = function (scrap, args, res) {
         var scrapInfo,
@@ -20,8 +73,6 @@ _cat.core.clientmanager = function () {
             scrapInfoArr,
             infoIndex,
             repeatIndex;
-
-
 
         scrapInfoArr = getScrapTestInfo(scrap.name[0]);
 
@@ -33,7 +84,6 @@ _cat.core.clientmanager = function () {
                 _cat.core.actionimpl.apply(this, args);
             }
         }
-
     };
 
 
@@ -42,7 +92,6 @@ _cat.core.clientmanager = function () {
             i, size,
             validate= 0,
             tempInfo,
-
             reportFormats;
 
         if (tests && scrapName) {
@@ -84,12 +133,30 @@ _cat.core.clientmanager = function () {
 
     totalDelay = 0;
 
+    updateTimeouts = function(scrap) {
+        var scrapId = scrap.id;
+        if (scrapId !== runStatus.intervalObj.signScrapId) {
+            runStatus.intervalObj.signScrapId = scrapId;
+            runStatus.intervalObj.counter = 0;
+            runStatus.intervalObj.numCommands = (scrap.numCommands ? scrap.numCommands : 1);
+        }
+    };
+
+    startInterval = function(catConfig, scrap) {
+        if (scrap.name[0] === tests[0].name) {
+            setupInterval(catConfig, scrap);
+        }
+    };
+
     return {
+
         signScrap : function(scrap, catConfig, args, _tests) {
             var urlAddress,
                 config;
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
+
+            startInterval(catConfig, scrap);
 
             if (checkIfExists(scrap.name[0], tests)) {
 
@@ -98,12 +165,10 @@ _cat.core.clientmanager = function () {
                 config = {
                     url : urlAddress,
                     callback : function() {
-                        var response = JSON.parse(this.responseText),
-                            scrapReadyIndex;
-
+                        var response = JSON.parse(this.responseText);
                         runStatus.scrapReady = parseInt(response.readyScrap.index) + 1;
-                        commitScrap(scrap, args, response);
 
+                        commitScrap(scrap, args, response);
                     }
                 };
 
@@ -119,14 +184,16 @@ _cat.core.clientmanager = function () {
 
             executeCode = function(codeCommands, context) {
                 var indexCommand,
-                    commandObj;
+                    commandObj,
+                    scrap = context.scrap;
+
+
+                updateTimeouts(scrap);
 
                 for (indexCommand in codeCommands) {
                     commandObj = codeCommands[indexCommand];
 
                     new Function("context", "return " + commandObj).apply(this, [context]);
-
-
                 }
 
                 runStatus.numRanSubscrap = runStatus.numRanSubscrap + codeCommands.length;
@@ -136,11 +203,12 @@ _cat.core.clientmanager = function () {
                     if (catConfig.isReport()) {
                         reportFormats = catConfig.getReportFormats();
                     }
-                    catConfig.endTest({reportFormats: reportFormats});
+
+                    // TODO change clear interval
+                    catConfig.endTest({reportFormats: reportFormats}, runStatus.intervalObj.interval);
                 }
 
             };
-
 
             runStatus.subscrapReady = runStatus.subscrapReady + codeCommands.length;
 
