@@ -13,7 +13,9 @@ module.exports = function (config) {
                     scrapconfig = scrap.config, counter,
                     args = (config.args || []);
 
-                //args =  JSON.parse(JSON.stringify(args));
+                _commandsCode = [];
+                args.push("scrap : _ipkg.scrap");
+                args.push("args  : _args");
 
                 rows.forEach(function (row) {
 
@@ -26,14 +28,9 @@ module.exports = function (config) {
                             scrapconfig.numCommands = _commandsCode.length;
                         }
 
-                       // { code:JSON.stringify(["assert", codeSnippetObject].join(".")), fail:true, scrap:_cat.core.getVar(pkgName).scrap, args:_args }
-
-                        args.push("'scrap' : _cat.core.getVar(pkgName).scrap");
-                        args.push("'args'  : _args");
-
                         if (!print) {
-                            scrap.print(["_cat.core.clientmanager.delayManager([", JSON.stringify(_commandsCode), "], {",
-                                    args.join(","),
+                            scrap.print(["_cat.core.clientmanager.delayManager(", JSON.stringify(_commandsCode), ", {",
+                                    args,
                                 "});"].join(""));
                         } else {
                             print.call(scrap, rows, counter);

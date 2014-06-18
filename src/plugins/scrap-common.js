@@ -378,8 +378,9 @@ module.exports = function () {
                                 "'code': [\"assert\", " + JSON.stringify(codeSnippetObject) + "].join(\".\")",
                                 "'fail': true"
                             ]
-
                         });
+
+                        dm.dispose();
                     }
                 }
             });

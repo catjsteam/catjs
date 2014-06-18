@@ -4,6 +4,7 @@ _cat.core.define("{{name}}", function({{arguments}}) {
         _argsrefs = arguments,
         _argsnames = "{{arguments}}",
         _args = {},
+        _ipkg = _cat.core.getVar(pkgName),
         _counter=0;
 
     if (_args) {

@@ -207,13 +207,12 @@ module.exports = function () {
 
                                 if (match) {
 
-                                    tempCommand = {
-                                        "command" : '_cat.core.plugin("jqm").actions.',
-                                        "args" : match,
-                                        "end" : ""
-                                    };
+                                    tempCommand = [
+                                        '_cat.core.plugin("jqm").actions.',
+                                        match
+                                    ];
 
-                                    return JSON.stringify(tempCommand);
+                                    return tempCommand.join("");
                                 }
                             }
 
@@ -221,7 +220,6 @@ module.exports = function () {
                         },
                         scrapConf = me.config,
                         scrap = scrapConf,
-                        scrapName,
                         dm;
 
                     jqmRows = this.get("jqm");
@@ -238,7 +236,7 @@ module.exports = function () {
                                 rows:[_elutils.uicontent({ rows: jqmRows, scrap: scrap})]
 
                             }, function(row) {
-                                return JSON.stringify(row);
+                                return row;
                             });
                         }
 
@@ -249,8 +247,9 @@ module.exports = function () {
                         }, function(row) {
                             return generate(row);
                         });
-
                     }
+
+                    dm.dispose();
                 }
             });
 

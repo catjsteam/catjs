@@ -1,9 +1,10 @@
+
 module.exports = function () {
 
 
     return {
 
-        uicontent: function (config) {
+        uicontent: function(config) {
             var scrap = config.scrap,
                 rows = config.rows;
 
@@ -14,12 +15,12 @@ module.exports = function () {
             ].join("")
         },
 
-        assert: function () {
+        assert: function() {
 
             return [
                 "_cat.utils.chai.assert(",
-                "context",
-                ");"
+                    "context",
+                    ");"
             ].join("");
 
 
