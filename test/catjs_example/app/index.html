@@ -27,9 +27,10 @@
 			@[scrap
 				@@name setUsername
                 @@embed true
-                @@jqm setText("#username", "catjs");
+                @@jqm setText("#username", "catjs0");
                 @@jqm setText("#username", "catjs1");
-                @@jqm setText("#username", "catjs2");
+
+                @@assert ok($('#username').val()=='catjs1','valid username')
 			]@
         -->
 
@@ -52,7 +53,12 @@
             @[scrap
 				@@name setEmail
                 @@embed true
-                @@jqm setText("#email", "catjsteam@gmail.com");
+                @@jqm setText("#email", "1");
+                @@jqm setText("#email", "2");
+                @@jqm setText("#email", "3");
+
+                @@assert ok($('#email').val()=='3','3')
+
 			]@
 		-->
         <div>

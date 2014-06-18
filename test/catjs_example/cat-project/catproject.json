@@ -8,7 +8,7 @@
     "host": "localhost",
     "port": "8089",
     "protocol": "http",
-    "analytics" : "true",
+    "analytics" : "Y",
     "apppath": "./../app",
     "appserver": {
         "host": "localhost",
