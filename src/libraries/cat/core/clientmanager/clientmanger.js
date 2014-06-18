@@ -119,15 +119,12 @@ _cat.core.clientmanager = function () {
 
             executeCode = function(codeCommands, context) {
                 var indexCommand,
-                    commandObj,
-
-                    tempCommand;
+                    commandObj;
 
                 for (indexCommand in codeCommands) {
                     commandObj = codeCommands[indexCommand];
-                    tempCommand = commandObj.command + commandObj.args + commandObj.end;
 
-                    new Function("context", "return " + tempCommand).apply(this, [context]);
+                    new Function("context", "return " + commandObj).apply(this, [context]);
 
 
                 }
