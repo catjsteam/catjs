@@ -8,13 +8,13 @@ var _Scrap = catrequire("cat.common.scrap"),
     _global = catrequire("cat.global"),
     _log = _global.log(),
     _catlibtils = catrequire("cat.lib.utils"),
-    _delayManagerUtils =  require("./utils/DelayManagerUtils");
+    _delayManagerUtils = require("./utils/DelayManagerUtils"),
+    _elutils = require("./utils/ExpressionUtils");
 
 
 module.exports = function () {
 
     var funcSnippetTpl = _tplutils.readTemplateFile("scrap/_func_snippet"),
-        assertCallTpl = _tplutils.readTemplateFile("scrap/_assert_call"),
         importJSTpl = _tplutils.readTemplateFile("scrap/_import_js"),
         requireJSTpl = _tplutils.readTemplateFile("scrap/_require_js"),
         importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css");
@@ -58,7 +58,6 @@ module.exports = function () {
                         me.setCtxArguments(ctx);
                     }
                 }});
-
 
 
             /**
@@ -329,7 +328,6 @@ module.exports = function () {
                 func: function (config) {
 
 
-
                 }
             });
 
@@ -348,7 +346,8 @@ module.exports = function () {
                     var codeRows,
                         me = this,
                         codeSnippet,
-                        codeSnippetObject;
+                        codeSnippetObject,
+                        dm;
 
                     codeRows = this.get("assert");
 
@@ -368,16 +367,22 @@ module.exports = function () {
                             }
                         }
 
+                        dm = new _delayManagerUtils({
+                            scrap: me
+                        });
 
-                        me.print(_tplutils.template({
-                            content: assertCallTpl,
-                            data: {
-                                expression: JSON.stringify(["assert", codeSnippetObject].join(".")),
-                                fail: true
-                            }
-                        }));
+
+                        dm.add({
+                            rows: [_elutils.assert()],
+                            args: [
+                                "'code': [\"assert\", " + JSON.stringify(codeSnippetObject) + "].join(\".\")",
+                                "'fail': true"
+                            ]
+
+                        });
                     }
-                }});
+                }
+            });
 
             /**
              * Annotation for require a javascript file on requirejs environment
@@ -399,7 +404,7 @@ module.exports = function () {
                     var requirerows = this.get("require"),
                         me = this,
                         basedir, libs, code,
-                        requirelist=[],
+                        requirelist = [],
                         requirecsslist = [],
                         config = {
                             shim: {
@@ -423,7 +428,7 @@ module.exports = function () {
                         }
                         requirerows.forEach(function (lib) {
 
-                            if (lib &&  _isCatjs(lib)) {
+                            if (lib && _isCatjs(lib)) {
 
                                 libs = catrequire("cat.cli").getProject().getInfo("dependencies");
                                 basedir = _path.dirname(lib) + "/";
@@ -434,7 +439,7 @@ module.exports = function () {
 
                                     if (code) {
 
-                                        libs.forEach(function(lib) {
+                                        libs.forEach(function (lib) {
                                             var fullpathlib,
                                                 key;
 
@@ -518,11 +523,11 @@ module.exports = function () {
 
                         if (contentByType && value) {
 
-                            if ( _isCatjs(value)) {
+                            if (_isCatjs(value)) {
                                 // handle cat library
                                 libs = catrequire("cat.cli").getProject().getInfo("dependencies");
 
-                                libs.forEach(function(lib) {
+                                libs.forEach(function (lib) {
                                     if (lib === "cat") {
                                         catlibidx = libcounter;
                                     }
@@ -534,7 +539,7 @@ module.exports = function () {
 
                                 basedir = _path.dirname(value) + "/";
                                 if (libs && libs.length > 0) {
-                                    args = ["?type=import&basedir=", basedir ,"&libs=", libs.join(",")].join("")
+                                    args = ["?type=import&basedir=", basedir , "&libs=", libs.join(",")].join("")
                                 }
                             }
 

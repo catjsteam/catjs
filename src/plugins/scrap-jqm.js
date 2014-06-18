@@ -1,6 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _scraputils = require("./utils/Utils"),
+    _elutils = require("./utils/ExpressionUtils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 var tipNum = 1;
@@ -230,16 +231,11 @@ module.exports = function () {
 
                     if (jqmRows) {
                         scrap = scrapConf;
-                        scrapName = (scrap.name ? scrap.name[0] : undefined);
 
                         if (jqmRows && jqmRows.join) {
 
                             dm.add({
-                                rows:[{
-                                    "command" : "_cat.core.ui.setContent(",
-                                    "args" : "{style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + jqmRows + "',tips: ''}",
-                                    "end" : ");"
-                                }]
+                                rows:[_elutils.uicontent({ rows: jqmRows, scrap: scrap})]
 
                             }, function(row) {
                                 return JSON.stringify(row);
