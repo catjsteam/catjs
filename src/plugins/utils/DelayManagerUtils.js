@@ -21,11 +21,10 @@ module.exports = function (config) {
 
                     if (row) {
                         _commandsCode.push((process ? process.call(scrap, row) : row));
-
                         if (scrapconfig.numCommands) {
-                            scrapconfig.numCommands += _commandsCode.length;
+                            scrapconfig.numCommands++;
                         } else {
-                            scrapconfig.numCommands = _commandsCode.length;
+                            scrapconfig.numCommands = 1;
                         }
 
                         if (!print) {
