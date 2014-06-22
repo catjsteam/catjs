@@ -1,4 +1,4 @@
-CATJS 0.2.0
+CATJS 0.2.2
 ==============
 
 *CATJS* is an automation framework for (mobile) web applications testing.
