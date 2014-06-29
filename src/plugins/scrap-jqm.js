@@ -27,7 +27,6 @@ module.exports = function () {
 
                     var jqmRows,
                         me = this,
-                        commandsCode = [],
                         tempCommand,
 
                         generate = function (jqmRow) {
