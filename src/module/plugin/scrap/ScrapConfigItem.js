@@ -6,6 +6,9 @@
  *
  * @type {module.exports}
  */
+
+var _typedas = require("typedas");
+
 module.exports = function () {
 
 
@@ -37,7 +40,7 @@ module.exports = function () {
         },
 
         instanceOf: function(obj) {
-            return  (obj["$$classType"] ? true : false);
+            return  (obj && _typedas.isObject(obj) && ("$$classType" in obj) && obj["$$classType"] ? true : false);
         }
 
     };
