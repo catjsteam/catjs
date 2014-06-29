@@ -1,4 +1,4 @@
-var _fs = require('fs.extra'),
+var _fs = require('fs'),
     _path = require('path'),
     _lineReader = require('line-reader'),
     _global = catrequire("cat.global"),
@@ -86,7 +86,7 @@ module.exports = _basePlugin.ext(function () {
                                 name: "scrap/_func",
                                 data: {
                                     name: pkgname,
-                                    arguments: (args ? args.join(",") : undefined),
+                                    arguments: (args ? ( args.join ? args.join(",") : args) : undefined),
                                     output: scrap.generate()}
                             }
                         ));
@@ -488,7 +488,7 @@ module.exports = _basePlugin.ext(function () {
                     counter = -1,
                     emitter = _me.getEmitter();
 
-                function _apply(filename) {
+                function _apply(filename, callback) {
 
                     var scraps = [],
                         scrapName,
@@ -515,14 +515,20 @@ module.exports = _basePlugin.ext(function () {
                         }
 
                         // apply all scraps
-                        _Scrap.apply({scraps: scraps});
+                        _Scrap.apply({scraps: scraps,  apply: true});
 
                         _inject(scraps, filename, function () {
                             counter++;
-                            _apply(filesArr[counter]);
+                            _apply(filesArr[counter], callback);
 
                             // update the scrap data w/o running scrap apply
                             _Scrap.apply({scraps: scraps, apply: false});
+                            if (counter === filesArr.length) {
+                                if (callback) {
+                                    callback.call(this);
+                                }
+                            }
+
                         });
                     } else {
                         //  _Scrap.apply({scraps: scraps});
@@ -552,7 +558,10 @@ module.exports = _basePlugin.ext(function () {
 
                                 if (filesArr && filesArr.length > 0) {
                                     counter = 0;
-                                    _apply(filesArr[counter]);
+                                    _apply(filesArr[counter], function() {
+                                        var scrapslcl = _Scrap.getScraps();
+                                        _Scrap.apply({scraps: scrapslcl, apply: true});
+                                    });
                                 }
                             }
 
