@@ -132,7 +132,7 @@ module.exports = _basePlugin.ext(function () {
                                         _Scrap.apply({
                                             basePath: _basePath,
                                             scraps: [scrap],
-                                            apply: false
+                                            apply: true
                                         });
                                     }
                                 }
