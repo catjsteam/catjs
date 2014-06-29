@@ -416,29 +416,6 @@ _cat.core = function () {
                 return _enum;
             };
 
-
-//            /*  take care of run-mode === tests
-//                we need to make sure that it get to run */
-//            if (this.getRunMode() === _enum.TEST_MANAGER) {
-//                tests = this.getTests();
-//                if (tests) {
-//                    testManager = (tests[tests.length-1].name || "NA");
-//                }
-//                _runModeValidation = setInterval(function() {
-//                    if (_runModeValidationRetry < 3) {
-//                        _log.log("[CAT] run-mode=tests waiting for catjs manager: '" + testManager + "' .... retry");
-//                        _runModeValidationRetry++;
-//
-//                    } else {
-//                        var reportFormats,
-//                            err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
-//
-//                        _log.log("[CAT] " + err);
-//                        me.endTest({reportFormats: reportFormats, error: err});
-//
-//                    }
-//                }, this.getTimeout() / 3);
-//            }
         }
 
         this.hasPhantom = function () {
