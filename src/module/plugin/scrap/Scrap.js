@@ -267,6 +267,9 @@ module.exports = function () {
 
                 if (scrap) {
                     if (isApply) {
+                        if (isApply) {
+                            scrap.numCommandsDestroy();
+                        }
                         scrap.buildContext(_scrapNames);
                         scrap.apply();
                     }
@@ -281,12 +284,14 @@ module.exports = function () {
             }
 
             var metaData = {files: {}, project: {}},
-                fileName, scrap, scraps,
+                fileName, scraps,
                 root, baseClonedProjectPath,
                 updateobj = {files: metaData.files, project: metaData.project},
-                isApply = true;
+                isApply;
 
             if (config) {
+
+                isApply = ("apply" in config ? config.apply : true);
                 scraps = (config.scraps || _scraps);
 
                 if (config.basePath) {
