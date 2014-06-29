@@ -474,6 +474,21 @@ _clazz.prototype.buildContext = function(scrapNames) {
     });
 };
 
+
+_clazz.prototype.numCommandsInc = function() {
+    if (this.config.numCommands) {
+        this.config.numCommands++;
+    } else {
+        this.config.numCommands = 1;
+    }
+};
+
+_clazz.prototype.numCommandsDestroy = function() {
+    if (this.config.numCommands) {
+        delete this.config.numCommands;
+    }
+};
+
 _clazz.prototype.extractAnnotations = function(scrapsRows) {
     var map = {};
 
