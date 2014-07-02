@@ -87,6 +87,22 @@ _cat.utils.TestsDB = function() {
             var code = "JSPath.apply('" + field + "', _data);";
 
             return new Function("JSPath", "_data", "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, [(typeof JSPath !== "undefined" ? JSPath : undefined), _data]);
+        },
+        random: function(field) {
+
+            function _random(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            var result = this.find(field),
+                cell=0;
+
+            if (result && result.length) {
+                cell = _random(0, result.length-1);
+                return result[cell];
+            }
+
+            return result;
         }
     };
 }();

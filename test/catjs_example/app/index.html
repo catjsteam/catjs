@@ -27,10 +27,12 @@
 			@[scrap
 				@@name setUsername
                 @@embed true
+                @@jqm setText("#username", @d.random(.users.name));
                 @@jqm setText("#username", "catjs0");
                 @@jqm setText("#username", "catjs1");
-
                 @@assert ok($('#username').val()=='catjs1','valid username')
+
+
 			]@
         -->
 
