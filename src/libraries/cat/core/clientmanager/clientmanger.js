@@ -216,7 +216,7 @@ _cat.core.clientmanager = function () {
                 setTimeout(function() {
                     executeCode(codeCommands, context);
                 }, totalDelay);
-                totalDelay += 4000;
+                totalDelay += 2000;
             } else {
                 executeCode(codeCommands, context);
             }
