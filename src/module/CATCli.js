@@ -30,6 +30,7 @@ module.exports = function () {
                     "k": ["--kill", 0],
                     "i": ["--init", "cat"],
                     "b": ["--task", "t@init", "--task", "t@scrap", "--task", "t@inject"],
+                    "a": ["--task", "t@autotest"],
                     "t": ["--task", "t@test"],
                     "c": ["--task", "t@clean"],
                     "s": ["--task", "t@server.start"],
