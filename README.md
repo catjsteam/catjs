@@ -182,7 +182,7 @@ The plugins aimed to give you a syntactic sugar, but you can always use your own
             ]@
         */
 
-### It about timne to run your tests  
+### It about time to run your tests  
 Open your favorite browser and go to: **http://localhost:8089**  
 Here is a short description for the events that occurs after loading the test deployment:
 
@@ -223,7 +223,7 @@ You can use the -a flag in the command line for auto scraps assigning.
                     "tests": [
                         {
                             "name": "myScrap"
-                        },
+                        }
                     ]
                 }
         }
