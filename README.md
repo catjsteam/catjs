@@ -75,25 +75,25 @@ CatJS support a standard JavaScript imports and the [requireJS](http://requirejs
     * *standard import* - Put CatJS library where you load your all of the other JavaScript resources and you can load other resources with cat annotation just add a new line after cat.js 
       
         
-        <! --
-            @[scrap
-                @@import[
-                    /cat/lib/cat.js
-                ]
-            ]@
-        -- >
+            <! --
+                @[scrap
+                    @@import[
+                        /cat/lib/cat.js
+                    ]
+                ]@
+            -- >
 
     
     
     * *RequireJS style* - Put CatJS require configuration just below yours  
         
-        /*
-           @[scrap
-               @@require[
-                  /cat/lib/cat.js
-               ]
-           ]@
-        */
+            /*
+               @[scrap
+                   @@require[
+                      /cat/lib/cat.js
+                   ]
+               ]@
+            */
 
        
 
