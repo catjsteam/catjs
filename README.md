@@ -69,7 +69,12 @@ Any future CatJS command should be running from the "cat-project" folder, since 
 Scrap is a single action annotation that can combine one or more operations or assertions.  
 You should put the scrap within comments.
 
-* Import catjs library
+* Import catjs library    
+CatJS support a standard JavaScript imports and the [requireJS](http://requirejs.org) library style  
+
+    * standard import  
+    Put CatJS library where you load your all of the other JavaScript resources  
+    You can load other resources with cat annotation just add a new line after cat.js
 
         <!--
             @[scrap
@@ -78,6 +83,18 @@ You should put the scrap within comments.
                 ]
             ]@
         -->
+
+    * RequireJS style  
+    Put CatJS require configuration just below yours
+    
+        /*
+           @[scrap
+               @@require[
+                  /cat/lib/cat.js
+               ]
+           ]@
+        */
+
 
 * Add your own scrap
 
@@ -226,7 +243,7 @@ Ignore the test scenarios definition and run all the tests at once.
 In this mode you will not be able to see the ui console or any delay in the script.
 
 
-### Use test data
+### Test Data Usage
 
 On CatJS project creation a test data file is being created: cat-project/src/config.testdata.json  
 This is a JSON file format and you can set your data inside and use that data within CatJS annotation. for example:
