@@ -46,7 +46,7 @@ In order to get started, you'll want to install CAT's CLI (command line interfac
 
 ### Then, create a new project with CatJS tool
 
-    npm install -i
+    catcli -i
 
 Follow the command inputs:
 
