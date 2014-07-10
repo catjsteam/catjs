@@ -1,14 +1,14 @@
-CATJS 0.2.3
+CatJS 0.2.3
 ==============
 
-*CATJS* is an automation framework for (mobile) web applications testing.
+*CatJS* is an automation framework for (mobile) web applications testing.
 It offers a new technology that makes testing easy, we don't do WebDriver like the other technologies, in our case the applications test themselves.
 With simple annotations added to your HTML5 code, an automated functional tests will be available as part of your application lifecycle.
 
 ### Code once, deploy it anywhere <br/>
 
-Once you added the test code you can run it using [CAT runner](https://www.npmjs.org/package/mobilerunner) (That is already part of CATJS, no need to do any additional installations), on any platform that your application supports.
-CAT runner can deploy your application on multiple devices and desktop browsers.
+Once you added the test code you can run it using [CatJS runner](https://www.npmjs.org/package/mobilerunner) (That is already part of CatJS, no need to do any additional installations), on any platform that your application supports.
+CatJS runner can deploy your application on multiple devices and desktop browsers.
 
 ### A few facts
 
@@ -16,7 +16,7 @@ CAT runner can deploy your application on multiple devices and desktop browsers.
 * Once you wish to test your application, with a simple command, a new deployment will be generated for you to use including the test code
 * You get to document your tests and test your code
 * When you are ready for production the additional annotations will be removed on the minify process.
-* CAT is an [NPM](https://www.npmjs.org/) and can be used as a command-line and/or as a module (The module will be available in the next releases)
+* CatJS is an [NPM](https://www.npmjs.org/) and can be used as a command-line and/or as a module (The module will be available in the next releases)
 
 [cat.js.team](http://catjsteam.github.io/) @catjsteam
 You can visit our [catjs forum](https://groups.google.com/forum/#!forum/catjs). Comments and questions are more than welcome, our team can help and consult about how to test your web application.
@@ -38,8 +38,8 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Quick Start
 
-### First, install CAT command line
-In order to get started, you'll want to install CAT's CLI (command line interface) globally. `catcli` command will be set into your system path.
+### First, install CatJS command line
+In order to get started, you'll want to install CatJS's CLI (command line interface) globally. `catcli` command will be set into your system path.
 
     npm install -g catjs
 
@@ -51,9 +51,9 @@ In order to get started, you'll want to install CAT's CLI (command line interfac
 Follow the command inputs:
 
 * Enter the project name: [project name, better with no spaces]
-* Enter CAT server's host name:  (localhost)
-* Enter CAT server's port:  (8089)
-* Enter CAT server's protocol:  (http)
+* Enter CatJS server's host name:  (localhost)
+* Enter CatJS server's port:  (8089)
+* Enter CatJS server's protocol:  (http)
 * May catjs anonymously report usage statistics to improve the tool over time?:  (Y) 
 * Enter your project's (application) path:  ./../app 
   Relative path from "cat-project" folder to your app. 
