@@ -72,8 +72,9 @@ You should put the scrap within comments.
 * Import catjs library    
 CatJS support a standard JavaScript imports and the [requireJS](http://requirejs.org) library style  
 
-    * *standard import* - Put CatJS library where you load your all of the other JavaScript resources and you can load other resources with cat annotation just add a new line after cat.js 
-      
+    * standard import  
+    Put CatJS library along with the other JavaScript resources  
+    You can load other resources with cat annotation, just add a new line after cat.js import   
         
             <! --
                 @[scrap
@@ -83,9 +84,8 @@ CatJS support a standard JavaScript imports and the [requireJS](http://requirejs
                 ]@
             -- >
 
-    
-    
-    * *RequireJS style* - Put CatJS require configuration just below yours  
+    * RequireJS style   
+    Put CatJS require configuration just below yours   
         
             /*
                @[scrap
@@ -95,7 +95,6 @@ CatJS support a standard JavaScript imports and the [requireJS](http://requirejs
                ]@
             */
 
-       
 
 * Add your own scrap
         
