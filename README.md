@@ -226,6 +226,26 @@ Ignore the test scenarios definition and run all the tests at once.
 In this mode you will not be able to see the ui console or any delay in the script.
 
 
+### Use test data
+
+On CatJS project creation a test data file is being created: cat-project/src/config.testdata.json  
+This is a JSON file format and you can set your data inside and use that data within CatJS annotation. for example:
+
+        /*
+            @[scrap
+                @@code alert(@d.find(.users.name))
+            ]@
+        */
+        
+We have integrated [JsPath](https://github.com/dfilatov/jspath) with CatJS core and you can use its syntax for query your data out from the test data JSON.
+Currently we have support for two scrap methods:
+
+* *find*    
+Find a specific single entry (In case we get more than one result we'll take the first)
+
+* *random*  
+Get a specific entry out of an Array of items, Each call will result a random entry.
+
 ## Example Application
 
 * Create an initial CatJS project with a simple example application included
@@ -263,6 +283,8 @@ Look into the file system where your generated project was created. At the root 
 ## Application Error Assertion
 catjs track your application errors and report it to the console/junit. With minimal annotation for catjs library loading you get to track your application errors.
    Combined it with catjs runner you can immediately get report about any errors on different browsers and devices.
+
+
 
 ## API reference
 
