@@ -6,7 +6,8 @@ var _catglobal = catrequire("cat.global"),
     _utils = catrequire("cat.utils"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
-    _Scrap = catrequire("cat.common.scrap");
+    _Scrap = catrequire("cat.common.scrap"),
+    _beautify = require('js-beautify').js_beautify;
 
 module.exports = _basePlugin.ext(function () {
 
@@ -34,7 +35,8 @@ module.exports = _basePlugin.ext(function () {
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"],
                 workDir = _catglobal.get("home").working.path,
-                catjson, catjsondata, args=[];
+                catjson, catjsondata, args=[],
+                filedata;
 
             if (!config) {
                 _log.error(errors[1]);
@@ -77,7 +79,16 @@ module.exports = _basePlugin.ext(function () {
                         }
                     }
 
-                    _fs.writeFileSync(catjson, JSON.stringify(catjsondata));
+                    filedata = JSON.stringify(catjsondata);
+                    if (filedata) {
+
+                        try {
+                            filedata = _beautify(filedata, { indent_size: 2 });
+                            _fs.writeFileSync(catjson, filedata);
+                        } catch(e) {
+                            _utils.error("[CAT autotest] Error occurred while writing the configuration data. Error: ", e);
+                        }
+                    }
 
                 }
             }
