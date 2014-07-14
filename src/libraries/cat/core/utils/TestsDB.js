@@ -5,7 +5,7 @@ _cat.utils.TestsDB = function() {
 
     (function() {
         _cat.utils.AJAX.sendRequestAsync({
-            url : "/cat/config/testdata.json",
+            url :  _cat.core.getBaseUrl("cat/config/testdata.json"),
             callback : {
                 call : function(check) {
                     _data = JSON.parse(check.response);
@@ -67,8 +67,11 @@ _cat.utils.TestsDB = function() {
         },
 
         init : function() {
-            TestDB = new _TestsDB();
-            return TestDB;
+            /*
+                 @deprecated
+                 TestDB = new _TestsDB();
+                 return TestDB;
+             */
         },
 
         getDB : function() {
