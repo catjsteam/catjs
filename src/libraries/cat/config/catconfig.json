@@ -32,5 +32,6 @@
         "errors": true
     },
     "run-mode": "all",
+    "run-test-delay": 2000,
     "test-failure-timeout": 30
 }
