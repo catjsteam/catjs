@@ -29,7 +29,7 @@ You can visit our [catjs forum](https://groups.google.com/forum/#!forum/catjs). 
 
 [Technology Through My Eyes](http://mobilewebtesting.wordpress.com/2014/06/22/how-to-test-your-mobile-web-application-using-catjs-part-one)
 
-## catjs - Seed project
+## CatJS - Seed project
 
 We recommend you to try our catjs seed project on [jQuery Moblie app](http://jquerymobile.com/)  
 Github project [https://github.com/ransnir/catjs-jqm-seed](https://github.com/ransnir/catjs-jqm-seed)  
@@ -420,7 +420,7 @@ You can explore our [plugins folder](https://github.com/catjsteam/catjs/tree/mas
     
     * *waterfall(element, eventName)* 
     * *setSelected(element, name, idx, eventname)* 
-    * *next:(element)* 
+    * *next(element)* 
     
     
 * **DOM** Partly supported
