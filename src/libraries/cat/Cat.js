@@ -21,38 +21,14 @@ _cat.core = function () {
             ALL: "all",
             TEST_MANAGER_OFFLINE : "offline"
         },
-        _getBase,
-        _getBaseUrl,
-        _runModeValidation,
-        _runModeValidationRetry=0;
-
-    _getBase="/";
-
-    _getBaseUrl = function() {
-        var base;
-
-        if (!_getBase) {
-            base = "/";
-
-        } else {
-            if (_getBase.trim) {
-                _getBase = _getBase.trim();
-            }
-            if (_getBase.charAt(0) === ".") {
-                base = _getBase.slice(1);
-            }
-            if (!base) {
-                base = "/";
-            }
-        }
-
-        return base;
-    };
+        _runModeValidation;
 
     addScrapToManager = function (testsInfo, scrap) {
 
         var i, test, testRepeats,
-            testDelay, preformVal,pkgNameVal;
+            testDelay, preformVal,pkgNameVal,
+            catConfig = _cat.core.getConfig(),
+            delay = catConfig.getTestDelay();
 
         for (i = 0; i < testsInfo.length; i++) {
             testNumber--;
@@ -60,7 +36,7 @@ _cat.core = function () {
 
             testRepeats = parseInt((test.repeat ? test.repeat : 1));
             test.repeat = "repeat(" + testRepeats + ")";
-			testDelay = "delay(" + (test.delay ? test.delay : 2000) + ")";
+			testDelay = "delay(" + (test.delay ? test.delay : delay) + ")";
             preformVal = "@@" + scrap.name[0] + " " + testRepeats;
             pkgNameVal = scrap.pkgName + "$$cat";
             if (test.scenario) {
@@ -257,17 +233,12 @@ _cat.core = function () {
             xmlhttp,
             configText,
             me = this,
-            url, catjson = "cat/config/cat.json",
-            baseurl = _getBaseUrl(),
-            tests, testManager;
+            url, catjson = "cat/config/cat.json";
 
         try {
-            if (baseurl && baseurl.charAt(baseurl.length-1) !== "/") {
-                baseurl += "/";
-            }
-            url = [baseurl , catjson].join("");
+
             xmlhttp = _cat.utils.AJAX.sendRequestSync({
-                url: url
+                url: _cat.core.getBaseUrl(catjson)
             });
             if (xmlhttp) {
                 configText = xmlhttp.responseText;
@@ -314,6 +285,10 @@ _cat.core = function () {
 
             };
 
+            this.getTestDelay = function() {                
+                return (innerConfig["run-test-delay"] || 2000);
+            };
+            
             this.getRunMode = function () {
                 return (innerConfig["run-mode"] || "all");
             };
@@ -451,7 +426,12 @@ _cat.core = function () {
         log: _log,
 
         onload: function(libs) {
+            
+            // load the libraries
             _import(libs);
+
+            // catjs initialization
+            _cat.core.init();            
         },
 
         init: function() {
@@ -528,7 +508,9 @@ _cat.core = function () {
             var manager = _cat.core.getManager(managerKey),
                 scrapref, scrapname, behaviors = [], actionItems = {},
                 matchvalue = {}, matchvalues = [],
-                totalDelay = 0;
+                totalDelay = 0,
+                catConfig = _cat.core.getConfig(),
+                delay = catConfig.getTestDelay();
 
             /**
              * Scrap call by its manager according to its behaviors
@@ -539,7 +521,7 @@ _cat.core = function () {
              */
             function __call(config) {
                 totalDelay = 0;
-                var delay = (config.delay || 2000),
+                var delay = (config.delay || delay),
                     repeat = (config.repeat || 1),
                     idx = 0,
                     func = function () {
@@ -879,6 +861,10 @@ _cat.core = function () {
 
         guid: function() {
             return _guid;
+        },
+
+        getBaseUrl: function(url) {
+            return  ([window.location.origin, "/", (url || "")].join("") || "/");
         }
 
     };
