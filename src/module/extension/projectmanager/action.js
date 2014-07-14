@@ -4,20 +4,18 @@ var path = require("path"),
     configPath,
     data,
     _fs = require("fs"),
-    project, sourceFolder;
+    project, sourceFolder,
+    _catcli;
 
 var readProject  = function() {
     var globalTests,
         scrapsObj,
         mainProject,
-        scrapsOrder,
         emptyQueue,
         getScrap,
-
         devicesTests;
 
     devicesTests = {};
-
     globalTests = [];
     scrapsObj = {};
 
@@ -40,39 +38,43 @@ var readProject  = function() {
         }
 
         data = _fs.readFileSync(configPath, 'utf8');
-        _testconfig = JSON.parse(data);
+        return JSON.parse(data);
 
-        return _testconfig;
     }());
 
 
-    scrapsOrder = (function() {
+    (function() {
 
-        var getScenarioTests =function(testsList, globalDelay, scenarioName) {
-            var innerConfigMap = [];
+        var getScenarioTests = function(testsList, globalDelay, scenarioName) {
+                
+            var innerConfigMap = [],
+                j= 0, i= 0, tempArr,
+                testsobj = (testsList ? testsList.tests : undefined), 
+                size = (testsobj ? testsobj.length : 0),
+                repeatFlow;
 
             if (testsList.tests) {
-                for (var i = 0; i < testsList.tests.length; i++) {
-                    if (!(testsList.tests[i].disable)) {
-                        if (testsList.tests[i].tests) {
-                            var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
+                for (i = 0; i < size; i++) {
+                    if (!(testsobj[i].disable)) {
+                        if (testsobj[i].tests) {
+                            repeatFlow = testsList.tests[i].repeat ?testsobj[i].repeat : 1;
 
-                            for (var j = 0; j < repeatFlow; j++) {
-                                var tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay, scenarioName);
+                            for (j = 0; j < repeatFlow; j++) {
+                                tempArr = getScenarioTests(testsobj[i], testsobj[i].delay, scenarioName);
                                 innerConfigMap = innerConfigMap.concat(tempArr);
                             }
 
                         } else {
 
                             // set the global delay
-                            if (!testsList.tests[i].delay && globalDelay) {
-                                testsList.tests[i].delay = globalDelay;
+                            if (!testsobj[i].delay && globalDelay) {
+                                testsobj[i].delay = globalDelay;
                             }
-                            testsList.tests[i].wasRun = false;
-                            testsList.tests[i].scenario = {name: (scenarioName || null)};
+                            testsobj[i].wasRun = false;
+                            testsobj[i].scenario = {name: (scenarioName || null)};
 
 
-                            innerConfigMap.push(testsList.tests[i]);
+                            innerConfigMap.push(testsobj[i]);
 
                         }
                     }
@@ -85,15 +87,22 @@ var readProject  = function() {
         testsScenarios,
         scenariosList,
         currentTestName,
-        indexTest;
+        indexTest=0,
+        currTest,
+        repeatScenario,
+        scenario, 
+        j, temp, indexGlobalTests,
+            globaltestsize,
+            testsscenariossize;
 
         testsScenarios = mainProject.tests;
         scenariosList = mainProject.scenarios;
 
-        for (indexTest in testsScenarios) {
-            var currTest,
-                repeatScenario,
-                scenario;
+        testsscenariossize = testsScenarios.length;
+        for (indexTest=0; indexTest<testsscenariossize; indexTest++) {
+            currTest = null;
+            repeatScenario = null;
+            scenario = null;
 
             currTest = testsScenarios[indexTest];
 
@@ -107,8 +116,7 @@ var readProject  = function() {
 
             if (scenario) {
                 repeatScenario = (scenario.repeat ? scenario.repeat : 1);
-                for (var j = 0; j < repeatScenario; j++) {
-                    var temp;
+                for (j = 0; j < repeatScenario; j++) {
                     temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
                     globalTests = globalTests.concat(temp);
                 }
@@ -118,7 +126,8 @@ var readProject  = function() {
         }
 
         //add attributes
-        for (var indexGlobalTests in globalTests) {
+        globaltestsize = globalTests.length;
+        for (indexGlobalTests=0; indexGlobalTests<globaltestsize; indexGlobalTests++) {
             globalTests[indexGlobalTests].run = false;
             globalTests[indexGlobalTests].index = indexGlobalTests;
             globalTests[indexGlobalTests].signed = false;
@@ -137,9 +146,10 @@ var readProject  = function() {
             indexRes,
             result,
             scrapElement,
-            scrapReadyIndex = testsConfig.scrapReadyIndex;
+            scrapReadyIndex = testsConfig.scrapReadyIndex,
+            size = resQueue.length;
 
-        for (indexRes in resQueue) {
+        for (indexRes=0; indexRes<size; indexRes++) {
             scrapElement = resQueue[indexRes];
             if (scrapElement.scrap.index <= scrapReadyIndex) {
 
@@ -215,6 +225,16 @@ var readProject  = function() {
                 scrapName  = req.query.scrap;
                 scrap = getScrap(scrapName, testId);
 
+                if (!scrap) {
+                    console.warn("[CAT] No valid scrap was found");
+                    return undefined;
+                } else {
+                    if (scrap.index === undefined || scrap.index === null) {
+                        console.warn("[CAT] No valid scrap index was found");
+                        return undefined;                        
+                    }
+                }
+                
                 // test data for the test id
                 currReadyIndex = testsConfig.scrapReadyIndex;
 
