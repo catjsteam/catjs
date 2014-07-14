@@ -281,6 +281,8 @@ exports.result = function (req, res) {
     }
 
     clearTimeout(_checkIfAlive);
+    
+    // TODO Session validation for end the test and start a new one...
     if (status !== 'End') {
 
         _checkIfAlive = setTimeout(function () {
