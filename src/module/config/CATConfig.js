@@ -205,8 +205,8 @@ var _global = catrequire("cat.global"),
                         }
                     }
 
+                    librariesConfig.unshift("cat.css");
                     librariesConfig.push("cat.src.js");
-                    librariesConfig.push("cat.css");
 
                     project.setInfo("dependencies", librariesConfig);
 
