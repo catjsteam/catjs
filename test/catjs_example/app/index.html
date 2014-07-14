@@ -8,11 +8,12 @@
 	<script src="js/jquery.js"></script>	
 	<script src="js/jquery.mobile-1.4.0.min.js"></script>
 	<!--
-		@[scrap
-		@@import[
-		        /cat/lib/cat.js
-		    ]
-		]@
+ @[scrap
+    @@name catImport
+    @@import[   
+        cat/lib/cat.js
+    ]
+ ]@
     -->
 </head>
 <body>
@@ -22,17 +23,15 @@
     </div>
 
     <div role="main" class="ui-content jqm-content">
-
+        
         <!--
 			@[scrap
 				@@name setUsername
                 @@embed true
-                @@jqm setText("#username", @d.random(.users.name));
-                @@jqm setText("#username", "catjs0");
-                @@jqm setText("#username", "catjs1");
+                @@jqm setText("#username", @d.random(.users.name))
+                @@jqm setText("#username", "catjs0")
+                @@jqm setText("#username", "catjs1")
                 @@assert ok($('#username').val()=='catjs1','valid username')
-
-
 			]@
         -->
 
@@ -41,28 +40,25 @@
             <input type="text" name="username" id="username" value="">
         </div>
         <script>
-            setTimeout(function() {
-                /*
+            var handle = setTimeout(function() {
+                 /*
                     @[scrap
-                        @@name setPassword
-                        @@jqm setText("#password", "123456789");
-                    ]@
+                        @@name setEmail
+                        @@jqm setText("#email", "1")
+                        @@jqm setText("#email", "2")
+                        @@jqm setText("#email", "3")
+        
+                        @@assert ok($('#email').val()=='3','3')
+        
+                    ]@                
                 */
-            }, 5000);
 
+                clearTimeout(handle);
+                
+            }, 2000);
+            
         </script>
-        <!--
-            @[scrap
-				@@name setEmail
-                @@embed true
-                @@jqm setText("#email", "1");
-                @@jqm setText("#email", "2");
-                @@jqm setText("#email", "3");
-
-                @@assert ok($('#email').val()=='3','3')
-
-			]@
-		-->
+        
         <div>
             <label for="email">Email:</label>
             <input type="text" name="email" id="email" value="">
@@ -70,9 +66,9 @@
 
         <!--
             @[scrap
-				@@name setPassword
+				@@name setPassword2
                 @@embed true
-                @@jqm setText("#password", "123456789");
+                @@jqm setText("#password", "123456789")
             ]@
         -->
         <div>
@@ -82,9 +78,9 @@
 
         <!--
 			@[scrap
-				@@name setRepeatPassword
+				@@name setRepeatPassword2
                 @@embed true
-                @@jqm setText("#repeatpassword", "123456789");
+                @@jqm setText("#repeatpassword", "123456789")
             ]@
         -->
         <div>
@@ -96,7 +92,7 @@
             @[scrap
                 @@name setmobileweb
                 @@embed true
-                @@jqm setCheck("#mobileweb");
+                @@jqm setCheck("#mobileweb")
 			]@
 		-->
 		
@@ -104,7 +100,7 @@
             @[scrap
                 @@name setweb
                 @@embed true
-                @@jqm setCheck("#web");
+                @@jqm setCheck("#web")
 			]@
 		-->
         <div>
@@ -127,7 +123,7 @@
 			@[scrap
 				@@name slider90
 				@@embed true
-				@@jqm slide("#usetesting" , 90);
+				@@jqm slide("#usetesting" , 90)
 			]@
 		-->
         <div>
@@ -139,11 +135,11 @@
 			@[scrap
 				@@name clickSignup
 				@@embed true
-				@@jqm clickButton("#signup");
+				@@jqm clickButton("#signup")
 			]@
 		-->
         <div>
-            <button id="signup" onclick="alert('thank you for using catjs')">Signup</button>
+            <button id="signup" onclick="this.innerHTML+=' - thank you for using catjs'">Signup</button>
         </div>
 
     </div>

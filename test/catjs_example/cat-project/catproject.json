@@ -8,7 +8,8 @@
     "host": "localhost",
     "port": "8089",
     "protocol": "http",
-    "analytics" : "Y",
+    
+    "analytics": "Y",
     "apppath": "./../app",
     "appserver": {
         "host": "localhost",
@@ -16,11 +17,46 @@
         "protocol": "http"
     },
 
-    "plugins": [
+    "runner": {
+        "run": {
+            "devices": [                
+                {
+                    "type": "localpc",
+                    "disable": false,
+                    "runner": {
+                        "name": "firefox",
+                        "address": "/index.html"
+                    }
+                },
+                {
+                    "type": "localpc",
+                    "disable": false,
+                    "runner": {
+                        "name": "chrome",
+                        "address": "/index.html"
+                    }
+                }
 
+            ]
+        }
+    },
+
+    "plugins": [
+        {
+            "name": "webserver.start",
+            "type": "webserver",
+            "action": "start",
+            "path": "./../app",
+            "port": "8090"
+        }
     ],
 
     "tasks": [
+
+        {
+            "name": "server",
+            "plugins": ["webserver.start"]
+        }
 
     ]
 
