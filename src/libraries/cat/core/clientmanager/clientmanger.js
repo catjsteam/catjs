@@ -58,7 +58,7 @@ _cat.core.clientmanager = function () {
                     err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
 
                 console.log("[CAT] " + err);
-                config.endTest({reportFormats: reportFormats, error: err}, intervalObj.interval);
+                config.endTest({reportFormats: reportFormats, error: err}, (runStatus ? runStatus.intervalObj : undefined));
 
             }
         }, config.getTimeout() / 3);
@@ -135,7 +135,7 @@ _cat.core.clientmanager = function () {
 
     updateTimeouts = function(scrap) {
         var scrapId = scrap.id;
-        if (scrapId !== runStatus.intervalObj.signScrapId) {
+        if (runStatus.intervalObj && (scrapId !== runStatus.intervalObj.signScrapId)) {
             runStatus.intervalObj.signScrapId = scrapId;
             runStatus.intervalObj.counter = 0;
             runStatus.intervalObj.numCommands = (scrap.numCommands ? scrap.numCommands : 1);
@@ -166,7 +166,7 @@ _cat.core.clientmanager = function () {
                     url : urlAddress,
                     callback : function() {
                         var response = JSON.parse(this.responseText);
-                        runStatus.scrapReady = parseInt(response.readyScrap.index) + 1;
+                        runStatus.scrapReady = parseInt(response.readyScrap ? response.readyScrap.index : 0) + 1;
 
                         commitScrap(scrap, args, response);
                     }
@@ -180,23 +180,30 @@ _cat.core.clientmanager = function () {
         delayManager : function(codeCommands, context) {
             var catConfig = _cat.core.getConfig(),
                 _enum = catConfig.getTestsTypes(),
-                executeCode;
+                executeCode,
+                delay = catConfig.getTestDelay();            
 
-            executeCode = function(codeCommands, context) {
-                var indexCommand,
+            executeCode = function(codeCommandsArg, context) {
+                var indexCommand=0,
                     commandObj,
-                    scrap = context.scrap;
+                    scrap = context.scrap,
+                    size = (codeCommandsArg ? codeCommandsArg.length : undefined);
 
 
                 updateTimeouts(scrap);
 
-                for (indexCommand in codeCommands) {
-                    commandObj = codeCommands[indexCommand];
+                for (indexCommand=0;  indexCommand<size; indexCommand++) {       
+                    commandObj = codeCommandsArg[indexCommand];
+                    commandObj  = (commandObj ? commandObj.trim() : undefined);                    
 
-                    new Function("context", "return " + commandObj).apply(this, [context]);
+                    if (commandObj) {
+                        new Function("context", "return " + commandObj).apply(this, [context]);
+                    } else {
+                        console.warn("[CAT] Ignore, Not a valid command: ", commandObj);
+                    }
                 }
 
-                runStatus.numRanSubscrap = runStatus.numRanSubscrap + codeCommands.length;
+                runStatus.numRanSubscrap = runStatus.numRanSubscrap + size;
 
                 if ((runStatus.numRanSubscrap === runStatus.subscrapReady) && runStatus.scrapReady === runStatus.scrapsNumber) {
                     var reportFormats;
@@ -205,7 +212,7 @@ _cat.core.clientmanager = function () {
                     }
 
                     // TODO change clear interval
-                    catConfig.endTest({reportFormats: reportFormats}, runStatus.intervalObj.interval);
+                    catConfig.endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
                 }
 
             };
@@ -216,7 +223,7 @@ _cat.core.clientmanager = function () {
                 setTimeout(function() {
                     executeCode(codeCommands, context);
                 }, totalDelay);
-                totalDelay += 2000;
+                totalDelay += delay;
             } else {
                 executeCode(codeCommands, context);
             }
