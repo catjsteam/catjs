@@ -315,6 +315,10 @@ _clazz.prototype.getRunat = function (key) {
     return this.config["run@"];
 };
 
+_clazz.prototype.getPkgName = function (key) {
+    return this.config["pkgName"];
+};
+
 _clazz.prototype.getSingleton = function (key) {
     return this.config.singleton[key];
 };
