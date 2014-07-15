@@ -499,74 +499,100 @@ module.exports = function () {
 
                     function _getType(value) {
 
-                        var values,
-                            type;
+                        var type="js";
                         if (value) {
-                            values = value.split(".");
-                            type = values[values.length - 1];
+
+                            if (value.indexOf(".css") !== -1) {
+                                type = "css";
+                            } else if (value.indexOf(".js") !== -1) {
+                                    type = "js";                                
+                            } else {
+                                value += "." + type; 
+                            }
                         }
 
-                        return type;
+                        return {type: type, value: value};
                     }
-
-                    function _printByType(type, value) {
-
-                        var contentByType,
-                            libs, basedir, args,
-                            contents = {
-                                "js": importJSTpl,
-                                "css": importCSSTpl
-                            }, catlibidx = -1, libcounter = 0;
-
-                        if (type) {
-                            contentByType = contents[type];
-                        }
-
-                        if (contentByType && value) {
-
+                    
+                    function generateLibs(value) {
+                                            
+                        var  libs, basedir,
+                            libcounter = 0,
+                            libsrcs = [];
+                        
+                    
                             if (_isCatjs(value)) {
+                                
                                 // handle cat library
                                 libs = catrequire("cat.cli").getProject().getInfo("dependencies");
 
                                 libs.forEach(function (lib) {
                                     if (lib === "cat") {
-                                        catlibidx = libcounter;
+                                        libs.splice(libcounter, 1);
+                                    }
+                                    if (lib.indexOf("cat.src") !== -1) {
+                                        libs.splice(libcounter, 1);
                                     }
                                     libcounter++;
-                                });
-                                if (catlibidx !== -1) {
-                                    libs = libs.splice(catlibidx, 1);
-                                }
+                                });                               
 
                                 basedir = _path.dirname(value) + "/";
-                                if (libs && libs.length > 0) {
-                                    args = ["?type=import&basedir=", basedir , "&libs=", libs.join(",")].join("")
-                                }
-                            }
 
-                            me.print(_tplutils.template({
-                                content: contentByType,
-                                data: {
-                                    src: value,
-                                    args: (args || "")
-                                }
-                            }));
+
+                                libs.forEach(function (lib) {
+                                    libsrcs.push([basedir, lib].join(""));
+                                });
+                                libsrcs.push(value);
+                                libsrcs.push([basedir, "cat.src.js"].join(""));
+                                
+                                
+                            } else {
+                                libsrcs.push(value);   
+                            }
+                        
+                        return libsrcs;
+                    }
+
+                    function _printByType(type, value) {
+
+                        var contentByType,                            
+                            contents = {
+                                "js": importJSTpl,
+                                "css": importCSSTpl
+                            };
+
+                        if (type) {
+                            contentByType = contents[type];
                         }
+
+                        
+                        me.print(_tplutils.template({
+                            content: contentByType,
+                            data: {
+                                src: value
+                            }
+                        }));
                     }
 
                     var importannos = this.get("import"),
-                        importType,
                         me = this;
 
                     me.$setType("html");
                     me.set("auto", false);
                     if (importannos) {
                         importannos.forEach(function (item) {
+                            var libs;
+                            
                             if (item) {
-                                importType = _getType(item);
-                                if (importType) {
-                                    _printByType(importType, item);
-                                }
+                                libs = generateLibs(item);
+                                libs.forEach(function(lib) {
+                                    var typeob = _getType(lib),
+                                        importType = typeob.type;
+
+                                    if (importType) {
+                                        _printByType(importType, typeob.value);
+                                    }                                    
+                                });
                             }
                         });
                     }
