@@ -308,7 +308,7 @@ module.exports = _basePlugin.ext(function () {
                         } else if (engine === _scrapEnum.engines.HTML_IMPORT_JS) {
 
                             content = scraplcl.generate();
-                            content = (_utils.prepareCode(content) || "");
+//                            content = (_utils.prepareCode(content) || "");
 
                         } else if (engine === _scrapEnum.engines.JS_EMBED_INSERT) {
                             content = scraplcl.generate();
