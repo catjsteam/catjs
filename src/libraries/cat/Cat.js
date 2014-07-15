@@ -402,7 +402,7 @@ _cat.core = function () {
         };
     }
 
-    function _import(query) {
+    function _import(query, callback) {
 
         var type = _cat.utils.Utils.querystring("type", query),
             basedir = _cat.utils.Utils.querystring("basedir", query),
@@ -416,7 +416,7 @@ _cat.core = function () {
 
                 libs[idx] = [basedir, libs[idx], (_cat.utils.Utils.extExists(libs[idx]) ? "" : ".js")].join("");
             }
-            _cat.utils.Loader.requires(libs);
+            _cat.utils.Loader.requires(libs, callback);
         }
 
     }
@@ -427,11 +427,13 @@ _cat.core = function () {
 
         onload: function(libs) {
             
+            // @deprecated - injecting the library directly to the code.
             // load the libraries
-            _import(libs);
+            //_import(libs);
 
             // catjs initialization
-            _cat.core.init();            
+            //_cat.core.init();
+           
         },
 
         init: function() {
@@ -508,9 +510,7 @@ _cat.core = function () {
             var manager = _cat.core.getManager(managerKey),
                 scrapref, scrapname, behaviors = [], actionItems = {},
                 matchvalue = {}, matchvalues = [],
-                totalDelay = 0,
-                catConfig = _cat.core.getConfig(),
-                delay = catConfig.getTestDelay();
+                totalDelay = 0;               
 
             /**
              * Scrap call by its manager according to its behaviors
@@ -520,8 +520,10 @@ _cat.core = function () {
              * @private
              */
             function __call(config) {
-                totalDelay = 0;
-                var delay = (config.delay || delay),
+                
+                var  catConfig = _cat.core.getConfig(),
+                    testdelay = catConfig.getTestDelay(),
+                    delay = (config.delay || testdelay ),
                     repeat = (config.repeat || 1),
                     idx = 0,
                     func = function () {
@@ -533,6 +535,7 @@ _cat.core = function () {
                         }
                     };
 
+                totalDelay = 0;
                 for (idx = 0; idx < repeat; idx++) {
                     totalDelay += delay * (idx + 1);
                     _cat.core.TestManager.updateDelay(totalDelay);
