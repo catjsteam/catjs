@@ -402,7 +402,7 @@ _cat.core = function () {
         };
     }
 
-    function _import(query) {
+    function _import(query, callback) {
 
         var type = _cat.utils.Utils.querystring("type", query),
             basedir = _cat.utils.Utils.querystring("basedir", query),
@@ -416,7 +416,7 @@ _cat.core = function () {
 
                 libs[idx] = [basedir, libs[idx], (_cat.utils.Utils.extExists(libs[idx]) ? "" : ".js")].join("");
             }
-            _cat.utils.Loader.requires(libs);
+            _cat.utils.Loader.requires(libs, callback);
         }
 
     }
@@ -427,11 +427,13 @@ _cat.core = function () {
 
         onload: function(libs) {
             
+            // @deprecated - injecting the library directly to the code.
             // load the libraries
-            _import(libs);
+            //_import(libs);
 
             // catjs initialization
-            _cat.core.init();            
+            //_cat.core.init();
+           
         },
 
         init: function() {
@@ -508,9 +510,7 @@ _cat.core = function () {
             var manager = _cat.core.getManager(managerKey),
                 scrapref, scrapname, behaviors = [], actionItems = {},
                 matchvalue = {}, matchvalues = [],
-                totalDelay = 0,
-                catConfig = _cat.core.getConfig(),
-                delay = catConfig.getTestDelay();
+                totalDelay = 0;               
 
             /**
              * Scrap call by its manager according to its behaviors
@@ -520,8 +520,10 @@ _cat.core = function () {
              * @private
              */
             function __call(config) {
-                totalDelay = 0;
-                var delay = (config.delay || delay),
+                
+                var  catConfig = _cat.core.getConfig(),
+                    testdelay = catConfig.getTestDelay(),
+                    delay = (config.delay || testdelay ),
                     repeat = (config.repeat || 1),
                     idx = 0,
                     func = function () {
@@ -533,6 +535,7 @@ _cat.core = function () {
                         }
                     };
 
+                totalDelay = 0;
                 for (idx = 0; idx < repeat; idx++) {
                     totalDelay += delay * (idx + 1);
                     _cat.core.TestManager.updateDelay(totalDelay);
@@ -1973,9 +1976,11 @@ _cat.utils.AJAX = function () {
 }();
 _cat.utils.Loader = function () {
 
-    var _module = {
+    var _libslength = 0,
+        _ready = 0,
+        _module = {
 
-        require: function (file) {
+        require: function (file, callback) {
 
             function _css(file) {
                 var node = document.createElement('link'),
@@ -1984,6 +1989,14 @@ _cat.utils.Loader = function () {
                 node.rel = 'stylesheet';
                 node.type = 'text/css';
                 node.href = file;
+
+                node.onload = function() {
+                    _ready++;
+                    if (_ready === _libslength) {
+                        callback.call(this);
+                    }
+                };
+
                 document.head.appendChild(node);
             }
 
@@ -1993,7 +2006,15 @@ _cat.utils.Loader = function () {
 
                 node.type = "text/javascript";
                 node.src = file;
-
+                node.onload = function() {
+                    _ready++;
+                    if (_ready === _libslength) {
+                        if (callback && callback.call) {
+                            callback.call(this);
+                        }
+                    }
+                };
+                
                 head.appendChild(node);
             }
 
@@ -2016,14 +2037,13 @@ _cat.utils.Loader = function () {
             var index = 0;
 
             return function (files, callback) {
+                _libslength = files.length;
                 index += 1;
-                _module.require(files[index - 1]);
+                _module.require(files[index - 1], ((index === files.length) ? callback : undefined));
 
                 if (index === files.length) {
                     index = 0;
-                    if (callback) {
-                        callback.call({index:index});
-                    }
+                    
                 } else {
                     _module.requires(files, callback);
                 }
@@ -2349,7 +2369,7 @@ if (typeof(_cat) !== "undefined") {
     _cat.utils.Utils = function () {
 
         return {
-            
+
             querystring: function(name, query){
                 var re, r=[], m;
 
@@ -3185,3 +3205,5 @@ _cat.plugins.sencha = function () {
 
 }();
 
+// catjs initialization
+_cat.core.init();
