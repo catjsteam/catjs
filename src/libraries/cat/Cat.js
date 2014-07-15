@@ -659,6 +659,9 @@ _cat.core = function () {
         },
 
         getVar: function (key) {
+            if (key.indexOf("$$cat") === -1) {
+                key += "$$cat";
+            }
             return _vars[key];
         },
 
@@ -692,7 +695,7 @@ _cat.core = function () {
         },
 
         action: function (thiz, config) {
-            var scrap = config.scrap,
+            var scrap = _cat.core.getVar(config.pkgName).scrap, 
                 runat, manager,
                 pkgname, args = arguments,
                 catConfig = _cat.core.getConfig(),
@@ -815,7 +818,7 @@ _cat.core = function () {
          * @param config
          */
         actionimpl: function (thiz, config) {
-            var scrap = config.scrap,
+            var scrap = _cat.core.getVar(config.pkgName).scrap,
                 catInternalObj,
                 catObj,
                 passedArguments,
