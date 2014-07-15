@@ -1,8 +1,10 @@
 _cat.utils.Loader = function () {
 
-    var _module = {
+    var _libslength = 0,
+        _ready = 0,
+        _module = {
 
-        require: function (file) {
+        require: function (file, callback) {
 
             function _css(file) {
                 var node = document.createElement('link'),
@@ -11,6 +13,14 @@ _cat.utils.Loader = function () {
                 node.rel = 'stylesheet';
                 node.type = 'text/css';
                 node.href = file;
+
+                node.onload = function() {
+                    _ready++;
+                    if (_ready === _libslength) {
+                        callback.call(this);
+                    }
+                };
+
                 document.head.appendChild(node);
             }
 
@@ -20,7 +30,15 @@ _cat.utils.Loader = function () {
 
                 node.type = "text/javascript";
                 node.src = file;
-
+                node.onload = function() {
+                    _ready++;
+                    if (_ready === _libslength) {
+                        if (callback && callback.call) {
+                            callback.call(this);
+                        }
+                    }
+                };
+                
                 head.appendChild(node);
             }
 
@@ -43,14 +61,13 @@ _cat.utils.Loader = function () {
             var index = 0;
 
             return function (files, callback) {
+                _libslength = files.length;
                 index += 1;
-                _module.require(files[index - 1]);
+                _module.require(files[index - 1], ((index === files.length) ? callback : undefined));
 
                 if (index === files.length) {
                     index = 0;
-                    if (callback) {
-                        callback.call({index:index});
-                    }
+                    
                 } else {
                     _module.requires(files, callback);
                 }
