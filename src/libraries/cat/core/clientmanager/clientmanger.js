@@ -178,16 +178,19 @@ _cat.core.clientmanager = function () {
         },
 
         delayManager : function(codeCommands, context) {
-            var catConfig = _cat.core.getConfig(),
+            var indexCommand = 0,
+                catConfig = _cat.core.getConfig(),
                 _enum = catConfig.getTestsTypes(),
                 executeCode,
                 delay = catConfig.getTestDelay();            
 
             executeCode = function(codeCommandsArg, context) {
-                var indexCommand=0,
-                    commandObj,
+                var commandObj,
                     scrap = context.scrap,
-                    size = (codeCommandsArg ? codeCommandsArg.length : undefined);
+                    size = (codeCommandsArg ? codeCommandsArg.length : undefined),
+                    functionargskeys = [],
+                    functionargs = [],
+                    contextkey;
 
 
                 updateTimeouts(scrap);
@@ -195,9 +198,19 @@ _cat.core.clientmanager = function () {
                 for (indexCommand=0;  indexCommand<size; indexCommand++) {       
                     commandObj = codeCommandsArg[indexCommand];
                     commandObj  = (commandObj ? commandObj.trim() : undefined);                    
-
+                    
                     if (commandObj) {
-                        new Function("context", "return " + commandObj).apply(this, [context]);
+                        functionargskeys.push("context");
+                        functionargs.push(context);
+                        if (context && context.args) {
+                            for (contextkey in context.args) {
+                                if (context.args.hasOwnProperty(contextkey)) {
+                                    functionargskeys.push(contextkey);
+                                    functionargs.push(context.args[contextkey]);
+                                }
+                            }
+                        }
+                        new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
                     } else {
                         console.warn("[CAT] Ignore, Not a valid command: ", commandObj);
                     }

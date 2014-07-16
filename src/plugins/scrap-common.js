@@ -94,47 +94,44 @@ module.exports = function () {
 
                     var codeRows,
                         code,
-                        me = this;
+                        me = this,
+                        dm,
+                        scrap = me.config;
 
                     codeRows = this.get("code");
 
                     if (codeRows) {
                         codeRows = _utils.prepareCode(codeRows);
-                        code = codeRows.join("\n");
 
-                        if (code) {
 
-                            /*  TODO make code validation
-                             TODO Move that snippet to the end of the generated code (source project)
-                             validcode = _jshint(code, {
-                             "strict": false,
-                             "curly": true,
-                             "eqeqeq": true,
-                             "immed": false,
-                             "latedef": true,
-                             "newcap": false,
-                             "noarg": true,
-                             "sub": true,
-                             "undef": true,
-                             "boss": true,
-                             "eqnull": true,
-                             "node": true,
-                             "es5": false
-                             },
-                             { assert:true });*/
+                        dm = new _delayManagerUtils({
+                            scrap: me
+                        });
 
-                            //if (validcode) {
-                            me.print(_tplutils.template({
-                                content: funcSnippetTpl,
-                                data: {
-                                    comment: " Generated code according to the scrap comment (see @@code)",
-                                    code: code
-                                }
-                            }));
-                            //} else {
-                            //    console.log("The code is not valid: ", _jshint.errors);
-                            //}
+                        if (codeRows) {
+
+                            if (codeRows && codeRows.join) {
+
+                                dm.add({
+                                    rows: [_elutils.uicontent({ rows: codeRows, scrap: scrap})]
+
+                                }, function (row) {
+                                    return row;
+                                });
+                            }
+
+
+                            dm.add({
+                                rows: codeRows
+
+                            });
                         }
+
+                        dm.dispose();
+
+                      
+
+
                     }
                 }});
 
@@ -499,63 +496,63 @@ module.exports = function () {
 
                     function _getType(value) {
 
-                        var type="js";
+                        var type = "js";
                         if (value) {
 
                             if (value.indexOf(".css") !== -1) {
                                 type = "css";
                             } else if (value.indexOf(".js") !== -1) {
-                                    type = "js";                                
+                                type = "js";
                             } else {
-                                value += "." + type; 
+                                value += "." + type;
                             }
                         }
 
                         return {type: type, value: value};
                     }
-                    
+
                     function generateLibs(value) {
-                                            
-                        var  libs, basedir,
+
+                        var libs, basedir,
                             libcounter = 0,
                             libsrcs = [];
-                        
-                    
-                            if (_isCatjs(value)) {
-                                
-                                // handle cat library
-                                libs = catrequire("cat.cli").getProject().getInfo("dependencies");
-
-                                libs.forEach(function (lib) {
-                                    if (lib === "cat") {
-                                        libs.splice(libcounter, 1);
-                                    }
-                                    if (lib.indexOf("cat.src") !== -1) {
-                                        libs.splice(libcounter, 1);
-                                    }
-                                    libcounter++;
-                                });                               
-
-                                basedir = _path.dirname(value) + "/";
 
 
-                                libs.forEach(function (lib) {
-                                    libsrcs.push([basedir, lib].join(""));
-                                });
-                                libsrcs.push(value);
-                                libsrcs.push([basedir, "cat.src.js"].join(""));
-                                
-                                
-                            } else {
-                                libsrcs.push(value);   
-                            }
-                        
+                        if (_isCatjs(value)) {
+
+                            // handle cat library
+                            libs = catrequire("cat.cli").getProject().getInfo("dependencies");
+
+                            libs.forEach(function (lib) {
+                                if (lib === "cat") {
+                                    libs.splice(libcounter, 1);
+                                }
+                                if (lib.indexOf("cat.src") !== -1) {
+                                    libs.splice(libcounter, 1);
+                                }
+                                libcounter++;
+                            });
+
+                            basedir = _path.dirname(value) + "/";
+
+
+                            libs.forEach(function (lib) {
+                                libsrcs.push([basedir, lib].join(""));
+                            });
+                            libsrcs.push(value);
+                            libsrcs.push([basedir, "cat.src.js"].join(""));
+
+
+                        } else {
+                            libsrcs.push(value);
+                        }
+
                         return libsrcs;
                     }
 
                     function _printByType(type, value) {
 
-                        var contentByType,                            
+                        var contentByType,
                             contents = {
                                 "js": importJSTpl,
                                 "css": importCSSTpl
@@ -565,7 +562,7 @@ module.exports = function () {
                             contentByType = contents[type];
                         }
 
-                        
+
                         me.print(_tplutils.template({
                             content: contentByType,
                             data: {
@@ -582,16 +579,16 @@ module.exports = function () {
                     if (importannos) {
                         importannos.forEach(function (item) {
                             var libs;
-                            
+
                             if (item) {
                                 libs = generateLibs(item);
-                                libs.forEach(function(lib) {
+                                libs.forEach(function (lib) {
                                     var typeob = _getType(lib),
                                         importType = typeob.type;
 
                                     if (importType) {
                                         _printByType(importType, typeob.value);
-                                    }                                    
+                                    }
                                 });
                             }
                         });

@@ -222,6 +222,7 @@ module.exports = function () {
                         dm;
 
                     jqmRows = this.get("jqm");
+                    
                     dm = new _delayManagerUtils({
                         scrap: me
                     });

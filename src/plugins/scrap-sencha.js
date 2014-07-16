@@ -1,6 +1,8 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
-    _scraputils = require("./utils/Utils");
+    _scraputils = require("./utils/Utils"),
+    _delayManagerUtils = require("./utils/DelayManagerUtils"),
+    _elutils = require("./utils/ExpressionUtils");
 
 module.exports = function () {
 
@@ -24,9 +26,16 @@ module.exports = function () {
                     var senchaRows,
                         sencha,
                         me = this,
+                        scrapConf = me.config,
+                        scrap = scrapConf,
+                        dm,
+                        
                         generate = function (senchaRow) {
 
-                            var sencha;
+                            var sencha,
+                                tempCommand;
+                            
+                            
                             senchaRow = _utils.prepareCode(senchaRow);
 
                             if (senchaRow && senchaRow.join) {
@@ -206,7 +215,13 @@ module.exports = function () {
                                 }
 
                                 if (match) {
-                                    me.print("_cat.core.plugin('sencha').actions." + match);
+
+                                    tempCommand = [
+                                        '_cat.core.plugin("sencha").actions.',
+                                        match
+                                    ];
+
+                                    return tempCommand.join("");
                                 }
 
                             }
@@ -214,23 +229,37 @@ module.exports = function () {
 
 
                     senchaRows = this.get("sencha");
-                    var scrapConf = me.config,
-                        scrap = scrapConf,
-                        scrapName;
-
+                
                     if (senchaRows) {
                         scrap = scrapConf;
-                        scrapName = (scrap.name ? scrap.name[0] : undefined);
 
-                        if (senchaRows && senchaRows.join) {
-                            me.print("_cat.core.ui.setContent({style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + (senchaRows.split ? senchaRows.split("\n").join("") : senchaRows) + "',tips: ''});");
+                        dm = new _delayManagerUtils({
+                            scrap: me
+                        });
+
+                        if (senchaRows) {
+                            scrap = scrapConf;
+
+                            if (senchaRows && senchaRows.join) {
+
+                                dm.add({
+                                    rows:[_elutils.uicontent({ rows: senchaRows, scrap: scrap})]
+
+                                }, function(row) {
+                                    return row;
+                                });
+                            }
+
+
+                            dm.add({
+                                rows:senchaRows
+
+                            }, function(row) {
+                                return generate(row);
+                            });
                         }
 
-                        senchaRows.forEach(function (senchaRow) {
-                            if (senchaRow) {
-                                generate(senchaRow);
-                            }
-                        });
+                        dm.dispose();
                     }
                 }
             });

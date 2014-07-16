@@ -1,7 +1,9 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _tplutils = catrequire("cat.tpl.utils"),
-    _scraputils = require("./utils/Utils");
+    _scraputils = require("./utils/Utils"),
+    _elutils = require("./utils/ExpressionUtils"),
+    _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 module.exports = function () {
 
@@ -27,6 +29,8 @@ module.exports = function () {
                     var enyoRows,
                         enyo,
                         me = this,
+                        tempCommand,
+                        
                         generate = function (enyoRow) {
 
 
@@ -66,38 +70,53 @@ module.exports = function () {
 
 
                                     if (match) {
-                                        me.print(_tplutils.template({
-                                            content: funcSnippetTpl,
-                                            data: {
-                                                comment: " Generated code according to the enyo scrap comment (see @@enyo)",
-                                                code: ("_cat.core.plugin('enyo').actions."+ match)
-                                            }
-                                        }));
+
+                                        tempCommand = [
+                                            '_cat.core.plugin("enyo").actions.',
+                                            match
+                                        ];
+
+                                        return tempCommand.join("");
                                     }
                                 }
                             }
-                        };
+                        },
+                        scrapConf = me.config,
+                        scrap = scrapConf,
+                        dm;
+
 
 
                     enyoRows = this.get("enyo");
-                    var scrapConf = me.config,
-                        scrap = scrapConf,
-                        scrapName;
+                    
+                    dm = new _delayManagerUtils({
+                        scrap: me
+                    });
 
                     if (enyoRows) {
                         scrap = scrapConf;
-                        scrapName = (scrap.name ? scrap.name[0] : undefined);
 
                         if (enyoRows && enyoRows.join) {
-                            me.print("_cat.core.ui.setContent({style: 'color:#0080FF', header: '" + scrapName + "', desc: '" + enyoRows + "',tips: ''});");
+
+                            dm.add({
+                                rows:[_elutils.uicontent({ rows: enyoRows, scrap: scrap})]
+
+                            }, function(row) {
+                                return row;
+                            });
                         }
 
-                        enyoRows.forEach(function (enyoRow) {
-                            if (enyoRow) {
-                                generate(enyoRow);
-                            }
+
+                        dm.add({
+                            rows:enyoRows
+
+                        }, function(row) {
+                            return generate(row);
                         });
                     }
+
+                    dm.dispose();
+                    
                 }
             });
 

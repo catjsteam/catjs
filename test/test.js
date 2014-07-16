@@ -14,6 +14,13 @@ var args = process.argv.slice(2),
             port: "8089",
             cwd: "./test/enyo/",
             tasks: ["t@init", "t@scrap", "t@inject", "t@server.start", "t@runner.start"]
+        },
+        {
+            name: "catjs_example",
+            testname: "catjs_example-test",
+            port: "8089",
+            cwd: "./test/catjs_example/",
+            tasks: ["t@init", "t@scrap", "t@inject", "t@autotest", "t@server.start", "t@runner.start"]
         }
     ],
     tests=[],
@@ -57,9 +64,12 @@ if (require.main === module) {
     module.exports = {
 
        run: function(entity) {
+           
            var map = {
                sencha: testdata[0],
-               enyo: testdata[1]
+               enyo: testdata[1],
+               "catjs_example": testdata[2] 
+                   
            },data= map[entity],
                handle;
 
