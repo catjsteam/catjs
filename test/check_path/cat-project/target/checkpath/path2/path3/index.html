@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>CAT Demo</title>
+	<link rel="stylesheet"  href="css/jquery.mobile-1.4.0.min.css">
+	<script src="js/jquery.js"></script>	
+	<script src="js/jquery.mobile-1.4.0.min.js"></script>
+	<!--
+		@[scrap
+		@@name catImport
+		@@import[
+		   /cat/lib/cat.js
+		   /cat/lib/cat.css
+		   /cat/lib/cat.src.js
+
+		]
+		]@
+    --><link rel="stylesheet" href="/cat/lib/cat.css" type="text/css" charset="utf-8" /> 
+ <script src="/cat/lib/chai.js"></script> 
+ <script src="/cat/lib/jspath.js"></script> 
+ <script src="/cat/lib/tmr.js"></script> 
+ <script src="/cat/lib/cat.js"></script> 
+ <script src="/cat/lib/cat.src.js"></script> 
+ <link rel="stylesheet" href="/cat/lib/cat.css" type="text/css" charset="utf-8" /> 
+ <script src="/cat/lib/cat.src.js"></script>
+</head>
+<body>
+<div data-role="page" id="mainPage" class="jqm-demos jqm-home">
+	<div data-role="header" class="jqm-header">
+        <h2>CAT - jQuery Mobile Demo</h2>
+    </div>
+
+    <div role="main" class="ui-content jqm-content">
+
+        <!--
+			@[scrap
+				@@name setUsername
+                @@embed true
+                @@jqm setText("#username", "test");
+			]@
+        --><script>_cat.core.action(this, { scrap:{"name":["setUsername"],"embed":["true"],"jqm":["setText(\"#username\", \"test\");"],"file":"C:/Users/snirr/workspace/catjs/test/check_path/cat-project/target/checkpath/path2/path3/index.html","scrapinfo":{"start":{"line":31,"col":3},"end":{"line":35,"col":5}},"commentinfo":{"start":{"line":30,"col":8},"end":{"line":36,"col":11}},"single":{"name":true,"embed":true,"jqm":false,"file":true,"scrapinfo":true,"commentinfo":true,"single":true,"singleton":true,"arguments":true,"context":false,"auto":true,"injectcode":true,"id":true,"$type":true,"numCommands":true},"singleton":{"name":-1,"embed":-1,"jqm":-1,"file":-1,"scrapinfo":-1,"commentinfo":-1,"single":-1,"singleton":-1,"arguments":-1,"context":1,"auto":-1,"injectcode":-1,"id":-1,"$type":-1,"numCommands":-1},"arguments":["thi$"],"context":["thi$"],"auto":true,"injectcode":false,"id":"scrap_6c99a196-6671-f130-39a0-6d345566adf6","$type":"html","numCommands":2,"pkgName":"C:.Users.snirr.workspace.catjs.test.check_path.cat-project.target.checkpath.path2.path3.index.html.setUsername"}},this);</script>
+
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" value="">
+        </div>
+        <script>
+            setTimeout(function() {
+                /*
+                    @[scrap
+                        @@name setPassword
+                        @@jqm setText("#password", "test");
+                    ]@
+                */
+            }, 5000);
+
+        </script>
+        <!--
+            @[scrap
+				@@name setEmail
+                @@embed true
+                @@jqm setText("#email", "test");
+			]@
+		--><script>_cat.core.action(this, { scrap:{"name":["setEmail"],"embed":["true"],"jqm":["setText(\"#email\", \"test\");"],"file":"C:/Users/snirr/workspace/catjs/test/check_path/cat-project/target/checkpath/path2/path3/index.html","scrapinfo":{"start":{"line":54,"col":12},"end":{"line":58,"col":5}},"commentinfo":{"start":{"line":53,"col":8},"end":{"line":59,"col":5}},"single":{"name":true,"embed":true,"jqm":false,"file":true,"scrapinfo":true,"commentinfo":true,"single":true,"singleton":true,"arguments":true,"context":false,"auto":true,"injectcode":true,"id":true,"$type":true,"numCommands":true},"singleton":{"name":-1,"embed":-1,"jqm":-1,"file":-1,"scrapinfo":-1,"commentinfo":-1,"single":-1,"singleton":-1,"arguments":-1,"context":1,"auto":-1,"injectcode":-1,"id":-1,"$type":-1,"numCommands":-1},"arguments":["thi$"],"context":["thi$"],"auto":true,"injectcode":false,"id":"scrap_29bb53bd-50a8-1706-3264-160493684a66","$type":"html","numCommands":2,"pkgName":"C:.Users.snirr.workspace.catjs.test.check_path.cat-project.target.checkpath.path2.path3.index.html.setEmail"}},this);</script>
+        <div>
+            <label for="email">Email:</label>
+            <input type="text" name="email" id="email" value="">
+        </div>
+
+        <!--
+            @[scrap
+				@@name setPassword
+                @@embed true
+                @@jqm setText("#password", "test");
+            ]@
+        --><script>_cat.core.action(this, { scrap:{"name":["setPassword"],"jqm":["setText(\"#password\", \"test\");"],"file":"C:/Users/snirr/workspace/catjs/test/check_path/cat-project/target/checkpath/path2/path3/index.html","scrapinfo":{"start":{"line":66,"col":12},"end":{"line":70,"col":14}},"commentinfo":{"start":{"line":65,"col":8},"end":{"line":71,"col":11}},"single":{"name":true,"jqm":false,"file":true,"scrapinfo":true,"commentinfo":true,"single":true,"singleton":true,"arguments":true,"context":false,"auto":true,"injectcode":true,"id":true,"$type":true,"embed":true,"numCommands":true},"singleton":{"name":-1,"jqm":-1,"file":-1,"scrapinfo":-1,"commentinfo":-1,"single":-1,"singleton":-1,"arguments":-1,"context":1,"auto":-1,"injectcode":-1,"id":-1,"$type":-1,"embed":-1,"numCommands":-1},"arguments":["thi$"],"context":["thi$"],"auto":true,"injectcode":false,"id":"scrap_9f75613e-d970-aadd-24c6-0ed7035721b9","$type":"html","embed":["true"],"numCommands":2,"pkgName":"C:.Users.snirr.workspace.catjs.test.check_path.cat-project.target.checkpath.path2.path3.index.html.setPassword"}},this);</script>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" value="">
+        </div>
+
+        <!--
+			@[scrap
+				@@name setRepeatPassword
+                @@embed true
+                @@jqm setText("#repeatpassword", "123456789");
+            ]@
+        --><script>_cat.core.action(this, { scrap:{"name":["setRepeatPassword"],"embed":["true"],"jqm":["setText(\"#repeatpassword\", \"123456789\");"],"file":"C:/Users/snirr/workspace/catjs/test/check_path/cat-project/target/checkpath/path2/path3/index.html","scrapinfo":{"start":{"line":78,"col":3},"end":{"line":82,"col":14}},"commentinfo":{"start":{"line":77,"col":8},"end":{"line":83,"col":11}},"single":{"name":true,"embed":true,"jqm":false,"file":true,"scrapinfo":true,"commentinfo":true,"single":true,"singleton":true,"arguments":true,"context":false,"auto":true,"injectcode":true,"id":true,"$type":true,"numCommands":true},"singleton":{"name":-1,"embed":-1,"jqm":-1,"file":-1,"scrapinfo":-1,"commentinfo":-1,"single":-1,"singleton":-1,"arguments":-1,"context":1,"auto":-1,"injectcode":-1,"id":-1,"$type":-1,"numCommands":-1},"arguments":["thi$"],"context":["thi$"],"auto":true,"injectcode":false,"id":"scrap_1707b411-a1bc-484f-8996-c13c53f441f9","$type":"html","numCommands":2,"pkgName":"C:.Users.snirr.workspace.catjs.test.check_path.cat-project.target.checkpath.path2.path3.index.html.setRepeatPassword"}},this);</script>
+        <div>
+            <label for="repeatpassword">Repeat Password:</label>
+            <input type="password" name="repeatpassword" id="repeatpassword" value="">
+        </div>
+
+		<!--
+            @[scrap
+                @@name setmobileweb
+                @@embed true
+                @@jqm setCheck("#mobileweb");
+			]@
+		--><script>_cat.core.action(this, { scrap:{"name":["setmobileweb"],"embed":["true"],"jqm":["setCheck(\"#mobileweb\");"],"file":"C:/Users/snirr/workspace/catjs/test/check_path/cat-project/target/checkpath/path2/path3/index.html","scrapinfo":{"start":{"line":90,"col":12},"end":{"line":94,"col":5}},"commentinfo":{"start":{"line":89,"col":2},"end":{"line":95,"col":5}},"single":{"name":true,"embed":true,"jqm":false,"file":true,"scrapinfo":true,"commentinfo":true,"single":true,"singleton":true,"arguments":true,"context":false,"auto":true,"injectcode":true,"id":true,"$type":true,"numCommands":true},"singleton":{"name":-1,"embed":-1,"jqm":-1,"file":-1,"scrapinfo":-1,"commentinfo":-1,"single":-1,"singleton":-1,"arguments":-1,"context":1,"auto":-1,"injectcode":-1,"id":-1,"$type":-1,"numCommands":-1},"arguments":["thi$"],"context":["thi$"],"auto":true,"injectcode":false,"id":"scrap_c213389f-ed3b-a82a-7f75-422a7df1e4d9","$type":"html","numCommands":2,"pkgName":"C:.Users.snirr.workspace.catjs.test.check_path.cat-project.target.checkpath.path2.path3.index.html.setmobileweb"}},this);</script>
+		
+		<!--
+            @[scrap
+                @@name setweb
+                @@embed true
+                @@jqm setCheck("#web");
+			]@
+		--><script>_cat.core.action(this, { scrap:{"name":["setweb"],"embed":["true"],"jqm":["setCheck(\"#web\");"],"file":"C:/Users/snirr/workspace/catjs/test/check_path/cat-project/target/checkpath/path2/path3/index.html","scrapinfo":{"start":{"line":98,"col":12},"end":{"line":102,"col":5}},"commentinfo":{"start":{"line":97,"col":2},"end":{"line":103,"col":5}},"single":{"name":true,"embed":true,"jqm":false,"file":true,"scrapinfo":true,"commentinfo":true,"single":true,"singleton":true,"arguments":true,"context":false,"auto":true,"injectcode":true,"id":true,"$type":true,"numCommands":true},"singleton":{"name":-1,"embed":-1,"jqm":-1,"file":-1,"scrapinfo":-1,"commentinfo":-1,"single":-1,"singleton":-1,"arguments":-1,"context":1,"auto":-1,"injectcode":-1,"id":-1,"$type":-1,"numCommands":-1},"arguments":["thi$"],"context":["thi$"],"auto":true,"injectcode":false,"id":"scrap_24a6d37e-ac85-49ea-a23b-581fa29cc73c","$type":"html","numCommands":2,"pkgName":"C:.Users.snirr.workspace.catjs.test.check_path.cat-project.target.checkpath.path2.path3.index.html.setweb"}},this);</script>
+        <div>
+            <fieldset data-role="controlgroup">
+                <legend>Which kind of developer are you?</legend>
+
+                <input type="checkbox" name="mobilenative" id="mobilenative">
+                <label for="mobilenative">Mobile - Native</label>
+
+                <input type="checkbox" name="mobileweb" id="mobileweb">
+                <label for="mobileweb">Mobile - Web</label>
+
+                <input type="checkbox" name="web" id="web">
+                <label for="web">Web</label>
+
+            </fieldset>
+        </div>
+
+		<!--
+			@[scrap
+				@@name slider90
+				@@embed true
+				@@jqm slide("#usetesting" , 90);
+			]@
+		--><script>_cat.core.action(this, { scrap:{"name":["slider90"],"embed":["true"],"jqm":["slide(\"#usetesting\" , 90);"],"file":"C:/Users/snirr/workspace/catjs/test/check_path/cat-project/target/checkpath/path2/path3/index.html","scrapinfo":{"start":{"line":121,"col":3},"end":{"line":125,"col":5}},"commentinfo":{"start":{"line":120,"col":2},"end":{"line":126,"col":5}},"single":{"name":true,"embed":true,"jqm":false,"file":true,"scrapinfo":true,"commentinfo":true,"single":true,"singleton":true,"arguments":true,"context":false,"auto":true,"injectcode":true,"id":true,"$type":true,"numCommands":true},"singleton":{"name":-1,"embed":-1,"jqm":-1,"file":-1,"scrapinfo":-1,"commentinfo":-1,"single":-1,"singleton":-1,"arguments":-1,"context":1,"auto":-1,"injectcode":-1,"id":-1,"$type":-1,"numCommands":-1},"arguments":["thi$"],"context":["thi$"],"auto":true,"injectcode":false,"id":"scrap_35db983e-2923-9f93-a37a-5008313c3e5c","$type":"html","numCommands":2,"pkgName":"C:.Users.snirr.workspace.catjs.test.check_path.cat-project.target.checkpath.path2.path3.index.html.slider90"}},this);</script>
+        <div>
+            <label for="usetesting">How often do you use testing?</label>
+            <input type="range" name="usetesting" id="usetesting" value="20" min="0" max="100">
+        </div>
+		
+		<!--
+			@[scrap
+				@@name clickSignup
+				@@embed true
+				@@jqm clickButton("#signup");
+			]@
+		--><script>_cat.core.action(this, { scrap:{"name":["clickSignup"],"embed":["true"],"jqm":["clickButton(\"#signup\");"],"file":"C:/Users/snirr/workspace/catjs/test/check_path/cat-project/target/checkpath/path2/path3/index.html","scrapinfo":{"start":{"line":133,"col":3},"end":{"line":137,"col":5}},"commentinfo":{"start":{"line":132,"col":2},"end":{"line":138,"col":5}},"single":{"name":true,"embed":true,"jqm":false,"file":true,"scrapinfo":true,"commentinfo":true,"single":true,"singleton":true,"arguments":true,"context":false,"auto":true,"injectcode":true,"id":true,"$type":true,"numCommands":true},"singleton":{"name":-1,"embed":-1,"jqm":-1,"file":-1,"scrapinfo":-1,"commentinfo":-1,"single":-1,"singleton":-1,"arguments":-1,"context":1,"auto":-1,"injectcode":-1,"id":-1,"$type":-1,"numCommands":-1},"arguments":["thi$"],"context":["thi$"],"auto":true,"injectcode":false,"id":"scrap_20be1989-a333-293b-41e2-f33885adfa4e","$type":"html","numCommands":2,"pkgName":"C:.Users.snirr.workspace.catjs.test.check_path.cat-project.target.checkpath.path2.path3.index.html.clickSignup"}},this);</script>
+        <div>
+            <button id="signup" onclick="alert('thank you for using catjs')">Signup</button>
+        </div>
+
+    </div>
+
+
+</div><!-- /page -->
+
+</body>
+</html>
