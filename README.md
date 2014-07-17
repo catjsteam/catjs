@@ -1,4 +1,4 @@
-CatJS 0.2.3
+CatJS 0.2.4
 ==============
 
 *CatJS* is an automation framework for (mobile) web applications testing.
@@ -301,6 +301,12 @@ Look into the file system where your generated project was created. At the root 
 catjs track your application errors and report it to the console/junit. With minimal annotation for catjs library loading you get to track your application errors.
    Combined it with catjs runner you can immediately get report about any errors on different browsers and devices.
 
+## Troubleshooting 
+
+### PhantomJS Support
+
+CatJS has support for phantomjs, but it's not being installed as part of the catjs package.
+Run: <code>catcli -t</code> And catjs will install phantom, or install it manually.
 
 
 ## API reference
