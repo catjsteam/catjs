@@ -7,8 +7,8 @@ var _catglobal = catrequire("cat.global"),
     _spawn = catrequire("cat.plugin.spawn"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
-    _bower = require('bower'),
-    _jsutils = require("js.utils");
+    _jsutils = require("js.utils"),
+    _bower;
 
 module.exports = _basePlugin.ext(function () {
 
@@ -400,12 +400,15 @@ module.exports = _basePlugin.ext(function () {
                     } else if (library.install === "bower") {
 
                         if (!_utils.isWindows()) {
-                            _bower.commands.install([library.name], {}, bowerConfig)
-                                .on('end', function (installed) {
-                                    _log.info('[bower] library ' + library.name + ' Installed');
-                                    _copydone();
-                                });
-
+                            if (_bower) {
+                                _bower.commands.install([library.name], {}, bowerConfig)
+                                    .on('end', function (installed) {
+                                        _log.info('[bower] library ' + library.name + ' Installed');
+                                        _copydone();
+                                    });
+                            } else {
+                                _utils.log("[catjs bower] No bower support");
+                            }
                         } else {
 
                             /* on windows we have an issue related to git <> bower
