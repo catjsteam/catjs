@@ -1,5 +1,7 @@
-CatJS 0.2.4
+CatJS 0.2.4 
 ==============
+  
+<p><div style="font-size:orange; font-size:12px">  It's much lighter...  </div></p>
 
 *CatJS* is an automation framework for (mobile) web applications testing.
 It offers a new technology that makes testing easy, we don't do WebDriver like the other technologies, in our case the applications test themselves.
@@ -162,7 +164,7 @@ CatJS has a test project for executing all of your scraps, to be able to see the
             ]@
         */
 
-Currently supported library are: JQM, Sencha Touch, (DOM, Enyo with few APIs, Angular is planned for future releases)
+Currently supported libraries are: JQM, Sencha Touch, (DOM, Enyo with few APIs, Angular is planned for future releases)
 The plugins aimed to give you a syntactic sugar, but you can always use your own code... and of course to code your own custom plugins.
 
 * *jqm* supports [JQM](http://jquerymobile.com/) library API
@@ -182,7 +184,7 @@ The plugins aimed to give you a syntactic sugar, but you can always use your own
             ]@
         */
 
-### It about time to run your tests  
+### It's about time to run your tests  
 Open your favorite browser and go to: **http://localhost:8089**  
 Here is a short description for the events that occurs after loading the test deployment:
 
