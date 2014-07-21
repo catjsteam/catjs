@@ -382,7 +382,7 @@ var CAT = function () {
 
                         if (project) {
                             // update analytics
-                            if (project.info.analytics && project.info.analytics == "Y") {
+                            if (project.info.analytics && (project.info.analytics == "Y" || project.info.analytics == "y" || project.info.analytics == "true" || project.info.analytics == "True")) {
                                 _analytics.updateAnalytics(global.catcommand, project.name);
                             }
 
