@@ -1,11 +1,36 @@
 var _childProcess = require('child_process'),
     _path = require('path'),
-    _phantomjs = require('phantomjs'),
-    _binPath = _phantomjs.path,
+    _phantomjs, autonpm,
+    _binPath,
     _global = catrequire("cat.global"),
     _utils = catrequire("cat.utils"),
     _props = catrequire("cat.props"),
     _log = _global.log();
+
+(function() {
+    try {
+        _phantomjs = require("phantomjs");
+        _binPath = _phantomjs.path;
+        
+        if (!_binPath) {
+            _utils.log("[catjs phantom-bridge] binPath is not valid, make sure you have installed phantomjs.")
+        }
+        
+    } catch(e) {
+        
+        _utils.log("[catjs] PhantomJS module is not installed, installing... please wait...");
+        
+        // fetch phantom
+        process.chdir(global.cathome);
+        autonpm = require("autonpm",{});
+        autonpm("phantomjs");
+
+        _phantomjs = require("phantomjs");
+        _binPath = _phantomjs.path;
+        
+    }
+})();
+
 
 /**
  * A bridge between nodejs and phantomjs project
