@@ -240,6 +240,7 @@ var CAT = function () {
                 var project,
                     pids,
                     linit,
+                    checkAnalytics,
                     targets = _targets, counter,
                     wait = false,
                     home = _global.get("home"),
@@ -382,8 +383,12 @@ var CAT = function () {
 
                         if (project) {
                             // update analytics
-                            if (project.info.analytics && (project.info.analytics == "Y" || project.info.analytics == "y" || project.info.analytics == "true" || project.info.analytics == "True")) {
-                                _analytics.updateAnalytics(global.catcommand, project.name);
+                            if (project.info.analytics || (project.info.analytics === "")) {
+                                checkAnalytics = project.info.analytics;
+                                var re = new RegExp( "(no)|(n)|(false)", "gi" );
+                                if (!(re.test(checkAnalytics))) {
+                                    _analytics.updateAnalytics(global.catcommand, project.name);
+                                }
                             }
 
 
