@@ -103,7 +103,7 @@ CatJS support a standard JavaScript imports and the [requireJS](http://requirejs
         /*
             @[scrap
                 @@name myScrap
-                @@log This is my first scrap
+                @@log "This is my first scrap"
             ]@
         */
         
