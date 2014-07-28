@@ -1,7 +1,7 @@
 {
   "name": "catjs",
   "description": "(Mobile) Web Automation Framework",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "homepage": "http://catjsteam.github.io",
   "author": {
     "name": "arik",
@@ -41,7 +41,7 @@
     "test": "node ./test/test.js"
   },
   "dependencies": {
-    "mobilerunner": "latest",
+    "mobilerunner": "~0.2.7",
     "fs.extra": "~1.2.1",
     "typedas": "~1.0.0",
     "log": "~1.4.0",
@@ -71,7 +71,7 @@
     "wrench": "~1.5.8",
     "contribute": "~0.0.3",
     "colors": "~0.6.2",
-    "autonpm": "^0.1.2"
+    "autonpm": "~0.1.2"
   },
   "keywords": [
     "runner",
@@ -93,6 +93,5 @@
   "contributors": [
     "Arik Lewin (https://github.com/lastboy)"
   ],
-  "_from": "catjs@~0.1.0",
   "license": "Apache-2.0"
 }
