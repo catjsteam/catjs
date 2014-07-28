@@ -1,7 +1,9 @@
-CatJS 0.2.6
+CatJS 0.2.8
 ==============
   
 <p><div style="font-size:orange; font-size:12px">  It's much lighter...  </div></p>
+
+<img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
 
 *CatJS* is an automation framework for (mobile) web applications testing.
 It offers a new technology that makes testing easy, we don't do WebDriver like the other technologies, in our case the applications test themselves.
