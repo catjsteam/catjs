@@ -8,11 +8,4 @@ how-to.txt
 build
 chromext
 resources/images
-test/helpers
-test/init-test
-test/jqm
-test/sandbox
-test/sencha-kitchen-sink
-test/velocity
-test/Gruntfile.js
-test/package.json
+test/
