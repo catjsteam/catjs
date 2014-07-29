@@ -188,7 +188,7 @@ module.exports = _basePlugin.ext(function () {
             targetfolder = _path.dirname(targetfile);
             if (targetfolder) {
                 if (!_fs.existsSync(targetfolder)) {
-                    _utils.mkdirSync(targetfolder);
+                    _utils.mkdirSync(targetfolder, {mode: 0777});
                 }
             }
 //            if (_fs.existsSync(targetfile)) {
