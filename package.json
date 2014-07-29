@@ -59,7 +59,7 @@
     "jshint": "~2.1.10",
     "express": "~3.4.4",
     "test-model-reporter": "~0.1.0",
-    "Faker": "~0.5.11",
+    "faker": "~0.5.11",
     "js.utils": "~0.1.9",
     "require-mapper": "~0.0.3",
     "glob": "~3.2.7",

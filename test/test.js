@@ -27,7 +27,7 @@ autonpm("request-progress", {where: path}).then(
                     _requestprogress = require("request-progress");
 
                     // Note that the options argument is optional
-                    _requestprogress(_request('http://google.com/doodle.png'), {
+                    _requestprogress(_request('http://github.com/catjsteam/catjs/archive/master.zip'), {
                         delay: 1000
                     })
                         .on('progress', function (state) {
@@ -36,7 +36,7 @@ autonpm("request-progress", {where: path}).then(
                         .on('error', function (err) {
                             console.error("error", err);
                         })
-                        .pipe(_fs.createWriteStream('doodle.png'))
+                        .pipe(_fs.createWriteStream('./test/catjs.zip'))
                         .on('error', function (err) {
                             console.error("error", err);
                         })
