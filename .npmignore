@@ -8,4 +8,5 @@ how-to.txt
 build
 chromext
 resources/images
-test/
+test/test-apps-master/
+test/catjs-test-apps.zip
