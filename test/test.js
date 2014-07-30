@@ -4,9 +4,13 @@ var args = process.argv.slice(2),
     _requestprogress,
     _request,
     _admzip,
+    _os = require("os"),
+    _platform  = _os.platform(),
     _path = require("path"),
     _fs = require("fs"),
-    path = _path.resolve("./node_modules"),
+    _nodeModulesPath = (_platform === "win32" ? "./" : "./node_modules"),
+    _npmcmd = (_platform === "win32" ? "npm" : "npm.cmd"),
+    path = _path.resolve(_nodeModulesPath),
     _extractFolder = "test-apps-master"
 _zipfolder = "./test/catjs-test-apps",
     _zipfile = _zipfolder + ".zip",
@@ -34,7 +38,7 @@ function _testBegin() {
     
     // extract zip file
     if (!_fs.existsSync(_zipfolder) && _fs.existsSync(_zipfile)) {
-        _admzip = global["$adm-zip"];
+        _admzip = (global["$adm-zip"] || require("adm-zip"));
 
         zip = new _admzip(_zipfile);
         zip.extractAllTo("./test", true);
@@ -49,8 +53,8 @@ function _testBegin() {
 function _install() {
 
     function _downloadTestApps(callback) {
-        _request = global["$request"];
-        _requestprogress = global["$request-progress"];
+        _request = (global["$request"] || require("request"));
+        _requestprogress = (global["$request-progress"] || require("request-progress"));
 
         // download the test apps if not exists
         if (!_fs.existsSync(_zipfile)) {
