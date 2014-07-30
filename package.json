@@ -1,7 +1,7 @@
 {
   "name": "catjs",
   "description": "(Mobile) Web Automation Framework",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "homepage": "http://catjsteam.github.io",
   "author": {
     "name": "arik",
@@ -59,7 +59,6 @@
     "jshint": "~2.1.10",
     "express": "~3.4.4",
     "test-model-reporter": "~0.1.0",
-    "faker": "~0.5.11",
     "js.utils": "~0.1.9",
     "require-mapper": "~0.0.3",
     "glob": "~3.2.7",
@@ -71,7 +70,8 @@
     "wrench": "~1.5.8",
     "contribute": "~0.0.3",
     "colors": "~0.6.2",
-    "autonpm": "~0.1.2"
+    "autonpm": "~0.1.2",
+    "faker": "^1.0.1"
   },
   "keywords": [
     "runner",
