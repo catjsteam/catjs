@@ -17,7 +17,9 @@ _cat.utils.Loader = function () {
                 node.onload = function() {
                     _ready++;
                     if (_ready === _libslength) {
-                        callback.call(this);
+                        if (callback && callback.call) {
+                            callback.call(this);
+                        }
                     }
                 };
 
