@@ -870,7 +870,20 @@ _cat.core = function () {
         },
 
         getBaseUrl: function(url) {
-            return  ([window.location.origin, "/", (url || "")].join("") || "/");
+            var regHtml,
+                endInPage,
+                pathname,
+                result;
+
+            regHtml = "(/.*/).*\\.html";
+            endInPage = new RegExp(regHtml + "$");
+            pathname = window.location.pathname;
+            result = endInPage.exec(pathname);
+
+            if (result !== null) {
+                pathname = (RegExp.$1);
+            }
+            return  ([window.location.origin, pathname, (url || "")].join("") || "/");
         }
 
     };

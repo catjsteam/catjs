@@ -106,6 +106,10 @@
             "type": "scrap-jqm"
         },
         {
+            "name": "p@scrap.vnc",
+            "type": "scrap-vnc"
+        },
+        {
             "name": "p@scrap.mock",
             "type": "scrap-mock"
         },
@@ -187,7 +191,7 @@
         },
         {
             "name": "t@scrap",
-            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@custom.plugin", "p@init.scrap"]
+            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.vnc", "p@scrap.enyo", "p@custom.plugin", "p@init.scrap"]
         },
         {
             "name": "t@inject",
