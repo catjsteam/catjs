@@ -870,7 +870,20 @@ _cat.core = function () {
         },
 
         getBaseUrl: function(url) {
-            return  ([window.location.origin, "/", (url || "")].join("") || "/");
+            var regHtml,
+                endInPage,
+                pathname,
+                result;
+
+            regHtml = "(/.*/).*\\.html";
+            endInPage = new RegExp(regHtml + "$");
+            pathname = window.location.pathname;
+            result = endInPage.exec(pathname);
+
+            if (result !== null) {
+                pathname = (RegExp.$1);
+            }
+            return  ([window.location.origin, pathname, (url || "")].join("") || "/");
         }
 
     };
@@ -1203,8 +1216,7 @@ _cat.core.clientmanager = function () {
             repeatIndex;
 
         scrapInfoArr = getScrapTestInfo(scrap.name[0]);
-
-        for (infoIndex in scrapInfoArr) {
+        for (infoIndex = 0; infoIndex < scrapInfoArr.length; infoIndex++) {
             scrapInfo = scrapInfoArr[infoIndex];
             repeat = scrapInfo.repeat || 1;
             for (repeatIndex = 0; repeatIndex < repeat; repeatIndex++){
@@ -3217,6 +3229,58 @@ _cat.plugins.sencha = function () {
         }
 
 
+    };
+
+}();
+
+var animation = false;
+
+
+_cat.plugins.vnc = function () {
+
+
+
+    return {
+
+        actions: {
+
+
+            mouseClick: function (x, y) {
+                window.rfb.mouseClick(x, y);
+            },
+
+            mouseScrollVer: function (x, y1, y2) {
+                window.rfb.mouseScrollVer(x, y1, y2);
+            },
+
+            mouseSlide: function (x1, y1, x2, y2) {
+                window.rfb.mouseSlide(x1, y1, x2, y2);
+            },
+
+            mouseLongClick: function (x1, y1) {
+                window.rfb.mouseLongClick(x1, y1);
+            },
+
+            swipeRight: function () {
+                window.rfb.swipeRight();
+            },
+
+            swipeLeft: function () {
+                window.rfb.swipeLeft();
+            },
+            back: function () {
+                window.rfb.back();
+            },
+
+            setText: function (text) {
+                window.rfb.setText(text);
+            },
+
+            home: function () {
+                window.rfb.home();
+            }
+
+        }
     };
 
 }();
