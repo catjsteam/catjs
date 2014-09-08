@@ -75,8 +75,7 @@ _cat.core.clientmanager = function () {
             repeatIndex;
 
         scrapInfoArr = getScrapTestInfo(scrap.name[0]);
-
-        for (infoIndex in scrapInfoArr) {
+        for (infoIndex = 0; infoIndex < scrapInfoArr.length; infoIndex++) {
             scrapInfo = scrapInfoArr[infoIndex];
             repeat = scrapInfo.repeat || 1;
             for (repeatIndex = 0; repeatIndex < repeat; repeatIndex++){
