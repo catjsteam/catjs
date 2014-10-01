@@ -1,4 +1,4 @@
-CatJS 0.3.4
+CatJS 0.3.5
 ==============
   
 <p><div style="font-size:orange; font-size:12px">  It's much lighter...  </div></p>
@@ -315,6 +315,19 @@ catjs track your application errors and report it to the console/junit. With min
 
 CatJS has support for phantomjs, but it's not being installed as part of the catjs package.
 Run: <code>catcli -t</code> And catjs will install phantom, or install it manually.
+
+### Npm Installation Failure
+
+In case an error occurs on the installation process you might need to upgrade the NodeJS/NPM.
+
+Example of an error that you might get:
+<code>
+ERR! Error: No compatible version found: colors@'^0.6.2'
+npm ERR! Valid install targets:
+npm ERR! ["0.3.0","0.5.0","0.5.1","0.6.0","0.6.0-1","0.6.1","0.6.2"]
+npm ERR!     at installTargetsError (/usr/lib/node_modules/npm/lib/cache.js:719:10)
+
+</code>
 
 
 ## API reference
