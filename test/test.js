@@ -50,7 +50,7 @@ function _testBegin() {
     _call("node", ["./test/" + _path.join(_extractFolder, "test.js")]);
 }
 
-function _install() {
+function _install(build) {
 
     function _downloadTestApps(callback) {
         _request = (global["$request"] || require("request"));
@@ -91,42 +91,44 @@ function _install() {
         }
     }
 
-    autonpm("request-progress", {where: path}).then(
-        function (mod) {
-
-        }).fail(
-        function (error) {
-            console.error("Fail to load request-progress module ", error);
-        })
-        .done(
-        function () {
-            autonpm("request", {where: path}).fail(
-                function (error) {
-                    console.error("Fail to load request module ", error);
-                })
-                .done(
-                function () {
-
-                    autonpm("adm-zip", {where: path}).fail(
-                        function (error) {
-                            console.error("Fail to load request module ", error);
-                        })
-                        .done(
-                        function () {
-
-                            var zip;
-
-                            // download test-apps zip file
-                            _downloadTestApps(function() {
-                                _testBegin();
-                                                               
-                            });
-                         
-                        }
-                    );
-                }
-            );
-        });
+    if (build) {
+        autonpm("request-progress", {where: path}).then(
+            function (mod) {
+    
+            }).fail(
+            function (error) {
+                console.error("Fail to load request-progress module ", error);
+            })
+            .done(
+            function () {
+                autonpm("request", {where: path}).fail(
+                    function (error) {
+                        console.error("Fail to load request module ", error);
+                    })
+                    .done(
+                    function () {
+    
+                        autonpm("adm-zip", {where: path}).fail(
+                            function (error) {
+                                console.error("Fail to load request module ", error);
+                            })
+                            .done(
+                            function () {
+    
+                                var zip;
+    
+                                // download test-apps zip file
+                                _downloadTestApps(function() {
+                                    _testBegin();
+                                                                   
+                                });
+                             
+                            }
+                        );
+                    }
+                );
+            });
+    }
 }
 
 function _deleteFolderRecursive(path) {
@@ -169,9 +171,13 @@ function _clean() {
     }
 }
 
-if (args && args[0] && args[0] === "clean") {
-    _clean();
+if (args && args[0]) {
+    if (args[0] === "clean") {
+        _clean();
+    } else if (args[0] === "jenkins") {
+        _install(false);
+    }
 } else {
-    _install();
+    _install(true);
 }
 
