@@ -190,7 +190,7 @@ var _typedas = require('typedas'),
             _mkEnvDir("target");
 
             // set the info properties incoming from the cat's project
-            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "cattarget", "analytics", "runner", "dependencies"]);
+            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "appcontext", "cattarget", "analytics", "runner", "dependencies"]);
 
         }
 
@@ -424,6 +424,11 @@ Config.prototype.getHost = function () {
 Config.prototype.getProtocol = function () {
     var protocol = this.getInfo("appserver.protocol") || this.getInfo("protocol");
     return (protocol || "http://");
+};
+
+Config.prototype.getContext = function () {
+    var context = this.getInfo("appcontext");
+    return (context || "/");
 };
 
 Config.prototype.getAddress = function () {
