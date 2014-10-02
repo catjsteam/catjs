@@ -259,7 +259,7 @@ module.exports = function () {
                 patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*)(\\).*\\).*)","g");
 
                 while (codeRows.match(patt)) {
-                    codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2'.$3'$4");
+                    codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2\".$3\"$4");
                 }
                 return codeRows;
             }
