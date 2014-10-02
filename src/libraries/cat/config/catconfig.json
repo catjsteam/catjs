@@ -15,6 +15,7 @@
     "name": "{{project.name}}",
     "ip": null,
     "port": null,
+    "context": "{{project.info.appcontext}}",
     "tests":[
         {"name" : "general"}
     ],
