@@ -875,7 +875,7 @@ _cat.core = function () {
                 pathname,
                 result;
 
-            regHtml = "(/.*/).*\\.html";
+            regHtml = "([/]?.*[/]*[/])+(.*[\\.html]?)";
             endInPage = new RegExp(regHtml + "$");
             pathname = window.location.pathname;
             result = endInPage.exec(pathname);
