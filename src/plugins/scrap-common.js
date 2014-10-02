@@ -349,11 +349,12 @@ module.exports = function () {
                     codeRows = this.get("assert");
 
                     if (codeRows) {
-                        codeSnippet = codeRows[0];
+                        codeRows = _utils.prepareCode(codeRows);
+                        codeSnippet = codeRows[0];                       
 
                         if (codeSnippet) {
                             try {
-                                codeSnippet = _utils.prepareCode(codeSnippet);
+                                                               
                                 // try to understand the code
                                 codeSnippetObject = _uglifyutils.getCodeSnippet({code: codeSnippet});
 
@@ -361,6 +362,7 @@ module.exports = function () {
                             } catch (e) {
                                 // TODO use uglifyjs to see if there was any error in the code.
                                 // TODO throw a proper error
+                                console.log(e);
                             }
                         }
 
