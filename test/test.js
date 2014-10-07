@@ -50,45 +50,46 @@ function _testBegin() {
     _call("node", ["./test/" + _path.join(_extractFolder, "test.js")]);
 }
 
-function _install(build) {
+function _install(build, proxy) {
 
     function _downloadTestApps(callback) {
+
+        var requestConfig = {
+ 		url:'http://github.com/catjsteam/test-apps/archive/master.zip'}), {
+		"throttle": 2000
+	};
+
+	if (proxy) {
+		requestConfig.proxy = proxy;
+	}
+
         _request = (global["$request"] || require("request"));
         _requestprogress = (global["$request-progress"] || require("request-progress"));
 
-        // download the test apps if not exists
-        if (!_fs.existsSync(_zipfile)) {
+	process.stdout.write("\n CatJS test-apps download (Please wait...) ");
+	// Note that the options argument is optional
+	_requestprogress(_request(requestConfig)
+	.on('progress', function (state) {
+	    process.stdout.write(".");
+	})
+	.on('error', function (err) {
+	    console.error("error", err);
+	})
+	.pipe(_fs.createWriteStream(_zipfile, {flags:"w+", mode:"0777"}))
+	.on('error', function (err) {
+	    console.error("error", err);
+	})
+	.on('close', function (err) {
 
-            process.stdout.write("\n CatJS test-apps download (Please wait...) ");
-            // Note that the options argument is optional
-            _requestprogress(_request('http://github.com/catjsteam/test-apps/archive/master.zip'), {
-                "throttle": 2000
-            })
-                .on('progress', function (state) {
-                    process.stdout.write(".");
-                })
-                .on('error', function (err) {
-                    console.error("error", err);
-                })
-                .pipe(_fs.createWriteStream(_zipfile))
-                .on('error', function (err) {
-                    console.error("error", err);
-                })
-                .on('close', function (err) {
+	    process.stdout.write("\n Test apps successfully downloaded. ");
 
-                    process.stdout.write("\n Test apps successfully downloaded. ");
+	    process.stdout.write("\n Start testing CatJS Apps");
+	    
+	    if (callback) {
+		callback.call(this);
+	    }
+	});
 
-                    process.stdout.write("\n Start testing CatJS Apps");
-                    
-                    if (callback) {
-                        callback.call(this);
-                    }
-                });
-        } else {
-            if (callback) {
-                callback.call(this);
-            }
-        }
     }
 
     if (build) {
@@ -174,10 +175,9 @@ function _clean() {
 if (args && args[0]) {
     if (args[0] === "clean") {
         _clean();
-    } else if (args[0] === "build") {
-        _install(false);
+    } else if (args[0] === "jenkins") {
+        _install(false, args[1]);
     }
 } else {
     _install(true);
 }
-
