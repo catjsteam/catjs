@@ -174,7 +174,7 @@ function _clean() {
 if (args && args[0]) {
     if (args[0] === "clean") {
         _clean();
-    } else if (args[0] === "jenkins") {
+    } else if (args[0] === "build") {
         _install(false);
     }
 } else {
