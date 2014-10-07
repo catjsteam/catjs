@@ -55,20 +55,21 @@ function _install(build, proxy) {
     function _downloadTestApps(callback) {
 
         var requestConfig = {
- 		url:'http://github.com/catjsteam/test-apps/archive/master.zip'}), {
-		"throttle": 2000
-	};
+ 		     url:'http://github.com/catjsteam/test-apps/archive/master.zip'
+        };
 
-	if (proxy) {
-		requestConfig.proxy = proxy;
-	}
+    	if (proxy) {
+    		requestConfig.proxy = proxy;
+    	}
 
         _request = (global["$request"] || require("request"));
         _requestprogress = (global["$request-progress"] || require("request-progress"));
 
 	process.stdout.write("\n CatJS test-apps download (Please wait...) ");
 	// Note that the options argument is optional
-	_requestprogress(_request(requestConfig)
+	_requestprogress(_request(requestConfig), {
+        "throttle": 2000
+    })
 	.on('progress', function (state) {
 	    process.stdout.write(".");
 	})
@@ -129,6 +130,12 @@ function _install(build, proxy) {
                     }
                 );
             });
+    } else {
+        // download test-apps zip file
+        _downloadTestApps(function() {
+            _testBegin();
+                                           
+        });
     }
 }
 
@@ -175,7 +182,8 @@ function _clean() {
 if (args && args[0]) {
     if (args[0] === "clean") {
         _clean();
-    } else if (args[0] === "jenkins") {
+    } else if (args[0] === "build") {
+        console.log("...", args);
         _install(false, args[1]);
     }
 } else {
