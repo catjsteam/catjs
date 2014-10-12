@@ -69,7 +69,7 @@ function _install(build, proxy) {
             
         } finally {
             if (!_request || !_requestprogress) {
-                console.log("\n npm modules are missing (request, requestprogress and amd-zip), use 'buildall' or install them manually under catjs node_modules...", cathome);
+                console.log("\n npm modules are missing (request, requestprogress and amd-zip), install them manually under catjs node_modules...", cathome);
             }
         }
             
@@ -187,8 +187,21 @@ function _clean() {
     }
 }
 
+if (require.main === module) {
 
-if (typeof exports !== 'undefined') {
+    // command line support
+    if (args && args[0]) {
+        if (args[0] === "clean") {
+            _clean();
+        } else if (args[0] === "build") {
+            console.log("...", args);
+            _install(false, args[1]);
+        }
+    } else {
+        _install(true);
+    }
+    
+} else if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
 
         // nodejs support
@@ -217,21 +230,7 @@ if (typeof exports !== 'undefined') {
         }();
 
     }
-} else {
-
-    // command line support
-    if (args && args[0]) {
-        if (args[0] === "clean") {
-            _clean();
-        } else if (args[0] === "build") {
-            console.log("...", args);
-            _install(false, args[1]);
-        }
-    } else {
-        _install(true);
-    }
-
-}
+} 
 
 
 
