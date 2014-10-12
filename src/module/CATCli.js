@@ -23,6 +23,8 @@ module.exports = function () {
                     "kill": [String, Number],
                     "task": [String, Array],
                     "init": String,
+                    "test": String,
+                    "proxy": String,
                     "watch": [Boolean, false],
                     "project": [String, null]
                 }, {

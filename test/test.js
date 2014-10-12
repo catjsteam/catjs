@@ -62,11 +62,19 @@ function _install(build, proxy) {
     		requestConfig.proxy = proxy;
     	}
 
-        _request = (global["$request"] || require("request"));
-        _requestprogress = (global["$request-progress"] || require("request-progress"));
-
+        try {
+            
+            _request = (global["$request"] || require("request"));
+            _requestprogress = (global["$request-progress"] || require("request-progress"));
+            
+        } finally {
+            if (!_request || !_requestprogress) {
+                console.log("\n npm modules are missing (request, requestprogress and amd-zip), use 'buildall' or install them manually under catjs node_modules...", cathome);
+            }
+        }
+            
 	process.stdout.write("\n CatJS test-apps download (Please wait...) ");
-	// Note that the options argument is optional
+      
 	_requestprogress(_request(requestConfig), {
         "throttle": 2000
     })
@@ -179,13 +187,51 @@ function _clean() {
     }
 }
 
-if (args && args[0]) {
-    if (args[0] === "clean") {
-        _clean();
-    } else if (args[0] === "build") {
-        console.log("...", args);
-        _install(false, args[1]);
+
+if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports) {
+
+        // nodejs support
+        module.exports = function() {
+
+            return {
+
+                /**
+                 * Manually run catjs build
+                 * 
+                 * @param proxy The proxy server
+                 */
+                build: function(proxy){
+                    _install(false, proxy);
+                },
+                
+                buildall: function(proxy){
+                    _install(true, proxy);
+                },
+                
+                clean: function() {
+                    _clean();
+                }
+            };
+
+        }();
+
     }
 } else {
-    _install(true);
+
+    // command line support
+    if (args && args[0]) {
+        if (args[0] === "clean") {
+            _clean();
+        } else if (args[0] === "build") {
+            console.log("...", args);
+            _install(false, args[1]);
+        }
+    } else {
+        _install(true);
+    }
+
 }
+
+
+
