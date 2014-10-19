@@ -59,8 +59,8 @@
             "name": "tmr",
             "address": "local",
             "base": ".",
-            "prod" :["tmr.js"],
-            "dev" :["tmr.js"],
+            "prod" :["target/tmr-min.js"],
+            "dev" :["target/tmr-min.js"],
             "install" : "static"
         },
         {
@@ -71,8 +71,8 @@
         },
         {
             "name": "jspath",
-            "prod" :["jspath.js"],
-            "dev" :["jspath.js"],
+            "prod" :["lib/jspath.js"],
+            "dev" :["lib/jspath.js"],
             "install": "static"
         }
     ]
