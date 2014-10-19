@@ -8,11 +8,11 @@ var args = process.argv.slice(2),
     _platform  = _os.platform(),
     _path = require("path"),
     _fs = require("fs"),
-    _nodeModulesPath = (_platform === "win32" ? "./" : "./node_modules"),
-    _npmcmd = (_platform === "win32" ? "npm" : "npm.cmd"),
+    basedir = "./",
+    _nodeModulesPath = (_platform === "win32" ? basedir : _path.join(basedir, "node_modules")),
     path = _path.resolve(_nodeModulesPath),
-    _extractFolder = "test-apps-master"
-_zipfolder = "./test/catjs-test-apps",
+    _extractFolder = "test-apps-master",
+    _zipfolder = _path.join(basedir, "test/catjs-test-apps"),
     _zipfile = _zipfolder + ".zip",
     _spawn = require('child_process');
 
@@ -41,13 +41,13 @@ function _testBegin() {
         _admzip = (global["$adm-zip"] || require("adm-zip"));
 
         zip = new _admzip(_zipfile);
-        zip.extractAllTo("./test", true);
+        zip.extractAllTo(_path.join(basedir, "test"), true);
     }
 
     console.log("CatJS running tests from directory: ", process.cwd());
     
     // activate catjs core tests
-    _call("node", ["./test/" + _path.join(_extractFolder, "test.js")]);
+    _call("node", [_path.join("test/" + _path.join(_extractFolder, "test.js"))]);
 }
 
 function _install(build, proxy) {
@@ -182,8 +182,8 @@ function _clean() {
     if (_fs.existsSync(_zipfile)) {
         _fs.unlinkSync(_zipfile);
     }
-    if (_fs.existsSync("./test/" + _extractFolder)) {
-        _deleteFolderRecursive("./test/" + _extractFolder);
+    if (_fs.existsSync(_path.join("test/" + _extractFolder))) {
+        _deleteFolderRecursive(_path.join("test/" + _extractFolder));
     }
 }
 
@@ -193,7 +193,12 @@ if (require.main === module) {
     if (args && args[0]) {
         if (args[0] === "clean") {
             _clean();
-        } else if (args[0] === "build") {
+            
+        } else if (args[0] === "buildall") {
+            console.log("...", args);
+            _install(true, args[1]);
+            
+        }  else if (args[0] === "build") {
             console.log("...", args);
             _install(false, args[1]);
         }
@@ -209,6 +214,10 @@ if (require.main === module) {
 
             return {
 
+                init: function() {
+                        
+                },
+                
                 /**
                  * Manually run catjs build
                  * 
