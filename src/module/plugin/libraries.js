@@ -8,6 +8,7 @@ var _catglobal = catrequire("cat.global"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
     _jsutils = require("js.utils"),
+    _manifest = require("./manifest/manifest.js"),
     _bower;
 
 module.exports = _basePlugin.ext(function () {
@@ -91,22 +92,21 @@ module.exports = _basePlugin.ext(function () {
                 wipe = false,
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"],
-                manifestFileName = "manifest.json",
-                manifestLib = _path.join(global.catlibs, manifestFileName),
                 catProjectLib,
                 catProjectSrc,
-                catProjectLibName,
-                library, mode,
+                manifestLib,
+                library, manifestMode,
+                manifestDetails,
                 workPath,
                 libWorkPath,
                 manifest,
                 libraries,
-                slot = 0,
-                envinfo;
+                slot = 0;             
 
-            if (_fs.existsSync(manifestLib)) {
-                manifest = _fs.readFileSync(manifestLib, "utf8");
-            }
+           
+            
+            manifest = _manifest.init();
+            
 
             function _copyResource() {
 
@@ -116,7 +116,7 @@ module.exports = _basePlugin.ext(function () {
                     return undefined;
                 }
                 var from,
-                    artifact = library[mode];
+                    artifact = library[manifestMode];
 
                 /**
                  * Copy resource synchronously
@@ -191,7 +191,7 @@ module.exports = _basePlugin.ext(function () {
 
                 var actions = {},
                     process1,
-                    targetManifestPath = _path.join(catProjectLib, manifestFileName),
+                    targetManifestPath = _path.join(catProjectLib, manifest.getFileName()),
                     doImport = false,
                     concatsByType;
 
@@ -218,6 +218,7 @@ module.exports = _basePlugin.ext(function () {
 
                 // copy the manifest file
                 try {
+                    manifestLib = manifest.getFilePath();
                     if (_fs.existsSync(manifestLib) && _fs.existsSync(targetManifestPath)) {
                         _utils.copySync(manifestLib, targetManifestPath);
                     }
@@ -545,18 +546,16 @@ module.exports = _basePlugin.ext(function () {
 
                 // prepare libraries
                 if (manifest) {
-
-                    manifest = JSON.parse(manifest);
-
-
-                    libraries = manifest.libraries;
-                    mode = manifest.mode;
-
+                   
+                    libraries = manifest.getLibraries();
+                    manifestMode = manifest.getMode();
+                    manifestDetails = manifest.getDetails();
 
                     if (_project) {
                         catProjectSrc = _project.getInfo("source");
-                        catProjectLib = manifest.out.folder;
-                        catProjectLibName = manifest.out.name;
+                        if (manifestDetails) {
+                            catProjectLib = manifestDetails.folder;
+                        }
 
                         workPath = _path.join(cathome, _project.getInfo("libraries").path);
                     }

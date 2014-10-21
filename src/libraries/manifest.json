@@ -56,6 +56,22 @@
             "install" : "static"
         },
         {
+            "name": "underscore",
+            "address": "local",
+            "base": ".",
+            "prod" :["underscore-min.js", "underscore-min.map"],
+            "dev" :["underscore-min.js", "underscore-min.map"],
+            "install" : "static"
+        },
+        {
+            "name": "js.utils",
+            "address": "local",
+            "base": ".",
+            "prod" :["target/jsutils-min.js"],
+            "dev" :["target/jsutils-min.js"],
+            "install" : "static"
+        },
+        {
             "name": "tmr",
             "address": "local",
             "base": ".",
