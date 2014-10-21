@@ -19,6 +19,8 @@
     "chai": "~1.9.2",
     "jspath": "~0.2.12",
     "requirejs": "~2.1.15",
-    "tmr": "https://github.com/lastboy/test-unit-reporter.git"
+    "underscore": "~1.7.0",
+    "tmr": "https://github.com/lastboy/test-unit-reporter.git",
+    "js.utils": "https://github.com/lastboy/js.utils.git"
   }
 }
