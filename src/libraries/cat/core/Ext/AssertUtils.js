@@ -43,7 +43,7 @@ _cat.utils.assert = function () {
                     displayName: config.displayName,
                     status: config.status,
                     message: config.message,
-                    success: config.status,
+                    success: (("success" in config && config.success) ? true : false), 
                     reportFormats: config.send
 
                 });

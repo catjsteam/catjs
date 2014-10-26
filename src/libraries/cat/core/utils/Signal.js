@@ -19,7 +19,7 @@ _cat.utils.Signal = function () {
                     var testCount;
                     if (opt.error) {
                         _cat.core.ui.setContent({
-                            header: "Test failed with an error",
+                            header: "Test failed with errors",
                             desc:  opt.error,
                             tips: "",
                             style: "color:red"
@@ -28,10 +28,11 @@ _cat.utils.Signal = function () {
                     } else {
                         testCount = _cat.core.TestManager.getTestCount();
                         _cat.core.ui.setContent({
-                            header: [testCount-1, "Tests complete"].join(" "),
+                            header: [testCount-1," tests total"].join(" "),
                             desc: "",
                             tips: "",
-                            style: "color:green"
+                            elementType: "listImageSummary",
+                            style: "color:#444444"
                         });
                     }
                 }, (timeout));
