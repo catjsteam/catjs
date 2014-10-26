@@ -17,7 +17,9 @@ module.exports = function () {
     var funcSnippetTpl = _tplutils.readTemplateFile("scrap/_func_snippet"),
         importJSTpl = _tplutils.readTemplateFile("scrap/_import_js"),
         requireJSTpl = _tplutils.readTemplateFile("scrap/_require_js"),
-        importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css");
+        requireGlobalsJSTpl = _tplutils.readTemplateFile("scrap/_require_globals_snippet"),
+        importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css"),
+        project = catrequire("cat.cli").getProject();
 
 
     function _isCatjs(lib) {
@@ -32,6 +34,65 @@ module.exports = function () {
         return false;
     }
 
+    // Build the library names according to the libraries manifest                           
+    function __updateLibs(deplibs) {
+        var result = [],
+            manifest = project.getManifest();
+        
+        function _Details(config) {
+
+            var me = this;
+
+            function _init(config, props) {
+
+                var lib = config.lib;
+                
+                me.name = config.name;
+                me.path = config.path;
+
+                props.forEach(function(item) {
+                    if (item in lib) {
+                        me[item] = lib[item];
+                    }
+                });
+            }
+            
+            _init(config, ["exports", "deps", "globals"]);
+            
+        }
+        
+        if (manifest) {
+            deplibs.forEach(function(item) {
+                var lib, names;
+                if (item) {
+                    lib = manifest.getLibrary(item);
+                    if (lib) {
+                        // get the actual file names
+                        names = lib.getFileNames();
+                        if (names && names.length > 0) {
+                            names.forEach(function(libpath) {
+                                if (libpath) {
+                                   result.push(new _Details({name: item, path: libpath, lib: lib})) ;
+                                }
+                            });
+                            
+
+                        } else {
+
+                            // push the library name as is, [.js] will be concatenated
+                            result.push(new _Details({name: item, path: item, lib: lib}));
+                        }
+
+                    } else {
+                        // push the library name as is, [.js] will be concatenated
+                        result.push(new _Details({name: item, path: item, lib: {}}));
+                    }
+                }
+            });
+        }
+        return result;
+    }
+    
     return {
 
         init: function (config) {
@@ -411,7 +472,7 @@ module.exports = function () {
                                 catjs: {
                                     exports: '_cat'
                                 },
-                                "catsrc": {
+                                "catsrcjs": {
                                     deps: [
                                         "cat"
                                     ]
@@ -420,8 +481,26 @@ module.exports = function () {
                             paths: {
 
                             }
-                        };
-
+                        }, globals = [];
+                    
+                    function _addGlobals(lib){
+                        
+                       var glob, exp;
+                       if (lib) {
+                           glob = ("globals" in lib ? lib.globals : false);
+                           exp = ("exports" in lib ? lib.exports : undefined);
+                           if (glob && exp) {
+                               globals.push(_tplutils.template({
+                                   content: requireGlobalsJSTpl,
+                                   data: {
+                                      handle: lib.name,
+                                      exports: exp
+                                   }
+                               }));
+                           }
+                       } 
+                    }
+                    
                     if (requirerows) {
                         if (!_typedas.isArray(requirerows)) {
                             requirerows = [requirerows];
@@ -430,7 +509,7 @@ module.exports = function () {
 
                             if (lib && _isCatjs(lib)) {
 
-                                libs = catrequire("cat.cli").getProject().getInfo("dependencies");
+                                libs = project.getInfo("dependencies");
                                 basedir = _path.dirname(lib) + "/";
 
                                 if (requirerows) {
@@ -439,27 +518,49 @@ module.exports = function () {
 
                                     if (code) {
 
+                                        // update the libs according to the manifest
+                                        libs = __updateLibs(libs);
+                                                                            
                                         libs.forEach(function (lib) {
                                             var fullpathlib,
-                                                key;
+                                                key, libpath = lib.path;
 
-                                            if (lib) {
-                                                lib = lib.split(".js").join("");
-                                                fullpathlib = basedir + lib;
-
-                                                if (_catlibtils.extExists(lib)) {
-                                                    if (lib.lastIndexOf(".css") !== -1) {
-                                                        requirecsslist.push(basedir + lib);
-                                                        return undefined;
-                                                    }
+                                            if (libpath) {
+                                                if (libpath.lastIndexOf(".map") !== -1) {
+                                                    return undefined;
                                                 }
 
-                                                key = lib.split(".").join("");
+                                                libpath = libpath.split(".js").join("");               
+                                                
+                                                fullpathlib = basedir + libpath;
+
+                                                if (_catlibtils.extExists(libpath)) {
+                                                    if (libpath.lastIndexOf(".css") !== -1) {
+                                                        requirecsslist.push(basedir + libpath);
+                                                        return undefined;
+                                                        
+                                                    } 
+                                                }
+
+                                                key = lib.name.split(".").join("");
                                                 config.paths[key] = fullpathlib;
+                                                if (lib.deps || lib.exports) {
+                                                    if (!config.shim[key]) {
+                                                        config.shim[key] = {};
+                                                    }      
+                                                    if (lib.deps) {
+                                                        config.shim[key].deps = lib.deps;
+                                                    }
+                                                    if (lib.exports) {
+                                                        config.shim[key].exports = lib.exports;
+                                                    }
+                                                    _addGlobals(lib);
+                                                }
                                                 requirelist.push(key);
                                             }
                                         });
 
+                                        
                                         // override configuration
                                         if (config.paths.chai) {
                                             config.shim.catjs.deps = ["chai"];
@@ -472,7 +573,8 @@ module.exports = function () {
                                                 config: JSON.stringify(config),
                                                 require: JSON.stringify(requirelist),
                                                 requirerefs: requirelist.join(",").split('"').join(""),
-                                                cssfiles: JSON.stringify(requirecsslist)
+                                                cssfiles: JSON.stringify(requirecsslist),
+                                                globals: (globals.length > 0 ? globals.join(" ") : "") 
                                             }
                                         }));
 
@@ -496,6 +598,8 @@ module.exports = function () {
                 single: false,
                 func: function (config) {
 
+                    var project = catrequire("cat.cli").getProject();                       
+                    
                     function _getType(value) {
 
                         var type = "js";
@@ -503,6 +607,8 @@ module.exports = function () {
 
                             if (value.indexOf(".css") !== -1) {
                                 type = "css";
+                            } else if (value.indexOf(".map") !== -1) {
+                                type = "map";
                             } else if (value.indexOf(".js") !== -1) {
                                 type = "js";
                             } else {
@@ -515,21 +621,25 @@ module.exports = function () {
 
                     function generateLibs(value) {
 
-                        var libs, basedir,
+                        var libs=[], deplibs=[], basedir,
                             libcounter = 0,
                             libsrcs = [];
 
 
                         if (_isCatjs(value)) {
-
+                           
+                                                       
                             // handle cat library
-                            libs = catrequire("cat.cli").getProject().getInfo("dependencies");
+                            deplibs = project.getInfo("dependencies");
+
+                            // update the libs according to the manifest
+                            libs = __updateLibs(deplibs);
 
                             libs.forEach(function (lib) {
-                                if (lib === "cat") {
+                                if (lib.path === "cat") {
                                     libs.splice(libcounter, 1);
                                 }
-                                if (lib.indexOf("cat.src") !== -1) {
+                                if (lib.path.indexOf("cat.src") !== -1) {
                                     libs.splice(libcounter, 1);
                                 }
                                 libcounter++;
@@ -539,7 +649,7 @@ module.exports = function () {
 
 
                             libs.forEach(function (lib) {
-                                libsrcs.push([basedir, lib].join(""));
+                                libsrcs.push([basedir, lib.path].join(""));
                             });
                             libsrcs.push(value);
                             libsrcs.push([basedir, "cat.src.js"].join(""));
@@ -548,7 +658,7 @@ module.exports = function () {
                         } else {
                             libsrcs.push(value);
                         }
-
+                        
                         return libsrcs;
                     }
 
@@ -588,7 +698,7 @@ module.exports = function () {
                                     var typeob = _getType(lib),
                                         importType = typeob.type;
 
-                                    if (importType) {
+                                    if (importType && importType !== "map") {
                                         _printByType(importType, typeob.value);
                                     }
                                 });
