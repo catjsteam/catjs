@@ -34,6 +34,7 @@ var _global = catrequire("cat.global"),
             scrapfilter, projectcopy,
             scrapscan, customPlugins,
             cattarget, targetfolder,
+            manifest,
             libIdx= 0,
             rmIdx=-1;
 
@@ -208,8 +209,8 @@ var _global = catrequire("cat.global"),
                     librariesConfig.unshift("cat.css");
                     librariesConfig.push("cat.src.js");
 
-                    project.setInfo("dependencies", librariesConfig);
-
+                    project.setInfo("dependencies", librariesConfig);                                                  
+                    
                     libraryBuildConfig = {
                         "name": "p@libraries.build",
                         "type": "libraries",

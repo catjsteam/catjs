@@ -61,6 +61,7 @@
             "base": ".",
             "prod" :["underscore-min.js", "underscore-min.map"],
             "dev" :["underscore-min.js", "underscore-min.map"],
+            "exports": "_",
             "install" : "static"
         },
         {
@@ -69,7 +70,8 @@
             "base": ".",
             "prod" :["target/jsutils-min.js"],
             "dev" :["target/jsutils-min.js"],
-            "install" : "static"
+            "install" : "static",
+            "deps": ["underscore"]
         },
         {
             "name": "tmr",
@@ -77,18 +79,23 @@
             "base": ".",
             "prod" :["target/tmr-min.js"],
             "dev" :["target/tmr-min.js"],
-            "install" : "static"
+            "install" : "static",
+            "deps": ["underscore", "jsutils"]
         },
         {
             "name": "chai",
             "prod" :["chai.js"],
             "dev" :["chai.js"],
+            "exports": "chai",
+            "globals": true,
             "install": "static"
         },
         {
             "name": "jspath",
             "prod" :["lib/jspath.js"],
             "dev" :["lib/jspath.js"],
+            "exports": "JSPath",
+            "globals": true,
             "install": "static"
         }
     ]

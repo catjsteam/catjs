@@ -8,6 +8,7 @@ var _typedas = require('typedas'),
     _props = catrequire("cat.props"),
     _fs = require("fs.extra"),
     _path = require("path"),
+    _manifest = catrequire("cat.common.manifest"),
 
     /**
      * Configuration Class
@@ -51,6 +52,7 @@ var _typedas = require('typedas'),
         this.tasks = tasks;
         this.pluginPaths = [];
         this.info = {};
+        this.manifest = _manifest.init();
 
 
         this._get = function(key) {
@@ -270,7 +272,6 @@ var _typedas = require('typedas'),
 
             // create target skeleton project
             _postCreation();
-
         }
 
         _main();
@@ -429,6 +430,10 @@ Config.prototype.getProtocol = function () {
 Config.prototype.getContext = function () {
     var context = this.getInfo("appcontext");
     return (context || "/");
+};
+
+Config.prototype.getManifest = function () {
+    return this.manifest;
 };
 
 Config.prototype.getAddress = function () {

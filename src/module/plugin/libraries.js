@@ -8,7 +8,6 @@ var _catglobal = catrequire("cat.global"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
     _jsutils = require("js.utils"),
-    _manifest = require("./manifest/manifest.js"),
     _bower;
 
 module.exports = _basePlugin.ext(function () {
@@ -99,13 +98,9 @@ module.exports = _basePlugin.ext(function () {
                 manifestDetails,
                 workPath,
                 libWorkPath,
-                manifest,
+                manifest = project.getManifest(),
                 libraries,
-                slot = 0;             
-
-           
-            
-            manifest = _manifest.init();
+                slot = 0;                                 
             
 
             function _copyResource() {

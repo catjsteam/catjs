@@ -1,6 +1,8 @@
 var _npmpath = require("path"),
     _fs = require("fs.extra"),
-    _log = _catglobal.log();
+    _global = catrequire("cat.global"),
+    _log = _global.log(),
+    _ = require("underscore");
 
 module.exports = function () {
 
@@ -23,9 +25,59 @@ module.exports = function () {
                     this.name = library.name;
                     this.prod = library.prod;
                     this.dev = library.dev;
+                    this.exports = ("exports" in library ? library.exports : undefined);
+                    this.deps = ("deps" in library ? library.deps : undefined);
+                    this.globals = ("globals" in library ? library.globals : undefined);
                     this.install = library.install;
                 }
             }
+
+            _Library.prototype.isStatic = function() {
+                if (this.install === "static") {
+                    return true;
+                }  
+                return false;
+            };
+            
+            /**
+             * Note: currently support only for static (probably the only type that will be supported)
+             * TODO In case more types will be added to the manifest.json add the proper functionality...
+             */
+             _Library.prototype.getFileNames = function() {
+                 var result;
+                 
+                 function _getNames(entity) {
+                     var names = [];
+                     
+                     if (entity) {
+                         entity.forEach(function(item) {
+                             var startpos;
+                             if (item && _.isString(item)) {
+
+                                 startpos = item.lastIndexOf("/");
+                                 startpos +=1;
+                                 item = item.substring(startpos, item.length);
+                                 
+                                 if (item) {
+                                     names.push(item);
+                                 }
+                             }
+                         });
+                     }
+                     
+                     return names;
+                 }
+                 
+                 if (this.isStatic) {
+                     if (me.getMode() === "dev") {
+                         result = _getNames(this.dev);
+                     } else {
+                         result = _getNames(this.prod);
+                     }
+                 }
+                 
+                 return result;
+            };
             
             function __init() {
 
@@ -70,7 +122,7 @@ module.exports = function () {
     };
 
     _Manifest.prototype.getMode = function () {
-        return (this._.mode);
+        return (this._.mode || "dev");
     };
 
     _Manifest.prototype.getDetails = function () {
@@ -96,15 +148,18 @@ module.exports = function () {
             var manifestFileName = "manifest.json", manifest,
                 _path = _npmpath.join(global.catlibs, manifestFileName);
 
-            if (_path && _fs.existsSync(_path)) {
-                manifest = _fs.readFileSync(_path, "utf8");
-
-                if (manifest) {
-                    manifest = JSON.parse(manifest);
-                    _manifest = new _Manifest(manifest);
+            if (!_manifest) {
+                
+                if (_path && _fs.existsSync(_path)) {
+                    manifest = _fs.readFileSync(_path, "utf8");
+    
+                    if (manifest) {
+                        manifest = JSON.parse(manifest);
+                        _manifest = new _Manifest(manifest);
+                    }
                 }
             }
-
+            
             return _manifest;
         },
 
