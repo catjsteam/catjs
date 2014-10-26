@@ -5,6 +5,8 @@ var path = require("path"),
     data,
     _fs = require("fs"),
     project, sourceFolder,
+    _utils = catrequire("cat.utils"),
+    _jsonlint = require("json-lint"),
     _catcli;
 
 var readProject  = function() {
@@ -21,6 +23,8 @@ var readProject  = function() {
 
     mainProject = (function() {
 
+        var result, jsonlint;
+        
         _catcli = (catrequire ? catrequire("cat.cli") : null);
         if (_catcli) {
 
@@ -38,8 +42,23 @@ var readProject  = function() {
         }
 
         data = _fs.readFileSync(configPath, 'utf8');
-        return JSON.parse(data);
 
+        try {
+            jsonlint = _jsonlint( data, {} );
+            if ( jsonlint.error ) {
+                _utils.error("error", ["CAT project manager] cat.json load with errors: \n ", jsonlint.error,
+                    " \n at line: ", jsonlint.line,
+                    " \n character: ", jsonlint.character,
+                    " \n "].join(""));
+            }
+
+            result = JSON.parse(data);
+            
+        } catch(e) {
+            _utils.error("[CAT Core] cat.json parse error: ", e);
+        }
+
+        return result;
     }());
 
 
