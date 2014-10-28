@@ -1267,9 +1267,12 @@ _cat.core.clientmanager = function () {
 
     checkIfExists = function(scrapName, tests) {
 
-        var indexScrap;
-        for (indexScrap in tests) {
-            if (tests[indexScrap].name === scrapName) {
+        var indexScrap= 0, size = (tests && tests.length ? tests.length : 0),
+            testitem;
+
+        for (; indexScrap<size; indexScrap++) {
+            testitem = tests[indexScrap];
+            if (testitem && testitem.name === scrapName) {
                 return true;
             }
         }
@@ -1288,7 +1291,9 @@ _cat.core.clientmanager = function () {
     };
 
     startInterval = function(catConfig, scrap) {
-        if (scrap.name[0] === tests[0].name) {
+        var lvar = (scrap && scrap.name ? scrap.name[0] : undefined),
+            rval = (tests && tests[0] ? tests[0].name : undefined);
+        if (lvar === rval) {
             setupInterval(catConfig, scrap);
         }
     };
@@ -1303,6 +1308,8 @@ _cat.core.clientmanager = function () {
 
             startInterval(catConfig, scrap);
 
+            console.log("[test] sign", scrap.name[0]);
+            
             if (checkIfExists(scrap.name[0], tests)) {
 
                 urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrap.name[0] + "&" + "testId=" + _cat.core.guid();
@@ -1316,6 +1323,8 @@ _cat.core.clientmanager = function () {
                         commitScrap(scrap, args, response);
                     }
                 };
+                
+                console.log("[test] sign request ", scrap.name[0]);
 
                 _cat.utils.AJAX.sendRequestAsync(config);
             }
@@ -1955,11 +1964,12 @@ _cat.utils.AJAX = function () {
 
             try {
                 xmlhttp.open(("GET" || config.method), config.url, false);
+
                 // TODO pass arguments on post
                 xmlhttp.send();
 
             } catch (err) {
-                _cat.core.log.warn("[CAT CHAI] error occurred: ", err, "\n");
+                _cat.core.log.warn("[CAT AJAX] error occurred: ", err, "\n");
 
             }
 
@@ -1983,9 +1993,10 @@ _cat.utils.AJAX = function () {
 
             var xmlhttp = new XMLHttpRequest(),
                 onerror = function (e) {
-                    _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
+                    _cat.core.log.error("[CAT AJAX] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
+                    console.log("[cat ajax async] state, status, url ", xmlhttp.readyState, xmlhttp.status, config.url);
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         // _cat.core.log("completed\n" + xmlhttp.responseText);
                         if ("callback" in config && config.callback) {
@@ -1997,7 +2008,6 @@ _cat.utils.AJAX = function () {
 
             xmlhttp.onreadystatechange = (("onreadystatechange" in config) ? config.onreadystatechange : onreadystatechange);
             xmlhttp.onerror = (("onerror" in config) ? config.onerror : onerror);
-
             xmlhttp.open(("GET" || config.method), config.url, true);
 
             // TODO pass arguments on post
