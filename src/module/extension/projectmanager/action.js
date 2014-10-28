@@ -176,7 +176,8 @@ var readProject  = function() {
 
                 result = {
                     "readyScrap" : tests[scrapReadyIndex],
-                    "scrapInfo" : tests[scrapElement.scrap.index]
+                    "scrapInfo" : tests[scrapElement.scrap.index],
+                    "status": 200
                 };
 
                 scrapElement.response.send(result);
