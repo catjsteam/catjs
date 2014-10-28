@@ -266,9 +266,11 @@ var readProject  = function() {
 
                     result = {
                         "readyScrap" : currTest[currReadyIndex],
-                        "scrapInfo" : currTest[scrap.index]
+                        "scrapInfo" : currTest[scrap.index],
+                        status: 200
                     };
 
+                    res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
                     res.send(result);
                     devicesTests[testId].scrapReadyIndex++;
 
