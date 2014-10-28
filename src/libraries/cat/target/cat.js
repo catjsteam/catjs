@@ -184,11 +184,17 @@ _cat.core = function () {
 
         init: function () {
 
+            // Test Manager Init
+            _cat.core.TestManager.init();
+            
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();
 
-            _config = new _cat.core.Config({hasPhantomjs: hasPhantomjs});
+            // catjs test project configuration settings
+            _config = new _cat.core.Config({
+                hasPhantomjs: hasPhantomjs
+            });
 
             // display the ui, if you didn't already
             if (_config.isUI()) {
@@ -1394,6 +1400,76 @@ _cat.core.clientmanager = function () {
         }
     };
 }();
+_cat.core.TestAction = function() {
+    
+    return {
+
+        TESTEND: function (opt) {
+
+            var timeout = _cat.core.TestManager.getDelay(),
+                config, testdata;
+
+            opt = (opt || {});
+            config = _cat.core.getConfig();
+
+            // ui signal notification
+            if (config.isUI()) {
+
+                timeout = (opt["timeout"] || 2000);
+
+                setTimeout(function () {
+                    var testCount;
+                    if (opt.error) {
+                        _cat.core.ui.setContent({
+                            header: "Test failed with errors",
+                            desc:  opt.error,
+                            tips: "",
+                            style: "color:red"
+                        });
+
+                    } else {
+                        testCount = _cat.core.TestManager.getTestCount();
+                        _cat.core.ui.setContent({
+                            header: [testCount-1," tests total"].join(" "),
+                            desc: "",
+                            tips: "",
+                            elementType: "listImageSummary",
+                            style: "color:#444444"
+                        });
+                    }
+                }, (timeout));
+            }
+
+            // server signal notification
+            if (config.isReport()) {
+                testdata = _cat.core.TestManager.addTestData({
+                    name: "End",
+                    displayName: "End",
+                    status: "End",
+                    message: "End",
+                    error: (opt.error || ""),
+                    reportFormats: opt.reportFormats
+                });
+
+                if (config) {
+                    _cat.utils.AJAX.sendRequestSync({
+                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                    });
+                }
+            }
+
+
+        },
+        
+        KILL: function () {
+
+            // close CAT UI
+            _cat.core.ui.off();
+            
+        }
+    };
+    
+}();
 _cat.core.TestManager = function() {
 
     var _enum = {
@@ -1478,6 +1554,15 @@ _cat.core.TestManager = function() {
 
 
     return {
+        
+        init: function() {
+            
+            // register signals
+            _cat.utils.Signal.register([
+                {signal: "KILL", impl: _cat.core.TestAction.KILL},
+                {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND}
+            ]);
+        },
 
         enum: _enum,
         
@@ -2109,75 +2194,19 @@ _cat.utils.Loader = function () {
 
 _cat.utils.Signal = function () {
 
-    var _funcmap = {
-
-        TESTEND: function (opt) {
-
-            var timeout = _cat.core.TestManager.getDelay(),
-                config, testdata;
-
-            opt = (opt || {});
-            config = _cat.core.getConfig();
-
-            // ui signal notification
-            if (config.isUI()) {
-
-                timeout = (opt["timeout"] || 2000);
-
-                setTimeout(function () {
-                    var testCount;
-                    if (opt.error) {
-                        _cat.core.ui.setContent({
-                            header: "Test failed with errors",
-                            desc:  opt.error,
-                            tips: "",
-                            style: "color:red"
-                        });
-
-                    } else {
-                        testCount = _cat.core.TestManager.getTestCount();
-                        _cat.core.ui.setContent({
-                            header: [testCount-1," tests total"].join(" "),
-                            desc: "",
-                            tips: "",
-                            elementType: "listImageSummary",
-                            style: "color:#444444"
-                        });
-                    }
-                }, (timeout));
-            }
-
-            // server signal notification
-            if (config.isReport()) {
-                testdata = _cat.core.TestManager.addTestData({
-                    name: "End",
-                    displayName: "End",
-                    status: "End",
-                    message: "End",
-                    error: (opt.error || ""),
-                    reportFormats: opt.reportFormats
-                });
-
-                if (config) {
-                    _cat.utils.AJAX.sendRequestSync({
-                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
-                    });
-                }
-            }
-
-
-        },
-        KILL: function () {
-
-            // close CAT UI
-            _cat.core.ui.off();
-
-            // Additional code in here
-        }
-    };
+    var _funcmap = {       };
 
     return {
 
+        register: function(arr) {
+            if (arr) {
+                arr.forEach(function(item) {
+                    _funcmap[item.signal] = item.impl;
+                });
+            }
+           
+        },
+        
         send: function (flag, opt) {
 
             if (flag && _funcmap[flag]) {

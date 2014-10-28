@@ -184,11 +184,17 @@ _cat.core = function () {
 
         init: function () {
 
+            // Test Manager Init
+            _cat.core.TestManager.init();
+            
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();
 
-            _config = new _cat.core.Config({hasPhantomjs: hasPhantomjs});
+            // catjs test project configuration settings
+            _config = new _cat.core.Config({
+                hasPhantomjs: hasPhantomjs
+            });
 
             // display the ui, if you didn't already
             if (_config.isUI()) {

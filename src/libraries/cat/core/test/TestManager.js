@@ -82,6 +82,15 @@ _cat.core.TestManager = function() {
 
 
     return {
+        
+        init: function() {
+            
+            // register signals
+            _cat.utils.Signal.register([
+                {signal: "KILL", impl: _cat.core.TestAction.KILL},
+                {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND}
+            ]);
+        },
 
         enum: _enum,
         
