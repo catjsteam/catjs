@@ -121,9 +121,12 @@ _cat.core.clientmanager = function () {
 
     checkIfExists = function(scrapName, tests) {
 
-        var indexScrap;
-        for (indexScrap in tests) {
-            if (tests[indexScrap].name === scrapName) {
+        var indexScrap= 0, size = (tests && tests.length ? tests.length : 0),
+            testitem;
+
+        for (; indexScrap<size; indexScrap++) {
+            testitem = tests[indexScrap];
+            if (testitem && testitem.name === scrapName) {
                 return true;
             }
         }
@@ -142,7 +145,9 @@ _cat.core.clientmanager = function () {
     };
 
     startInterval = function(catConfig, scrap) {
-        if (scrap.name[0] === tests[0].name) {
+        var lvar = (scrap && scrap.name ? scrap.name[0] : undefined),
+            rval = (tests && tests[0] ? tests[0].name : undefined);
+        if (lvar === rval) {
             setupInterval(catConfig, scrap);
         }
     };
@@ -156,7 +161,7 @@ _cat.core.clientmanager = function () {
             tests = _tests;
 
             startInterval(catConfig, scrap);
-
+            
             if (checkIfExists(scrap.name[0], tests)) {
 
                 urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrap.name[0] + "&" + "testId=" + _cat.core.guid();
@@ -170,7 +175,7 @@ _cat.core.clientmanager = function () {
                         commitScrap(scrap, args, response);
                     }
                 };
-
+                
                 _cat.utils.AJAX.sendRequestAsync(config);
             }
 
