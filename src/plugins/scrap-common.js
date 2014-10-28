@@ -625,7 +625,6 @@ module.exports = function () {
                             libcounter = 0,
                             libsrcs = [];
 
-
                         if (_isCatjs(value)) {
                            
                                                        
@@ -638,22 +637,20 @@ module.exports = function () {
                             libs.forEach(function (lib) {
                                 if (lib.path === "cat") {
                                     libs.splice(libcounter, 1);
-                                }
-                                if (lib.path.indexOf("cat.src") !== -1) {
-                                    libs.splice(libcounter, 1);
-                                }
+                                }                                
                                 libcounter++;
                             });
 
                             basedir = _path.dirname(value) + "/";
 
-
+                           
                             libs.forEach(function (lib) {
-                                libsrcs.push([basedir, lib.path].join(""));
+                                if (lib.path.indexOf("cat.src") === -1) {
+                                    libsrcs.push([basedir, lib.path].join(""));
+                                }
                             });
                             libsrcs.push(value);
                             libsrcs.push([basedir, "cat.src.js"].join(""));
-
 
                         } else {
                             libsrcs.push(value);
