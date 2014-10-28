@@ -44,7 +44,7 @@ var webserver  = function() {
                 set = config.set;
 
             var allowCrossDomain = function(req, res, next) {
-                res.header('Access-Control-Allow-Origin', req.headers.origin);
+                res.header('Access-Control-Allow-Origin', "*");
                 res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
                 next();
 
@@ -76,7 +76,8 @@ var webserver  = function() {
                 _server.use(_express.bodyParser());
                 _server.use(allowCrossDomain);
                 _server.use(_express.bodyParser());
-                _server.use(_express.static(path));
+                _server.use(_server.router);
+                _server.use(_express.static(path));                                                   
             });
 
             if (set) {
@@ -96,6 +97,11 @@ var webserver  = function() {
                 });
             }
 
+            _server.get('/*', function(req, res, next){
+                res.setHeader('Last-Modified', (new Date()).toUTCString());
+                next();
+            });
+
             // kill the server with get request
             _server.get('/exit', function(req, res) {
                 res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
@@ -107,9 +113,10 @@ var webserver  = function() {
                 if (req.query && req.query.scrap
                         && req.query.testId) {
                     _projectmanager.checkScrap(req,res);
-                } else {
-                    res.send({"error" : "invalid"} );
                 }
+//                } else {
+//                    res.send({"error" : "invalid"} );
+//                }
 
             });
 
