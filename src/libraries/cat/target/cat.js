@@ -16,11 +16,7 @@ _cat.core = function () {
         _vars, _managers, _context,
         _config, _log,
         _guid,
-        _enum = {
-            TEST_MANAGER: "tests",
-            ALL: "all",
-            TEST_MANAGER_OFFLINE: "offline"
-        },
+        _enum,
         _runModeValidation;
 
     addScrapToManager = function (testsInfo, scrap) {
@@ -152,261 +148,6 @@ _cat.core = function () {
         }
     })();
 
-    // singelton class
-    function GetTestsClass(config) {
-        this.globalTests = [];
-        // do this once
-        this.setTests = function (config) {
-
-            var getScenarioTests = function (testsList, globalDelay, scenarioName) {
-                    var innerConfigMap = [];
-                    if (testsList.tests) {
-                        for (var i = 0; i < testsList.tests.length; i++) {
-                            if (!(testsList.tests[i].disable)) {
-                                if (testsList.tests[i].tests) {
-                                    var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
-
-                                    for (var j = 0; j < repeatFlow; j++) {
-                                        var tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay);
-                                        innerConfigMap = innerConfigMap.concat(tempArr);
-                                    }
-
-                                } else {
-
-                                    // set the global delay
-                                    if (!testsList.tests[i].delay && globalDelay) {
-                                        testsList.tests[i].delay = globalDelay;
-                                    }
-                                    testsList.tests[i].wasRun = false;
-                                    testsList.tests[i].scenario = {name: (scenarioName || null)};
-                                    innerConfigMap.push(testsList.tests[i]);
-
-                                }
-                            }
-                        }
-                    }
-
-                    return innerConfigMap;
-
-                }, i, j, temp,
-                testsFlow, scenarios, scenario,
-                repeatScenario, currTest, currentTestName;
-
-            testsFlow = config.tests;
-            scenarios = config.scenarios;
-            for (i = 0; i < testsFlow.length; i++) {
-                currTest = testsFlow[i];
-
-                if (!currTest || !("name" in currTest)) {
-                    _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
-                    continue;
-                }
-                currentTestName = currTest.name;
-                scenario = scenarios[currentTestName];
-
-                if (scenario) {
-                    repeatScenario = (scenario.repeat ? scenario.repeat : 1);
-                    for (j = 0; j < repeatScenario; j++) {
-                        temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
-                        this.globalTests = this.globalTests.concat(temp);
-                    }
-                } else {
-                    _log.warn("[CAT] No valid scenario '", currTest.name, "' was found, double check your cat.json project");
-                }
-            }
-        };
-
-        if (GetTestsClass._singletonInstance) {
-            return GetTestsClass._singletonInstance;
-        }
-
-        this.setTests(config);
-
-        GetTestsClass._singletonInstance = this;
-
-        this.getTests = function () {
-            return this.globalTests;
-        };
-    }
-
-    function Config() {
-
-        var innerConfig,
-            xmlhttp,
-            configText,
-            me = this,
-            url, catjson = "cat/config/cat.json";
-
-        try {
-
-            xmlhttp = _cat.utils.AJAX.sendRequestSync({
-                url: _cat.core.getBaseUrl(catjson)
-            });
-            if (xmlhttp) {
-                configText = xmlhttp.responseText;
-                if (configText) {
-                    try {
-                        innerConfig = JSON.parse(configText);
-                    } catch (e) {
-                        _cat.core.log.error("[CAT Core] cat.json parse error: ", e);
-                    }
-                }
-            }
-        }
-        catch (err) {
-            //todo: log error
-        }
-
-        if (innerConfig) {
-
-            this.getType = function () {
-                return innerConfig.type;
-            };
-
-            this.getName = function () {
-                return innerConfig.name;
-            };
-
-            this.getIp = function () {
-                if (innerConfig.ip) {
-                    return innerConfig.ip;
-                } else {
-                    return  document.location.hostname;
-                }
-            };
-
-            this.getPort = function () {
-                if (innerConfig.port) {
-                    return innerConfig.port;
-                } else {
-                    return  document.location.port;
-                }
-            };
-
-            this.getTests = function () {
-
-                var tests = new GetTestsClass(innerConfig);
-
-                return tests.getTests();
-
-            };
-
-            this.getTestDelay = function () {
-                return (innerConfig["run-test-delay"] || 2000);
-            };
-
-            this.getRunMode = function () {
-                return (innerConfig["run-mode"] || "all");
-            };
-
-            this.getTimeout = function () {
-                var timeout = innerConfig["test-failure-timeout"];
-                if (timeout) {
-                    timeout = parseInt(timeout);
-                    if (isNaN(timeout)) {
-                        timeout = 30;
-                    }
-                }
-                timeout = timeout * 1000;
-                return timeout;
-            };
-
-            this.isReportType = function (key) {
-                var formats = me.getReportFormats(),
-                    i, size, item;
-
-                if (formats && formats.length > 0) {
-                    size = formats.length;
-                    for (i = 0; i < size; i++) {
-                        item = formats[i];
-                        if (item === key) {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            };
-
-            this.isJUnitSupport = function () {
-
-                return this.isReportType("junit");
-            };
-
-            this.isConsoleSupport = function () {
-
-                return this.isReportType("console");
-            };
-
-            this.getReportFormats = function () {
-
-                var format = [],
-                    report;
-
-                if (_cat.utils.Utils.validate(innerConfig, "report")) {
-
-                    report = innerConfig.report;
-                    format = (report.format ? report.format : format);
-                }
-
-                return format;
-            };
-
-            this.isReport = function () {
-
-                if (_cat.utils.Utils.validate(innerConfig, "report") && _cat.utils.Utils.validate(innerConfig.report, "disable", false)) {
-
-                    return true;
-                }
-
-                return false;
-            };
-
-            this.isErrors = function () {
-
-                if (_cat.utils.Utils.validate(innerConfig, "assert") && _cat.utils.Utils.validate(innerConfig.assert, "errors", true)) {
-
-                    return true;
-                }
-
-                return false;
-            };
-
-            this.isUI = function () {
-                if (_cat.utils.Utils.validate(innerConfig, "ui", true)) {
-
-                    return true;
-                }
-
-                return false;
-            };
-
-
-            this.endTest = function (opt, interval) {
-                _cat.utils.Signal.send('TESTEND', opt);
-                if (interval === -1) {
-                    console.log("Test End");
-                } else {
-                    clearInterval(interval);
-                }
-            };
-
-
-            this.getTestsTypes = function () {
-                return _enum;
-            };
-
-        }
-
-        this.hasPhantom = function () {
-            return hasPhantomjs;
-        };
-
-        this.available = function () {
-            return (innerConfig ? true : false);
-        };
-    }
-
     function _import(query, callback) {
 
         var type = _cat.utils.Utils.querystring("type", query),
@@ -443,9 +184,11 @@ _cat.core = function () {
 
         init: function () {
 
+            _enum = _cat.core.TestManager.enum;
+            
             _guid = _cat.utils.Storage.getGUID();
 
-            _config = new Config();
+            _config = new _cat.core.Config({hasPhantomjs: hasPhantomjs});
 
             // display the ui, if you didn't already
             if (_config.isUI()) {
@@ -898,6 +641,263 @@ _cat.core = function () {
 if (typeof exports === "object") {
     module.exports = _cat;
 }
+_cat.core.Config = function(args) {
+
+    var innerConfig,
+        xmlhttp,
+        configText,
+        me = this,
+        catjson = "cat/config/cat.json",
+        _log = _cat.core.log,
+        _enum = _cat.core.TestManager.enum,
+        hasPhantomjs = args.hasPhantomjs;
+
+    try {
+
+        xmlhttp = _cat.utils.AJAX.sendRequestSync({
+            url: _cat.core.getBaseUrl(catjson)
+        });
+        if (xmlhttp) {
+            configText = xmlhttp.responseText;
+            if (configText) {
+                try {
+                    innerConfig = JSON.parse(configText);
+                } catch (e) {
+                    _cat.core.log.error("[CAT Core] cat.json parse error: ", e);
+                }
+            }
+        }
+    }
+    catch (err) {
+        //todo: log error
+    }
+
+    if (innerConfig) {
+
+        this.getType = function () {
+            return innerConfig.type;
+        };
+
+        this.getName = function () {
+            return innerConfig.name;
+        };
+
+        this.getIp = function () {
+            if (innerConfig.ip) {
+                return innerConfig.ip;
+            } else {
+                return  document.location.hostname;
+            }
+        };
+
+        this.getPort = function () {
+            if (innerConfig.port) {
+                return innerConfig.port;
+            } else {
+                return  document.location.port;
+            }
+        };
+
+        this.getTests = function () {
+
+            function _GetTestsClass(config) {
+
+                this.globalTests = [];
+                
+                // do this once
+                this.setTests = function (config) {
+
+                    var getScenarioTests = function (testsList, globalDelay, scenarioName) {
+                            var innerConfigMap = [];
+                            if (testsList.tests) {
+                                for (var i = 0; i < testsList.tests.length; i++) {
+                                    if (!(testsList.tests[i].disable)) {
+                                        if (testsList.tests[i].tests) {
+                                            var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
+
+                                            for (var j = 0; j < repeatFlow; j++) {
+                                                var tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay);
+                                                innerConfigMap = innerConfigMap.concat(tempArr);
+                                            }
+
+                                        } else {
+
+                                            // set the global delay
+                                            if (!testsList.tests[i].delay && globalDelay) {
+                                                testsList.tests[i].delay = globalDelay;
+                                            }
+                                            testsList.tests[i].wasRun = false;
+                                            testsList.tests[i].scenario = {name: (scenarioName || null)};
+                                            innerConfigMap.push(testsList.tests[i]);
+
+                                        }
+                                    }
+                                }
+                            }
+
+                            return innerConfigMap;
+
+                        }, i, j, temp,
+                        testsFlow, scenarios, scenario,
+                        repeatScenario, currTest, currentTestName;
+
+                    testsFlow = config.tests;
+                    scenarios = config.scenarios;
+                    for (i = 0; i < testsFlow.length; i++) {
+                        currTest = testsFlow[i];
+
+                        if (!currTest || !("name" in currTest)) {
+                            _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                            continue;
+                        }
+                        currentTestName = currTest.name;
+                        scenario = scenarios[currentTestName];
+
+                        if (scenario) {
+                            repeatScenario = (scenario.repeat ? scenario.repeat : 1);
+                            for (j = 0; j < repeatScenario; j++) {
+                                temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
+                                this.globalTests = this.globalTests.concat(temp);
+                            }
+                        } else {
+                            _log.warn("[CAT] No valid scenario '", currTest.name, "' was found, double check your cat.json project");
+                        }
+                    }
+                };
+
+                if (_GetTestsClass._singletonInstance) {
+                    return _GetTestsClass._singletonInstance;
+                }
+
+                this.setTests(config);
+
+                _GetTestsClass._singletonInstance = this;
+
+                this.getTests = function () {
+                    return this.globalTests;
+                };
+            }
+            
+            var tests = new _GetTestsClass(innerConfig);
+
+            return tests.getTests();
+
+        };
+
+        this.getTestDelay = function () {
+            return (innerConfig["run-test-delay"] || 2000);
+        };
+
+        this.getRunMode = function () {
+            return (innerConfig["run-mode"] || "all");
+        };
+
+        this.getTimeout = function () {
+            var timeout = innerConfig["test-failure-timeout"];
+            if (timeout) {
+                timeout = parseInt(timeout);
+                if (isNaN(timeout)) {
+                    timeout = 30;
+                }
+            }
+            timeout = timeout * 1000;
+            return timeout;
+        };
+
+        this.isReportType = function (key) {
+            var formats = me.getReportFormats(),
+                i, size, item;
+
+            if (formats && formats.length > 0) {
+                size = formats.length;
+                for (i = 0; i < size; i++) {
+                    item = formats[i];
+                    if (item === key) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        };
+
+        this.isJUnitSupport = function () {
+
+            return this.isReportType("junit");
+        };
+
+        this.isConsoleSupport = function () {
+
+            return this.isReportType("console");
+        };
+
+        this.getReportFormats = function () {
+
+            var format = [],
+                report;
+
+            if (_cat.utils.Utils.validate(innerConfig, "report")) {
+
+                report = innerConfig.report;
+                format = (report.format ? report.format : format);
+            }
+
+            return format;
+        };
+
+        this.isReport = function () {
+
+            if (_cat.utils.Utils.validate(innerConfig, "report") && _cat.utils.Utils.validate(innerConfig.report, "disable", false)) {
+
+                return true;
+            }
+
+            return false;
+        };
+
+        this.isErrors = function () {
+
+            if (_cat.utils.Utils.validate(innerConfig, "assert") && _cat.utils.Utils.validate(innerConfig.assert, "errors", true)) {
+
+                return true;
+            }
+            return false;
+        };
+
+        this.isUI = function () {
+            if (_cat.utils.Utils.validate(innerConfig, "ui", true)) {
+
+                return true;
+            }
+
+            return false;
+        };
+
+
+        this.endTest = function (opt, interval) {
+            _cat.utils.Signal.send('TESTEND', opt);
+            if (interval === -1) {
+                console.log("Test End");
+            } else {
+                clearInterval(interval);
+            }
+        };
+
+
+        this.getTestsTypes = function () {
+            return _enum;
+        };
+
+    }
+
+    this.hasPhantom = function () {
+        return hasPhantomjs;
+    };
+
+    this.available = function () {
+        return (innerConfig ? true : false);
+    };
+};
 /**
  * General error handling for the hosted application
  * @type {_cat.core.errors}
@@ -1307,8 +1307,6 @@ _cat.core.clientmanager = function () {
             tests = _tests;
 
             startInterval(catConfig, scrap);
-
-            console.log("[test] sign", scrap.name[0]);
             
             if (checkIfExists(scrap.name[0], tests)) {
 
@@ -1324,8 +1322,6 @@ _cat.core.clientmanager = function () {
                     }
                 };
                 
-                console.log("[test] sign request ", scrap.name[0]);
-
                 _cat.utils.AJAX.sendRequestAsync(config);
             }
 
@@ -1402,9 +1398,11 @@ _cat.core.TestManager = function() {
 
     var _enum = {
         TYPE_TEST: "test",
-        TYPE_SIGNAL: "signal"
+        TYPE_SIGNAL: "signal",
+        TEST_MANAGER: "tests",
+        ALL: "all",
+        TEST_MANAGER_OFFLINE: "offline"
     };
-
 
     // Test Manager data class
     function _Data(config) {
@@ -1481,6 +1479,8 @@ _cat.core.TestManager = function() {
 
     return {
 
+        enum: _enum,
+        
         addTestData: function(config) {
             var data = new _Data(config);
             _testsData.push(data);
@@ -1505,7 +1505,7 @@ _cat.core.TestManager = function() {
         },
 
         /**
-         * Update the last total delay
+         * Update the last total         ,delay
          *
          * @param delay
          */
@@ -1964,12 +1964,11 @@ _cat.utils.AJAX = function () {
 
             try {
                 xmlhttp.open(("GET" || config.method), config.url, false);
-
                 // TODO pass arguments on post
                 xmlhttp.send();
 
             } catch (err) {
-                _cat.core.log.warn("[CAT AJAX] error occurred: ", err, "\n");
+                _cat.core.log.warn("[CAT CHAI] error occurred: ", err, "\n");
 
             }
 
@@ -1993,10 +1992,9 @@ _cat.utils.AJAX = function () {
 
             var xmlhttp = new XMLHttpRequest(),
                 onerror = function (e) {
-                    _cat.core.log.error("[CAT AJAX] error occurred: ", e, "\n");
+                    _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
-                    console.log("[cat ajax async] state, status, url ", xmlhttp.readyState, xmlhttp.status, config.url);
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         // _cat.core.log("completed\n" + xmlhttp.responseText);
                         if ("callback" in config && config.callback) {
@@ -2008,6 +2006,7 @@ _cat.utils.AJAX = function () {
 
             xmlhttp.onreadystatechange = (("onreadystatechange" in config) ? config.onreadystatechange : onreadystatechange);
             xmlhttp.onerror = (("onerror" in config) ? config.onerror : onerror);
+
             xmlhttp.open(("GET" || config.method), config.url, true);
 
             // TODO pass arguments on post

@@ -2,9 +2,11 @@ _cat.core.TestManager = function() {
 
     var _enum = {
         TYPE_TEST: "test",
-        TYPE_SIGNAL: "signal"
+        TYPE_SIGNAL: "signal",
+        TEST_MANAGER: "tests",
+        ALL: "all",
+        TEST_MANAGER_OFFLINE: "offline"
     };
-
 
     // Test Manager data class
     function _Data(config) {
@@ -81,6 +83,8 @@ _cat.core.TestManager = function() {
 
     return {
 
+        enum: _enum,
+        
         addTestData: function(config) {
             var data = new _Data(config);
             _testsData.push(data);
@@ -105,7 +109,7 @@ _cat.core.TestManager = function() {
         },
 
         /**
-         * Update the last total delay
+         * Update the last total         ,delay
          *
          * @param delay
          */
