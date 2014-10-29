@@ -183,19 +183,19 @@ _cat.core = function () {
         },
 
         init: function () {
-
-            // Test Manager Init
-            _cat.core.TestManager.init();
-            
+                      
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();
 
-            // catjs test project configuration settings
+            // 
             _config = new _cat.core.Config({
                 hasPhantomjs: hasPhantomjs
             });
 
+            // Test Manager Init
+            _cat.core.TestManager.init();
+            
             // display the ui, if you didn't already
             if (_config.isUI()) {
                 _cat.core.ui.enable();
@@ -518,12 +518,8 @@ _cat.core = function () {
 
                                 /*  Manager call  */
                                 (function () {
-                                    _cat.core.managerCall(managerScrap.scrap.name[0], function () {
-                                        var reportFormats;
-                                        if (_config.isReport()) {
-                                            reportFormats = _config.getReportFormats();
-                                        }
-                                        _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats});
+                                    _cat.core.managerCall(managerScrap.scrap.name[0], function () {                                       
+                                        _cat.utils.TestManager.send('TESTEND');
                                     });
                                 })();
 

@@ -183,19 +183,19 @@ _cat.core = function () {
         },
 
         init: function () {
-
-            // Test Manager Init
-            _cat.core.TestManager.init();
-            
+                      
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();
 
-            // catjs test project configuration settings
+            // 
             _config = new _cat.core.Config({
                 hasPhantomjs: hasPhantomjs
             });
 
+            // Test Manager Init
+            _cat.core.TestManager.init();
+            
             // display the ui, if you didn't already
             if (_config.isUI()) {
                 _cat.core.ui.enable();
@@ -518,12 +518,8 @@ _cat.core = function () {
 
                                 /*  Manager call  */
                                 (function () {
-                                    _cat.core.managerCall(managerScrap.scrap.name[0], function () {
-                                        var reportFormats;
-                                        if (_config.isReport()) {
-                                            reportFormats = _config.getReportFormats();
-                                        }
-                                        _cat.utils.Signal.send('TESTEND', {reportFormats: reportFormats});
+                                    _cat.core.managerCall(managerScrap.scrap.name[0], function () {                                       
+                                        _cat.utils.TestManager.send('TESTEND');
                                     });
                                 })();
 
@@ -879,17 +875,6 @@ _cat.core.Config = function(args) {
             return false;
         };
 
-
-        this.endTest = function (opt, interval) {
-            _cat.utils.Signal.send('TESTEND', opt);
-            if (interval === -1) {
-                console.log("Test End");
-            } else {
-                clearInterval(interval);
-            }
-        };
-
-
         this.getTestsTypes = function () {
             return _enum;
         };
@@ -1162,7 +1147,19 @@ _cat.core.clientmanager = function () {
         catConfig,
         startInterval,
         getScrapInterval,
-        setupInterval;
+        setupInterval,
+        endTest;
+
+    endTest = function (opt, interval) {
+
+        _cat.utils.Signal.send('TESTEND', opt);
+        if (interval === -1) {
+            console.log("Test End");
+        } else {
+            clearInterval(interval);
+        }
+    };
+    
     runStatus = {
         "scrapReady" : 0,
         "subscrapReady" : 0,
@@ -1210,7 +1207,7 @@ _cat.core.clientmanager = function () {
                     err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
 
                 console.log("[CAT] " + err);
-                config.endTest({reportFormats: reportFormats, error: err}, (runStatus ? runStatus.intervalObj : undefined));
+                endTest({reportFormats: reportFormats, error: err}, (runStatus ? runStatus.intervalObj : undefined));
 
             }
         }, config.getTimeout() / 3);
@@ -1381,7 +1378,7 @@ _cat.core.clientmanager = function () {
                     }
 
                     // TODO change clear interval
-                    catConfig.endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
+                    endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
                 }
 
             };
@@ -1400,9 +1397,36 @@ _cat.core.clientmanager = function () {
         }
     };
 }();
-_cat.core.TestAction = function() {
-    
+_cat.core.TestAction = function () {
+
     return {
+
+        TESTSTART: function (opt) {
+
+            var guid = _cat.core.guid(),
+                testdata,            
+                config = _cat.core.getConfig();
+
+            opt = (opt || {});
+                
+            // server signal notification
+            if (config.isReport()) {
+                testdata = _cat.core.TestManager.addTestData({
+                    name: "Start",
+                    displayName: "start",
+                    status: "Start",
+                    message: "Start",
+                    error: (opt.error || ""),
+                    reportFormats: opt.reportFormats
+                });
+
+                if (config) {
+                    _cat.utils.AJAX.sendRequestSync({
+                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                    });
+                }
+            }
+        },
 
         TESTEND: function (opt) {
 
@@ -1422,7 +1446,7 @@ _cat.core.TestAction = function() {
                     if (opt.error) {
                         _cat.core.ui.setContent({
                             header: "Test failed with errors",
-                            desc:  opt.error,
+                            desc: opt.error,
                             tips: "",
                             style: "color:red"
                         });
@@ -1430,7 +1454,7 @@ _cat.core.TestAction = function() {
                     } else {
                         testCount = _cat.core.TestManager.getTestCount();
                         _cat.core.ui.setContent({
-                            header: [testCount-1," tests total"].join(" "),
+                            header: [testCount - 1, " tests total"].join(" "),
                             desc: "",
                             tips: "",
                             elementType: "listImageSummary",
@@ -1460,15 +1484,15 @@ _cat.core.TestAction = function() {
 
 
         },
-        
+
         KILL: function () {
 
             // close CAT UI
             _cat.core.ui.off();
-            
+
         }
     };
-    
+
 }();
 _cat.core.TestManager = function() {
 
@@ -1560,8 +1584,16 @@ _cat.core.TestManager = function() {
             // register signals
             _cat.utils.Signal.register([
                 {signal: "KILL", impl: _cat.core.TestAction.KILL},
-                {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND}
+                {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND},
+                {signal: "TESTSTART", impl: _cat.core.TestAction.TESTSTART}
             ]);
+
+            // START test signal
+            var config = _cat.core.getConfig();
+            // TODO we need to set test start signal via an API
+            if (config.getTests()) {
+                _cat.core.TestManager.send({signal:"TESTSTART"});
+            }
         },
 
         enum: _enum,
@@ -1605,6 +1637,22 @@ _cat.core.TestManager = function() {
         getDelay: function() {
             return (_globalTestData.delay || 0);
         },
+
+        /**
+         * Send an action to the server
+         * 
+         * @param opt
+         *  signal [KILL, TESTSTART, TESTEND]
+         */
+        send: function(opt) {
+            var signal = opt.signal,
+                config = _cat.core.getConfig(), reportFormats;
+            
+            if (config.isReport()) {
+                reportFormats = config.getReportFormats();
+            }
+            _cat.utils.Signal.send(signal, {reportFormats: reportFormats});
+        },       
 
         /**
          *

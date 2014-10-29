@@ -230,17 +230,6 @@ _cat.core.Config = function(args) {
             return false;
         };
 
-
-        this.endTest = function (opt, interval) {
-            _cat.utils.Signal.send('TESTEND', opt);
-            if (interval === -1) {
-                console.log("Test End");
-            } else {
-                clearInterval(interval);
-            }
-        };
-
-
         this.getTestsTypes = function () {
             return _enum;
         };

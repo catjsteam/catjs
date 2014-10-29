@@ -10,7 +10,19 @@ _cat.core.clientmanager = function () {
         catConfig,
         startInterval,
         getScrapInterval,
-        setupInterval;
+        setupInterval,
+        endTest;
+
+    endTest = function (opt, interval) {
+
+        _cat.utils.Signal.send('TESTEND', opt);
+        if (interval === -1) {
+            console.log("Test End");
+        } else {
+            clearInterval(interval);
+        }
+    };
+    
     runStatus = {
         "scrapReady" : 0,
         "subscrapReady" : 0,
@@ -58,7 +70,7 @@ _cat.core.clientmanager = function () {
                     err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
 
                 console.log("[CAT] " + err);
-                config.endTest({reportFormats: reportFormats, error: err}, (runStatus ? runStatus.intervalObj : undefined));
+                endTest({reportFormats: reportFormats, error: err}, (runStatus ? runStatus.intervalObj : undefined));
 
             }
         }, config.getTimeout() / 3);
@@ -229,7 +241,7 @@ _cat.core.clientmanager = function () {
                     }
 
                     // TODO change clear interval
-                    catConfig.endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
+                    endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
                 }
 
             };

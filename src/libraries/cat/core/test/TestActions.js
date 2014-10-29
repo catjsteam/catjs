@@ -1,6 +1,33 @@
-_cat.core.TestAction = function() {
-    
+_cat.core.TestAction = function () {
+
     return {
+
+        TESTSTART: function (opt) {
+
+            var guid = _cat.core.guid(),
+                testdata,            
+                config = _cat.core.getConfig();
+
+            opt = (opt || {});
+                
+            // server signal notification
+            if (config.isReport()) {
+                testdata = _cat.core.TestManager.addTestData({
+                    name: "Start",
+                    displayName: "start",
+                    status: "Start",
+                    message: "Start",
+                    error: (opt.error || ""),
+                    reportFormats: opt.reportFormats
+                });
+
+                if (config) {
+                    _cat.utils.AJAX.sendRequestSync({
+                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                    });
+                }
+            }
+        },
 
         TESTEND: function (opt) {
 
@@ -20,7 +47,7 @@ _cat.core.TestAction = function() {
                     if (opt.error) {
                         _cat.core.ui.setContent({
                             header: "Test failed with errors",
-                            desc:  opt.error,
+                            desc: opt.error,
                             tips: "",
                             style: "color:red"
                         });
@@ -28,7 +55,7 @@ _cat.core.TestAction = function() {
                     } else {
                         testCount = _cat.core.TestManager.getTestCount();
                         _cat.core.ui.setContent({
-                            header: [testCount-1," tests total"].join(" "),
+                            header: [testCount - 1, " tests total"].join(" "),
                             desc: "",
                             tips: "",
                             elementType: "listImageSummary",
@@ -58,13 +85,13 @@ _cat.core.TestAction = function() {
 
 
         },
-        
+
         KILL: function () {
 
             // close CAT UI
             _cat.core.ui.off();
-            
+
         }
     };
-    
+
 }();

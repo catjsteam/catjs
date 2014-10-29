@@ -88,8 +88,16 @@ _cat.core.TestManager = function() {
             // register signals
             _cat.utils.Signal.register([
                 {signal: "KILL", impl: _cat.core.TestAction.KILL},
-                {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND}
+                {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND},
+                {signal: "TESTSTART", impl: _cat.core.TestAction.TESTSTART}
             ]);
+
+            // START test signal
+            var config = _cat.core.getConfig();
+            // TODO we need to set test start signal via an API
+            if (config.getTests()) {
+                _cat.core.TestManager.send({signal:"TESTSTART"});
+            }
         },
 
         enum: _enum,
@@ -133,6 +141,22 @@ _cat.core.TestManager = function() {
         getDelay: function() {
             return (_globalTestData.delay || 0);
         },
+
+        /**
+         * Send an action to the server
+         * 
+         * @param opt
+         *  signal [KILL, TESTSTART, TESTEND]
+         */
+        send: function(opt) {
+            var signal = opt.signal,
+                config = _cat.core.getConfig(), reportFormats;
+            
+            if (config.isReport()) {
+                reportFormats = config.getReportFormats();
+            }
+            _cat.utils.Signal.send(signal, {reportFormats: reportFormats});
+        },       
 
         /**
          *
