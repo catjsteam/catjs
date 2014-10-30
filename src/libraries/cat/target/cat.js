@@ -959,7 +959,8 @@ _cat.utils.assert = function () {
                 return;
             }
 
-            var testdata;
+            var testdata,
+                total, failed, passed;
 
             if (config.status && config.message && config.name && config.displayName) {
 
@@ -976,11 +977,14 @@ _cat.utils.assert = function () {
                 });
 
                 if (config.ui) {
+                    total = _cat.core.TestManager.getTestCount();
+                    passed = _cat.core.TestManager.getTestSucceededCount();
+                    failed = total - passed;
                     _cat.core.ui.setContent({
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestSucceededCount(),
+                        tips: {passed: (!isNaN(passed) ? passed : 0), failed: (!isNaN(failed) ? failed : 0), total: (!isNaN(total) ? total: 0)},
                         elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
                     });
                 }
@@ -1148,36 +1152,38 @@ _cat.core.clientmanager = function () {
         startInterval,
         getScrapInterval,
         setupInterval,
-        endTest;
+        endTest,
+        testQueue = {},
+        currentState = { index: 0 };
 
     endTest = function (opt, interval) {
 
-        _cat.utils.Signal.send('TESTEND', opt);
+        _cat.core.TestManager.send({signal: 'TESTEND', error: opt.error});
         if (interval === -1) {
             console.log("Test End");
         } else {
             clearInterval(interval);
         }
     };
-    
+
     runStatus = {
-        "scrapReady" : 0,
-        "subscrapReady" : 0,
-        "numRanSubscrap" : 0,
-        "scrapsNumber" : 0
+        "scrapReady": 0,
+        "subscrapReady": 0,
+        "numRanSubscrap": 0,
+        "scrapsNumber": 0
 
     };
 
-    getScrapInterval = function(scrap) {
+    getScrapInterval = function (scrap) {
         var scrapId = scrap.id,
             numCommands = (scrap.numCommands ? scrap.numCommands : 1);
 
         if (!runStatus.intervalObj) {
             runStatus.intervalObj = {
-                "interval" : undefined,
-                "counter" : 0,
-                "numCommands" : numCommands,
-                "signScrapId" : scrapId
+                "interval": undefined,
+                "counter": 0,
+                "numCommands": numCommands,
+                "signScrapId": scrapId
 
 
             };
@@ -1186,48 +1192,50 @@ _cat.core.clientmanager = function () {
     };
 
 
-    setupInterval = function(config, scrap) {
+    setupInterval = function (config, scrap) {
+        
         var tests,
-            scrapId = scrap.id,
             intervalObj = getScrapInterval(scrap),
             testManager;
         tests = config.getTests();
         if (tests) {
-            testManager = (tests[tests.length-1].name || "NA");
+            testManager = (tests[tests.length - 1].name || "NA");
         }
 
 
-        intervalObj.interval  = setInterval(function() {
+        intervalObj.interval = setInterval(function () {
 
-            if (intervalObj.counter < intervalObj.numCommands) {
+            if (intervalObj.counter < 3) {
                 intervalObj.counter++;
+                console.log("[CatJS manager] No activity detected, retry,  ", intervalObj.counter);
 
             } else {
-                var reportFormats,
-                    err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
+                var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
 
-                console.log("[CAT] " + err);
-                endTest({reportFormats: reportFormats, error: err}, (runStatus ? runStatus.intervalObj : undefined));
-
+                console.log("[CatJS Error] ", err);
+                endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
+                clearInterval(intervalObj.interval);
             }
         }, config.getTimeout() / 3);
+        
         return;
     };
 
 
-
-    commitScrap = function (scrap, args, res) {
+    commitScrap = function (scrap, args) {
         var scrapInfo,
             repeat,
             scrapInfoArr,
             infoIndex,
-            repeatIndex;
+            repeatIndex,
+            size;
 
-        scrapInfoArr = getScrapTestInfo(scrap.name[0]);
-        for (infoIndex = 0; infoIndex < scrapInfoArr.length; infoIndex++) {
+        scrapInfoArr = getScrapTestInfo(scrap.name);
+        size = scrapInfoArr.length;
+        for (infoIndex = 0; infoIndex < size; infoIndex++) {
             scrapInfo = scrapInfoArr[infoIndex];
             repeat = scrapInfo.repeat || 1;
-            for (repeatIndex = 0; repeatIndex < repeat; repeatIndex++){
+            for (repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {
                 _cat.core.ui.on();
                 _cat.core.actionimpl.apply(this, args);
             }
@@ -1238,7 +1246,7 @@ _cat.core.clientmanager = function () {
     getScrapTestInfo = function (scrapName) {
         var scrapTests = [],
             i, size,
-            validate= 0,
+            validate = 0,
             tempInfo,
             reportFormats;
 
@@ -1250,7 +1258,7 @@ _cat.core.clientmanager = function () {
                     tempInfo = {"name": tests[i].name,
                         "scenario": tests[i].scenario,
                         "wasRun": tests[i].wasRun,
-                        "delay" : tests[i].delay,
+                        "delay": tests[i].delay,
                         "repeat": tests[i].repeat};
                     tempInfo.index = i;
                     scrapTests.push(tempInfo);
@@ -1260,7 +1268,7 @@ _cat.core.clientmanager = function () {
         }
 
         if (!validate) {
-            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName +"'. Check your cat.json project");
+            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName + "'. Check your cat.json project");
             if (!_cat.core.ui.isOpen()) {
                 _cat.core.ui.on();
             }
@@ -1268,12 +1276,12 @@ _cat.core.clientmanager = function () {
         return scrapTests;
     };
 
-    checkIfExists = function(scrapName, tests) {
+    checkIfExists = function (scrapName, tests) {
 
-        var indexScrap= 0, size = (tests && tests.length ? tests.length : 0),
+        var indexScrap = 0, size = (tests && tests.length ? tests.length : 0),
             testitem;
 
-        for (; indexScrap<size; indexScrap++) {
+        for (; indexScrap < size; indexScrap++) {
             testitem = tests[indexScrap];
             if (testitem && testitem.name === scrapName) {
                 return true;
@@ -1284,7 +1292,7 @@ _cat.core.clientmanager = function () {
 
     totalDelay = 0;
 
-    updateTimeouts = function(scrap) {
+    updateTimeouts = function (scrap) {
         var scrapId = scrap.id;
         if (runStatus.intervalObj && (scrapId !== runStatus.intervalObj.signScrapId)) {
             runStatus.intervalObj.signScrapId = scrapId;
@@ -1293,7 +1301,7 @@ _cat.core.clientmanager = function () {
         }
     };
 
-    startInterval = function(catConfig, scrap) {
+    startInterval = function (catConfig, scrap) {
         var lvar = (scrap && scrap.name ? scrap.name[0] : undefined),
             rval = (tests && tests[0] ? tests[0].name : undefined);
         if (lvar === rval) {
@@ -1303,41 +1311,113 @@ _cat.core.clientmanager = function () {
 
     return {
 
-        signScrap : function(scrap, catConfig, args, _tests) {
+
+
+        signScrap: function (scrap, catConfig, args, _tests) {
             var urlAddress,
                 config;
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
 
             startInterval(catConfig, scrap);
-            
+
             if (checkIfExists(scrap.name[0], tests)) {
 
                 urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrap.name[0] + "&" + "testId=" + _cat.core.guid();
 
                 config = {
-                    url : urlAddress,
-                    callback : function() {
-                        var response = JSON.parse(this.responseText);
-                        runStatus.scrapReady = parseInt(response.readyScrap ? response.readyScrap.index : 0) + 1;
+                    url: urlAddress,
+                    callback: function () {
 
-                        commitScrap(scrap, args, response);
+                        var response = JSON.parse(this.responseText),
+                            scraplist;
+
+                        function _process(config) {
+                            var scrap = config.scrapInfo,
+                                args = config.args;
+
+                            if (scrap) {
+                                runStatus.scrapReady = parseInt(scrap ? scrap.index : 0) + 1;
+                                commitScrap(scrap, args);
+                            }
+                        }
+
+                        function _add2Queue(config) {
+                            config.args = args;
+                            testQueue[config.scrapInfo.index] = config;
+                        }
+
+                        function _processReadyScraps() {
+
+                            var idx = currentState.index;
+                            if (testQueue[idx]) {
+                                var config = testQueue[idx];
+                                if (config) {
+                                    _process(config);
+                                    testQueue[idx] = undefined;
+                                    currentState.index++;
+                                    _processReadyScraps();
+                                }
+
+                            }
+
+                        }
+
+                        if (response.ready) {
+                            scraplist = response.readyScraps;
+                            if (scraplist) {
+                                scraplist.forEach(function (scrap) {
+                                    var config = testQueue[scrap.index];
+                                    if (config) {
+                                        // already in queue;
+
+                                    } else {
+                                        _add2Queue({scrapInfo: scrap, args: args});
+                                    }
+//                                    var config = testQueue[scrap.index];
+//                                    if (config) {
+//                                        _process(testQueue[scrap.index]);
+//                                        testQueue[scrap.index] = undefined;
+//                                    } else {
+//                                        _process({scrapInfo: scrap, args: args});
+//                                    }
+                                });
+                            }
+                        } else {
+
+//                            response.args = args;
+//                            testQueue[response.scrapInfo.index] = response;
+                            _add2Queue({scrapInfo: response.scrapInfo, args: args});
+                        }
+
+                        _processReadyScraps();
+
+//                        if (!response.ready) {
+//                            
+//                            console.log("[NOT READY]  scrap index: ", response.scrapInfo.index);
+//                            
+//                        } else {
+//
+//                            console.log("[READY]  scrap index: ", response.scrapInfo.index);
+//                            runStatus.scrapReady = parseInt(response.readyScrap ? response.readyScrap.index : 0) + 1;
+//                            commitScrap(scrap, args, response);
+//                        }
                     }
                 };
-                
+
                 _cat.utils.AJAX.sendRequestAsync(config);
             }
 
         },
 
-        delayManager : function(codeCommands, context) {
+        delayManager: function (codeCommands, context) {
             var indexCommand = 0,
                 catConfig = _cat.core.getConfig(),
                 _enum = catConfig.getTestsTypes(),
                 executeCode,
-                delay = catConfig.getTestDelay();            
+                delay = catConfig.getTestDelay();
 
-            executeCode = function(codeCommandsArg, context) {
+            executeCode = function (codeCommandsArg, context) {
                 var commandObj,
                     scrap = context.scrap,
                     size = (codeCommandsArg ? codeCommandsArg.length : undefined),
@@ -1348,10 +1428,10 @@ _cat.core.clientmanager = function () {
 
                 updateTimeouts(scrap);
 
-                for (indexCommand=0;  indexCommand<size; indexCommand++) {       
+                for (indexCommand = 0; indexCommand < size; indexCommand++) {
                     commandObj = codeCommandsArg[indexCommand];
-                    commandObj  = (commandObj ? commandObj.trim() : undefined);                    
-                    
+                    commandObj = (commandObj ? commandObj.trim() : undefined);
+
                     if (commandObj) {
                         functionargskeys.push("context");
                         functionargs.push(context);
@@ -1386,7 +1466,7 @@ _cat.core.clientmanager = function () {
             runStatus.subscrapReady = runStatus.subscrapReady + codeCommands.length;
 
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
-                setTimeout(function() {
+                setTimeout(function () {
                     executeCode(codeCommands, context);
                 }, totalDelay);
                 totalDelay += delay;
@@ -1447,20 +1527,11 @@ _cat.core.TestAction = function () {
                         _cat.core.ui.setContent({
                             header: "Test failed with errors",
                             desc: opt.error,
-                            tips: "",
+                            tips: {},
                             style: "color:red"
                         });
 
-                    } else {
-                        testCount = _cat.core.TestManager.getTestCount();
-                        _cat.core.ui.setContent({
-                            header: [testCount - 1, " tests total"].join(" "),
-                            desc: "",
-                            tips: "",
-                            elementType: "listImageSummary",
-                            style: "color:#444444"
-                        });
-                    }
+                    } 
                 }, (timeout));
             }
 
@@ -1574,6 +1645,7 @@ _cat.core.TestManager = function() {
 
     var _testsData = [],
         _counter = 0,
+        _hasFailed = false,
         _globalTestData = {};
 
 
@@ -1599,22 +1671,45 @@ _cat.core.TestManager = function() {
         enum: _enum,
         
         addTestData: function(config) {
-            var data = new _Data(config);
+            var data = new _Data(config),
+                name;
             _testsData.push(data);
-            if (config.success) {
+            
+            name = data.get("name");
+            if (config.success && (name !== "Start" && name !== "End")) {
                 _counter++;
+                
+            } else {
+                _hasFailed = true; 
             }
 
             return data;
 
         },
 
+        isFailed: function() {
+            return _hasFailed;
+        },
+        
         getLastTestData: function() {
             return (_testsData.length > 0 ? _testsData[_testsData.length-1] : undefined);
         },
 
         getTestCount: function() {
-            return (_testsData ? _testsData.length : 0);
+            var counter=0;
+            
+            _testsData.forEach(function(test) {
+                var name;    
+            
+                if (test) {
+                    name = test.get("name");
+                    if (name !== "Start" && name !== "End") {
+                        counter++;
+                    }
+                }
+            });
+            
+            return counter;
         },
 
         getTestSucceededCount: function() {
@@ -1645,13 +1740,21 @@ _cat.core.TestManager = function() {
          *  signal [KILL, TESTSTART, TESTEND]
          */
         send: function(opt) {
-            var signal = opt.signal,
-                config = _cat.core.getConfig(), reportFormats;
+            var signal,
+                config = _cat.core.getConfig(), reportFormats,
+                options;               
+            
+            opt = (opt || {});
+            signal = opt.signal;
             
             if (config.isReport()) {
                 reportFormats = config.getReportFormats();
+                options = {reportFormats: reportFormats};
             }
-            _cat.utils.Signal.send(signal, {reportFormats: reportFormats});
+            if ("error" in opt) {
+                options.error = opt.error;
+            }
+            _cat.utils.Signal.send(signal, options);
         },       
 
         /**
@@ -1708,6 +1811,22 @@ _cat.core.ui = function () {
         }
     }
 
+    function _setText(elt, text, style) {
+
+        var styleAttrs = (style ? style.split(";") : []);
+
+        if (elt) {
+            styleAttrs.forEach(function (item) {
+                var value = (item ? item.split(":") : undefined);
+                if (value) {
+                    elt.style[value[0]] = value[1];
+                }
+            });
+
+            elt.textContent = text;
+        }
+    }
+    
     function _create() {
         var catElement;
         if (typeof document !== "undefined") {
@@ -1726,7 +1845,11 @@ _cat.core.ui = function () {
                     '<div id=loading></div>' +
                     '<div id="catlogo" ></div>' +
                     '<div id="catHeader">CAT Tests<span id="catheadermask">click to mask on/off</span></div>' +
-                    '<div class="text-tips"></div>' +
+                    '<div class="text-tips">' +
+                    '   <div class="tests">Tests <span style="color:green">passed</span> : <span  id="tests_passed">0</span></div>' +
+                    '   <div class="tests">Tests <span style="color:red">failed</span> : <span  id="tests_failed">0</span></div>' +
+                    '   <div class="tests"><span  id="tests_total">0</span> Tests Total</div>' +
+                    '</div>' +
                     '<div id="cat-status-content">' +
                     '<ul id="testList"></ul>' +
                     '</div>' +
@@ -1781,8 +1904,7 @@ _cat.core.ui = function () {
         });
     }
 
-    var testNumber = 0,
-        logoopacity = 0.5,
+    var logoopacity = 0.5,
         masktipopacity = 1,
 
         _disabled = false,
@@ -1960,6 +2082,33 @@ _cat.core.ui = function () {
             element.className = element.className + " markedElement";
         },
 
+        setContentTip: function(config) {
+
+            var  testsFailed =  document.getElementById("tests_failed"),
+                testsPassed =  document.getElementById("tests_passed"),
+                testsTotal =  document.getElementById("tests_total"),
+                testStatus;
+
+            if ("tips" in config) {
+                if ("tips" in config && config.tips) {
+                    testStatus  = config.tips;
+                    if (testStatus) {
+                        if ("failed" in testStatus) {
+                            _setText(testsFailed, testStatus.failed);
+                        }
+                        if ("passed" in testStatus) {
+                            _setText(testsPassed, testStatus.passed);
+                        }
+                        if ("total" in testStatus) {
+                            _setText(testsTotal, testStatus.total);
+                        }
+                    }
+                    
+                }
+            }
+
+        },
+            
         /**
          *  Set the displayable content for CAT status widget
          *
@@ -1973,25 +2122,8 @@ _cat.core.ui = function () {
             var catStatusContentElt,
                 catElement = _getCATElt(),
                 isOpen = false,
-                reset = ("reset" in config ? config.reset : false);
-
-
-
-            function _setText(elt, text, style) {
-
-                var styleAttrs = (style ? style.split(";") : []);
-
-                if (elt) {
-                    styleAttrs.forEach(function (item) {
-                        var value = (item ? item.split(":") : undefined);
-                        if (value) {
-                            elt.style[value[0]] = value[1];
-                        }
-                    });
-
-                    elt.textContent = text;
-                }
-            }
+                reset = ("reset" in config ? config.reset : false),
+                me = this;
 
             if (catElement) {
                 catStatusContentElt = _getCATStatusContentElt();
@@ -2022,10 +2154,11 @@ _cat.core.ui = function () {
                             ul.insertBefore(newLI, ul.children[0]);
                             newLI.innerHTML = innerListElement;
 
-                            var textTips =  document.getElementsByClassName("text-tips")[0];
-
+                           
+                            
+                            
                             setTimeout(function() {
-
+                              
                                 // add element to ui test list
                                 if ("header" in config) {
                                     _setText(newLI.childNodes[0]  , config.header, config.style);
@@ -2034,16 +2167,8 @@ _cat.core.ui = function () {
                                     _setText(newLI.childNodes[1], config.desc, config.style);
                                 }
 
-                                if ("tips" in config) {
-                                    if (config.tips) {
-                                        testNumber  = config.tips;
-                                        _setText(textTips, "Number of test passed : " + testNumber, config.style);
-                                    } else {
-                                        _setText(textTips, "Number of test passed : " + testNumber, "color : green");
-                                    }
-
-                                }
-
+                                me.setContentTip(config);
+                                
                                 if ("elementType" in config) {
                                     newLI.className = newLI.className + " " + config.elementType;
 
