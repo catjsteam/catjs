@@ -1,4 +1,4 @@
-CatJS 0.3.6
+CatJS 0.4.0
 ==============
   
 <p><div style="font-size:orange; font-size:12px">  It's much lighter...  </div></p>
