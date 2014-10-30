@@ -13,6 +13,22 @@ _cat.core.ui = function () {
         }
     }
 
+    function _setText(elt, text, style) {
+
+        var styleAttrs = (style ? style.split(";") : []);
+
+        if (elt) {
+            styleAttrs.forEach(function (item) {
+                var value = (item ? item.split(":") : undefined);
+                if (value) {
+                    elt.style[value[0]] = value[1];
+                }
+            });
+
+            elt.textContent = text;
+        }
+    }
+    
     function _create() {
         var catElement;
         if (typeof document !== "undefined") {
@@ -31,7 +47,11 @@ _cat.core.ui = function () {
                     '<div id=loading></div>' +
                     '<div id="catlogo" ></div>' +
                     '<div id="catHeader">CAT Tests<span id="catheadermask">click to mask on/off</span></div>' +
-                    '<div class="text-tips"></div>' +
+                    '<div class="text-tips">' +
+                    '   <div class="tests">Tests <span style="color:green">passed</span> : <span  id="tests_passed">0</span></div>' +
+                    '   <div class="tests">Tests <span style="color:red">failed</span> : <span  id="tests_failed">0</span></div>' +
+                    '   <div class="tests"><span  id="tests_total">0</span> Tests Total</div>' +
+                    '</div>' +
                     '<div id="cat-status-content">' +
                     '<ul id="testList"></ul>' +
                     '</div>' +
@@ -86,8 +106,7 @@ _cat.core.ui = function () {
         });
     }
 
-    var testNumber = 0,
-        logoopacity = 0.5,
+    var logoopacity = 0.5,
         masktipopacity = 1,
 
         _disabled = false,
@@ -265,6 +284,33 @@ _cat.core.ui = function () {
             element.className = element.className + " markedElement";
         },
 
+        setContentTip: function(config) {
+
+            var  testsFailed =  document.getElementById("tests_failed"),
+                testsPassed =  document.getElementById("tests_passed"),
+                testsTotal =  document.getElementById("tests_total"),
+                testStatus;
+
+            if ("tips" in config) {
+                if ("tips" in config && config.tips) {
+                    testStatus  = config.tips;
+                    if (testStatus) {
+                        if ("failed" in testStatus) {
+                            _setText(testsFailed, testStatus.failed);
+                        }
+                        if ("passed" in testStatus) {
+                            _setText(testsPassed, testStatus.passed);
+                        }
+                        if ("total" in testStatus) {
+                            _setText(testsTotal, testStatus.total);
+                        }
+                    }
+                    
+                }
+            }
+
+        },
+            
         /**
          *  Set the displayable content for CAT status widget
          *
@@ -278,25 +324,8 @@ _cat.core.ui = function () {
             var catStatusContentElt,
                 catElement = _getCATElt(),
                 isOpen = false,
-                reset = ("reset" in config ? config.reset : false);
-
-
-
-            function _setText(elt, text, style) {
-
-                var styleAttrs = (style ? style.split(";") : []);
-
-                if (elt) {
-                    styleAttrs.forEach(function (item) {
-                        var value = (item ? item.split(":") : undefined);
-                        if (value) {
-                            elt.style[value[0]] = value[1];
-                        }
-                    });
-
-                    elt.textContent = text;
-                }
-            }
+                reset = ("reset" in config ? config.reset : false),
+                me = this;
 
             if (catElement) {
                 catStatusContentElt = _getCATStatusContentElt();
@@ -327,10 +356,11 @@ _cat.core.ui = function () {
                             ul.insertBefore(newLI, ul.children[0]);
                             newLI.innerHTML = innerListElement;
 
-                            var textTips =  document.getElementsByClassName("text-tips")[0];
-
+                           
+                            
+                            
                             setTimeout(function() {
-
+                              
                                 // add element to ui test list
                                 if ("header" in config) {
                                     _setText(newLI.childNodes[0]  , config.header, config.style);
@@ -339,16 +369,8 @@ _cat.core.ui = function () {
                                     _setText(newLI.childNodes[1], config.desc, config.style);
                                 }
 
-                                if ("tips" in config) {
-                                    if (config.tips) {
-                                        testNumber  = config.tips;
-                                        _setText(textTips, "Number of test passed : " + testNumber, config.style);
-                                    } else {
-                                        _setText(textTips, "Number of test passed : " + testNumber, "color : green");
-                                    }
-
-                                }
-
+                                me.setContentTip(config);
+                                
                                 if ("elementType" in config) {
                                     newLI.className = newLI.className + " " + config.elementType;
 

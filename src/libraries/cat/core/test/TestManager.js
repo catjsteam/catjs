@@ -78,6 +78,7 @@ _cat.core.TestManager = function() {
 
     var _testsData = [],
         _counter = 0,
+        _hasFailed = false,
         _globalTestData = {};
 
 
@@ -103,22 +104,45 @@ _cat.core.TestManager = function() {
         enum: _enum,
         
         addTestData: function(config) {
-            var data = new _Data(config);
+            var data = new _Data(config),
+                name;
             _testsData.push(data);
-            if (config.success) {
+            
+            name = data.get("name");
+            if (config.success && (name !== "Start" && name !== "End")) {
                 _counter++;
+                
+            } else {
+                _hasFailed = true; 
             }
 
             return data;
 
         },
 
+        isFailed: function() {
+            return _hasFailed;
+        },
+        
         getLastTestData: function() {
             return (_testsData.length > 0 ? _testsData[_testsData.length-1] : undefined);
         },
 
         getTestCount: function() {
-            return (_testsData ? _testsData.length : 0);
+            var counter=0;
+            
+            _testsData.forEach(function(test) {
+                var name;    
+            
+                if (test) {
+                    name = test.get("name");
+                    if (name !== "Start" && name !== "End") {
+                        counter++;
+                    }
+                }
+            });
+            
+            return counter;
         },
 
         getTestSucceededCount: function() {
@@ -149,13 +173,21 @@ _cat.core.TestManager = function() {
          *  signal [KILL, TESTSTART, TESTEND]
          */
         send: function(opt) {
-            var signal = opt.signal,
-                config = _cat.core.getConfig(), reportFormats;
+            var signal,
+                config = _cat.core.getConfig(), reportFormats,
+                options;               
+            
+            opt = (opt || {});
+            signal = opt.signal;
             
             if (config.isReport()) {
                 reportFormats = config.getReportFormats();
+                options = {reportFormats: reportFormats};
             }
-            _cat.utils.Signal.send(signal, {reportFormats: reportFormats});
+            if ("error" in opt) {
+                options.error = opt.error;
+            }
+            _cat.utils.Signal.send(signal, options);
         },       
 
         /**

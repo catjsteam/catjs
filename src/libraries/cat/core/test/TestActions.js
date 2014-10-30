@@ -48,20 +48,11 @@ _cat.core.TestAction = function () {
                         _cat.core.ui.setContent({
                             header: "Test failed with errors",
                             desc: opt.error,
-                            tips: "",
+                            tips: {},
                             style: "color:red"
                         });
 
-                    } else {
-                        testCount = _cat.core.TestManager.getTestCount();
-                        _cat.core.ui.setContent({
-                            header: [testCount - 1, " tests total"].join(" "),
-                            desc: "",
-                            tips: "",
-                            elementType: "listImageSummary",
-                            style: "color:#444444"
-                        });
-                    }
+                    } 
                 }, (timeout));
             }
 

@@ -32,7 +32,8 @@ _cat.utils.assert = function () {
                 return;
             }
 
-            var testdata;
+            var testdata,
+                total, failed, passed;
 
             if (config.status && config.message && config.name && config.displayName) {
 
@@ -49,11 +50,14 @@ _cat.utils.assert = function () {
                 });
 
                 if (config.ui) {
+                    total = _cat.core.TestManager.getTestCount();
+                    passed = _cat.core.TestManager.getTestSucceededCount();
+                    failed = total - passed;
                     _cat.core.ui.setContent({
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestSucceededCount(),
+                        tips: {passed: (!isNaN(passed) ? passed : 0), failed: (!isNaN(failed) ? failed : 0), total: (!isNaN(total) ? total: 0)},
                         elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
                     });
                 }
