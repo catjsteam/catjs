@@ -1374,34 +1374,15 @@ _cat.core.clientmanager = function () {
                                     } else {
                                         _add2Queue({scrapInfo: scrap, args: args});
                                     }
-//                                    var config = testQueue[scrap.index];
-//                                    if (config) {
-//                                        _process(testQueue[scrap.index]);
-//                                        testQueue[scrap.index] = undefined;
-//                                    } else {
-//                                        _process({scrapInfo: scrap, args: args});
-//                                    }
+
                                 });
                             }
                         } else {
 
-//                            response.args = args;
-//                            testQueue[response.scrapInfo.index] = response;
                             _add2Queue({scrapInfo: response.scrapInfo, args: args});
                         }
 
                         _processReadyScraps();
-
-//                        if (!response.ready) {
-//                            
-//                            console.log("[NOT READY]  scrap index: ", response.scrapInfo.index);
-//                            
-//                        } else {
-//
-//                            console.log("[READY]  scrap index: ", response.scrapInfo.index);
-//                            runStatus.scrapReady = parseInt(response.readyScrap ? response.readyScrap.index : 0) + 1;
-//                            commitScrap(scrap, args, response);
-//                        }
                     }
                 };
 
