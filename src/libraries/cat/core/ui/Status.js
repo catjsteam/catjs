@@ -55,8 +55,8 @@ _cat.core.ui = function () {
                     '<div id="cat-status-content">' +
                     '<ul id="testList"></ul>' +
                     '</div>' +
-                    '</div>' +
-                    '<div id="catmask" class="fadeMe"></div>';
+                    '<div id="catmask" class="fadeMe"></div>' +
+                    '</div>';                   
 
             if (document.body) {
                 document.body.appendChild(catElement);
@@ -106,10 +106,7 @@ _cat.core.ui = function () {
         });
     }
 
-    var logoopacity = 0.5,
-        masktipopacity = 1,
-
-        _disabled = false,
+    var _disabled = false,
         _me =  {
 
         disable: function() {
@@ -156,8 +153,10 @@ _cat.core.ui = function () {
 
                 if (logoelt && catmask && catmask.classList) {
                     _addEventListener(logoelt, "click", listener);
-                }               
-
+                }
+                        
+               
+                        
             }
 
         },
