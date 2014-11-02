@@ -165,6 +165,7 @@ div#cat-status #cat-status-content .text-tips {
     position:absolute;
     right:10px;
     top:10px;
+    text-align: left;
 }
 
 div#cat-status .displayoff {
@@ -194,7 +195,7 @@ div#cat-status {
     margin-top: 10px;
     margin-right : 10px;
     display: table;
-    font-family: "HPSimplified, Arial";
+    font-family: "Trebuchet MS", Tahoma;
 }
 
 div#catHeader {
@@ -204,13 +205,13 @@ div#catHeader {
     margin-left: 60px;
     margin-top: 15px;
     font-size: 1.3em;
-    font-family: "HPSimplified, Arial";
+    font-family: "Trebuchet MS", Tahoma;
     font-size: 14px;
 
 
 }
 span#catheadermask {
-    font-family: "HPSimplified, Arial";
+    font-family: "Trebuchet MS", Tahoma;
     font-size:10px;
     color:#444444;
     white-space: nowrap;
@@ -245,7 +246,7 @@ ul#testList li{
 div.text-tips {
     margin-top: 35px;
     padding-left: 10px;
-    font-family: "HPSimplified, Arial";
+    font-family: "Trebuchet MS", Tahoma;
     font-size:18px;
 }
 
