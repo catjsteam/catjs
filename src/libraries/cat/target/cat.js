@@ -1935,26 +1935,7 @@ _cat.core.ui = function () {
 
                 if (logoelt && catmask && catmask.classList) {
                     _addEventListener(logoelt, "click", listener);
-                }
-
-                setInterval(function() {
-                    var logoelt = document.getElementById("catlogo"),
-                        catheadermask = document.getElementById("catheadermask");
-
-                    if (logoopacity === 1) {
-                        logoopacity = 0.5;
-                        setTimeout(function() {
-                            masktipopacity = 0;
-                        }, 2000);
-
-                    } else {
-                        logoopacity = 1;
-                    }
-                    if (logoelt) {
-                        catheadermask.style.opacity = masktipopacity+"";
-                        logoelt.style.opacity = logoopacity+"";
-                    }
-                }, 2000);
+                }               
 
             }
 
