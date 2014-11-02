@@ -95,7 +95,6 @@ _cat.core.clientmanager = function () {
             scrapInfo = scrapInfoArr[infoIndex];
             repeat = scrapInfo.repeat || 1;
             for (repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {
-                _cat.core.ui.on();
                 _cat.core.actionimpl.apply(this, args);
             }
         }

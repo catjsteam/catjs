@@ -97,6 +97,7 @@ _cat.core.TestManager = function() {
             var config = _cat.core.getConfig();
             // TODO we need to set test start signal via an API
             if (config.getTests()) {
+                _cat.core.ui.on();
                 _cat.core.TestManager.send({signal:"TESTSTART"});
             }
         },
