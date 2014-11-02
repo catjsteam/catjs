@@ -1834,8 +1834,8 @@ _cat.core.ui = function () {
                     '<div id="cat-status-content">' +
                     '<ul id="testList"></ul>' +
                     '</div>' +
-                    '</div>' +
-                    '<div id="catmask" class="fadeMe"></div>';
+                    '<div id="catmask" class="fadeMe"></div>' +
+                    '</div>';                   
 
             if (document.body) {
                 document.body.appendChild(catElement);
@@ -1926,6 +1926,7 @@ _cat.core.ui = function () {
                 // set logo listener
                 var logoelt = document.getElementById("catlogo"),
                     catmask = document.getElementById("catmask"),
+                    catheadermask = document.getElementById("catheadermask"),
                     listener = function() {
                         var catmask = document.getElementById("catmask");
                         if (catmask) {
@@ -1935,8 +1936,10 @@ _cat.core.ui = function () {
 
                 if (logoelt && catmask && catmask.classList) {
                     _addEventListener(logoelt, "click", listener);
-                }               
-
+                }
+                        
+               
+                        
             }
 
         },

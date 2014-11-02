@@ -2,7 +2,7 @@ div#cat-status {
   height: 100%;
   overflow: hidden;
   opacity: .8;
-  z-index: 100;
+  z-index: 1000000;
   position: absolute;
   right: 0;
   top: 0;
