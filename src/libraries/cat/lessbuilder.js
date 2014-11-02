@@ -23,7 +23,7 @@ function _generate() {
         if (e) {
             console.error("error occured while parsing the content: ",e);
         }
-        _fs.writeFileSync( "./css/" + _name +".css", model.toCSS({ compress: false }) );
+        _fs.writeFileSync( "./css/" + _name +".css", model.toCSS({ compress: true }) );
     });
 }
 
