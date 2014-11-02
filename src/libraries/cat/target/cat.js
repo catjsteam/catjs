@@ -1154,14 +1154,10 @@ _cat.core.clientmanager = function () {
         setupInterval,
         endTest,
         testQueue = {},
-        currentState = { index: 0 },
-        intervalHandlerController;
+        currentState = { index: 0 };
 
     endTest = function (opt, interval) {
 
-        if (intervalHandlerController) {
-            clearInterval(intervalHandlerController);
-        }
         _cat.core.TestManager.send({signal: 'TESTEND', error: opt.error});
         if (interval === -1) {
             console.log("Test End");
@@ -1199,35 +1195,30 @@ _cat.core.clientmanager = function () {
     setupInterval = function (config, scrap) {
         
         var tests,
+            intervalObj = getScrapInterval(scrap),
             testManager;
-
         tests = config.getTests();
         if (tests) {
             testManager = (tests[tests.length - 1].name || "NA");
         }
 
 
-        if (intervalHandlerController) {
-            clearInterval(intervalHandlerController.intervalObj);
-        }
-        intervalHandlerController = getScrapInterval(scrap);
-        intervalHandlerController.interval = setInterval(function () {
+        intervalObj.interval = setInterval(function () {
 
-            if (intervalHandlerController.counter < 3) {
-                intervalHandlerController.counter++;
-                console.log("[CatJS manager] No activity detected, retry,  ", intervalHandlerController.counter);
+            if (intervalObj.counter < 3) {
+                intervalObj.counter++;
+                console.log("[CatJS manager] No activity detected, retry,  ", intervalObj.counter);
 
             } else {
                 var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
 
-                clearInterval(intervalHandlerController.interval);
-                console.log("[CatJS Error] ", err);                                
+                console.log("[CatJS Error] ", err);
                 endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
-               
+                clearInterval(intervalObj.interval);
             }
         }, config.getTimeout() / 3);
         
-        return intervalHandlerController;
+        return;
     };
 
 
@@ -1244,7 +1235,7 @@ _cat.core.clientmanager = function () {
         for (infoIndex = 0; infoIndex < size; infoIndex++) {
             scrapInfo = scrapInfoArr[infoIndex];
             repeat = scrapInfo.repeat || 1;
-            for (repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {            
+            for (repeatIndex = 0; repeatIndex < repeat; repeatIndex++) {
                 _cat.core.actionimpl.apply(this, args);
             }
         }
@@ -1276,7 +1267,7 @@ _cat.core.clientmanager = function () {
         }
 
         if (!validate) {
-            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName +"'. Check your cat.json project");
+            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName + "'. Check your cat.json project");
             if (!_cat.core.ui.isOpen()) {
                 _cat.core.ui.on();
             }
@@ -1312,9 +1303,9 @@ _cat.core.clientmanager = function () {
     startInterval = function (catConfig, scrap) {
         var lvar = (scrap && scrap.name ? scrap.name[0] : undefined),
             rval = (tests && tests[0] ? tests[0].name : undefined);
-        //if (lvar === rval) {
-        setupInterval(catConfig, scrap);
-        //}
+        if (lvar === rval) {
+            setupInterval(catConfig, scrap);
+        }
     };
 
     return {
@@ -1339,7 +1330,7 @@ _cat.core.clientmanager = function () {
 
                         var response = JSON.parse(this.responseText),
                             scraplist;
-                        
+
                         function _process(config) {
                             var scrap = config.scrapInfo,
                                 args = config.args;
@@ -1394,7 +1385,6 @@ _cat.core.clientmanager = function () {
                     }
                 };
 
-                
                 _cat.utils.AJAX.sendRequestAsync(config);
             }
 
