@@ -1175,14 +1175,12 @@ _cat.core.clientmanager = function () {
     };
 
     getScrapInterval = function (scrap) {
-        var scrapId = scrap.id,
-            numCommands = (scrap.numCommands ? scrap.numCommands : 1);
+        var scrapId = scrap.id;
 
         if (!runStatus.intervalObj) {
             runStatus.intervalObj = {
                 "interval": undefined,
                 "counter": 0,
-                "numCommands": numCommands,
                 "signScrapId": scrapId
 
 
@@ -1296,7 +1294,6 @@ _cat.core.clientmanager = function () {
         if (runStatus.intervalObj && (scrapId !== runStatus.intervalObj.signScrapId)) {
             runStatus.intervalObj.signScrapId = scrapId;
             runStatus.intervalObj.counter = 0;
-            runStatus.intervalObj.numCommands = (scrap.numCommands ? scrap.numCommands : 1);
         }
     };
 

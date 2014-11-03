@@ -267,9 +267,6 @@ module.exports = function () {
 
                 if (scrap) {
                     if (isApply) {
-                        if (isApply) {
-                            scrap.numCommandsDestroy();
-                        }
                         scrap.buildContext(_scrapNames);
                         scrap.apply();
                     }

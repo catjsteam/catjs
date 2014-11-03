@@ -26,7 +26,6 @@ module.exports = function (config) {
                     if (row) {
 
                         _commandsCode.push((process ? process.call(_scrap, row) : row));
-                        _scrap.numCommandsInc();
                     }
 
                     counter++;
