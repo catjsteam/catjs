@@ -306,6 +306,10 @@ module.exports = function () {
 
             // create meta data file
             _md.update(updateobj);
+            
+            if ("callback" in config) {
+                config.callback.call(this, scraps);
+            }
 
         },
 

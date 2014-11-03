@@ -39,6 +39,7 @@ module.exports = _basePlugin.ext(function () {
                     projectTarget = _me._project.getInfo("target");
 
                 scraps.forEach(function (scrap) {
+                    
                     var out,
                         runat,
                         managerout,
@@ -523,7 +524,14 @@ module.exports = _basePlugin.ext(function () {
                             _apply(filesArr[counter], callback);
 
                             // update the scrap data w/o running scrap apply
-                            _Scrap.apply({scraps: scraps, apply: false});
+                            _Scrap.apply({
+                                scraps: scraps, 
+                                apply: false,
+                                callback: function(scraps) {
+                                  
+                                }
+                            });
+                            
                             if (counter === filesArr.length) {
                                 if (callback) {
                                     callback.call(this);
@@ -532,7 +540,6 @@ module.exports = _basePlugin.ext(function () {
 
                         });
                     } else {
-                        //  _Scrap.apply({scraps: scraps});
                         emitter.emit("job.done", {status: "done"});
                     }
                 }
