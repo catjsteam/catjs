@@ -675,6 +675,7 @@ module.exports = function () {
                         me.print(_tplutils.template({
                             content: contentByType,
                             data: {
+                                events: {onload: ( value.indexOf("cat.src.js") !== -1 ? "onload=\"_cat.core.init()\"" : undefined )},
                                 src: value
                             }
                         }));
@@ -692,11 +693,11 @@ module.exports = function () {
                             if (item) {
                                 libs = generateLibs(item);
                                 libs.forEach(function (lib) {
-                                    var typeob = _getType(lib),
-                                        importType = typeob.type;
+                                    var typeo = _getType(lib),
+                                        importType = typeo.type;
 
                                     if (importType && importType !== "map") {
-                                        _printByType(importType, typeob.value);
+                                        _printByType(importType, typeo.value);
                                     }
                                 });
                             }
