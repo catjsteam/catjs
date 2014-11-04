@@ -76,7 +76,8 @@ _cat.core.TestManager = function() {
 
     };
 
-    var _testsData = [],
+    var _summaryInfo,
+        _testsData = [],
         _counter = 0,
         _hasFailed = false,
         _globalTestData = {};
@@ -191,6 +192,14 @@ _cat.core.TestManager = function() {
             _cat.utils.Signal.send(signal, options);
         },       
 
+        setSummaryInfo: function(info) {
+            _summaryInfo = info;  
+        },
+        
+        getSummaryInfo: function(info) {
+            return _summaryInfo;  
+        },
+        
         /**
          *
          * @param config
