@@ -108,6 +108,7 @@ _cat.core.ui = function () {
 
     var _disabled = false,
         _onloadIstener,
+        _loaderListener = false,
         _me =  {
 
         disable: function() {
@@ -127,45 +128,46 @@ _cat.core.ui = function () {
             if (_disabled) {
                 return;
             }
-
-            _onloadIstener = true;
-            _addEventListener(window, "load", function(e) {
-                
-                var catElement = _getCATElt();
-                if (typeof document !== "undefined") {
-    
-                    if (catElement) {
-                        catElement.style.display = "";
-                    } else {
-                        _create();
-                        catElement = _getCATElt();
+           
+            if (!_loaderListener) {
+                _loaderListener = true;
+                _addEventListener(window, "load", function(e) {
+                    
+                    var catElement = _getCATElt();
+                    if (typeof document !== "undefined") {
+        
                         if (catElement) {
-                            _me.toggle();
                             catElement.style.display = "";
+                        } else {
+                            _create();
+                            catElement = _getCATElt();
+                            if (catElement) {
+                                _me.toggle();
+                                catElement.style.display = "";
+                            }
                         }
-                    }
-    
-                    if (catElement) {
-                        _onloadIstener = false;    
+        
+                        if (catElement) {
+                            _onloadIstener = false;    
+                        }
+                        
+                        // set logo listener
+                        var logoelt = document.getElementById("catlogo"),
+                            catmask = document.getElementById("catmask"),
+                            listener = function() {                            
+                                if (catmask) {
+                                    catmask.classList.toggle("fadeMe");
+                                }
+                            };
+        
+                        if (logoelt && catmask && catmask.classList) {
+                            _addEventListener(logoelt, "click", listener);
+                        }                                      
+                                
                     }
                     
-                    // set logo listener
-                    var logoelt = document.getElementById("catlogo"),
-                        catmask = document.getElementById("catmask"),
-                        listener = function() {
-                            var catmask = document.getElementById("catmask");
-                            if (catmask) {
-                                catmask.classList.toggle("fadeMe");
-                            }
-                        };
-    
-                    if (logoelt && catmask && catmask.classList) {
-                        _addEventListener(logoelt, "click", listener);
-                    }                                      
-                            
-                }
-                
-            });
+                });
+            }
 
         },
 
