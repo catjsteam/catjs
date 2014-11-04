@@ -1880,6 +1880,7 @@ _cat.core.ui = function () {
             catElement = document.createElement("DIV");
 
             catElement.id = "__catelement";
+            catElement.className = "cat-status-container";
             catElement.style.width = "200px";
             catElement.style.height = "200px";
             catElement.style.position = "fixed";
@@ -1899,11 +1900,11 @@ _cat.core.ui = function () {
                     '   <div class="tests"><span  id="tests_status"></span></div>' +
                     '</div>' +
                     '<div id="cat-status-content">' +
-                    '<ul id="testList"></ul>' +
+                        '<ul id="testList"></ul>' +
                     '</div>' +
-                    '<div id="catmask" class="fadeMe"></div>' +
-                    '</div>';
-
+                '</div>'+
+                '<div id="catmask" class="fadeMe"></div>';
+            
             if (document.body) {
                 document.body.appendChild(catElement);
             }
