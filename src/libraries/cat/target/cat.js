@@ -196,6 +196,9 @@ _cat.core = function () {
             // Test Manager Init
             _cat.core.TestManager.init();
             
+            // set scrap data info
+            _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());
+            
             // display the ui, if you didn't already
             if (_config.isUI()) {
                 _cat.core.ui.enable();
@@ -417,6 +420,37 @@ _cat.core = function () {
                 key += "$$cat";
             }
             return _vars[key];
+        },
+        
+        getScraps: function() {
+            
+            var key, item, arr=[];
+            for (key in _vars) {
+                item = _vars[key];
+                if (item && "scrap" in item) {
+                    arr.push(item.scrap);
+                }
+            }
+            
+            return arr;  
+        },
+        
+        getSummaryInfo: function() {
+          
+            var scraps = _cat.core.getScraps(),
+                info = {assert: {total: 0}},
+                assertinfo = info.assert;
+            
+            if (scraps) {
+                scraps.forEach(function(scrap) {
+                    var assert;
+                    if (scrap) {
+                        assertinfo.total += ( ("assert" in scrap && scrap.assert.length > 0) ? scrap.assert.length : 0) ;
+                    }
+                });
+            }
+            
+            return info;
         },
 
         varSearch: function (key) {
@@ -960,7 +994,7 @@ _cat.utils.assert = function () {
             }
 
             var testdata,
-                total, failed, passed;
+                total, failed, passed, tests;
 
             if (config.status && config.message && config.name && config.displayName) {
 
@@ -980,11 +1014,12 @@ _cat.utils.assert = function () {
                     total = _cat.core.TestManager.getTestCount();
                     passed = _cat.core.TestManager.getTestSucceededCount();
                     failed = total - passed;
+                    tests =  (_cat.core.TestManager.getSummaryInfo().assert.total || 0);
                     _cat.core.ui.setContent({
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: {passed: (!isNaN(passed) ? passed : 0), failed: (!isNaN(failed) ? failed : 0), total: (!isNaN(total) ? total: 0)},
+                        tips: {tests: tests ,passed: (!isNaN(passed) ? passed : 0), failed: (!isNaN(failed) ? failed : 0), total: (!isNaN(total) ? total: 0)},
                         elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
                     });
                 }
@@ -1152,6 +1187,7 @@ _cat.core.clientmanager = function () {
         startInterval,
         getScrapInterval,
         setupInterval,
+        intervalObj,
         endTest,
         testQueue = {},
         currentState = { index: 0 };
@@ -1182,19 +1218,26 @@ _cat.core.clientmanager = function () {
                 "interval": undefined,
                 "counter": 0,
                 "signScrapId": scrapId
-
-
             };
+        } else {
+            runStatus.intervalObj.signScrapId = scrapId;
         }
+
+        if (intervalObj) {
+            clearInterval(intervalObj.interval);
+        }
+        
         return runStatus.intervalObj;
     };
 
 
     setupInterval = function (config, scrap) {
         
-        var tests,
-            intervalObj = getScrapInterval(scrap),
+        var tests,            
             testManager;
+        
+        intervalObj = getScrapInterval(scrap);
+        
         tests = config.getTests();
         if (tests) {
             testManager = (tests[tests.length - 1].name || "NA");
@@ -1203,9 +1246,20 @@ _cat.core.clientmanager = function () {
 
         intervalObj.interval = setInterval(function () {
 
+            var msg = ["No test activity, retry: "];
             if (intervalObj.counter < 3) {
                 intervalObj.counter++;
-                console.log("[CatJS manager] No activity detected, retry,  ", intervalObj.counter);
+
+                msg.push(intervalObj.counter);
+                
+                _cat.core.ui.setContent({
+                    header: "Test Status",
+                    desc: msg.join(""),
+                    tips: {},
+                    style: "color:gray"
+                });
+                
+                console.log("[CatJS manager] ", msg.join(""));
 
             } else {
                 var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
@@ -1298,11 +1352,7 @@ _cat.core.clientmanager = function () {
     };
 
     startInterval = function (catConfig, scrap) {
-        var lvar = (scrap && scrap.name ? scrap.name[0] : undefined),
-            rval = (tests && tests[0] ? tests[0].name : undefined);
-        if (lvar === rval) {
-            setupInterval(catConfig, scrap);
-        }
+        setupInterval(catConfig, scrap);
     };
 
     return {
@@ -1504,7 +1554,7 @@ _cat.core.TestAction = function () {
                         _cat.core.ui.setContent({
                             header: "Test failed with errors",
                             desc: opt.error,
-                            tips: {},
+                            tips: {status: "failed"},
                             style: "color:red"
                         });
 
@@ -1620,7 +1670,8 @@ _cat.core.TestManager = function() {
 
     };
 
-    var _testsData = [],
+    var _summaryInfo,
+        _testsData = [],
         _counter = 0,
         _hasFailed = false,
         _globalTestData = {};
@@ -1735,6 +1786,14 @@ _cat.core.TestManager = function() {
             _cat.utils.Signal.send(signal, options);
         },       
 
+        setSummaryInfo: function(info) {
+            _summaryInfo = info;  
+        },
+        
+        getSummaryInfo: function(info) {
+            return _summaryInfo;  
+        },
+        
         /**
          *
          * @param config
@@ -1789,8 +1848,8 @@ _cat.core.ui = function () {
         }
     }
 
-    function _setText(elt, text, style) {
-
+    function _setInternalContent(elt, text, style, attr) {
+        
         var styleAttrs = (style ? style.split(";") : []);
 
         if (elt) {
@@ -1801,10 +1860,20 @@ _cat.core.ui = function () {
                 }
             });
 
-            elt.textContent = text;
-        }
+            elt[attr] = text;
+        }        
     }
     
+    function _setText(elt, text, style) {
+
+        _setInternalContent(elt, text, style, "textContent");
+    } 
+    
+    function _setHTML(elt, text, style) {
+
+        _setInternalContent(elt, text, style, "innerHTML");
+    }
+
     function _create() {
         var catElement;
         if (typeof document !== "undefined") {
@@ -1822,17 +1891,18 @@ _cat.core.ui = function () {
                 '<div id="cat-status" class="cat-dynamic cat-status-open">' +
                     '<div id=loading></div>' +
                     '<div id="catlogo" ></div>' +
-                    '<div id="catHeader">CAT Tests<span id="catheadermask">click to mask on/off</span></div>' +
+                    '<div id="catHeader"><div>CatJS Console</div><span id="catheadermask">click to mask on/off</span></div>' +
                     '<div class="text-tips">' +
                     '   <div class="tests">Tests <span style="color:green">passed</span> : <span  id="tests_passed">0</span></div>' +
                     '   <div class="tests">Tests <span style="color:red">failed</span> : <span  id="tests_failed">0</span></div>' +
-                    '   <div class="tests"><span  id="tests_total">0</span> Tests Total</div>' +
+                    '   <div class="tests"><span  id="tests_total_counter">0</span> Tests Total (<span  id="tests_total">0</span>)</div>' +
+                    '   <div class="tests"><span  id="tests_status"></span></div>' +
                     '</div>' +
                     '<div id="cat-status-content">' +
                     '<ul id="testList"></ul>' +
                     '</div>' +
                     '<div id="catmask" class="fadeMe"></div>' +
-                    '</div>';                   
+                    '</div>';
 
             if (document.body) {
                 document.body.appendChild(catElement);
@@ -1884,273 +1954,284 @@ _cat.core.ui = function () {
 
     var _disabled = false,
         _onloadIstener,
-        _me =  {
+        _loaderListener = false,
+        _me = {
 
-        disable: function() {
-            _disabled = true;
-        },
+            disable: function () {
+                _disabled = true;
+            },
 
-        enable: function() {
-            _disabled = false;
-        },
+            enable: function () {
+                _disabled = false;
+            },
 
-        /**
-         * Display the CAT widget (if not created it will be created first)
-         *
-         */
-        on: function () {
+            /**
+             * Display the CAT widget (if not created it will be created first)
+             *
+             */
+            on: function () {
 
-            if (_disabled) {
-                return;
-            }
+                if (_disabled) {
+                    return;
+                }
 
-            _onloadIstener = true;
-            _addEventListener(window, "load", function(e) {
-                
+                if (!_loaderListener) {
+                    _loaderListener = true;
+                    _addEventListener(window, "load", function (e) {
+
+                        var catElement = _getCATElt();
+                        if (typeof document !== "undefined") {
+
+                            if (catElement) {
+                                catElement.style.display = "";
+                            } else {
+                                _create();
+                                catElement = _getCATElt();
+                                if (catElement) {
+                                    _me.toggle();
+                                    catElement.style.display = "";
+                                }
+                            }
+
+                            if (catElement) {
+                                _onloadIstener = false;
+                            }
+
+                            // set logo listener
+                            var logoelt = document.getElementById("catlogo"),
+                                catmask = document.getElementById("catmask"),
+                                listener = function () {
+                                    if (catmask) {
+                                        catmask.classList.toggle("fadeMe");
+                                    }
+                                };
+
+                            if (logoelt && catmask && catmask.classList) {
+                                _addEventListener(logoelt, "click", listener);
+                            }
+
+                        }
+
+                    });
+                }
+
+            },
+
+            /**
+             * Hide the CAT status widget
+             *
+             */
+            off: function () {
+
                 var catElement = _getCATElt();
-                if (typeof document !== "undefined") {
-    
-                    if (catElement) {
-                        catElement.style.display = "";
-                    } else {
-                        _create();
-                        catElement = _getCATElt();
-                        if (catElement) {
-                            _me.toggle();
-                            catElement.style.display = "";
+                if (catElement) {
+                    _resetContent();
+                    catElement.style.display = "none";
+                }
+
+            },
+
+            /**
+             * Destroy the CAT status widget
+             *
+             */
+            destroy: function () {
+                var catElement = _getCATElt();
+                if (catElement) {
+                    if (catElement.parentNode) {
+                        catElement.parentNode.removeChild(catElement);
+                    }
+                }
+            },
+
+            /**
+             * Toggle the content display of CAT status widget
+             *
+             */
+            toggle: function () {
+                if (_disabled) {
+                    return;
+                }
+
+                var catElement = _getCATElt(),
+                    catStatusElt = _getCATStatusElt(),
+                    catStatusContentElt = _getCATStatusContentElt();
+
+                if (catElement) {
+                    catStatusElt = _getCATStatusElt();
+                    if (catStatusElt) {
+                        _resetContent();
+
+                        catStatusElt.classList.toggle("cat-status-close");
+
+                        if (catStatusContentElt) {
+                            catStatusContentElt.classList.toggle("displayoff");
                         }
                     }
-    
-                    if (catElement) {
-                        _onloadIstener = false;    
+                }
+
+
+            },
+
+            isOpen: function () {
+                var catElement = _getCATElt(),
+                    catStatusElt = _getCATStatusElt();
+
+                if (catElement) {
+                    catStatusElt = _getCATStatusElt();
+                    if (catStatusElt) {
+
+                        if (catStatusElt.classList.contains("cat-status-close")) {
+                            return false;
+                        }
                     }
-                    
-                    // set logo listener
-                    var logoelt = document.getElementById("catlogo"),
-                        catmask = document.getElementById("catmask"),
-                        listener = function() {
-                            var catmask = document.getElementById("catmask");
-                            if (catmask) {
-                                catmask.classList.toggle("fadeMe");
-                            }
-                        };
-    
-                    if (logoelt && catmask && catmask.classList) {
-                        _addEventListener(logoelt, "click", listener);
-                    }                                      
-                            
+                } else {
+
+                    return false;
                 }
-                
-            });
 
-        },
+                return true;
+            },
 
-        /**
-         * Hide the CAT status widget
-         *
-         */
-        off: function () {
+            isContent: function () {
 
-            var catElement = _getCATElt();
-            if (catElement) {
-                _resetContent();
-                catElement.style.display = "none";
-            }
-
-        },
-
-        /**
-         * Destroy the CAT status widget
-         *
-         */
-        destroy: function () {
-            var catElement = _getCATElt();
-            if (catElement) {
-                if (catElement.parentNode) {
-                    catElement.parentNode.removeChild(catElement);
-                }
-            }
-        },
-
-        /**
-         * Toggle the content display of CAT status widget
-         *
-         */
-        toggle: function () {
-            if (_disabled) {
-                return;
-            }
-
-            var catElement = _getCATElt(),
-                catStatusElt = _getCATStatusElt(),
-                catStatusContentElt = _getCATStatusContentElt();
-
-            if (catElement) {
-                catStatusElt = _getCATStatusElt();
-                if (catStatusElt) {
-                    _resetContent();
-
-                    catStatusElt.classList.toggle("cat-status-close");
-
-                    if (catStatusContentElt) {
-                        catStatusContentElt.classList.toggle("displayoff");
+                function _isText(elt) {
+                    if (elt && elt.innerText && ((elt.innerText).trim())) {
+                        return true;
                     }
+                    return false;
                 }
-            }
 
+                var catStatusContentElt = _getCATStatusContentElt(),
+                    bool = 0;
 
-        },
+                bool += (_isText(catStatusContentElt.childNodes[1]) ? 1 : 0);
 
-        isOpen: function() {
-            var catElement = _getCATElt(),
-                catStatusElt = _getCATStatusElt();
-
-            if (catElement) {
-                catStatusElt = _getCATStatusElt();
-                if (catStatusElt) {
-
-                    if (catStatusElt.classList.contains("cat-status-close")) {
-                        return false;
-                    }
-                }
-            } else {
-
-                return false;
-            }
-
-            return true;
-        },
-
-        isContent: function() {
-
-            function _isText(elt) {
-                if ( elt &&  elt.innerText && ((elt.innerText).trim()) ) {
+                if (bool === 1) {
                     return true;
                 }
+
                 return false;
-            }
-
-            var catStatusContentElt = _getCATStatusContentElt(),
-                bool = 0;
-
-            bool  += (_isText(catStatusContentElt.childNodes[1]) ? 1 : 0);
-
-            if (bool === 1) {
-                return true;
-            }
-
-            return false;
-        },
+            },
 
 
-        markedElement : function(elementId ) {
-            var element = document.getElementById(elementId);
-            element.className = element.className + " markedElement";
-        },
+            markedElement: function (elementId) {
+                var element = document.getElementById(elementId);
+                element.className = element.className + " markedElement";
+            },
 
-        setContentTip: function(config) {
+            setContentTip: function (config) {
 
-            var  testsFailed =  document.getElementById("tests_failed"),
-                testsPassed =  document.getElementById("tests_passed"),
-                testsTotal =  document.getElementById("tests_total"),
-                testStatus;
+                var testsFailed = document.getElementById("tests_failed"),
+                    testsPassed = document.getElementById("tests_passed"),
+                    testsTotal = document.getElementById("tests_total"),
+                    testsTotalCounter = document.getElementById("tests_total_counter"),
+                    testsStatusDesc = document.getElementById("tests_status"),
+                    failedStatus = "<span class=\"test_failed\"> Test Failed </span>",
+                    passedStatus = "<span class=\"test_succeeded\"> Test End Successfully </span>",
+                    testStatus;
 
-            if ("tips" in config) {
-                if ("tips" in config && config.tips) {
-                    testStatus  = config.tips;
-                    if (testStatus) {
-                        if ("failed" in testStatus) {
-                            _setText(testsFailed, testStatus.failed);
+                if ("tips" in config) {
+                    if ("tips" in config && config.tips) {
+                        testStatus = config.tips;
+                        if (testStatus) {
+                            if ("failed" in testStatus) {
+                                _setText(testsFailed, testStatus.failed);
+                            }
+                            if ("passed" in testStatus) {
+                                _setText(testsPassed, testStatus.passed);
+                            }
+                            if ("tests" in testStatus) {
+                                _setText(testsTotal, testStatus.tests);
+                            }
+                            if ("total" in testStatus) {
+                                _setText(testsTotalCounter, testStatus.total);
+                            }
+                            if ("status" in testStatus) {
+                                _setHTML(testsStatusDesc, (testStatus.status === "succeeded" ? passedStatus : failedStatus));
+
+                            }
                         }
-                        if ("passed" in testStatus) {
-                            _setText(testsPassed, testStatus.passed);
-                        }
-                        if ("total" in testStatus) {
-                            _setText(testsTotal, testStatus.total);
-                        }
+
                     }
-                    
                 }
-            }
 
-        },
-            
-        /**
-         *  Set the displayable content for CAT status widget
-         *
-         * @param config
-         *      header - The header content
-         *      desc - The description content
-         *      tips - The tips text (mostly for the test-cases counter)
-         */
-        setContent: function (config) {
+            },
 
-            var catStatusContentElt,
-                catElement = _getCATElt(),
-                isOpen = false,
-                reset = ("reset" in config ? config.reset : false),
-                me = this;
+            /**
+             *  Set the displayable content for CAT status widget
+             *
+             * @param config
+             *      header - The header content
+             *      desc - The description content
+             *      tips - The tips text (mostly for the test-cases counter)
+             */
+            setContent: function (config) {
 
-            if (catElement) {
-                catStatusContentElt = _getCATStatusContentElt();
-                if (catStatusContentElt) {
-                    if (config) {
-                        isOpen = _me.isOpen();
+                var catStatusContentElt,
+                    catElement = _getCATElt(),
+                    isOpen = false,
+                    reset = ("reset" in config ? config.reset : false),
+                    me = this;
 
-                        if ("header" in config && config.header) {
-                            _me.on();
-                            if (!isOpen && !reset) {
-                                _me.toggle();
-                            }
-                        } else {
-                            if (!reset && isOpen) {
-                                setTimeout(function () {
+                if (catElement) {
+                    catStatusContentElt = _getCATStatusContentElt();
+                    if (catStatusContentElt) {
+                        if (config) {
+                            isOpen = _me.isOpen();
+
+                            if ("header" in config && config.header) {
+                                _me.on();
+                                if (!isOpen && !reset) {
                                     _me.toggle();
-                                }, 300);
+                                }
+                            } else {
+                                if (!reset && isOpen) {
+                                    setTimeout(function () {
+                                        _me.toggle();
+                                    }, 300);
+                                }
                             }
-                        }
-                        var innerListElement =
+                            var innerListElement =
 
                                 '<div class="text-top"><span style="color:green"></span></div>' +
-                                '<div class="text"></div>';
+                                    '<div class="text"></div>';
 
-                        if (config.header || config.desc || config.tips) {
-                            var ul = document.getElementById("testList");
-                            var newLI = document.createElement("LI");
-                            ul.insertBefore(newLI, ul.children[0]);
-                            newLI.innerHTML = innerListElement;
+                            if (config.header || config.desc || config.tips) {
+                                var ul = document.getElementById("testList");
+                                var newLI = document.createElement("LI");
+                                ul.insertBefore(newLI, ul.children[0]);
+                                newLI.innerHTML = innerListElement;
 
-                           
-                            
-                            
-                            setTimeout(function() {
-                              
-                                // add element to ui test list
-                                if ("header" in config) {
-                                    _setText(newLI.childNodes[0]  , config.header, config.style);
-                                }
-                                if ("desc" in config) {
-                                    _setText(newLI.childNodes[1], config.desc, config.style);
-                                }
 
-                                me.setContentTip(config);
-                                
-                                if ("elementType" in config) {
-                                    newLI.className = newLI.className + " " + config.elementType;
+                                setTimeout(function () {
 
-                                } else {
-                                    newLI.className = newLI.className + " listImageInfo";
-                                }
+                                    // add element to ui test list
+                                    if ("header" in config) {
+                                        _setText(newLI.childNodes[0], config.header, config.style);
+                                    }
+                                    if ("desc" in config) {
+                                        _setText(newLI.childNodes[1], config.desc, config.style);
+                                    }
 
-                            }, 300);
+                                    me.setContentTip(config);
+
+                                    if ("elementType" in config) {
+                                        newLI.className = newLI.className + " " + config.elementType;
+
+                                    } else {
+                                        newLI.className = newLI.className + " listImageInfo";
+                                    }
+
+                                }, 300);
+                            }
+
                         }
-
                     }
                 }
             }
-        }
 
-    };
+        };
 
     return _me;
 
@@ -3489,6 +3570,3 @@ _cat.plugins.vnc = function () {
     };
 
 }();
-
-// catjs initialization
-_cat.core.init();
