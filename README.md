@@ -1,7 +1,11 @@
 CatJS 0.4.0
 ==============
   
-<p><div style="font-size:orange; font-size:12px">  It's much lighter...  </div></p>
+## **Contest** Oct 26 - Nov 26, 2014
+You can win easy money, up to <b>*500$*</b>. Read all about it in [here](http://catjsteam.github.io/contest.html)
+
+<hr/>
+<br/>
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
 
