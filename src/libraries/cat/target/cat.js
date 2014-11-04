@@ -1319,7 +1319,7 @@ _cat.core.clientmanager = function () {
         }
 
         if (!validate) {
-            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName + "'. Check your cat.json project");
+            console.warn("[CatJS] Failed to match a scrap with named: '" + scrapName + "'. Check your cat.json project");
             if (!_cat.core.ui.isOpen()) {
                 _cat.core.ui.on();
             }
@@ -1472,7 +1472,7 @@ _cat.core.clientmanager = function () {
                         }
                         new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
                     } else {
-                        console.warn("[CAT] Ignore, Not a valid command: ", commandObj);
+                        console.warn("[CatJS] Ignore, Not a valid command: ", commandObj);
                     }
                 }
 
@@ -1874,20 +1874,30 @@ _cat.core.ui = function () {
         _setInternalContent(elt, text, style, "innerHTML");
     }
 
+    function _appendUI() {
+        if (__catElement) {
+            if (document.body) {
+                document.body.appendChild(__catElement);
+            } else {
+                console.warn("[CatJS UI] failed to display catjs UI. HTML Body element is not exists or not valid");
+            }
+        }
+    }
+    
     function _create() {
-        var catElement;
-        if (typeof document !== "undefined") {
-            catElement = document.createElement("DIV");
 
-            catElement.id = "__catelement";
-            catElement.className = "cat-status-container";
-            catElement.style.width = "200px";
-            catElement.style.height = "200px";
-            catElement.style.position = "fixed";
-            catElement.style.bottom = "10px";
-            catElement.style.zIndex = "10000000";
-            catElement.style.display = "none";
-            catElement.innerHTML =
+        if (typeof document !== "undefined") {
+            __catElement = document.createElement("DIV");
+
+            __catElement.id = "__catelement";
+            __catElement.className = "cat-status-container";
+            __catElement.style.width = "200px";
+            __catElement.style.height = "200px";
+            __catElement.style.position = "fixed";
+            __catElement.style.bottom = "10px";
+            __catElement.style.zIndex = "10000000";
+            __catElement.style.display = "none";
+            __catElement.innerHTML =
 
                 '<div id="cat-status" class="cat-dynamic cat-status-open">' +
                     '<div id=loading></div>' +
@@ -1904,16 +1914,23 @@ _cat.core.ui = function () {
                     '</div>' +
                 '</div>'+
                 '<div id="catmask" class="fadeMe"></div>';
-            
-            if (document.body) {
-                document.body.appendChild(catElement);
-            }
+
+            _appendUI();
+           
         }
     }
 
     function _getCATElt() {
+        var catelement;
+        
         if (typeof document !== "undefined") {
-            return document.getElementById("__catelement");
+            catelement = document.getElementById("__catelement");
+            
+            if (!catelement) {
+                _appendUI();
+            }
+            
+            return catelement;
         }
         return undefined;
     }
@@ -1953,7 +1970,8 @@ _cat.core.ui = function () {
         });
     }
 
-    var _disabled = false,
+    var __catElement,
+        _disabled = false,
         _onloadIstener,
         _loaderListener = false,
         _me = {

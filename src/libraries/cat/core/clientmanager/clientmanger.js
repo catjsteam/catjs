@@ -143,7 +143,7 @@ _cat.core.clientmanager = function () {
         }
 
         if (!validate) {
-            console.warn("[CAT] Failed to match a scrap with named: '" + scrapName + "'. Check your cat.json project");
+            console.warn("[CatJS] Failed to match a scrap with named: '" + scrapName + "'. Check your cat.json project");
             if (!_cat.core.ui.isOpen()) {
                 _cat.core.ui.on();
             }
@@ -296,7 +296,7 @@ _cat.core.clientmanager = function () {
                         }
                         new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
                     } else {
-                        console.warn("[CAT] Ignore, Not a valid command: ", commandObj);
+                        console.warn("[CatJS] Ignore, Not a valid command: ", commandObj);
                     }
                 }
 
