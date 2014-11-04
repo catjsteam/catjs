@@ -34,5 +34,5 @@
     },
     "run-mode": "all",
     "run-test-delay": 500,
-    "test-failure-timeout": 30
+    "test-failure-timeout": 20
 }
