@@ -48,7 +48,7 @@ _cat.core.TestAction = function () {
                         _cat.core.ui.setContent({
                             header: "Test failed with errors",
                             desc: opt.error,
-                            tips: {},
+                            tips: {status: "failed"},
                             style: "color:red"
                         });
 
