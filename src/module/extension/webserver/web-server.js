@@ -10,9 +10,7 @@ var _http = require("http"),
     _utils  = catrequire("cat.utils"),
      _winston = require('winston'),
     _projectmanager = require('../projectmanager/action'),
-    vars = {
-        assert: require('./CatObjects/assert')
-    };
+    _assert = require('./CatObjects/assert');
 
 /**
  * Web Server support mainly for serving static pages
@@ -80,22 +78,9 @@ var webserver  = function() {
                 _server.use(_express.static(path));                                                   
             });
 
-            if (set) {
-                set.forEach(function(item) {
-                    var value;
-                    if (item) {
-                        if ("var" in item) {
-                            value = vars[item.var];
-                            if (value !== undefined) {
-                                if ("prop" in item) {
-                                    value = value[item.prop];
-                                    _server.get( ('/'+item.key), value);
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+           
+            _server.get('/assert', _assert.result);
+                          
 
             _server.get('/*', function(req, res, next){
                 res.setHeader('Last-Modified', (new Date()).toUTCString());

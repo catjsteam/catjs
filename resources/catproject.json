@@ -62,8 +62,7 @@
         {
             "name": "p@project.webserver.start",
             "type": "webserver",
-            "action": "start",
-            "set": [{"key": "assert", "var": "assert", "prop":"result"}]
+            "action": "start"
         },
         {
             "name": "p@project.runner.start",
