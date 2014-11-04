@@ -196,6 +196,9 @@ _cat.core = function () {
             // Test Manager Init
             _cat.core.TestManager.init();
             
+            // set scrap data info
+            _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());
+            
             // display the ui, if you didn't already
             if (_config.isUI()) {
                 _cat.core.ui.enable();
@@ -417,6 +420,37 @@ _cat.core = function () {
                 key += "$$cat";
             }
             return _vars[key];
+        },
+        
+        getScraps: function() {
+            
+            var key, item, arr=[];
+            for (key in _vars) {
+                item = _vars[key];
+                if (item && "scrap" in item) {
+                    arr.push(item.scrap);
+                }
+            }
+            
+            return arr;  
+        },
+        
+        getSummaryInfo: function() {
+          
+            var scraps = _cat.core.getScraps(),
+                info = {assert: {total: 0}},
+                assertinfo = info.assert;
+            
+            if (scraps) {
+                scraps.forEach(function(scrap) {
+                    var assert;
+                    if (scrap) {
+                        assertinfo.total += ( ("assert" in scrap && scrap.assert.length > 0) ? scrap.assert.length : 0) ;
+                    }
+                });
+            }
+            
+            return info;
         },
 
         varSearch: function (key) {
