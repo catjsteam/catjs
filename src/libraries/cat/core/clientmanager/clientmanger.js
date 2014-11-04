@@ -11,6 +11,7 @@ _cat.core.clientmanager = function () {
         startInterval,
         getScrapInterval,
         setupInterval,
+        intervalObj,
         endTest,
         testQueue = {},
         currentState = { index: 0 };
@@ -41,19 +42,26 @@ _cat.core.clientmanager = function () {
                 "interval": undefined,
                 "counter": 0,
                 "signScrapId": scrapId
-
-
             };
+        } else {
+            runStatus.intervalObj.signScrapId = scrapId;
         }
+
+        if (intervalObj) {
+            clearInterval(intervalObj.interval);
+        }
+        
         return runStatus.intervalObj;
     };
 
 
     setupInterval = function (config, scrap) {
         
-        var tests,
-            intervalObj = getScrapInterval(scrap),
+        var tests,            
             testManager;
+        
+        intervalObj = getScrapInterval(scrap);
+        
         tests = config.getTests();
         if (tests) {
             testManager = (tests[tests.length - 1].name || "NA");
@@ -62,9 +70,20 @@ _cat.core.clientmanager = function () {
 
         intervalObj.interval = setInterval(function () {
 
+            var msg = ["No test activity, retry: "];
             if (intervalObj.counter < 3) {
                 intervalObj.counter++;
-                console.log("[CatJS manager] No activity detected, retry,  ", intervalObj.counter);
+
+                msg.push(intervalObj.counter);
+                
+                _cat.core.ui.setContent({
+                    header: "Test Status",
+                    desc: msg.join(""),
+                    tips: {},
+                    style: "color:gray"
+                });
+                
+                console.log("[CatJS manager] ", msg.join(""));
 
             } else {
                 var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
@@ -157,11 +176,7 @@ _cat.core.clientmanager = function () {
     };
 
     startInterval = function (catConfig, scrap) {
-        var lvar = (scrap && scrap.name ? scrap.name[0] : undefined),
-            rval = (tests && tests[0] ? tests[0].name : undefined);
-        if (lvar === rval) {
-            setupInterval(catConfig, scrap);
-        }
+        setupInterval(catConfig, scrap);
     };
 
     return {
