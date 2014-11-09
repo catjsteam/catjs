@@ -69,16 +69,16 @@ module.exports = function () {
              *  singleton - 1[default -1]
              *  $type   - js
              */
-            _Scrap.add({name: "screenshot",
-                single: false,
-                singleton: 1,
-                func: function (config) {
-                    var me = this;
-
-
-                    me.print("app.getScreenshot();");
-
-                }});
+//            _Scrap.add({name: "screenshot",
+//                single: false,
+//                singleton: 1,
+//                func: function (config) {
+//                    var me = this;
+//
+//
+//                    me.print("app.getScreenshot();");
+//
+//                }});
 
             /**
              * Annotation for javascript code

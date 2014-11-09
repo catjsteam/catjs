@@ -113,6 +113,26 @@ var webserver  = function() {
 
             });
 
+
+            _server.post('/screenshot', function(req, res){
+
+                debugger;
+                _fs.readFile(req.files.photo.path, function (err, data) {
+
+                    var scrapName = req.body.scrapName;
+                    var deviceName = req.body.deviceName;
+
+                    var finalScreenshotName = scrapName + "_" + deviceName +".png";
+
+                    _fs.writeFile(finalScreenshotName, data, function (err) {
+                        console.log("It's saved with read");
+                        res.redirect("back");
+                    });
+                });
+
+            });
+
+
             _server.listen(port, function() {
                 _log.info(_props.get("cat.ext.webserver.start").format("[webserver ext]"));
                 if (callback) {
