@@ -123,9 +123,30 @@ function readTestConfig(scenario) {
     return testConfigMap;
 }
 
-function ReportCreator(filename, id, scenario) {
+/**
+ * Report Entity
+ * 
+ * @param filename The test's file name
+ * @param id The id of the test
+ * @param scenario The current scenario
+ * @param status The status of the test ["Start" | "End"]
+ * @constructor
+ */
+function ReportCreator(filename, id, scenario, status) {
+    
+    this.init(filename, id, scenario, status);
+}
+
+
+
+ReportCreator.prototype.init = function (filename, id, scenario, status) {
+    
+    this._id = id;
+    this._status = 0;
     this._fileName = filename;
-    this._testConfigMap = readTestConfig(scenario);
+    if (status && status !== "Start" && status != "End") {
+        this._testConfigMap = readTestConfig(scenario);
+    }
     this._hasFailed = false;
     this._testsuite = _jmr.create({
         type: "model.testsuite",
@@ -133,10 +154,28 @@ function ReportCreator(filename, id, scenario) {
             name: id
         }
     });
-}
+};
+
+ReportCreator.prototype.reset = function () {
+    
+    this._status = 0;
+    this._hasFailed = false;
+    this._testsuite = _jmr.create({
+        type: "model.testsuite",
+        data: {
+            name: this._id
+        }
+    });
+};
+
+ReportCreator.prototype.validate = function () {
+    
+    
+};
+
 ReportCreator.prototype.getTestConfigMap = function () {
     return this._testConfigMap;
-}
+};
 
 ReportCreator.prototype.addTestCase = function (config) {
     var failure,
@@ -203,13 +242,13 @@ ReportCreator.prototype.addTestCase = function (config) {
     // set console color
     _colors.setTheme({'current': _colorsArray[getColorIndex(id)]});
 
-    if (isManagerRunMode()) {
+    if (this._testConfigMap && isManagerRunMode()) {
         if (this._testConfigMap[testName]) {
             this._testConfigMap[testName].wasRun = true;
         }
     }
 
-    if (status !== 'End') {
+    if (status !== 'End' && status !== 'Start') {
 
         if (isjunit) {
             _writeTestCase();
@@ -226,21 +265,47 @@ ReportCreator.prototype.addTestCase = function (config) {
 
     } else {
 
-        if (error) {
-            _colors.setTheme({'current': "red"});
-            result = "Test end with error: " + error;
-            result = "======== Test End - " + result + " ========";
+        if (status === 'End') {
+            if (error) {
+                _colors.setTheme({'current': "red"});
+                result = "Test end with error: " + error;
+                result = "======== Test End - " + result + " ========";
+    
+            } else {
+                result = this._hasFailed ? "failed" : "succeeded";
+                result = "======== Test End - " + result + " ========";
+            }
+            
+            // print to console the test info
+            _printTest2Console(result);            
+    
+            // delete the color on test end
+            deleteColor(id);
 
-        } else {
-            result = this._hasFailed ? "failed" : "succeeded";
-            result = "======== Test End - " + result + " ========";
+            this._status = 0;
+            
+        } else if (status === 'Start') {
+            
+            if (this._status === 1) {
+               // todo call end.. fail the test!!!
+
+                result = "======== Test End - Aborted ========";
+                // print to console the test info
+                _printTest2Console(result);
+
+                // delete the color on test end
+                deleteColor(id);               
+            }
+
+            this.reset();
+            this._status = 1;
+            result = "======== Test Start  ========";
+
+            // print to console the test info
+            _printTest2Console(result);
+
         }
 
-        // print to console the test info
-        _printTest2Console(result);
-
-        // delete the color on test end
-        deleteColor(id);
     }
 };
 
@@ -267,7 +332,10 @@ exports.result = function (req, res) {
         hasPhantom = query.hasPhantom,
         id = query.id,
         file, checkIfAliveTimeout = (_testconfig["test-failure-timeout"] || 30) * 1000,
-        reportsArr = [];
+        reportsArr = [],
+        reportKey,
+        testConfigMap,
+        key;
 
     if (reports) {
         reportsArr = reports.split(",");
@@ -281,6 +349,8 @@ exports.result = function (req, res) {
     }
 
     clearTimeout(_checkIfAlive);
+    
+    // TODO Session validation for end the test and start a new one...
     if (status !== 'End') {
 
         _checkIfAlive = setTimeout(function () {
@@ -292,10 +362,10 @@ exports.result = function (req, res) {
                 _log.info("[CAT] Tests stopped reporting, probably a network problem, failing the rest of the tests");
             }
 
-            for (var reportKey in _reportCreator) {
-                var testConfigMap = _reportCreator[reportKey].getTestConfigMap();
+            for (reportKey in _reportCreator) {
+                testConfigMap = _reportCreator[reportKey].getTestConfigMap();
 
-                for (var key in testConfigMap) {
+                for (key in testConfigMap) {
                     _log.info(testConfigMap[key]);
                     if (!testConfigMap[key].wasRun) {
                         _reportCreator[reportKey].addTestCase({testName: testConfigMap[key].name, status: 'failure', phantomStatus: '', message: 'failed due to network issue', reports: reports, error: error, id: id});
@@ -304,8 +374,8 @@ exports.result = function (req, res) {
             }
 
         }, checkIfAliveTimeout);
-    }
-
+    } 
+    
     _log.info("requesting " + testName + message + status);
     res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
     res.send({"testName": testName, "message": message, "status": status});
@@ -315,7 +385,7 @@ exports.result = function (req, res) {
     file = "./" + reportType + "-" + phantomStatus + id + ".xml";
 
     if (!_reportCreator[id]) {
-        _reportCreator[id] = new ReportCreator(file, reportType + id, scenario);
+        _reportCreator[id] = new ReportCreator(file, reportType + id, scenario, status);
     }
 
     _reportCreator[id].addTestCase({testName: testName, status: status, phantomStatus: phantomStatus, message: message, reports: reports, error: error, id: id});

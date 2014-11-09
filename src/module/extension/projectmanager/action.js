@@ -1,257 +1,308 @@
-
 // read configuration
 var path = require("path"),
     configPath,
     data,
     _fs = require("fs"),
-    project, sourceFolder;
+    project, sourceFolder,
+    _utils = catrequire("cat.utils"),
+    _jsonlint = require("json-lint"),
+    _catcli,
+    TestConfig = require("./TestConfig.js"),
 
-var readProject  = function() {
-    var globalTests,
-        scrapsObj,
-        mainProject,
-        scrapsOrder,
-        emptyQueue,
-        getScrap,
+    readProject = function () {
+        var globalTests,
+            scrapsObj,
+            mainProject,
+            emptyQueue,
+            getScrap,
+            devicesTests;
 
-        devicesTests;
+        devicesTests = {};
+        globalTests = [];
+        scrapsObj = {};
 
-    devicesTests = {};
+        mainProject = (function () {
 
-    globalTests = [];
-    scrapsObj = {};
+            var result, jsonlint;
 
-    mainProject = (function() {
+            _catcli = (catrequire ? catrequire("cat.cli") : null);
+            if (_catcli) {
 
-        _catcli = (catrequire ? catrequire("cat.cli") : null);
-        if (_catcli) {
-
-            project = _catcli.getProject();
-            if (project) {
-                try {
-                    sourceFolder = project.info.source;
-                    configPath = path.join(sourceFolder, "config/cat.json");
-                } catch (e) {
+                project = _catcli.getProject();
+                if (project) {
+                    try {
+                        sourceFolder = project.info.source;
+                        configPath = path.join(sourceFolder, "config/cat.json");
+                    } catch (e) {
 //                    _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT test project is available.", e);
-                }
-            } else {
+                    }
+                } else {
 //                _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT project is available.");
+                }
             }
-        }
 
-        data = _fs.readFileSync(configPath, 'utf8');
-        _testconfig = JSON.parse(data);
+            data = _fs.readFileSync(configPath, 'utf8');
 
-        return _testconfig;
-    }());
+            try {
+                jsonlint = _jsonlint(data, {});
+                if (jsonlint.error) {
+                    _utils.error("error", ["CAT project manager] cat.json load with errors: \n ", jsonlint.error,
+                        " \n at line: ", jsonlint.line,
+                        " \n character: ", jsonlint.character,
+                        " \n "].join(""));
+                }
+
+                result = JSON.parse(data);
+
+            } catch (e) {
+                _utils.error("[CAT Core] cat.json parse error: ", e);
+            }
+
+            return result;
+        }());
 
 
-    scrapsOrder = (function() {
+        (function () {
 
-        var getScenarioTests =function(testsList, globalDelay, scenarioName) {
-            var innerConfigMap = [];
+            var getScenarioTests = function (testsList, globalDelay, scenarioName) {
 
-            if (testsList.tests) {
-                for (var i = 0; i < testsList.tests.length; i++) {
-                    if (!(testsList.tests[i].disable)) {
-                        if (testsList.tests[i].tests) {
-                            var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
+                    var innerConfigMap = [],
+                        j = 0, i = 0, tempArr,
+                        testsobj = (testsList ? testsList.tests : undefined),
+                        size = (testsobj ? testsobj.length : 0),
+                        repeatFlow;
 
-                            for (var j = 0; j < repeatFlow; j++) {
-                                var tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay, scenarioName);
-                                innerConfigMap = innerConfigMap.concat(tempArr);
+                    if (testsList.tests) {
+                        for (i = 0; i < size; i++) {
+                            if (!(testsobj[i].disable)) {
+                                if (testsobj[i].tests) {
+                                    repeatFlow = testsList.tests[i].repeat ? testsobj[i].repeat : 1;
+
+                                    for (j = 0; j < repeatFlow; j++) {
+                                        tempArr = getScenarioTests(testsobj[i], testsobj[i].delay, scenarioName);
+                                        innerConfigMap = innerConfigMap.concat(tempArr);
+                                    }
+
+                                } else {
+
+                                    // set the global delay
+                                    if (!testsobj[i].delay && globalDelay) {
+                                        testsobj[i].delay = globalDelay;
+                                    }
+                                    testsobj[i].wasRun = false;
+                                    testsobj[i].scenario = {name: (scenarioName || null)};
+
+
+                                    innerConfigMap.push(testsobj[i]);
+
+                                }
                             }
-
-                        } else {
-
-                            // set the global delay
-                            if (!testsList.tests[i].delay && globalDelay) {
-                                testsList.tests[i].delay = globalDelay;
-                            }
-                            testsList.tests[i].wasRun = false;
-                            testsList.tests[i].scenario = {name: (scenarioName || null)};
-
-
-                            innerConfigMap.push(testsList.tests[i]);
-
                         }
+                    }
+
+                    return innerConfigMap;
+
+                },
+                testsScenarios,
+                scenariosList,
+                currentTestName,
+                indexTest = 0,
+                currTest,
+                repeatScenario,
+                scenario,
+                j, temp, indexGlobalTests,
+                globaltestsize,
+                testsscenariossize;
+
+            testsScenarios = mainProject.tests;
+            scenariosList = mainProject.scenarios;
+
+            testsscenariossize = testsScenarios.length;
+            for (indexTest = 0; indexTest < testsscenariossize; indexTest++) {
+                currTest = null;
+                repeatScenario = null;
+                scenario = null;
+
+                currTest = testsScenarios[indexTest];
+
+                if (!currTest || !("name" in currTest)) {
+//                _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                    continue;
+                }
+
+                currentTestName = currTest.name;
+                scenario = scenariosList[currentTestName];
+
+                if (scenario) {
+                    repeatScenario = (scenario.repeat ? scenario.repeat : 1);
+                    for (j = 0; j < repeatScenario; j++) {
+                        temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
+                        globalTests = globalTests.concat(temp);
+                    }
+                } else {
+//                _log.warn("[CAT] No valid scenario '", currTest.name, "' was found, double check your cat.json project");
+                }
+            }
+
+            //add attributes
+            globaltestsize = globalTests.length;
+            for (indexGlobalTests = 0; indexGlobalTests < globaltestsize; indexGlobalTests++) {
+                globalTests[indexGlobalTests].run = false;
+                globalTests[indexGlobalTests].index = indexGlobalTests;
+                globalTests[indexGlobalTests].signed = false;
+
+                scrapsObj[globalTests[indexGlobalTests].name] = globalTests[indexGlobalTests];
+            }
+        })();
+
+        emptyQueue = function (testId) {
+
+            var testsConfig = devicesTests[testId],
+                scraplist = [];
+
+            /**
+             * Validate if the queue contains any scrap that are ready and in their turn
+             *
+             * @private
+             */
+            function _getReadyScraps() {
+
+                var idx = testsConfig.getIndex();
+                if (testsConfig.isInQueue(idx)) {
+
+                    scraplist.push(testsConfig.getTest(idx));
+                    testsConfig.remove(idx);
+                    testsConfig.next();
+
+                    _getReadyScraps();
+                    
+                } 
+            }
+
+            _getReadyScraps();
+
+            return scraplist;
+
+        };
+
+
+        getScrap = function (scrapName, testId) {
+            var indexTests,
+                tests = devicesTests[testId].tests,
+                tempScrap,
+                indexTests = 0, size;
+
+            if (tests) {
+                size = tests.length;
+                for (indexTests = 0; indexTests < size; indexTests++) {
+                    tempScrap = tests[indexTests];
+                    if (tempScrap.name == scrapName && !(tempScrap.run)) {
+                        return tempScrap;
                     }
                 }
             }
 
-            return innerConfigMap;
+            return null;
+        };
 
-        },
-        testsScenarios,
-        scenariosList,
-        currentTestName,
-        indexTest;
+        return {
 
-        testsScenarios = mainProject.tests;
-        scenariosList = mainProject.scenarios;
+            getProject: function () {
+                return mainProject;
+            },
 
-        for (indexTest in testsScenarios) {
-            var currTest,
-                repeatScenario,
-                scenario;
+            getScrapsOrder: function () {
+                return globalTests;
+            },
 
-            currTest = testsScenarios[indexTest];
+            checkScrap: function (req, res) {
+                var scrapName,
+                    scrap,
+                    result,
+                    testId,
+                    currTest,
+                    currReadyIndex,
+                    testsConfig,
+                    cloneGlobalTests,
+                    isReady = false,
+                    readyScrapList = [];
 
-            if (!currTest || !("name" in currTest)) {
-//                _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
-                continue;
-            }
+                testId = req.query.testId;
+                if (testId) {
+                    
+                    testsConfig = devicesTests[testId];
+                    
+                   
+                    if (!testsConfig ||
+                        (testsConfig && globalTests.length === testsConfig.getIndex())) {
+                        
+                        cloneGlobalTests = JSON.parse(JSON.stringify(globalTests));
+                        devicesTests[testId] = new TestConfig({
+                            "tests": cloneGlobalTests
+                        });
+                    }
 
-            currentTestName = currTest.name;
-            scenario = scenariosList[currentTestName];
+                    testsConfig = devicesTests[testId];
+                    
+                    // test data for the test id
+                    currReadyIndex = testsConfig.getIndex();
 
-            if (scenario) {
-                repeatScenario = (scenario.repeat ? scenario.repeat : 1);
-                for (var j = 0; j < repeatScenario; j++) {
-                    var temp;
-                    temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
-                    globalTests = globalTests.concat(temp);
-                }
-            } else {
-//                _log.warn("[CAT] No valid scenario '", currTest.name, "' was found, double check your cat.json project");
-            }
-        }
+                    if (req.query && req.query.scrap && scrapsObj[req.query.scrap]) {
 
-        //add attributes
-        for (var indexGlobalTests in globalTests) {
-            globalTests[indexGlobalTests].run = false;
-            globalTests[indexGlobalTests].index = indexGlobalTests;
-            globalTests[indexGlobalTests].signed = false;
+                        scrapName = req.query.scrap;
+                        scrap = getScrap(scrapName, testId);
 
-            scrapsObj[globalTests[indexGlobalTests].name] = globalTests[indexGlobalTests];
-        }
-    })();
+                        if (!scrap) {
+                            console.warn("[CAT] No valid scrap was found");
+                            return undefined;
+                        } else {
+                            if (scrap.index === undefined || scrap.index === null) {
+                                console.warn("[CAT] No valid scrap index was found");
+                                return undefined;
+                            }
+                        }                       
 
+                        currTest = testsConfig.tests;
+                        currTest[scrap.index].signed = true;
 
-    emptyQueue = function(testId) {
+                        // if this is the next scrap
+                        if (scrap.index <= currReadyIndex) {
+                            
+                            currTest[scrap.index].run = true;
+                            isReady = true;
 
-        var tempQueue = [],
-            testsConfig = devicesTests[testId],
-            tests = testsConfig.tests,
-            resQueue = testsConfig.resQueue,
-            indexRes,
-            result,
-            scrapElement,
-            scrapReadyIndex = testsConfig.scrapReadyIndex;
+                            readyScrapList.push(scrap);
+                            testsConfig.next();
+                            
+                            readyScrapList = readyScrapList.concat(emptyQueue(testId));
 
-        for (indexRes in resQueue) {
-            scrapElement = resQueue[indexRes];
-            if (scrapElement.scrap.index <= scrapReadyIndex) {
+                        } else {
 
-                tests[scrapElement.scrap.index].run = true;
+                            // set the scrap index into queue
+                            testsConfig.resQueue[scrap.index] = 1;
 
-                result = {
-                    "readyScrap" : tests[scrapReadyIndex],
-                    "scrapInfo" : tests[scrapElement.scrap.index]
-                };
+                        }
 
-                scrapElement.response.send(result);
-                scrapReadyIndex++;
-                devicesTests[testId].scrapReadyIndex = scrapReadyIndex;
+                        // send back response
+                        result = {
+                            "ready": isReady,
+                            "readyScraps": readyScrapList,
+                            "scrapInfo": currTest[scrap.index],
+                            status: 200
+                        };
 
-            } else {
-                tempQueue.push(scrapElement);
-            }
-
-        }
-        devicesTests[testId].resQueue = tempQueue;
-
-    }
-
-
-    getScrap = function(scrapName, testId) {
-        var indexTests,
-            tests = devicesTests[testId].tests,
-            tempScrap;
-
-        for (indexTests in tests) {
-            tempScrap = tests[indexTests];
-            if (tempScrap.name == scrapName && !(tempScrap.run)) {
-                return tempScrap;
-            }
-        }
-    }
+                        res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+                        res.send(result);
 
 
-    return {
-
-        getProject : function() {
-            return mainProject;
-        },
-
-        getScrapsOrder : function () {
-            return globalTests;
-        },
-
-        checkScrap : function(req, res) {
-            var scrapName,
-                scrap,
-                result,
-                testId,
-                currTest,
-                currReadyIndex,
-                testsConfig,
-                cloneGlobalTests;
-
-            testId = req.query.testId;
-            if (!devicesTests[testId] ||
-                (devicesTests[testId] && globalTests.length === devicesTests[testId].scrapReadyIndex)) {
-                cloneGlobalTests = JSON.parse(JSON.stringify(globalTests));
-                devicesTests[testId] = {
-                    "scrapReadyIndex" : 0,
-                    "tests" : cloneGlobalTests,
-                    "resQueue" : []
-                }
-            }
-
-            testsConfig = devicesTests[testId];
-            if (req.query && req.query.scrap && scrapsObj[req.query.scrap]) {
-
-                scrapName  = req.query.scrap;
-                scrap = getScrap(scrapName, testId);
-
-                // test data for the test id
-                currReadyIndex = testsConfig.scrapReadyIndex;
-
-                currTest = testsConfig.tests;
-                currTest[scrap.index].signed = true;
-
-                // if this is the next scrap
-                if (scrap.index <= currReadyIndex) {
-                    currTest[scrap.index].run = true;
-
-                    result = {
-                        "readyScrap" : currTest[currReadyIndex],
-                        "scrapInfo" : currTest[scrap.index]
-                    };
-
-                    res.send(result);
-                    devicesTests[testId].scrapReadyIndex++;
-
-                    emptyQueue(testId);
-
-                } else {
-
-                    testsConfig.resQueue.push({
-                        "scrap" : currTest[scrap.index],
-                        "request" : req,
-                        "response" : res
-                    });
+                    }
                 }
 
             }
 
 
-        }
+        };
 
-
-    };
-
-}();
+    }();
 
 module.exports = readProject;

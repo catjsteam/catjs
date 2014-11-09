@@ -28,12 +28,13 @@ var _global = catrequire("cat.global"),
             idx = 0, size, project, pluginsPath = [],
             dependencies = [],
             librariesConfig = [],
-            librariesDefault = ["chai", "jspath", "tmr", "cat"],
+            librariesDefault = ["underscore", "js.utils", "tmr", "jspath", "chai",  "cat"],
             libraryBuildConfig, dependenciesInfo,
             appTargetPath, appPath,
             scrapfilter, projectcopy,
             scrapscan, customPlugins,
             cattarget, targetfolder,
+            manifest,
             libIdx= 0,
             rmIdx=-1;
 
@@ -205,11 +206,11 @@ var _global = catrequire("cat.global"),
                         }
                     }
 
+                    librariesConfig.unshift("cat.css");
                     librariesConfig.push("cat.src.js");
-                    librariesConfig.push("cat.css");
 
-                    project.setInfo("dependencies", librariesConfig);
-
+                    project.setInfo("dependencies", librariesConfig);                                                  
+                    
                     libraryBuildConfig = {
                         "name": "p@libraries.build",
                         "type": "libraries",

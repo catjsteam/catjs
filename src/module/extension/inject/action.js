@@ -39,6 +39,7 @@ module.exports = _basePlugin.ext(function () {
                     projectTarget = _me._project.getInfo("target");
 
                 scraps.forEach(function (scrap) {
+                    
                     var out,
                         runat,
                         managerout,
@@ -188,7 +189,7 @@ module.exports = _basePlugin.ext(function () {
             targetfolder = _path.dirname(targetfile);
             if (targetfolder) {
                 if (!_fs.existsSync(targetfolder)) {
-                    _utils.mkdirSync(targetfolder);
+                    _utils.mkdirSync(targetfolder, {mode: 0777});
                 }
             }
 //            if (_fs.existsSync(targetfile)) {
@@ -273,7 +274,7 @@ module.exports = _basePlugin.ext(function () {
                         }
 
                         scrapCtxArguments = scraplcl.generateCtxArguments();
-                        param1 = [["{ scrap:", JSON.stringify(scraplcl.serialize()), "}"].join("")];
+                        param1 = [JSON.stringify({ "pkgName": scraplcl.getPkgName()})];
 
                         // add context arguments if exists
                         if (scrapCtxArguments && scrapCtxArguments.length > 0) {
@@ -297,6 +298,7 @@ module.exports = _basePlugin.ext(function () {
                                 }
                             );
                             content = (_utils.prepareCode(content) || "");
+
                         } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
                             // Embed Javascript block for HTML file
                             content = _tplutils.template({
@@ -308,7 +310,7 @@ module.exports = _basePlugin.ext(function () {
                         } else if (engine === _scrapEnum.engines.HTML_IMPORT_JS) {
 
                             content = scraplcl.generate();
-                            content = (_utils.prepareCode(content) || "");
+                            //content = (_utils.prepareCode(content) || "");
 
                         } else if (engine === _scrapEnum.engines.JS_EMBED_INSERT) {
                             content = scraplcl.generate();
@@ -522,7 +524,14 @@ module.exports = _basePlugin.ext(function () {
                             _apply(filesArr[counter], callback);
 
                             // update the scrap data w/o running scrap apply
-                            _Scrap.apply({scraps: scraps, apply: false});
+                            _Scrap.apply({
+                                scraps: scraps, 
+                                apply: false,
+                                callback: function(scraps) {
+                                  
+                                }
+                            });
+                            
                             if (counter === filesArr.length) {
                                 if (callback) {
                                     callback.call(this);
@@ -531,7 +540,6 @@ module.exports = _basePlugin.ext(function () {
 
                         });
                     } else {
-                        //  _Scrap.apply({scraps: scraps});
                         emitter.emit("job.done", {status: "done"});
                     }
                 }

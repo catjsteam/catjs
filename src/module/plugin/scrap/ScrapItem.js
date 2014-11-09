@@ -1,4 +1,3 @@
-
 var _utils = catrequire("cat.utils"),
     _props = catrequire("cat.props"),
     _typedas = require("typedas"),
@@ -39,7 +38,7 @@ function _validateConfigEntry(key, config) {
     if (key === "$type") {
         value = config[key];
         if (value) {
-            _scrapEnum.scrapEnum.fileTypes.forEach(function(type){
+            _scrapEnum.scrapEnum.fileTypes.forEach(function (type) {
                 if (type === (_typedas.isArray(value) ? value[0] : value)) {
                     // supported type
                     validation[key] = true;
@@ -110,18 +109,18 @@ _clazz = function (config) {
     function _init(name, defaultValue) {
         var items,
             value,
-            values=[];
+            values = [];
 
         function _defaultvalues(validateItems) {
 
-            var idx= 0, size=validateItems.length,
+            var idx = 0, size = validateItems.length,
                 item;
 
             if (!defaultValue || (defaultValue && _typedas.isArray(defaultValue) && defaultValue.length === 0)) {
                 return;
             }
 
-            for (; idx<size; idx++) {
+            for (; idx < size; idx++) {
                 item = validateItems[idx];
                 if (_typedas.isArray(defaultValue)) {
                     if (_jsutils.Object.contains(defaultValue, item)) {
@@ -132,7 +131,8 @@ _clazz = function (config) {
                         return undefined;
                     }
                 }
-            };
+            }
+            ;
 
             if (_typedas.isArray(defaultValue)) {
                 if (defaultValue.length > 0) {
@@ -191,7 +191,7 @@ _clazz = function (config) {
 
     function _nameValidation(config, value) {
         if (!("name" in config && config.name && config.name[0])) {
-           config.name = value;
+            config.name = value;
         }
     }
 
@@ -246,7 +246,7 @@ _clazz = function (config) {
                     me.config.singleton[key] = -1;
 
                     // init the attribute functionality
-                    initFunc =  me[key + "Init"];
+                    initFunc = me[key + "Init"];
                     if (initFunc) {
                         initFunc.call(me);
                     }
@@ -286,7 +286,7 @@ _clazz.prototype.addConfig = function (arr, key) {
 
     if (arr && _typedas.isArray(arr)) {
 
-        arr.forEach(function(item) {
+        arr.forEach(function (item) {
 
             if (item && item.key && (typeof(item.value) !== 'undefined')) {
 
@@ -313,6 +313,10 @@ _clazz.prototype.setSingleton = function (key, bol) {
 
 _clazz.prototype.getRunat = function (key) {
     return this.config["run@"];
+};
+
+_clazz.prototype.getPkgName = function (key) {
+    return this.config["pkgName"];
 };
 
 _clazz.prototype.getSingleton = function (key) {
@@ -388,7 +392,7 @@ _clazz.prototype.setCtxArguments = function (arr) {
         if (_typedas.isArray(arr)) {
             this.config.arguments = [];
             this.config.arguments = this.config.arguments.concat(arr);
-            this.set("arguments",  _cleanObjectNoise(this.config.arguments));
+            this.set("arguments", _cleanObjectNoise(this.config.arguments));
 
         } else {
             _log.warning(_props.get("cat.arguments.type").format("[scrap class (addCtxArguments)]", "array"));
@@ -429,7 +433,7 @@ _clazz.prototype.apply = function () {
                 if (singleton < 2) {
                     func.call(me, {});
                 }
-                if (singleton === 1){
+                if (singleton === 1) {
                     me.setSingleton(prop, singleton++);
                 }
 
@@ -459,14 +463,14 @@ _clazz.prototype.update = function (key, config) {
 
 };
 
-_clazz.prototype.getContextItem = function(key) {
+_clazz.prototype.getContextItem = function (key) {
     return this.$$context.get(key);
 };
 
-_clazz.prototype.buildContext = function(scrapNames) {
+_clazz.prototype.buildContext = function (scrapNames) {
     var me = this;
     this.$$context.destroy();
-    scrapNames.forEach(function(key){
+    scrapNames.forEach(function (key) {
         var value = me.get(key);
         if (value !== undefined) {
             me.$$context.set(key, me.get(key));
@@ -474,26 +478,11 @@ _clazz.prototype.buildContext = function(scrapNames) {
     });
 };
 
-
-_clazz.prototype.numCommandsInc = function() {
-    if (this.config.numCommands) {
-        this.config.numCommands++;
-    } else {
-        this.config.numCommands = 1;
-    }
-};
-
-_clazz.prototype.numCommandsDestroy = function() {
-    if (this.config.numCommands) {
-        delete this.config.numCommands;
-    }
-};
-
-_clazz.prototype.extractAnnotations = function(scrapsRows) {
+_clazz.prototype.extractAnnotations = function (scrapsRows) {
     var map = {};
 
     // extract nested annotations
-    scrapsRows.forEach(function(item){
+    scrapsRows.forEach(function (item) {
         var scrapItem,
             scrapItemName, scrapItemValue;
 
@@ -565,8 +554,8 @@ _clazz.prototype.$setReplaceData = function (config) {
 
                 if (replaceRows.length > 0) {
                     value = {
-                        lines:[],
-                        $linesmap:{},
+                        lines: [],
+                        $linesmap: {},
                         rows: replaceRows,
                         action: (action || undefined),
                         $ready: 0,
@@ -580,8 +569,8 @@ _clazz.prototype.$setReplaceData = function (config) {
                         apply: function (line) {
                             var me = this,
                                 currentLine,
-                                counter= 0,
-                                delta, idx=0, test;
+                                counter = 0,
+                                delta, idx = 0, test;
 
                             if (action && line) {
 
@@ -590,19 +579,19 @@ _clazz.prototype.$setReplaceData = function (config) {
                                     this.lines.push(line.line);
                                     //this.$linesmap[line.row] = this.lines[this.lines.length-1];
 
-                                    if (this.rows.indexOf(line.row) === this.rows.length-1) {
+                                    if (this.rows.indexOf(line.row) === this.rows.length - 1) {
                                         // if this is the last cell...
-                                        this.newlines =  action.call({}, this.lines, line.mark);
+                                        this.newlines = action.call({}, this.lines, line.mark);
                                         if (this.newlines && _typedas.isArray(this.newlines)) {
 
-                                            this.newlines.forEach(function(newline) {
+                                            this.newlines.forEach(function (newline) {
                                                 me.$linesmap[me.rows[counter]] = newline;
                                                 counter++;
                                             });
 
-                                            delta =  (this.rows.length - this.newlines.length);
+                                            delta = (this.rows.length - this.newlines.length);
                                             if (delta !== 0) {
-                                                for (idx=counter; idx<delta; idx++) {
+                                                for (idx = counter; idx < delta; idx++) {
                                                     me.$linesmap[me.rows[idx]] = "\r\n";
                                                 }
                                             }
@@ -618,11 +607,11 @@ _clazz.prototype.$setReplaceData = function (config) {
                                 // after done processing the lines, replace the involved lines.
                                 if (this.$ready === 1) {
                                     // if we have processed all rows...
-                                    currentLine = line.row-1;
-                                    if ( (currentLine) === (line.lines.length)) {
+                                    currentLine = line.row - 1;
+                                    if ((currentLine) === (line.lines.length)) {
                                         test = this.$linesmap[currentLine];
                                         if (test || test === null) {
-                                            line.lines[currentLine-1] =  ( (test || "") + ( (test && test.indexOf("\n") === -1) ? "\n" : "") );
+                                            line.lines[currentLine - 1] = ( (test || "") + ( (test && test.indexOf("\n") === -1) ? "\n" : "") );
                                         }
                                     }
                                 }

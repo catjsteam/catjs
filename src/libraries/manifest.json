@@ -12,7 +12,7 @@
             "prod" :[
                 {
                     "name": "cat.js",
-                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js", "CatInit.js"],
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
                     "type": "js"
                 },
                 {
@@ -29,7 +29,7 @@
             "dev" :[
                 {
                     "name":"cat.js",
-                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js", "CatInit.js"],
+                    "src": ["Cat.js", "core/**/*.js", "plugins/**/*.js"],
                     "type": "js"
                 },
                 {
@@ -56,23 +56,46 @@
             "install" : "static"
         },
         {
+            "name": "underscore",
+            "address": "local",
+            "base": ".",
+            "prod" :["underscore-min.js", "underscore-min.map"],
+            "dev" :["underscore-min.js", "underscore-min.map"],
+            "exports": "_",
+            "install" : "static"
+        },
+        {
+            "name": "js.utils",
+            "address": "local",
+            "base": ".",
+            "prod" :["target/jsutils-min.js"],
+            "dev" :["target/jsutils-min.js"],
+            "install" : "static",
+            "deps": ["underscore"]
+        },
+        {
             "name": "tmr",
             "address": "local",
             "base": ".",
-            "prod" :["tmr.js"],
-            "dev" :["tmr.js"],
-            "install" : "static"
+            "prod" :["target/tmr-min.js"],
+            "dev" :["target/tmr-min.js"],
+            "install" : "static",
+            "deps": ["underscore", "jsutils"]
         },
         {
             "name": "chai",
             "prod" :["chai.js"],
             "dev" :["chai.js"],
+            "exports": "chai",
+            "globals": true,
             "install": "static"
         },
         {
             "name": "jspath",
-            "prod" :["jspath.js"],
-            "dev" :["jspath.js"],
+            "prod" :["lib/jspath.js"],
+            "dev" :["lib/jspath.js"],
+            "exports": "JSPath",
+            "globals": true,
             "install": "static"
         }
     ]

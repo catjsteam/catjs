@@ -1,0 +1,26 @@
+{
+  "name": "catjs",
+  "version": "0.0.1",
+  "homepage": "https://github.com/catjsteam/catjs",
+  "authors": [
+    "arik <lewin.arik@gmail.com>"
+  ],
+  "description": "catjs dependencies",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "build",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "chai": "~1.9.2",
+    "jspath": "~0.2.12",
+    "requirejs": "~2.1.15",
+    "underscore": "~1.7.0",
+    "tmr": "https://github.com/lastboy/test-unit-reporter.git",
+    "js.utils": "https://github.com/lastboy/js.utils.git"
+  }
+}

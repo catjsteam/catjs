@@ -32,7 +32,8 @@ _cat.utils.assert = function () {
                 return;
             }
 
-            var testdata;
+            var testdata,
+                total, failed, passed, tests;
 
             if (config.status && config.message && config.name && config.displayName) {
 
@@ -43,17 +44,21 @@ _cat.utils.assert = function () {
                     displayName: config.displayName,
                     status: config.status,
                     message: config.message,
-                    success: config.status,
+                    success: (("success" in config && config.success) ? true : false), 
                     reportFormats: config.send
 
                 });
 
                 if (config.ui) {
+                    total = _cat.core.TestManager.getTestCount();
+                    passed = _cat.core.TestManager.getTestSucceededCount();
+                    failed = total - passed;
+                    tests =  (_cat.core.TestManager.getSummaryInfo().assert.total || 0);
                     _cat.core.ui.setContent({
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: _cat.core.TestManager.getTestSucceededCount(),
+                        tips: {tests: tests ,passed: (!isNaN(passed) ? passed : 0), failed: (!isNaN(failed) ? failed : 0), total: (!isNaN(total) ? total: 0)},
                         elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
                     });
                 }

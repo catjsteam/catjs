@@ -30,7 +30,7 @@ Install CAT as NPM for development environment
 
 add a symbolic link:
 --------------------
-:/usr/bin$ sudo ln -s ~/dev/projects/lastboy/HPSoftware/CATCore/catcli.js ./catcli
+:/usr/bin$ sudo ln -s ~/dev/projects/lastboy/catjs/catcli.js ./catcli
 
 remove symbolic link:
 ---------------------

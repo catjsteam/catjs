@@ -17,7 +17,9 @@ module.exports = function () {
     var funcSnippetTpl = _tplutils.readTemplateFile("scrap/_func_snippet"),
         importJSTpl = _tplutils.readTemplateFile("scrap/_import_js"),
         requireJSTpl = _tplutils.readTemplateFile("scrap/_require_js"),
-        importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css");
+        requireGlobalsJSTpl = _tplutils.readTemplateFile("scrap/_require_globals_snippet"),
+        importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css"),
+        project = catrequire("cat.cli").getProject();
 
 
     function _isCatjs(lib) {
@@ -32,6 +34,65 @@ module.exports = function () {
         return false;
     }
 
+    // Build the library names according to the libraries manifest                           
+    function __updateLibs(deplibs) {
+        var result = [],
+            manifest = project.getManifest();
+        
+        function _Details(config) {
+
+            var me = this;
+
+            function _init(config, props) {
+
+                var lib = config.lib;
+                
+                me.name = config.name;
+                me.path = config.path;
+
+                props.forEach(function(item) {
+                    if (item in lib) {
+                        me[item] = lib[item];
+                    }
+                });
+            }
+            
+            _init(config, ["exports", "deps", "globals"]);
+            
+        }
+        
+        if (manifest) {
+            deplibs.forEach(function(item) {
+                var lib, names;
+                if (item) {
+                    lib = manifest.getLibrary(item);
+                    if (lib) {
+                        // get the actual file names
+                        names = lib.getFileNames();
+                        if (names && names.length > 0) {
+                            names.forEach(function(libpath) {
+                                if (libpath) {
+                                   result.push(new _Details({name: item, path: libpath, lib: lib})) ;
+                                }
+                            });
+                            
+
+                        } else {
+
+                            // push the library name as is, [.js] will be concatenated
+                            result.push(new _Details({name: item, path: item, lib: lib}));
+                        }
+
+                    } else {
+                        // push the library name as is, [.js] will be concatenated
+                        result.push(new _Details({name: item, path: item, lib: {}}));
+                    }
+                }
+            });
+        }
+        return result;
+    }
+    
     return {
 
         init: function (config) {
@@ -94,47 +155,44 @@ module.exports = function () {
 
                     var codeRows,
                         code,
-                        me = this;
+                        me = this,
+                        dm,
+                        scrap = me.config;
 
                     codeRows = this.get("code");
 
                     if (codeRows) {
                         codeRows = _utils.prepareCode(codeRows);
-                        code = codeRows.join("\n");
 
-                        if (code) {
 
-                            /*  TODO make code validation
-                             TODO Move that snippet to the end of the generated code (source project)
-                             validcode = _jshint(code, {
-                             "strict": false,
-                             "curly": true,
-                             "eqeqeq": true,
-                             "immed": false,
-                             "latedef": true,
-                             "newcap": false,
-                             "noarg": true,
-                             "sub": true,
-                             "undef": true,
-                             "boss": true,
-                             "eqnull": true,
-                             "node": true,
-                             "es5": false
-                             },
-                             { assert:true });*/
+                        dm = new _delayManagerUtils({
+                            scrap: me
+                        });
 
-                            //if (validcode) {
-                            me.print(_tplutils.template({
-                                content: funcSnippetTpl,
-                                data: {
-                                    comment: " Generated code according to the scrap comment (see @@code)",
-                                    code: code
-                                }
-                            }));
-                            //} else {
-                            //    console.log("The code is not valid: ", _jshint.errors);
-                            //}
+                        if (codeRows) {
+
+                            if (codeRows && codeRows.join) {
+
+                                dm.add({
+                                    rows: [_elutils.uicontent({ rows: codeRows, scrap: scrap})]
+
+                                }, function (row) {
+                                    return row;
+                                });
+                            }
+
+
+                            dm.add({
+                                rows: codeRows
+
+                            });
                         }
+
+                        dm.dispose();
+
+                      
+
+
                     }
                 }});
 
@@ -352,11 +410,12 @@ module.exports = function () {
                     codeRows = this.get("assert");
 
                     if (codeRows) {
-                        codeSnippet = codeRows[0];
+                        codeRows = _utils.prepareCode(codeRows);
+                        codeSnippet = codeRows[0];                       
 
                         if (codeSnippet) {
                             try {
-                                codeSnippet = _utils.prepareCode(codeSnippet);
+                                                               
                                 // try to understand the code
                                 codeSnippetObject = _uglifyutils.getCodeSnippet({code: codeSnippet});
 
@@ -364,6 +423,7 @@ module.exports = function () {
                             } catch (e) {
                                 // TODO use uglifyjs to see if there was any error in the code.
                                 // TODO throw a proper error
+                                console.log(e);
                             }
                         }
 
@@ -412,7 +472,7 @@ module.exports = function () {
                                 catjs: {
                                     exports: '_cat'
                                 },
-                                "catsrc": {
+                                "catsrcjs": {
                                     deps: [
                                         "cat"
                                     ]
@@ -421,8 +481,26 @@ module.exports = function () {
                             paths: {
 
                             }
-                        };
-
+                        }, globals = [];
+                    
+                    function _addGlobals(lib){
+                        
+                       var glob, exp;
+                       if (lib) {
+                           glob = ("globals" in lib ? lib.globals : false);
+                           exp = ("exports" in lib ? lib.exports : undefined);
+                           if (glob && exp) {
+                               globals.push(_tplutils.template({
+                                   content: requireGlobalsJSTpl,
+                                   data: {
+                                      handle: lib.name,
+                                      exports: exp
+                                   }
+                               }));
+                           }
+                       } 
+                    }
+                    
                     if (requirerows) {
                         if (!_typedas.isArray(requirerows)) {
                             requirerows = [requirerows];
@@ -431,7 +509,7 @@ module.exports = function () {
 
                             if (lib && _isCatjs(lib)) {
 
-                                libs = catrequire("cat.cli").getProject().getInfo("dependencies");
+                                libs = project.getInfo("dependencies");
                                 basedir = _path.dirname(lib) + "/";
 
                                 if (requirerows) {
@@ -440,27 +518,49 @@ module.exports = function () {
 
                                     if (code) {
 
+                                        // update the libs according to the manifest
+                                        libs = __updateLibs(libs);
+                                                                            
                                         libs.forEach(function (lib) {
                                             var fullpathlib,
-                                                key;
+                                                key, libpath = lib.path;
 
-                                            if (lib) {
-                                                lib = lib.split(".js").join("");
-                                                fullpathlib = basedir + lib;
-
-                                                if (_catlibtils.extExists(lib)) {
-                                                    if (lib.lastIndexOf(".css") !== -1) {
-                                                        requirecsslist.push(basedir + lib);
-                                                        return undefined;
-                                                    }
+                                            if (libpath) {
+                                                if (libpath.lastIndexOf(".map") !== -1) {
+                                                    return undefined;
                                                 }
 
-                                                key = lib.split(".").join("");
+                                                libpath = libpath.split(".js").join("");               
+                                                
+                                                fullpathlib = basedir + libpath;
+
+                                                if (_catlibtils.extExists(libpath)) {
+                                                    if (libpath.lastIndexOf(".css") !== -1) {
+                                                        requirecsslist.push(basedir + libpath);
+                                                        return undefined;
+                                                        
+                                                    } 
+                                                }
+
+                                                key = lib.name.split(".").join("");
                                                 config.paths[key] = fullpathlib;
+                                                if (lib.deps || lib.exports) {
+                                                    if (!config.shim[key]) {
+                                                        config.shim[key] = {};
+                                                    }      
+                                                    if (lib.deps) {
+                                                        config.shim[key].deps = lib.deps;
+                                                    }
+                                                    if (lib.exports) {
+                                                        config.shim[key].exports = lib.exports;
+                                                    }
+                                                    _addGlobals(lib);
+                                                }
                                                 requirelist.push(key);
                                             }
                                         });
 
+                                        
                                         // override configuration
                                         if (config.paths.chai) {
                                             config.shim.catjs.deps = ["chai"];
@@ -473,7 +573,8 @@ module.exports = function () {
                                                 config: JSON.stringify(config),
                                                 require: JSON.stringify(requirelist),
                                                 requirerefs: requirelist.join(",").split('"').join(""),
-                                                cssfiles: JSON.stringify(requirecsslist)
+                                                cssfiles: JSON.stringify(requirecsslist),
+                                                globals: (globals.length > 0 ? globals.join(" ") : "") 
                                             }
                                         }));
 
@@ -497,76 +598,108 @@ module.exports = function () {
                 single: false,
                 func: function (config) {
 
+                    var project = catrequire("cat.cli").getProject();                       
+                    
                     function _getType(value) {
 
-                        var values,
-                            type;
+                        var type = "js";
                         if (value) {
-                            values = value.split(".");
-                            type = values[values.length - 1];
+
+                            if (value.indexOf(".css") !== -1) {
+                                type = "css";
+                            } else if (value.indexOf(".map") !== -1) {
+                                type = "map";
+                            } else if (value.indexOf(".js") !== -1) {
+                                type = "js";
+                            } else {
+                                value += "." + type;
+                            }
                         }
 
-                        return type;
+                        return {type: type, value: value};
+                    }
+
+                    function generateLibs(value) {
+
+                        var libs=[], deplibs=[], basedir,
+                            libcounter = 0,
+                            libsrcs = [];
+
+                        if (_isCatjs(value)) {
+                           
+                                                       
+                            // handle cat library
+                            deplibs = project.getInfo("dependencies");
+
+                            // update the libs according to the manifest
+                            libs = __updateLibs(deplibs);
+
+                            libs.forEach(function (lib) {
+                                if (lib.path === "cat") {
+                                    libs.splice(libcounter, 1);
+                                }                                
+                                libcounter++;
+                            });
+
+                            basedir = _path.dirname(value) + "/";
+
+                           
+                            libs.forEach(function (lib) {
+                                if (lib.path.indexOf("cat.src") === -1) {
+                                    libsrcs.push([basedir, lib.path].join(""));
+                                }
+                            });
+                            libsrcs.push(value);
+                            libsrcs.push([basedir, "cat.src.js"].join(""));
+
+                        } else {
+                            libsrcs.push(value);
+                        }
+                        
+                        return libsrcs;
                     }
 
                     function _printByType(type, value) {
 
                         var contentByType,
-                            libs, basedir, args,
                             contents = {
                                 "js": importJSTpl,
                                 "css": importCSSTpl
-                            }, catlibidx = -1, libcounter = 0;
+                            };
 
                         if (type) {
                             contentByType = contents[type];
                         }
 
-                        if (contentByType && value) {
 
-                            if (_isCatjs(value)) {
-                                // handle cat library
-                                libs = catrequire("cat.cli").getProject().getInfo("dependencies");
-
-                                libs.forEach(function (lib) {
-                                    if (lib === "cat") {
-                                        catlibidx = libcounter;
-                                    }
-                                    libcounter++;
-                                });
-                                if (catlibidx !== -1) {
-                                    libs = libs.splice(catlibidx, 1);
-                                }
-
-                                basedir = _path.dirname(value) + "/";
-                                if (libs && libs.length > 0) {
-                                    args = ["?type=import&basedir=", basedir , "&libs=", libs.join(",")].join("")
-                                }
+                        me.print(_tplutils.template({
+                            content: contentByType,
+                            data: {
+                                events: {onload: ( value.indexOf("cat.src.js") !== -1 ? "onload=\"_cat.core.init()\"" : undefined )},
+                                src: value
                             }
-
-                            me.print(_tplutils.template({
-                                content: contentByType,
-                                data: {
-                                    src: value,
-                                    args: (args || "")
-                                }
-                            }));
-                        }
+                        }));
                     }
 
                     var importannos = this.get("import"),
-                        importType,
                         me = this;
 
                     me.$setType("html");
                     me.set("auto", false);
                     if (importannos) {
                         importannos.forEach(function (item) {
+                            var libs;
+
                             if (item) {
-                                importType = _getType(item);
-                                if (importType) {
-                                    _printByType(importType, item);
-                                }
+                                libs = generateLibs(item);
+                                libs.forEach(function (lib) {
+                                    var typeo = _getType(lib),
+                                        importType = typeo.type;
+
+                                    if (importType && importType !== "map") {
+                                        _printByType(importType, typeo.value);
+                                    }
+                                });
                             }
                         });
                     }

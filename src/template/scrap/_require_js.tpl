@@ -4,9 +4,12 @@
 require.config({{config}});
 require({{require}}, function({{requirerefs}}) {
 
-    if (typeof chai !== "undefined") {
-        window["chai"] = chai;
+    {{globals}}
+    
+    _cat.utils.Loader.requires({{cssfiles}});
+    
+    if (_cat) {
+        _cat.core.init();     
     }
-    _cat.utils.Loader.requires({{cssfiles}})
 
 });

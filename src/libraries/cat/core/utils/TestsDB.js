@@ -1,11 +1,12 @@
 
 _cat.utils.TestsDB = function() {
 
-    var _data;
+    var _data,
+        _testnextcache = {};
 
     (function() {
         _cat.utils.AJAX.sendRequestAsync({
-            url : "/cat/config/testdata.json",
+            url :  _cat.core.getBaseUrl("cat/config/testdata.json"),
             callback : {
                 call : function(check) {
                     _data = JSON.parse(check.response);
@@ -67,8 +68,11 @@ _cat.utils.TestsDB = function() {
         },
 
         init : function() {
-            TestDB = new _TestsDB();
-            return TestDB;
+            /*
+                 @deprecated
+                 TestDB = new _TestsDB();
+                 return TestDB;
+             */
         },
 
         getDB : function() {
@@ -86,7 +90,7 @@ _cat.utils.TestsDB = function() {
         find : function(field) {
             var code = "JSPath.apply('" + field + "', _data);";
 
-            return new Function("JSPath", "_data", "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, [(typeof JSPath !== "undefined" ? JSPath : undefined), _data]);
+            return (new Function("JSPath", "_data", "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, [(typeof JSPath !== "undefined" ? JSPath : undefined), _data]) || "");
         },
         random: function(field) {
 
@@ -100,6 +104,22 @@ _cat.utils.TestsDB = function() {
             if (result && result.length) {
                 cell = _random(0, result.length-1);
                 return result[cell];
+            }
+
+            return result;
+        },
+        next: function(field) {
+
+            var result = this.find(field),
+                cell=0;
+
+            if (result && result.length) {
+                if (_testnextcache[field] !== undefined && _testnextcache[field] != null) {
+                    _testnextcache[field]++;
+                } else {
+                    _testnextcache[field] = 0;
+                }
+                return result[_testnextcache[field]];
             }
 
             return result;

@@ -23,6 +23,8 @@ module.exports = function () {
                     "kill": [String, Number],
                     "task": [String, Array],
                     "init": String,
+                    "test": String,
+                    "proxy": String,
                     "watch": [Boolean, false],
                     "project": [String, null]
                 }, {
@@ -30,6 +32,7 @@ module.exports = function () {
                     "k": ["--kill", 0],
                     "i": ["--init", "cat"],
                     "b": ["--task", "t@init", "--task", "t@scrap", "--task", "t@inject"],
+                    "a": ["--task", "t@autotest"],
                     "t": ["--task", "t@test"],
                     "c": ["--task", "t@clean"],
                     "s": ["--task", "t@server.start"],
@@ -75,6 +78,7 @@ module.exports = function () {
                         "cat.common.scrap": "src/module/plugin/scrap/Scrap.js",
 
                         "cat.common.config": "src/module/config/project/Config.js",
+                        "cat.common.manifest": "src/module/config/manifest/manifest.js",
                         "cat.common.parser": "src/module/common/parser/Parser.js",
 
                         "cat.scrap.utils": "src/module/plugin/scrap/ScrapUtils.js"

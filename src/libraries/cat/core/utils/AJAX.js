@@ -59,7 +59,7 @@ _cat.utils.AJAX = function () {
 
             var xmlhttp = new XMLHttpRequest(),
                 onerror = function (e) {
-                    _cat.core.log("[CAT CHAI] error occurred: ", e, "\n");
+                    _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {

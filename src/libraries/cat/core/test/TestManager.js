@@ -2,9 +2,11 @@ _cat.core.TestManager = function() {
 
     var _enum = {
         TYPE_TEST: "test",
-        TYPE_SIGNAL: "signal"
+        TYPE_SIGNAL: "signal",
+        TEST_MANAGER: "tests",
+        ALL: "all",
+        TEST_MANAGER_OFFLINE: "offline"
     };
-
 
     // Test Manager data class
     function _Data(config) {
@@ -74,30 +76,75 @@ _cat.core.TestManager = function() {
 
     };
 
-    var _testsData = [],
+    var _summaryInfo,
+        _testsData = [],
         _counter = 0,
+        _hasFailed = false,
         _globalTestData = {};
 
 
     return {
+        
+        init: function() {
+            
+            // register signals
+            _cat.utils.Signal.register([
+                {signal: "KILL", impl: _cat.core.TestAction.KILL},
+                {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND},
+                {signal: "TESTSTART", impl: _cat.core.TestAction.TESTSTART}
+            ]);
 
+            // START test signal
+            var config = _cat.core.getConfig();
+            // TODO we need to set test start signal via an API
+            if (config.getTests()) {
+                _cat.core.ui.on();
+                _cat.core.TestManager.send({signal:"TESTSTART"});
+            }
+        },
+
+        enum: _enum,
+        
         addTestData: function(config) {
-            var data = new _Data(config);
+            var data = new _Data(config),
+                name;
             _testsData.push(data);
-            if (config.success) {
+            
+            name = data.get("name");
+            if (config.success && (name !== "Start" && name !== "End")) {
                 _counter++;
+                
+            } else {
+                _hasFailed = true; 
             }
 
             return data;
 
         },
 
+        isFailed: function() {
+            return _hasFailed;
+        },
+        
         getLastTestData: function() {
             return (_testsData.length > 0 ? _testsData[_testsData.length-1] : undefined);
         },
 
         getTestCount: function() {
-            return (_testsData ? _testsData.length : 0);
+            var counter=0;
+            
+            _testsData.forEach(function(test) {
+                var name;    
+            
+                if (test) {
+                    name = test.get("name");
+                    if (name !== "Start" && name !== "End") {
+                        counter++;
+                    }
+                }
+            });
+            
+            return counter;
         },
 
         getTestSucceededCount: function() {
@@ -105,7 +152,7 @@ _cat.core.TestManager = function() {
         },
 
         /**
-         * Update the last total delay
+         * Update the last total         ,delay
          *
          * @param delay
          */
@@ -121,6 +168,38 @@ _cat.core.TestManager = function() {
             return (_globalTestData.delay || 0);
         },
 
+        /**
+         * Send an action to the server
+         * 
+         * @param opt
+         *  signal [KILL, TESTSTART, TESTEND]
+         */
+        send: function(opt) {
+            var signal,
+                config = _cat.core.getConfig(), reportFormats,
+                options;               
+            
+            opt = (opt || {});
+            signal = opt.signal;
+            
+            if (config.isReport()) {
+                reportFormats = config.getReportFormats();
+                options = {reportFormats: reportFormats};
+            }
+            if ("error" in opt) {
+                options.error = opt.error;
+            }
+            _cat.utils.Signal.send(signal, options);
+        },       
+
+        setSummaryInfo: function(info) {
+            _summaryInfo = info;  
+        },
+        
+        getSummaryInfo: function(info) {
+            return _summaryInfo;  
+        },
+        
         /**
          *
          * @param config

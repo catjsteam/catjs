@@ -15,6 +15,7 @@
     "name": "{{project.name}}",
     "ip": null,
     "port": null,
+    "context": "{{project.info.appcontext}}",
     "tests":[
         {"name" : "general"}
     ],
@@ -32,5 +33,6 @@
         "errors": true
     },
     "run-mode": "all",
-    "test-failure-timeout": 30
+    "run-test-delay": 500,
+    "test-failure-timeout": 20
 }

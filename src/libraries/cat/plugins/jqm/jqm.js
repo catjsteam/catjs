@@ -9,7 +9,10 @@ _cat.plugins.jqm = function () {
 
             oldElement.classList.remove("markedElement");
         }
-        element.className = element.className + " markedElement";
+
+        if (element) {
+            element.className = element.className + " markedElement";
+        }
         oldElement = element;
         
     };

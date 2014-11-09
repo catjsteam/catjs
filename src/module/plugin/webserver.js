@@ -5,7 +5,7 @@ var _log = catrequire("cat.global").log(),
     _utils = catrequire("cat.utils"),
 
     _emitter,
-    _global,
+    _global = catrequire("cat.global"),
     _data,
     _internalConfig,
     _project;
@@ -34,7 +34,7 @@ module.exports = _basePlugin.ext(function () {
                     webserver = config.webserver,
                     thiz = config.thiz,
                     basePath = _project.getTargetFolder(),
-                    path = (extensionParams.path ? _path.join(basePath, extensionParams.path) : basePath),
+                    path = (extensionParams.path ? _path.join(_global.get("home").working.path, extensionParams.path) : basePath),
                     action = extensionParams.action,
                     set = extensionParams.set;
 
@@ -98,7 +98,6 @@ module.exports = _basePlugin.ext(function () {
                 }
 
                 _emitter = config.emitter;
-                _global = config.global;
                 _data = config.data;
                 _internalConfig = config.internalConfig;
                 _project = _internalConfig.externalConfig.project;

@@ -173,12 +173,27 @@ module.exports = function () {
             }
         },
 
-        error: function (msg) {
-            _log.error(msg);
-            if (console) {
-                console.error(msg);
+        error: function () {
+            
+            function parseArgs(args) {
+                var i=0, size = args.length, out = [];
+                
+                if (size > 0) {
+                    for (; i<size;i++) {
+                        out.push(args[i]);
+                    }
+                } else {
+                    return "General error occurred";
+                }
+                
+                return out.join("; ");
             }
-            throw msg;
+            
+            _log.error.apply(_log, arguments);
+            if (console) {
+                console.error.apply(console, arguments);
+            }
+            throw parseArgs(arguments);
         },
 
         getRelativePath: function (file, basePath) {
@@ -259,7 +274,7 @@ module.exports = function () {
                 patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*)(\\).*\\).*)","g");
 
                 while (codeRows.match(patt)) {
-                    codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2'.$3'$4");
+                    codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2\".$3\"$4");
                 }
                 return codeRows;
             }

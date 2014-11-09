@@ -22,7 +22,8 @@ var CAT = function () {
         _catconfigInternal,
         _counter= 0,
         _configargs,
-        _module;
+        _module,
+        _proxy;
 
     /**
      * Get which task to get to run from the CAT command line.
@@ -176,6 +177,8 @@ var CAT = function () {
 
             // TODO messages should be taken from resource
             var grunt, args, path, watch = false, kill = -1,
+                npmtest = "npm", testmodule,
+                testcmd,
                 initProject,
                 msg = ["[CAT] Project failed to load, No valid argument path was found"];
 
@@ -199,6 +202,8 @@ var CAT = function () {
 
                 kill = (config.kill || kill);
                 watch = (config.watch || watch);
+                testcmd = (config["test"] || undefined);
+                _proxy = (config.proxy || undefined);
                 initProject = typeof config.init === 'undefined' ? undefined :  config.init || "cat";
                 _targets = config.task;
                 grunt = config.grunt;
@@ -240,6 +245,7 @@ var CAT = function () {
                 var project,
                     pids,
                     linit,
+                    checkAnalytics,
                     targets = _targets, counter,
                     wait = false,
                     home = _global.get("home"),
@@ -267,6 +273,22 @@ var CAT = function () {
 
                 _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
 
+                if (testcmd) {
+                    testcmd = (testcmd.trim ? testcmd.trim() : testcmd);
+                    
+                    testmodule = require("./../../test/test.js");
+                    if (testcmd === "build") {
+                        testmodule.build(_proxy);
+                        
+                    } else if (testcmd === "buildall") {
+                        testmodule.buildall(_proxy);
+                    
+                    } else if (testcmd === "clean") {
+                        testmodule.clean();
+                    }
+                    
+                    return undefined;
+                }
 
                 if (initProject) {
                     linit = catrequire("cat.init");
@@ -382,8 +404,12 @@ var CAT = function () {
 
                         if (project) {
                             // update analytics
-                            if (project.info.analytics && project.info.analytics == "Y") {
-                                _analytics.updateAnalytics(global.catcommand, project.name);
+                            if (project.info.analytics || (project.info.analytics === "")) {
+                                checkAnalytics = project.info.analytics;
+                                var re = new RegExp( "(no)|(n)|(false)", "gi" );
+                                if (!(re.test(checkAnalytics))) {
+                                    _analytics.updateAnalytics(global.catcommand, project.name);
+                                }
                             }
 
 

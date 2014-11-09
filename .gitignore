@@ -15,3 +15,7 @@ test/catjs_example/cat-project/
 test/jqm/cat-project/
 test/sencha-kitchen-sink/cat-project/
 settings.json~
+package.json~
+test/test-apps-master/
+test/catjs-test-apps.zip
+.bower.json

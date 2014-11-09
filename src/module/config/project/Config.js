@@ -8,6 +8,7 @@ var _typedas = require('typedas'),
     _props = catrequire("cat.props"),
     _fs = require("fs.extra"),
     _path = require("path"),
+    _manifest = catrequire("cat.common.manifest"),
 
     /**
      * Configuration Class
@@ -51,6 +52,7 @@ var _typedas = require('typedas'),
         this.tasks = tasks;
         this.pluginPaths = [];
         this.info = {};
+        this.manifest = _manifest.init();
 
 
         this._get = function(key) {
@@ -190,7 +192,7 @@ var _typedas = require('typedas'),
             _mkEnvDir("target");
 
             // set the info properties incoming from the cat's project
-            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "cattarget", "analytics", "runner", "dependencies"]);
+            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "appcontext", "cattarget", "analytics", "runner", "dependencies"]);
 
         }
 
@@ -270,7 +272,6 @@ var _typedas = require('typedas'),
 
             // create target skeleton project
             _postCreation();
-
         }
 
         _main();
@@ -424,6 +425,15 @@ Config.prototype.getHost = function () {
 Config.prototype.getProtocol = function () {
     var protocol = this.getInfo("appserver.protocol") || this.getInfo("protocol");
     return (protocol || "http://");
+};
+
+Config.prototype.getContext = function () {
+    var context = this.getInfo("appcontext");
+    return (context || "/");
+};
+
+Config.prototype.getManifest = function () {
+    return this.manifest;
 };
 
 Config.prototype.getAddress = function () {

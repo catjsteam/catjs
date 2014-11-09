@@ -62,8 +62,7 @@
         {
             "name": "p@project.webserver.start",
             "type": "webserver",
-            "action": "start",
-            "set": [{"key": "assert", "var": "assert", "prop":"result"}]
+            "action": "start"
         },
         {
             "name": "p@project.runner.start",
@@ -108,6 +107,10 @@
         {
             "name": "p@scrap.screenshot",
             "type": "scrap-screenshot"
+        },
+        {
+            "name": "p@scrap.vnc",
+            "type": "scrap-vnc"
         },
         {
             "name": "p@scrap.mock",
@@ -191,7 +194,7 @@
         },
         {
             "name": "t@scrap",
-            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@scrap.screenshot", "p@custom.plugin", "p@init.scrap"]
+            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.vnc", "p@scrap.enyo", "p@scrap.screenshot", "p@custom.plugin", "p@init.scrap"]
         },
         {
             "name": "t@inject",

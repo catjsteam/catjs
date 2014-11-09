@@ -13,40 +13,89 @@ _cat.core.ui = function () {
         }
     }
 
-    function _create() {
-        var catElement;
-        if (typeof document !== "undefined") {
-            catElement = document.createElement("DIV");
+    function _setInternalContent(elt, text, style, attr) {
+        
+        var styleAttrs = (style ? style.split(";") : []);
 
-            catElement.id = "__catelement";
-            catElement.style.width = "200px";
-            catElement.style.height = "200px";
-            catElement.style.position = "fixed";
-            catElement.style.bottom = "10px";
-            catElement.style.zIndex = "10000000";
-            catElement.style.display = "none";
-            catElement.innerHTML =
+        if (elt) {
+            styleAttrs.forEach(function (item) {
+                var value = (item ? item.split(":") : undefined);
+                if (value) {
+                    elt.style[value[0]] = value[1];
+                }
+            });
+
+            elt[attr] = text;
+        }        
+    }
+    
+    function _setText(elt, text, style) {
+
+        _setInternalContent(elt, text, style, "textContent");
+    } 
+    
+    function _setHTML(elt, text, style) {
+
+        _setInternalContent(elt, text, style, "innerHTML");
+    }
+
+    function _appendUI() {
+        if (__catElement) {
+            if (document.body) {
+                document.body.appendChild(__catElement);
+            } else {
+                console.warn("[CatJS UI] failed to display catjs UI. HTML Body element is not exists or not valid");
+            }
+        }
+    }
+    
+    function _create() {
+
+        if (typeof document !== "undefined") {
+            __catElement = document.createElement("DIV");
+
+            __catElement.id = "__catelement";
+            __catElement.className = "cat-status-container";
+            __catElement.style.width = "200px";
+            __catElement.style.height = "200px";
+            __catElement.style.position = "fixed";
+            __catElement.style.bottom = "10px";
+            __catElement.style.zIndex = "10000000";
+            __catElement.style.display = "none";
+            __catElement.innerHTML =
 
                 '<div id="cat-status" class="cat-dynamic cat-status-open">' +
                     '<div id=loading></div>' +
                     '<div id="catlogo" ></div>' +
-                    '<div id="catHeader">CAT Tests<span id="catheadermask">click to mask on/off</span></div>' +
-                    '<div class="text-tips"></div>' +
+                    '<div id="catHeader"><div>CatJS Console</div><span id="catheadermask">click to mask on/off</span></div>' +
+                    '<div class="text-tips">' +
+                    '   <div class="tests">Tests <span style="color:green">passed</span> : <span  id="tests_passed">0</span></div>' +
+                    '   <div class="tests">Tests <span style="color:red">failed</span> : <span  id="tests_failed">0</span></div>' +
+                    '   <div class="tests"><span  id="tests_total_counter">0</span> Tests Total (<span  id="tests_total">0</span>)</div>' +
+                    '   <div class="tests"><span  id="tests_status"></span></div>' +
+                    '</div>' +
                     '<div id="cat-status-content">' +
-                    '<ul id="testList"></ul>' +
+                        '<ul id="testList"></ul>' +
                     '</div>' +
-                    '</div>' +
-                    '<div id="catmask" class="fadeMe"></div>';
+                '</div>'+
+                '<div id="catmask" class="fadeMe"></div>';
 
-            if (document.body) {
-                document.body.appendChild(catElement);
-            }
+            _appendUI();
+           
         }
     }
 
     function _getCATElt() {
+        var catelement;
+        
         if (typeof document !== "undefined") {
-            return document.getElementById("__catelement");
+            catelement = document.getElementById("__catelement");
+            
+            if (!catelement) {
+                _appendUI();
+            }
+            
+            return catelement;
         }
         return undefined;
     }
@@ -86,285 +135,287 @@ _cat.core.ui = function () {
         });
     }
 
-    var testNumber = 0,
-        logoopacity = 0.5,
-        masktipopacity = 1,
-
+    var __catElement,
         _disabled = false,
-        _me =  {
+        _onloadIstener,
+        _loaderListener = false,
+        _me = {
 
-        disable: function() {
-            _disabled = true;
-        },
+            disable: function () {
+                _disabled = true;
+            },
 
-        enable: function() {
-            _disabled = false;
-        },
+            enable: function () {
+                _disabled = false;
+            },
 
-        /**
-         * Display the CAT widget (if not created it will be created first)
-         *
-         */
-        on: function () {
+            /**
+             * Display the CAT widget (if not created it will be created first)
+             *
+             */
+            on: function () {
 
-            if (_disabled) {
-                return;
-            }
+                if (_disabled) {
+                    return;
+                }
 
-            var catElement = _getCATElt();
-            if (typeof document !== "undefined") {
+                if (!_loaderListener) {
+                    _loaderListener = true;
+                    _addEventListener(window, "load", function (e) {
+
+                        var catElement = _getCATElt();
+                        if (typeof document !== "undefined") {
+
+                            if (catElement) {
+                                catElement.style.display = "";
+                            } else {
+                                _create();
+                                catElement = _getCATElt();
+                                if (catElement) {
+                                    _me.toggle();
+                                    catElement.style.display = "";
+                                }
+                            }
+
+                            if (catElement) {
+                                _onloadIstener = false;
+                            }
+
+                            // set logo listener
+                            var logoelt = document.getElementById("catlogo"),
+                                catmask = document.getElementById("catmask"),
+                                listener = function () {
+                                    if (catmask) {
+                                        catmask.classList.toggle("fadeMe");
+                                    }
+                                };
+
+                            if (logoelt && catmask && catmask.classList) {
+                                _addEventListener(logoelt, "click", listener);
+                            }
+
+                        }
+
+                    });
+                }
+
+            },
+
+            /**
+             * Hide the CAT status widget
+             *
+             */
+            off: function () {
+
+                var catElement = _getCATElt();
+                if (catElement) {
+                    _resetContent();
+                    catElement.style.display = "none";
+                }
+
+            },
+
+            /**
+             * Destroy the CAT status widget
+             *
+             */
+            destroy: function () {
+                var catElement = _getCATElt();
+                if (catElement) {
+                    if (catElement.parentNode) {
+                        catElement.parentNode.removeChild(catElement);
+                    }
+                }
+            },
+
+            /**
+             * Toggle the content display of CAT status widget
+             *
+             */
+            toggle: function () {
+                if (_disabled) {
+                    return;
+                }
+
+                var catElement = _getCATElt(),
+                    catStatusElt = _getCATStatusElt(),
+                    catStatusContentElt = _getCATStatusContentElt();
 
                 if (catElement) {
-                    catElement.style.display = "";
-                } else {
-                    _create();
-                    catElement = _getCATElt();
-                    if (catElement) {
-                        _me.toggle();
-                        catElement.style.display = "";
-                    }
-                }
+                    catStatusElt = _getCATStatusElt();
+                    if (catStatusElt) {
+                        _resetContent();
 
-                // set logo listener
-                var logoelt = document.getElementById("catlogo"),
-                    catmask = document.getElementById("catmask"),
-                    listener = function() {
-                        var catmask = document.getElementById("catmask");
-                        if (catmask) {
-                            catmask.classList.toggle("fadeMe");
+                        catStatusElt.classList.toggle("cat-status-close");
+
+                        if (catStatusContentElt) {
+                            catStatusContentElt.classList.toggle("displayoff");
                         }
-                    };
-
-                if (logoelt && catmask && catmask.classList) {
-                    _addEventListener(logoelt, "click", listener);
-                }
-
-                setInterval(function() {
-                    var logoelt = document.getElementById("catlogo"),
-                        catheadermask = document.getElementById("catheadermask");
-
-                    if (logoopacity === 1) {
-                        logoopacity = 0.5;
-                        setTimeout(function() {
-                            masktipopacity = 0;
-                        }, 2000);
-
-                    } else {
-                        logoopacity = 1;
-                    }
-                    if (logoelt) {
-                        catheadermask.style.opacity = masktipopacity+"";
-                        logoelt.style.opacity = logoopacity+"";
-                    }
-                }, 2000);
-
-            }
-
-        },
-
-        /**
-         * Hide the CAT status widget
-         *
-         */
-        off: function () {
-
-            var catElement = _getCATElt();
-            if (catElement) {
-                _resetContent();
-                catElement.style.display = "none";
-            }
-
-        },
-
-        /**
-         * Destroy the CAT status widget
-         *
-         */
-        destroy: function () {
-            var catElement = _getCATElt();
-            if (catElement) {
-                if (catElement.parentNode) {
-                    catElement.parentNode.removeChild(catElement);
-                }
-            }
-        },
-
-        /**
-         * Toggle the content display of CAT status widget
-         *
-         */
-        toggle: function () {
-            if (_disabled) {
-                return;
-            }
-
-            var catElement = _getCATElt(),
-                catStatusElt = _getCATStatusElt(),
-                catStatusContentElt = _getCATStatusContentElt();
-
-            if (catElement) {
-                catStatusElt = _getCATStatusElt();
-                if (catStatusElt) {
-                    _resetContent();
-
-                    catStatusElt.classList.toggle("cat-status-close");
-
-                    if (catStatusContentElt) {
-                        catStatusContentElt.classList.toggle("displayoff");
                     }
                 }
-            }
 
 
-        },
+            },
 
-        isOpen: function() {
-            var catElement = _getCATElt(),
-                catStatusElt = _getCATStatusElt();
+            isOpen: function () {
+                var catElement = _getCATElt(),
+                    catStatusElt = _getCATStatusElt();
 
-            if (catElement) {
-                catStatusElt = _getCATStatusElt();
-                if (catStatusElt) {
+                if (catElement) {
+                    catStatusElt = _getCATStatusElt();
+                    if (catStatusElt) {
 
-                    if (catStatusElt.classList.contains("cat-status-close")) {
-                        return false;
+                        if (catStatusElt.classList.contains("cat-status-close")) {
+                            return false;
+                        }
                     }
+                } else {
+
+                    return false;
                 }
-            } else {
 
-                return false;
-            }
+                return true;
+            },
 
-            return true;
-        },
+            isContent: function () {
 
-        isContent: function() {
+                function _isText(elt) {
+                    if (elt && elt.innerText && ((elt.innerText).trim())) {
+                        return true;
+                    }
+                    return false;
+                }
 
-            function _isText(elt) {
-                if ( elt &&  elt.innerText && ((elt.innerText).trim()) ) {
+                var catStatusContentElt = _getCATStatusContentElt(),
+                    bool = 0;
+
+                bool += (_isText(catStatusContentElt.childNodes[1]) ? 1 : 0);
+
+                if (bool === 1) {
                     return true;
                 }
+
                 return false;
-            }
-
-            var catStatusContentElt = _getCATStatusContentElt(),
-                bool = 0;
-
-            bool  += (_isText(catStatusContentElt.childNodes[1]) ? 1 : 0);
-
-            if (bool === 1) {
-                return true;
-            }
-
-            return false;
-        },
+            },
 
 
-        markedElement : function(elementId ) {
-            var element = document.getElementById(elementId);
-            element.className = element.className + " markedElement";
-        },
+            markedElement: function (elementId) {
+                var element = document.getElementById(elementId);
+                element.className = element.className + " markedElement";
+            },
 
-        /**
-         *  Set the displayable content for CAT status widget
-         *
-         * @param config
-         *      header - The header content
-         *      desc - The description content
-         *      tips - The tips text (mostly for the test-cases counter)
-         */
-        setContent: function (config) {
+            setContentTip: function (config) {
 
-            var catStatusContentElt,
-                catElement = _getCATElt(),
-                isOpen = false,
-                reset = ("reset" in config ? config.reset : false);
+                var testsFailed = document.getElementById("tests_failed"),
+                    testsPassed = document.getElementById("tests_passed"),
+                    testsTotal = document.getElementById("tests_total"),
+                    testsTotalCounter = document.getElementById("tests_total_counter"),
+                    testsStatusDesc = document.getElementById("tests_status"),
+                    failedStatus = "<span class=\"test_failed\"> Test Failed </span>",
+                    passedStatus = "<span class=\"test_succeeded\"> Test End Successfully </span>",
+                    testStatus;
 
-
-
-            function _setText(elt, text, style) {
-
-                var styleAttrs = (style ? style.split(";") : []);
-
-                if (elt) {
-                    styleAttrs.forEach(function (item) {
-                        var value = (item ? item.split(":") : undefined);
-                        if (value) {
-                            elt.style[value[0]] = value[1];
-                        }
-                    });
-
-                    elt.textContent = text;
-                }
-            }
-
-            if (catElement) {
-                catStatusContentElt = _getCATStatusContentElt();
-                if (catStatusContentElt) {
-                    if (config) {
-                        isOpen = _me.isOpen();
-
-                        if ("header" in config && config.header) {
-                            _me.on();
-                            if (!isOpen && !reset) {
-                                _me.toggle();
+                if ("tips" in config) {
+                    if ("tips" in config && config.tips) {
+                        testStatus = config.tips;
+                        if (testStatus) {
+                            if ("failed" in testStatus) {
+                                _setText(testsFailed, testStatus.failed);
                             }
-                        } else {
-                            if (!reset && isOpen) {
-                                setTimeout(function () {
-                                    _me.toggle();
-                                }, 300);
+                            if ("passed" in testStatus) {
+                                _setText(testsPassed, testStatus.passed);
                             }
-                        }
-                        var innerListElement =
+                            if ("tests" in testStatus) {
+                                _setText(testsTotal, testStatus.tests);
+                            }
+                            if ("total" in testStatus) {
+                                _setText(testsTotalCounter, testStatus.total);
+                            }
+                            if ("status" in testStatus) {
+                                _setHTML(testsStatusDesc, (testStatus.status === "succeeded" ? passedStatus : failedStatus));
 
-                                '<div class="text-top"><span style="color:green"></span></div>' +
-                                '<div class="text"></div>';
-
-                        if (config.header || config.desc || config.tips) {
-                            var ul = document.getElementById("testList");
-                            var newLI = document.createElement("LI");
-                            ul.insertBefore(newLI, ul.children[0]);
-                            newLI.innerHTML = innerListElement;
-
-                            var textTips =  document.getElementsByClassName("text-tips")[0];
-
-                            setTimeout(function() {
-
-                                // add element to ui test list
-                                if ("header" in config) {
-                                    _setText(newLI.childNodes[0]  , config.header, config.style);
-                                }
-                                if ("desc" in config) {
-                                    _setText(newLI.childNodes[1], config.desc, config.style);
-                                }
-
-                                if ("tips" in config) {
-                                    if (config.tips) {
-                                        testNumber  = config.tips;
-                                        _setText(textTips, "Number of test passed : " + testNumber, config.style);
-                                    } else {
-                                        _setText(textTips, "Number of test passed : " + testNumber, "color : green");
-                                    }
-
-                                }
-
-                                if ("elementType" in config) {
-                                    newLI.className = newLI.className + " " + config.elementType;
-
-                                } else {
-                                    newLI.className = newLI.className + " listImageInfo";
-                                }
-
-                            }, 300);
+                            }
                         }
 
                     }
                 }
-            }
-        }
 
-    };
+            },
+
+            /**
+             *  Set the displayable content for CAT status widget
+             *
+             * @param config
+             *      header - The header content
+             *      desc - The description content
+             *      tips - The tips text (mostly for the test-cases counter)
+             */
+            setContent: function (config) {
+
+                var catStatusContentElt,
+                    catElement = _getCATElt(),
+                    isOpen = false,
+                    reset = ("reset" in config ? config.reset : false),
+                    me = this;
+
+                if (catElement) {
+                    catStatusContentElt = _getCATStatusContentElt();
+                    if (catStatusContentElt) {
+                        if (config) {
+                            isOpen = _me.isOpen();
+
+                            if ("header" in config && config.header) {
+                                _me.on();
+                                if (!isOpen && !reset) {
+                                    _me.toggle();
+                                }
+                            } else {
+                                if (!reset && isOpen) {
+                                    setTimeout(function () {
+                                        _me.toggle();
+                                    }, 300);
+                                }
+                            }
+                            var innerListElement =
+
+                                '<div class="text-top"><span style="color:green"></span></div>' +
+                                    '<div class="text"></div>';
+
+                            if (config.header || config.desc || config.tips) {
+                                var ul = document.getElementById("testList");
+                                var newLI = document.createElement("LI");
+                                ul.insertBefore(newLI, ul.children[0]);
+                                newLI.innerHTML = innerListElement;
+
+
+                                setTimeout(function () {
+
+                                    // add element to ui test list
+                                    if ("header" in config) {
+                                        _setText(newLI.childNodes[0], config.header, config.style);
+                                    }
+                                    if ("desc" in config) {
+                                        _setText(newLI.childNodes[1], config.desc, config.style);
+                                    }
+
+                                    me.setContentTip(config);
+
+                                    if ("elementType" in config) {
+                                        newLI.className = newLI.className + " " + config.elementType;
+
+                                    } else {
+                                        newLI.className = newLI.className + " listImageInfo";
+                                    }
+
+                                }, 300);
+                            }
+
+                        }
+                    }
+                }
+            }
+
+        };
 
     return _me;
 
