@@ -466,6 +466,17 @@ You can explore our [plugins folder](https://github.com/catjsteam/catjs/tree/mas
     
     
 **Note:** If you need more API support, just ask :)
+
+
+<script>
+    (function(){
+      for(var els = document.getElementsByTagName ('a'), i = els.length; i--;) {
+        els[i].setAttribute("target","_blank");
+      }
+
+    })();
+</script>
+
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
