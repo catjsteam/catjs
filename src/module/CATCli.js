@@ -3,13 +3,16 @@ var _nopt = require("nopt"),
     _fs = require("fs"),
     _Mapper = require("require-mapper"),
     _mapper = new _Mapper(),
-    util = require('util');
+    util = require('util'),
+    ansi = require("ansi");
 
 function hook_stdout(callback) {
     var old_write = process.stdout.write;
 
     process.stdout.write = (function(write) {
         return function(string, encoding, fd) {
+            ansi(process.stdout).fg.reset();
+            ansi(process.stdout).bg.reset();
             write.apply(process.stdout, arguments);
             callback(string, encoding, fd);
         }

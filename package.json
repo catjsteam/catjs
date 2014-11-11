@@ -1,101 +1,101 @@
 {
-    "name": "catjs",
-    "description": "(Mobile) Web Automation Framework",
-    "version": "0.4.2",
-    "homepage": "http://catjsteam.github.io",
-    "author": {
-        "name": "arik",
-        "email": "lewin.arik@hp.com"
+  "name": "catjs",
+  "description": "(Mobile) Web Automation Framework",
+  "version": "0.4.21",
+  "homepage": "http://catjsteam.github.io",
+  "author": {
+    "name": "arik",
+    "email": "lewin.arik@hp.com"
+  },
+  "maintainers": [
+    {
+      "name": "Pablo Retyk",
+      "email": "pabloretyk@gmail.com"
     },
-    "maintainers": [
-        {
-            "name": "Pablo Retyk",
-            "email": "pabloretyk@gmail.com"
-        },
-        {
-            "name": "Ran Snir",
-            "email": "ransnir@gmail.com"
-        }
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/lastboy/catjs.git"
-    },
-    "bugs": {
-        "url": "https://github.com/lastboy/catjs/issues"
-    },
-    "licenses": [
-        {
-            "type": "Apache-2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        }
-    ],
-    "engines": {
-        "node": ">= 0.10.0"
-    },
-    "main": "src/module/CAT",
-    "bin": {
-        "catcli": "catcli.js"
-    },
-    "scripts": {
-        "test": "node ./test/test.js"
-    },
-    "dependencies": {
-        "mobilerunner": "~0.2.7",
-        "fs.extra": "~1.2.1",
-        "typedas": "~1.0.0",
-        "log": "~1.4.0",
-        "nopt": "~2.2.0",
-        "properties": "~0.3.3",
-        "line-reader": "~0.2.3",
-        "string-format": "~0.2.1",
-        "js-beautify": "~1.4.0",
-        "watch": "~0.8.0",
-        "date-format-lite": "~0.1.5",
-        "line-by-line": "~0.1.1",
-        "underscore": "~1.5.1",
-        "minimatch": "~0.2.12",
-        "uglify-js": "~2.4.0",
-        "jshint": "~2.1.10",
-        "express": "~3.4.4",
-        "test-model-reporter": "~0.1.5",
-        "js.utils": "~0.2.0",
-        "require-mapper": "~0.0.3",
-        "glob": "~3.2.7",
-        "my-ip": "~1.1.0",
-        "json-lint": "~0.1.0",
-        "prompt": "~0.2.12",
-        "jetty": "~0.2.1",
-        "winston": "~0.7.2",
-        "wrench": "~1.5.8",
-        "contribute": "~0.0.3",
-        "colors": "~0.6.2",
-        "autonpm": "~0.1.2",
-        "faker": "~2.0.1"
-    },
-    "devDependencies": {
-        "less": "^1.7.5"
-    },
-    "keywords": [
-        "runner",
-        "catrunner",
-        "annotation",
-        "app",
-        "mobile",
-        "html5",
-        "test",
-        "testing",
-        "unit",
-        "automation",
-        "ui",
-        "jquery",
-        "sencha",
-        "chai",
-        "enyo"
-    ],
-    "contributors": [
-        "Arik Lewin (https://github.com/lastboy)"
-    ],
-    "license": "Apache-2.0"
-
+    {
+      "name": "Ran Snir",
+      "email": "ransnir@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lastboy/catjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lastboy/catjs/issues"
+  },
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "main": "src/module/CAT",
+  "bin": {
+    "catcli": "catcli.js"
+  },
+  "scripts": {
+    "test": "node ./test/test.js"
+  },
+  "dependencies": {
+    "mobilerunner": "~0.2.30",
+    "fs.extra": "~1.2.1",
+    "typedas": "~1.0.0",
+    "log": "~1.4.0",
+    "nopt": "~2.2.0",
+    "properties": "~0.3.3",
+    "line-reader": "~0.2.3",
+    "string-format": "~0.2.1",
+    "js-beautify": "~1.4.0",
+    "watch": "~0.8.0",
+    "date-format-lite": "~0.1.5",
+    "line-by-line": "~0.1.1",
+    "underscore": "~1.5.1",
+    "minimatch": "~0.2.12",
+    "uglify-js": "~2.4.0",
+    "jshint": "~2.1.10",
+    "express": "~3.4.4",
+    "test-model-reporter": "~0.1.5",
+    "js.utils": "~0.2.0",
+    "require-mapper": "~0.0.3",
+    "glob": "~3.2.7",
+    "my-ip": "~1.1.0",
+    "json-lint": "~0.1.0",
+    "prompt": "~0.2.12",
+    "jetty": "~0.2.1",
+    "winston": "~0.7.2",
+    "wrench": "~1.5.8",
+    "contribute": "~0.0.3",
+    "colors": "~0.6.2",
+    "autonpm": "~0.1.2",
+    "faker": "~2.0.1",
+    "ansi": "^0.3.0"
+  },
+  "devDependencies": {
+    "less": "^1.7.5"
+  },
+  "keywords": [
+    "runner",
+    "catrunner",
+    "annotation",
+    "app",
+    "mobile",
+    "html5",
+    "test",
+    "testing",
+    "unit",
+    "automation",
+    "ui",
+    "jquery",
+    "sencha",
+    "chai",
+    "enyo"
+  ],
+  "contributors": [
+    "Arik Lewin (https://github.com/lastboy)"
+  ],
+  "license": "Apache-2.0"
 }
