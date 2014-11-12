@@ -16,6 +16,7 @@ var CAT = function () {
         _emitter,
         _basedir,
         _watch,
+        _debug,
         _cache,
         _utils,
         _targets,
@@ -202,6 +203,7 @@ var CAT = function () {
 
                 kill = (config.kill || kill);
                 watch = (config.watch || watch);
+                _debug = ("debug" in config ? config.debug : false);
                 testcmd = (config["test"] || undefined);
                 _proxy = (config.proxy || undefined);
                 initProject = typeof config.init === 'undefined' ? undefined :  config.init || "cat";
@@ -377,6 +379,8 @@ var CAT = function () {
                     }
                 }
 
+                
+                _module.debug(_debug);                
                 _module.kill(kill);
 
                 if (_targets) {
@@ -390,7 +394,8 @@ var CAT = function () {
                         if (watch) {
                             _watch = catrequire("cat.watch");
                             _watch.init();
-                        }
+                        }                                                                     
+                        
                         // load CAT project
                         project = _project.load({
                             path: path,
@@ -445,6 +450,42 @@ var CAT = function () {
 
         },
 
+        isDebug: function() {
+            return _debug;
+        },
+        
+        debug: function(debug) {
+
+            var unhook,
+                util,
+                nocolor;
+            
+            function _hook_stdout(callback) {
+                var old_write = process.stdout.write;
+
+                process.stdout.write = (function(write) {
+                    return function(string, encoding, fd) {
+                        write.apply(process.stdout, arguments);
+                        callback(string, encoding, fd);
+                    }
+                })(process.stdout.write);
+
+                return function() {
+                    process.stdout.write = old_write
+                };
+            }
+
+            if (debug) {
+                util = require('util');
+                nocolor = require("stripcolorcodes");
+                unhook = _hook_stdout(function(string, encoding, fd) {
+                    string = nocolor(string);
+                    util.debug(util.inspect(string))
+                });
+            }
+
+        },
+        
         kill: function(pid) {
             var pids;
 

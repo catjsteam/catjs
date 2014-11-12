@@ -1,7 +1,7 @@
 {
   "name": "catjs",
   "description": "(Mobile) Web Automation Framework",
-  "version": "0.4.21",
+  "version": "0.4.22",
   "homepage": "http://catjsteam.github.io",
   "author": {
     "name": "arik",
@@ -72,7 +72,7 @@
     "colors": "~0.6.2",
     "autonpm": "~0.1.2",
     "faker": "~2.0.1",
-    "ansi": "^0.3.0"
+    "stripcolorcodes": "^0.1.0"
   },
   "devDependencies": {
     "less": "^1.7.5"

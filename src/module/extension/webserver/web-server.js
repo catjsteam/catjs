@@ -99,16 +99,11 @@ var webserver  = function() {
                         && req.query.testId) {
                     _projectmanager.checkScrap(req,res);
                 }
-//                } else {
-//                    res.send({"error" : "invalid"} );
-//                }
-
             });
 
 
             _server.post('/screenshot', function(req, res){
 
-                debugger;
                 _fs.readFile(req.files.photo.path, function (err, data) {
 
                     var scrapName = req.body.scrapName;

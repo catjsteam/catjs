@@ -2,30 +2,7 @@ var _nopt = require("nopt"),
     _path = require("path"),
     _fs = require("fs"),
     _Mapper = require("require-mapper"),
-    _mapper = new _Mapper(),
-    util = require('util'),
-    ansi = require("ansi");
-
-function hook_stdout(callback) {
-    var old_write = process.stdout.write;
-
-    process.stdout.write = (function(write) {
-        return function(string, encoding, fd) {
-            ansi(process.stdout).fg.reset();
-            ansi(process.stdout).bg.reset();
-            write.apply(process.stdout, arguments);
-            callback(string, encoding, fd);
-        }
-    })(process.stdout.write);
-
-    return function() {
-        process.stdout.write = old_write
-    };
-}
-
-var unhook = hook_stdout(function(string, encoding, fd) {
-    util.debug(util.inspect(string))
-});
+    _mapper = new _Mapper();
 
 module.exports = function () {
 
@@ -45,6 +22,7 @@ module.exports = function () {
                     "init": String,
                     "test": String,
                     "proxy": String,
+                    "debug": [Boolean, false],
                     "watch": [Boolean, false],
                     "project": [String, null]
                 }, {
