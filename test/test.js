@@ -28,7 +28,8 @@ function _call(command, args, callback) {
     });
 
     ls.stderr.on('data', function (data) {
-        console.log(data);
+        var buff = new Buffer(data);
+        console.log(buff.toString('utf8'));
     });
 
     ls.on('close', function (code) {
