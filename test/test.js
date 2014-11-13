@@ -22,8 +22,12 @@ function _call(command, args, callback) {
 
     console.log("CatJS command:", command, " ", args);
 
+    ls.stdout.on('data', function (data) {
+        console.log(data);
+    });
+
     ls.stderr.on('data', function (data) {
-        console.log('stderr: ' + data);
+        console.log(data);
     });
 
     ls.on('close', function (code) {

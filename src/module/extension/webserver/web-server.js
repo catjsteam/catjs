@@ -1,11 +1,9 @@
-var _http = require("http"),
-    _url = require("url"),
+var _url = require("url"),
     _path = require("path"),
     _fs = require("fs"),
     _express = require('express'),
     _global = catrequire("cat.global"),
-    _log = _global.log(),
-    _props = catrequire("cat.props"),
+    _log = _global.log(),   
     _server,
     _utils  = catrequire("cat.utils"),
      _winston = require('winston'),
@@ -49,7 +47,7 @@ var webserver  = function() {
             };
 
             if (!path || (path && !_fs.existsSync(path))) {
-                _utils.log("warning", "[CAT WebServer] not valid location: " + path);
+                _utils.log("warning", "[catjs server] not valid location: " + path);
                 return undefined;
             }
 
@@ -57,7 +55,6 @@ var webserver  = function() {
 
             var logger = new (_winston.Logger)({
                 transports: [
-                   //new (_winston.transports.Console)({ level: 'verbose', json: false}),
                     new (_winston.transports.File)({ filename: 'express_server.log',  level: 'info', json: false })
                 ]
             });
@@ -71,9 +68,9 @@ var webserver  = function() {
             _server.configure(function () {
                 _server.set('port', process.env.PORT || port);
                 _server.use(_express.logger({stream: winstonStream, format: 'dev'}));
-                _server.use(_express.bodyParser());
+                _server.use(_express.json());
+                _server.use(_express.urlencoded());
                 _server.use(allowCrossDomain);
-                _server.use(_express.bodyParser());
                 _server.use(_server.router);
                 _server.use(_express.static(path));                                                   
             });
@@ -112,7 +109,6 @@ var webserver  = function() {
                     var finalScreenshotName = scrapName + "_" + deviceName +".png";
 
                     _fs.writeFile(finalScreenshotName, data, function (err) {
-                        console.log("It's saved with read");
                         res.redirect("back");
                     });
                 });
@@ -121,7 +117,7 @@ var webserver  = function() {
 
 
             _server.listen(port, function() {
-                _log.info(_props.get("cat.ext.webserver.start").format("[webserver ext]"));
+                _utils.log("info", ("[catjs server] Server Started, listening to port:" + port));
                 if (callback) {
                     callback.call(this);
                 }
@@ -130,7 +126,7 @@ var webserver  = function() {
 
         stop: function(callback) {
             if (_server) {
-                _log.debug(_props.get("cat.ext.webserver.stop").format("[webserver ext]"));
+                _utils.log("info", ("[catjs server] Server Stopped "));
                 if (callback) {
                     callback.call(this);
                 }
