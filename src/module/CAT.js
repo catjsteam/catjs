@@ -480,6 +480,7 @@ var CAT = function () {
                 nocolor = require("stripcolorcodes");
                 unhook = _hook_stdout(function(string, encoding, fd) {
                     string = nocolor(string);
+                    string = string.split("/n").join("").split("/r").join("");
                     util.debug(util.inspect(string))
                 });
             }
