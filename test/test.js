@@ -31,7 +31,7 @@ function _call(command, args, callback) {
 
                 string = buff.toString('utf8');
                 string = nocolor(string);
-                string = string.split("\n").join("").split("\r").join("");
+                string = string.split("\n").join("").split("\r").join("").split("\'").join("");
                 
                 console.log(util.inspect(string));
             }
