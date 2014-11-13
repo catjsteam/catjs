@@ -8,7 +8,8 @@ var _url = require("url"),
     _utils  = catrequire("cat.utils"),
      _winston = require('winston'),
     _projectmanager = require('../projectmanager/action'),
-    _assert = require('./CatObjects/assert');
+    _assert = require('./CatObjects/assert'),
+    _runner = require('./CatObjects/runner');
 
 /**
  * Web Server support mainly for serving static pages
@@ -76,7 +77,8 @@ var webserver  = function() {
             });
 
            
-            _server.get('/assert', _assert.result);
+            _server.get('/assert', _assert.get);
+            _server.get('/runner', _runner.get);
                           
 
             _server.get('/*', function(req, res, next){
