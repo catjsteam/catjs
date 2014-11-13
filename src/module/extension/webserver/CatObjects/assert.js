@@ -9,7 +9,8 @@ var _jmr = require("test-model-reporter"),
     _colors,
     _colorsArray = ['blue', 'yellow', 'cyan', 'magenta', 'grey', 'green'],
     _colorCell = {},
-    _colorIndex = -1;
+    _colorIndex = -1,
+    _useragent = require('express-useragent');
 
 
 /**
@@ -125,56 +126,68 @@ function readTestConfig(scenario) {
 
 /**
  * Report Entity
- * 
+ *
  * @param filename The test's file name
  * @param id The id of the test
  * @param scenario The current scenario
  * @param status The status of the test ["Start" | "End"]
  * @constructor
  */
-function ReportCreator(filename, id, scenario, status) {
-    
-    this.init(filename, id, scenario, status);
+function ReportCreator(config) {
+
+    this.init(config);
 }
 
 
+ReportCreator.prototype.init = function (config) {
 
-ReportCreator.prototype.init = function (filename, id, scenario, status) {
-    
-    this._id = id;
+    var status = config.status;
+
+    this._name = config.name;
+    this._ua = config.ua;
+    this._id = config.id;
     this._status = 0;
-    this._fileName = filename;
+    this._fileName = config.filename;
     if (status && status !== "Start" && status != "End") {
-        this._testConfigMap = readTestConfig(scenario);
+        this._testConfigMap = readTestConfig(config.scenario);
     }
     this._hasFailed = false;
     this._testsuite = _jmr.create({
         type: "model.testsuite",
         data: {
-            name: id
+            name: config.id
         }
     });
 };
 
 ReportCreator.prototype.reset = function () {
-    
+
     this._status = 0;
     this._hasFailed = false;
     this._testsuite = _jmr.create({
         type: "model.testsuite",
         data: {
-            name: this._id
+            name: this.getTitle(),
+            id: this._id
         }
     });
 };
 
 ReportCreator.prototype.validate = function () {
-    
-    
+
+
 };
 
 ReportCreator.prototype.getTestConfigMap = function () {
     return this._testConfigMap;
+};
+
+ReportCreator.prototype.getTitle = function() {
+    var ua = this._ua, uainfo;
+    
+    uainfo = (ua ? [" ", this._name, " ", ua.Browser, " " , ua.Version, " " , ua.OS, " "].join("") : "");
+    
+    return uainfo;
 };
 
 ReportCreator.prototype.addTestCase = function (config) {
@@ -198,9 +211,12 @@ ReportCreator.prototype.addTestCase = function (config) {
     isconsole = (reports["console"] === 1);
 
     function _printTest2Console(msg) {
-        var message;
+        var message, title;
+        
         if (isconsole) {
-            message = "[" + id + "] " + msg;
+            title = me.getTitle();
+            message = ["[" , id , "] ", title, msg].join("");
+            
             console.info(message.current);
             _log.info(message);
         }
@@ -270,31 +286,31 @@ ReportCreator.prototype.addTestCase = function (config) {
                 _colors.setTheme({'current': "red"});
                 result = "Test end with error: " + error;
                 result = "======== Test End - " + result + " ========";
-    
+
             } else {
                 result = this._hasFailed ? "failed" : "succeeded";
                 result = "======== Test End - " + result + " ========";
             }
-            
+
             // print to console the test info
-            _printTest2Console(result);            
-    
+            _printTest2Console(result);
+
             // delete the color on test end
             deleteColor(id);
 
             this._status = 0;
-            
+
         } else if (status === 'Start') {
-            
+
             if (this._status === 1) {
-               // todo call end.. fail the test!!!
+                // todo call end.. fail the test!!!
 
                 result = "======== Test End - Aborted ========";
                 // print to console the test info
                 _printTest2Console(result);
 
                 // delete the color on test end
-                deleteColor(id);               
+                deleteColor(id);
             }
 
             this.reset();
@@ -321,6 +337,17 @@ init();
 
 exports.result = function (req, res) {
 
+    function _userAgent(req) {
+
+        var source = req.headers['user-agent'],
+            us;
+        if (source) {
+            us = _useragent.parse(source);
+        }
+
+        return us;
+    }
+
     var query = req.query,
         testName = query.testName,
         message = query.message,
@@ -331,16 +358,17 @@ exports.result = function (req, res) {
         reportType = query.type,
         hasPhantom = query.hasPhantom,
         id = query.id,
+        name = (query.name || "NA"), 
         file, checkIfAliveTimeout = (_testconfig["test-failure-timeout"] || 30) * 1000,
         reportsArr = [],
         reportKey,
         testConfigMap,
-        key;
+        key, ua = _userAgent(req);
 
     if (reports) {
         reportsArr = reports.split(",");
         reports = {};
-        reportsArr.forEach(function(report) {
+        reportsArr.forEach(function (report) {
             if (report) {
                 reports[report] = 1;
             }
@@ -349,13 +377,19 @@ exports.result = function (req, res) {
     }
 
     clearTimeout(_checkIfAlive);
-    
+
     // TODO Session validation for end the test and start a new one...
     if (status !== 'End') {
 
         _checkIfAlive = setTimeout(function () {
             if (_reportCreator == {}) {
-                _reportCreator['notest'] = new ReportCreator("notestname.xml", 'notest', scenario);
+                _reportCreator['notest'] = new ReportCreator({
+                    filename: "notestname.xml",
+                    id: 'notest',
+                    scenario: scenario,
+                    ua: ua,
+                    name: name
+                });
                 _log.info("[CAT] No asserts received, probably a network problem, failing the rest of the tests ");
 
             } else {
@@ -374,8 +408,8 @@ exports.result = function (req, res) {
             }
 
         }, checkIfAliveTimeout);
-    } 
-    
+    }
+
     _log.info("requesting " + testName + message + status);
     res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
     res.send({"testName": testName, "message": message, "status": status});
@@ -385,7 +419,14 @@ exports.result = function (req, res) {
     file = "./" + reportType + "-" + phantomStatus + id + ".xml";
 
     if (!_reportCreator[id]) {
-        _reportCreator[id] = new ReportCreator(file, reportType + id, scenario, status);
+        _reportCreator[id] = new ReportCreator({
+            filename: file,
+            id: (reportType + id),
+            scenario: scenario,
+            status: status,
+            ua: ua,
+            name: name
+        });
     }
 
     _reportCreator[id].addTestCase({testName: testName, status: status, phantomStatus: phantomStatus, message: message, reports: reports, error: error, id: id});

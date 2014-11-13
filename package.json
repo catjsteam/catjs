@@ -72,7 +72,8 @@
     "colors": "~0.6.2",
     "autonpm": "~0.1.2",
     "faker": "~2.0.1",
-    "stripcolorcodes": "^0.1.0"
+    "stripcolorcodes": "^0.1.0",
+    "express-useragent": "^0.1.2"
   },
   "devDependencies": {
     "less": "^1.7.5"
