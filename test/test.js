@@ -29,6 +29,7 @@ function _call(command, args, callback) {
             buff = new Buffer(data);
             if (buff) {
 
+                string = buff.toString('utf8');
                 string = nocolor(string);
                 string = string.split("\n").join("").split("\r").join("");
                 
