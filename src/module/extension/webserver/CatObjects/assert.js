@@ -155,7 +155,8 @@ ReportCreator.prototype.init = function (config) {
     this._testsuite = _jmr.create({
         type: "model.testsuite",
         data: {
-            name: config.id
+            name: this.getTitle(),
+            id: this._id
         }
     });
 };
