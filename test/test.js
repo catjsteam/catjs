@@ -5,7 +5,7 @@ var args = process.argv.slice(2),
     _request,
     _admzip,
     _os = require("os"),
-    _platform  = _os.platform(),
+    _platform = _os.platform(),
     _path = require("path"),
     _fs = require("fs"),
     basedir = "./",
@@ -20,16 +20,31 @@ var args = process.argv.slice(2),
 function _call(command, args, callback) {
     var ls = _spawn.spawn(command, args);
 
+    function printBuffer(data) {
+        var util = require('util'),
+            nocolor = require("stripcolorcodes"),
+            buff, string;
+
+        if (data) {
+            buff = new Buffer(data);
+            if (buff) {
+
+                string = nocolor(string);
+                string = string.split("\n").join("").split("\r").join("");
+                
+                console.log(util.inspect(string));
+            }
+        }
+    }
+
     console.log("CatJS command:", command, " ", args);
 
     ls.stdout.on('data', function (data) {
-        var buff = new Buffer(data);        
-        console.log(buff.toString('utf8'));
+        printBuffer(data);
     });
 
     ls.stderr.on('data', function (data) {
-        var buff = new Buffer(data);
-        console.log(buff.toString('utf8'));
+        printBuffer(data);
     });
 
     ls.on('close', function (code) {
@@ -41,7 +56,7 @@ function _call(command, args, callback) {
 }
 
 function _testBegin() {
-    
+
     // extract zip file
     if (!_fs.existsSync(_zipfolder) && _fs.existsSync(_zipfile)) {
         _admzip = (global["$adm-zip"] || require("adm-zip"));
@@ -51,7 +66,7 @@ function _testBegin() {
     }
 
     console.log("CatJS running tests from directory: ", process.cwd());
-    
+
     // activate catjs core tests
     _call("node", [_path.join("test/" + _path.join(_extractFolder, "test.js"))]);
 }
@@ -61,56 +76,56 @@ function _install(build, proxy) {
     function _downloadTestApps(callback) {
 
         var requestConfig = {
- 		     url:'http://github.com/catjsteam/test-apps/archive/master.zip'
+            url: 'http://github.com/catjsteam/test-apps/archive/master.zip'
         };
 
-    	if (proxy) {
-    		requestConfig.proxy = proxy;
-    	}
+        if (proxy) {
+            requestConfig.proxy = proxy;
+        }
 
         try {
-            
+
             _request = (global["$request"] || require("request"));
             _requestprogress = (global["$request-progress"] || require("request-progress"));
-            
+
         } finally {
             if (!_request || !_requestprogress) {
                 console.log("\n npm modules are missing (request, requestprogress and amd-zip), install them manually under catjs node_modules...", cathome);
             }
         }
-            
-	process.stdout.write("\n CatJS test-apps download (Please wait...) ");
-      
-	_requestprogress(_request(requestConfig), {
-        "throttle": 2000
-    })
-	.on('progress', function (state) {
-	    process.stdout.write(".");
-	})
-	.on('error', function (err) {
-	    console.error("error", err);
-	})
-	.pipe(_fs.createWriteStream(_zipfile, {flags:"w+", mode:"0777"}))
-	.on('error', function (err) {
-	    console.error("error", err);
-	})
-	.on('close', function (err) {
 
-	    process.stdout.write("\n Test apps successfully downloaded. ");
+        process.stdout.write("\n CatJS test-apps download (Please wait...) ");
 
-	    process.stdout.write("\n Start testing CatJS Apps");
-	    
-	    if (callback) {
-		callback.call(this);
-	    }
-	});
+        _requestprogress(_request(requestConfig), {
+            "throttle": 2000
+        })
+            .on('progress', function (state) {
+                process.stdout.write(".");
+            })
+            .on('error', function (err) {
+                console.error("error", err);
+            })
+            .pipe(_fs.createWriteStream(_zipfile, {flags: "w+", mode: "0777"}))
+            .on('error', function (err) {
+                console.error("error", err);
+            })
+            .on('close', function (err) {
+
+                process.stdout.write("\n Test apps successfully downloaded. ");
+
+                process.stdout.write("\n Start testing CatJS Apps");
+
+                if (callback) {
+                    callback.call(this);
+                }
+            });
 
     }
 
     if (build) {
         autonpm("request-progress", {where: path}).then(
             function (mod) {
-    
+
             }).fail(
             function (error) {
                 console.error("Fail to load request-progress module ", error);
@@ -123,22 +138,22 @@ function _install(build, proxy) {
                     })
                     .done(
                     function () {
-    
+
                         autonpm("adm-zip", {where: path}).fail(
                             function (error) {
                                 console.error("Fail to load request module ", error);
                             })
                             .done(
                             function () {
-    
+
                                 var zip;
-    
+
                                 // download test-apps zip file
-                                _downloadTestApps(function() {
+                                _downloadTestApps(function () {
                                     _testBegin();
-                                                                   
+
                                 });
-                             
+
                             }
                         );
                     }
@@ -146,9 +161,9 @@ function _install(build, proxy) {
             });
     } else {
         // download test-apps zip file
-        _downloadTestApps(function() {
+        _downloadTestApps(function () {
             _testBegin();
-                                           
+
         });
     }
 }
@@ -199,45 +214,45 @@ if (require.main === module) {
     if (args && args[0]) {
         if (args[0] === "clean") {
             _clean();
-            
+
         } else if (args[0] === "buildall") {
             console.log("...", args);
             _install(true, args[1]);
-            
-        }  else if (args[0] === "build") {
+
+        } else if (args[0] === "build") {
             console.log("...", args);
             _install(false, args[1]);
         }
     } else {
         _install(true);
     }
-    
+
 } else if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
 
         // nodejs support
-        module.exports = function() {
+        module.exports = function () {
 
             return {
 
-                init: function() {
-                        
+                init: function () {
+
                 },
-                
+
                 /**
                  * Manually run catjs build
-                 * 
+                 *
                  * @param proxy The proxy server
                  */
-                build: function(proxy){
+                build: function (proxy) {
                     _install(false, proxy);
                 },
-                
-                buildall: function(proxy){
+
+                buildall: function (proxy) {
                     _install(true, proxy);
                 },
-                
-                clean: function() {
+
+                clean: function () {
                     _clean();
                 }
             };
