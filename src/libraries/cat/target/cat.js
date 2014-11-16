@@ -2820,6 +2820,33 @@ if (typeof exports !== 'undefined') {
 }
 
 
+_cat.plugins.deviceinfo = function () {
+
+
+
+    return {
+
+        actions: {
+
+
+            deviceinfo: function (scrapName) {
+
+                console.log("deviceinfo");
+                var url = "catjsdeviceinfo:\\scrapName=" + scrapName,
+                    iframe = document.createElement("IFRAME");
+
+                iframe.setAttribute("src", url);
+                document.documentElement.appendChild(iframe);
+                iframe.parentNode.removeChild(iframe);
+                iframe = null;
+            }
+        }
+
+
+    };
+
+}();
+
 var animation = false;
 
 
@@ -3006,9 +3033,6 @@ _cat.plugins.jqm = function () {
             return val;
         }
     }
-
-
-
 
     /**
      * Trigger an event with a given object

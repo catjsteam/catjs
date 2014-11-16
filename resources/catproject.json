@@ -109,6 +109,10 @@
             "type": "scrap-screenshot"
         },
         {
+            "name": "p@scrap.deviceinfo",
+            "type": "scrap-deviceinfo"
+        },
+        {
             "name": "p@scrap.vnc",
             "type": "scrap-vnc"
         },
@@ -194,11 +198,11 @@
         },
         {
             "name": "t@scrap",
-            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.vnc", "p@scrap.enyo", "p@scrap.screenshot", "p@custom.plugin", "p@init.scrap"]
+            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.vnc", "p@scrap.enyo", "p@scrap.screenshot", "p@scrap.deviceinfo", "p@custom.plugin", "p@init.scrap"]
         },
         {
             "name": "t@inject",
-            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@scrap.screenshot", "p@custom.plugin", "p@project.inject", "p@project.minify"]
+            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@scrap.screenshot", "p@scrap.deviceinfo", "p@custom.plugin", "p@project.inject", "p@project.minify"]
         }
     ]
 
