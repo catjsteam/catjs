@@ -1,16 +1,15 @@
-var _http = require("http"),
-    _url = require("url"),
+var _url = require("url"),
     _path = require("path"),
     _fs = require("fs"),
     _express = require('express'),
     _global = catrequire("cat.global"),
-    _log = _global.log(),
-    _props = catrequire("cat.props"),
+    _log = _global.log(),   
     _server,
     _utils  = catrequire("cat.utils"),
      _winston = require('winston'),
     _projectmanager = require('../projectmanager/action'),
-    _assert = require('./CatObjects/assert');
+    _assert = require('./CatObjects/assert'),
+    _runner = require('./CatObjects/runner');
 
 /**
  * Web Server support mainly for serving static pages
@@ -49,7 +48,7 @@ var webserver  = function() {
             };
 
             if (!path || (path && !_fs.existsSync(path))) {
-                _utils.log("warning", "[CAT WebServer] not valid location: " + path);
+                _utils.log("warning", "[catjs server] not valid location: " + path);
                 return undefined;
             }
 
@@ -57,7 +56,6 @@ var webserver  = function() {
 
             var logger = new (_winston.Logger)({
                 transports: [
-                   //new (_winston.transports.Console)({ level: 'verbose', json: false}),
                     new (_winston.transports.File)({ filename: 'express_server.log',  level: 'info', json: false })
                 ]
             });
@@ -71,15 +69,16 @@ var webserver  = function() {
             _server.configure(function () {
                 _server.set('port', process.env.PORT || port);
                 _server.use(_express.logger({stream: winstonStream, format: 'dev'}));
-                _server.use(_express.bodyParser());
+                _server.use(_express.json());
+                _server.use(_express.urlencoded());
                 _server.use(allowCrossDomain);
-                _server.use(_express.bodyParser());
                 _server.use(_server.router);
                 _server.use(_express.static(path));                                                   
             });
 
            
-            _server.get('/assert', _assert.result);
+            _server.get('/assert', _assert.get);
+            _server.get('/runner', _runner.get);
                           
 
             _server.get('/*', function(req, res, next){
@@ -99,16 +98,11 @@ var webserver  = function() {
                         && req.query.testId) {
                     _projectmanager.checkScrap(req,res);
                 }
-//                } else {
-//                    res.send({"error" : "invalid"} );
-//                }
-
             });
 
 
             _server.post('/screenshot', function(req, res){
 
-                debugger;
                 _fs.readFile(req.files.photo.path, function (err, data) {
 
                     var scrapName = req.body.scrapName;
@@ -117,7 +111,6 @@ var webserver  = function() {
                     var finalScreenshotName = scrapName + "_" + deviceName +".png";
 
                     _fs.writeFile(finalScreenshotName, data, function (err) {
-                        console.log("It's saved with read");
                         res.redirect("back");
                     });
                 });
@@ -126,7 +119,7 @@ var webserver  = function() {
 
 
             _server.listen(port, function() {
-                _log.info(_props.get("cat.ext.webserver.start").format("[webserver ext]"));
+                _utils.log("info", ("[catjs server] Server Started, listening to port:" + port));
                 if (callback) {
                     callback.call(this);
                 }
@@ -135,7 +128,7 @@ var webserver  = function() {
 
         stop: function(callback) {
             if (_server) {
-                _log.debug(_props.get("cat.ext.webserver.stop").format("[webserver ext]"));
+                _utils.log("info", ("[catjs server] Server Stopped "));
                 if (callback) {
                     callback.call(this);
                 }

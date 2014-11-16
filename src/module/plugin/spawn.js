@@ -88,6 +88,14 @@ module.exports = _basePlugin.ext(function () {
                     };
 
                     chilsp.on('close', callback);
+                    
+                    if (chilsp.stdout ) {
+                        chilsp.stdout.pipe(process.stdout);
+                    }
+                    if (chilsp.stderr) {
+                        chilsp.stderr.pipe(process.stderr);
+                    }
+                    
                 } catch (e) {
                     _utils.error(_props.get("cat.error").format("[spawn]", e));
                     if (emitter) {

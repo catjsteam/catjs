@@ -96,7 +96,7 @@ module.exports = function () {
 
                     phantomProcess.stderr.on('data', function (data) {
                         data += '';
-                        _log.debug(_props.get("cat.ext.spawn.phantomjs.log").format("[phantomjs bridge]", "error", data.replace("\n", "\nstderr: ")));
+                        _log.debug(_props.get("cat.ext.spawn.phantomjs.log").format("[phantomjs bridge]", "error", data.replace("\n", "\n ")));
                     });
 
                     phantomProcess.on('exit', function (code) {

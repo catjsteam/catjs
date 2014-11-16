@@ -75,19 +75,48 @@ var runner = function () {
                     "host": "auto",
                     "port": config.port
                 }
+            }, origcallback;
+
+            if (config && config.runnerconfig) {
+                runnerConfig = config.runnerconfig;
+                if (runnerConfig.run) {
+                    if (!runnerConfig.server) {
+                        runnerConfig.server = {
+                            "host": "auto",
+                            "port": config.port
+                        }
+                    }
+                }
+            }
+
+            if (runnerConfig.callback) {
+                origcallback = runnerConfig.callback;
+            }
+            runnerConfig.callback = function (info) {
+
+                var runinfo,
+                    errors;
+
+                if (info) {
+                    if (!info.test())
+                    
+                        errors = info.errors();
+                        if (errors) {
+                            _utils.error(("[Mobile Runner] Error messages: " + (errors ? errors.print() : "General error occured")) );
+                        }
+
+                    runinfo = info.getRunnableInfo();
+                    if (runinfo) {
+                        _utils.error("[Mobile Runner] Failed to run all of the requested devices or browsers. Planned: " + info.size() + " actual: " + runinfo.size());
+                    }
+
+                }
+
+                if (origcallback) {
+                    origcallback.call(this, info);
+                }
             };
 
-             if (config && config.runnerconfig) {
-                 runnerConfig = config.runnerconfig;
-                 if (runnerConfig.run) {
-                     if (!runnerConfig.server) {
-                         runnerConfig.server = {
-                             "host": "auto",
-                             "port": config.port
-                         }
-                     }
-                 }
-             }
             _mobilerunner.run(runnerConfig);
         },
 

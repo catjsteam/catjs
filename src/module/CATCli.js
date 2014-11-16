@@ -4,9 +4,6 @@ var _nopt = require("nopt"),
     _Mapper = require("require-mapper"),
     _mapper = new _Mapper();
 
-
-
-
 module.exports = function () {
 
     var _module,
@@ -25,6 +22,7 @@ module.exports = function () {
                     "init": String,
                     "test": String,
                     "proxy": String,
+                    "debug": [Boolean, false],
                     "watch": [Boolean, false],
                     "project": [String, null]
                 }, {
