@@ -28,6 +28,41 @@ module.exports = function () {
                     var deviceinfoRows,
                         me = this,
 
+
+                        generate = function (deviceinfoRow) {
+
+                            var deviceinfo;
+
+                            deviceinfoRow = _utils.prepareCode(deviceinfoRow);
+
+                            if (deviceinfoRow && deviceinfoRow.join) {
+                                deviceinfo = deviceinfoRow.join("\n");
+                            } else {
+                                deviceinfo = deviceinfoRow;
+                            }
+
+                            if (deviceinfo) {
+                                var match = _scraputils.generate({
+                                    api: "deviceinfo",
+                                    apiname: "deviceinfo",
+                                    exp: deviceinfo
+                                });
+
+                                if (match) {
+
+                                    tempCommand = [
+                                        '_cat.core.plugin("deviceinfo").actions.',
+                                        match
+                                    ];
+
+                                    return tempCommand.join("");
+                                }
+                            }
+
+                            return undefined;
+                        },
+                        
+                        
                         scrapConf = me.config,
                         scrap = scrapConf,
                         dm;
@@ -55,8 +90,11 @@ module.exports = function () {
                             rows:deviceinfoRows
 
                         }, function(row) {
-                            var deviceinfoCommand = '_cat.core.plugin("deviceinfo").actions.deviceinfo("' + scrap.name[0] + '")';
-                            return deviceinfoCommand;
+                            //var deviceinfoCommand = '_cat.core.plugin("deviceinfo").actions.deviceinfo("' + scrap.name[0] + '")';
+
+
+                            return generate(row);
+//                            return deviceinfoCommand;
                         });
                     }
 

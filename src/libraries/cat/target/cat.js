@@ -2829,10 +2829,12 @@ _cat.plugins.deviceinfo = function () {
         actions: {
 
 
-            deviceinfo: function (scrapName) {
+            deviceinfo: function (interval) {
+                 if (typeof interval === "undefined") {
+                     interval = true;
+                 }
 
-                console.log("deviceinfo");
-                var url = "catjsdeviceinfo:\\scrapName=" + scrapName,
+                var url = "catjsdeviceinfo:\\interval=" + interval,
                     iframe = document.createElement("IFRAME");
 
                 iframe.setAttribute("src", url);
