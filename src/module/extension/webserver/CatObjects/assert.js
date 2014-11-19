@@ -7,7 +7,8 @@ var _global = catrequire("cat.global"),
     _testconfig,   
     _useragent = require('express-useragent'),
     _Assert = require("./entity/Assert"),
-    _ReportCreator = require("./entity/Reporter");
+    _ReportCreator = require("./entity/Reporter"),
+    _config = require("./config");
 
 
 
@@ -18,31 +19,9 @@ var _global = catrequire("cat.global"),
  * - Loading cat configuration
  */
 function init() {
-
-
-
-    // read configuration
-    var path = require("path"),
-        configPath,
-        data,
-        project, sourceFolder;
-
-    if (_catcli) {
-        project = _catcli.getProject();
-        if (project) {
-            try {
-                sourceFolder = project.getInfo("source");
-                configPath = path.join(sourceFolder, "/config/cat.json");
-            } catch (e) {
-                _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT test project is available.", e);
-            }
-        } else {
-            _log.error("[CAT server (assert module)] Failed to load cat.json test project, No CAT project is available.");
-        }
-    }
-
-    data = _fs.readFileSync(configPath, 'utf8');
-    _testconfig = JSON.parse(data);
+  
+    // load cat.json test data...
+    _testconfig = _config.get();
 
 }
 
@@ -145,25 +124,24 @@ exports.get = function (req, res) {
 
     if (!_reportCreator[id]) {
         _reportCreator[id] = new _ReportCreator({
-            filename: file,
             id: (reportType + id),
-            scenario: scenario,
             status: status,
-            ua: ua,
             name: name,
-            testConfig: _testconfig
+            filename: file,
+            scenario: scenario,
+            ua: ua,
+            testConfig: _testconfig,
+            reports: reports
         });
     }
 
     _reportCreator[id].addTestCase({
-        testName: testName,
-        status: status,
-        phantomStatus: phantomStatus,
-        message: message, 
-        reports: reports, 
-        error: error,
         id: id,
-        testConfig: _testconfig
+        status: status,
+        testName: testName,
+        phantomStatus: phantomStatus,
+        message: message,       
+        error: error
     });
 };
 
