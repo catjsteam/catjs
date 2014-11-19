@@ -46,6 +46,14 @@ _cat.core.Config = function(args) {
                 return  document.location.hostname;
             }
         };
+        
+        this.getMethod = function () {
+            if (innerConfig.method) {
+                return innerConfig.method;
+            } else {
+                return  "http";
+            }
+        };
 
         this.getPort = function () {
             if (innerConfig.port) {
