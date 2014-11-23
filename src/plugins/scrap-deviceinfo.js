@@ -90,11 +90,7 @@ module.exports = function () {
                             rows:deviceinfoRows
 
                         }, function(row) {
-                            //var deviceinfoCommand = '_cat.core.plugin("deviceinfo").actions.deviceinfo("' + scrap.name[0] + '")';
-
-
                             return generate(row);
-//                            return deviceinfoCommand;
                         });
                     }
 
