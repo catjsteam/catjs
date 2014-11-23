@@ -725,6 +725,14 @@ _cat.core.Config = function(args) {
                 return  document.location.hostname;
             }
         };
+        
+        this.getMethod = function () {
+            if (innerConfig.method) {
+                return innerConfig.method;
+            } else {
+                return  "http";
+            }
+        };
 
         this.getPort = function () {
             if (innerConfig.port) {
@@ -1812,22 +1820,23 @@ _cat.core.TestManager = function() {
             var reports = testdata.getReportFormats(),
                 storageEnum = _cat.utils.Storage.enum;
 
-            return "http://" + config.getIp() +  ":" +
-                config.getPort() + "/assert?" +
-                "testName=" + testdata.getName() +
-                "&scenario=" + _cat.utils.Storage.get(storageEnum.CURRENT_SCENARIO, storageEnum.SESSION) +
-                "&message=" + testdata.getMessage() +
-                "&error=" + testdata.getError() +
-                "&status=" + testdata.getStatus() +
-                "&reports=" + (reports ? reports.join(",") : "") +
-                "&name=" + config.getName() +
-                "&type=" + testdata.getType() +
-                "&hasPhantom="  + config.hasPhantom() +
-                "&id="  + _cat.core.guid() +
-                "&cache="+ (new Date()).toUTCString();
-
-        }
-
+            return _cat.utils.Request.generate({
+                service: "assert",
+                cache:true,
+                params: {
+                    testName: testdata.getName(),
+                    name: testdata.getName(),
+                    type: testdata.getType(),
+                    scenario: _cat.utils.Storage.get(storageEnum.CURRENT_SCENARIO, storageEnum.SESSION),
+                    message: testdata.getMessage(),
+                    error: testdata.getError(),
+                    status: testdata.getStatus(),
+                    reports:(reports ? reports.join(",") : ""),
+                    hasPhantom:  + config.hasPhantom(),
+                    id: _cat.core.guid()
+                }                    
+            });
+        }            
     };
 
 
@@ -2430,6 +2439,85 @@ _cat.utils.Loader = function () {
 //    //Call the init function in the loaded file.
 //    console.log("generation done");
 //})
+
+_cat.utils.Request = function () {
+   
+    return {
+
+        /**
+         * Generates request for catjs monitoring server
+         * 
+         * @param config {Object} The main object
+         *      service {String} The service url name
+         *      params {Object} Request parameters
+         *      cache {Boolean} Enable url cache
+         *      
+         * @returns {*}
+         */
+        generate: function(config) {
+
+            var service = config.service, 
+                paramsarg = config.params,
+                params = [],
+                key, param, counter= 0,
+                uri;
+            
+            function getURI() {
+                var catconfig,
+                    method, ip, port,
+                    uri;
+
+                catconfig = _cat.core.getConfig();
+                if (catconfig) {
+                    method = catconfig.getMethod();
+                    ip = catconfig.getIp();
+                    port = catconfig.getPort();
+
+                    uri = [method, "://", ip, ":", port, "/", service].join("");
+                }
+                
+                return uri;
+            }
+            
+            function _addKey(params, key, param) {
+                params.push(key);
+                params.push("=");
+                params.push(param);
+            }
+
+            if ("cache" in config && params) {
+                params.cache = (new Date()).toUTCString();
+            }
+            
+            for (key in paramsarg) {
+                if (paramsarg.hasOwnProperty(key)) {
+                    param = paramsarg[key];
+                    if (param) {
+                        if (counter === 0) {
+                            params.push("?");
+                        } else {
+                            params.push("&");
+                        }
+                        _addKey(params, key, param);
+                        counter++;
+                    }
+                }
+            }                        
+
+            uri = getURI();
+            if (!uri) {
+                _cat.core.log.error("[catjs request] Failed to resolve catjs server address");
+                
+                return undefined;
+            }
+            
+            return [uri, params.join("")].join("");
+                          
+        }    
+        
+    };
+
+}();
 
 _cat.utils.Signal = function () {
 

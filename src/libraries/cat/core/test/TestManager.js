@@ -218,22 +218,23 @@ _cat.core.TestManager = function() {
             var reports = testdata.getReportFormats(),
                 storageEnum = _cat.utils.Storage.enum;
 
-            return "http://" + config.getIp() +  ":" +
-                config.getPort() + "/assert?" +
-                "testName=" + testdata.getName() +
-                "&scenario=" + _cat.utils.Storage.get(storageEnum.CURRENT_SCENARIO, storageEnum.SESSION) +
-                "&message=" + testdata.getMessage() +
-                "&error=" + testdata.getError() +
-                "&status=" + testdata.getStatus() +
-                "&reports=" + (reports ? reports.join(",") : "") +
-                "&name=" + config.getName() +
-                "&type=" + testdata.getType() +
-                "&hasPhantom="  + config.hasPhantom() +
-                "&id="  + _cat.core.guid() +
-                "&cache="+ (new Date()).toUTCString();
-
-        }
-
+            return _cat.utils.Request.generate({
+                service: "assert",
+                cache:true,
+                params: {
+                    testName: testdata.getName(),
+                    name: testdata.getName(),
+                    type: testdata.getType(),
+                    scenario: _cat.utils.Storage.get(storageEnum.CURRENT_SCENARIO, storageEnum.SESSION),
+                    message: testdata.getMessage(),
+                    error: testdata.getError(),
+                    status: testdata.getStatus(),
+                    reports:(reports ? reports.join(",") : ""),
+                    hasPhantom:  + config.hasPhantom(),
+                    id: _cat.core.guid()
+                }                    
+            });
+        }            
     };
 
 

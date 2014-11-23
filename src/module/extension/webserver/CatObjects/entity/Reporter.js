@@ -23,6 +23,8 @@ Reporter.prototype.init = function (config) {
 
     var status = config.status;
 
+    this._isjunit = false;
+    this._isconsole = false;
     this._colors = new _colors();
     this._testconfig = config.testConfig;
     this._name = config.name;
@@ -30,6 +32,13 @@ Reporter.prototype.init = function (config) {
     this._id = config.id;
     this._status = 0;
     this._fileName = config.filename;
+    this._reports = ("reports" in config && config.reports ? config.reports : undefined);
+
+    if (this._reports) {
+        this._isjunit = (this._reports["junit"] === 1);
+        this._isconsole = (this._reports["console"] === 1);
+    }
+    
     if (status && status !== "Start" && status != "End") {
         this._testConfigMap = this.readTestConfig(config.scenario);
     }
@@ -122,25 +131,20 @@ Reporter.prototype.addTestCase = function (config) {
         result,
         logmessage,
         output, symbol,
-        me = this, isjunit, isconsole,
+        me = this,
         testName, status, phantomStatus, message, reports, error, id;
 
     testName = config.testName;
     status = config.status;
     phantomStatus = config.phantomStatus;
     message = config.message;
-    reports = config.reports;
     error = config.error;
     id = config.id;
-
-
-    isjunit = (reports["junit"] === 1);
-    isconsole = (reports["console"] === 1);
 
     function _printTest2Console(msg) {
         var message, title;
 
-        if (isconsole) {
+        if (this._isconsole) {
             title = me.getTitle();
             message = ["[" , id , "] ", title, msg].join("");
 
@@ -193,7 +197,7 @@ Reporter.prototype.addTestCase = function (config) {
 
     if (status !== 'End' && status !== 'Start') {
 
-        if (isjunit) {
+        if (this._isjunit) {
             _writeTestCase();
         }
 

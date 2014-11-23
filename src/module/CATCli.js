@@ -61,6 +61,7 @@ module.exports = function () {
                         "cat.props": "src/module/Properties.js",
                         "cat.config.utils": "src/module/utils/fs/Config.js",
                         "cat.mdata": "src/module/utils/fs/MetaData.js",
+                        "cat.jsonutils": "src/module/utils/fs/JSON.js",
                         "cat.watch": "src/module/Watch.js",
                         "cat.cache": "src/module/Cache.js",
 

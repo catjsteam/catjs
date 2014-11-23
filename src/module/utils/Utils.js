@@ -67,7 +67,53 @@ module.exports = function () {
 
     return {
 
+        /**
+         * 
+         * 
+         * @param refobject {Object} The target object
+         * @param values {Array} The properties to be assigned to the target object
+         *              key {String} The property key
+         *              obj {Object} The object to be copied the property from
+         *              default {Object} The default value to be set
+         */
+        setProps: function (refobject, values) {
+            if (values) {
+                values.forEach(function(value) {
+                    
+                    var defaultval = ("default" in value ? value["default"] : undefined);
+                    if (value) {
+                        if (value.key in value.val) {
+                            if (value.val !== undefined) {
+                                refobject[value.key] = value.val;
+                                
+                            } else if (defaultval !== undefined) {
+                                refobject[value.key] = defaultval;
+                            }
+                        }
+                    }
+                });
+            }
+        },
 
+        /**
+         * 
+         * 
+         * @param value {Object} The source object
+         *          key {String} The property key 
+         *          obj {Object} The object to be copied the property from
+         *          default {Object} A default value
+         *          
+         * @returns {*}
+         */
+        getProp: function(value) {
+            
+            if (value) {
+                var defaultval = ("default" in value ? value["default"] : undefined);
+                return (value.key in value.obj ? value.obj[value.key] : (undefined));
+            }
+
+            return undefined;
+        },        
 
         isWindows: function () {
             var type = _os.platform();
