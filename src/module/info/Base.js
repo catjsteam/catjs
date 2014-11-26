@@ -35,15 +35,26 @@ module.exports = function() {
     function _createFS(config) {
 
         var name, path, filename,
-            entity;
+            entity, record, data;
         
         if (!config) {
             return undefined;
         }
 
+        /*_utils.prepareProps({ 
+            global: {obj: config}, 
+            props: [
+                {key: "name"},
+                {key: "path"},
+                {key: "entity"},
+                {key: "data"}                
+            ] 
+        });*/
+        
         name = _utils.getProp({key: "name", obj: config});
         path = _utils.getProp({key: "path", obj: config});
         entity = _utils.getProp({key: "entity", obj: config});
+        data = _utils.getProp({key: "data", obj: config, default:[]});
         
         if (!_fs.existsSync(path)) {
             _wrench.mkdirSyncRecursive(path, 0777);
@@ -54,6 +65,12 @@ module.exports = function() {
             filename = _path.join(path, name);
             if (!_fs.existsSync(filename) ) {
                 files[filename] = entity.create(filename);
+            } else {
+                if (files[filename]) {
+                    record = files[filename]; 
+                } else {
+                    record = entity.create(filename, false);
+                }   
             }
         } else {
             _utils.error("[catjs info] 'entity' is not valid");
@@ -102,7 +119,20 @@ module.exports = function() {
     }
         
     return {
-      
+
+        /**
+         * Creates Report folder with: device | runner info
+         * e.g. 1-1-2014/_ID_/info_device_android.json
+         * 
+         * @param config
+         *          id {String} the test id
+         *          device {String} device type: browser | device
+         *          type {String} available types: android | ios
+         *          entity {String} available entities: info | test
+         *          data {Object} the data that should be set to the file
+         * 
+         * @returns {undefined}
+         */
         createFS: function(config) {
             
                       

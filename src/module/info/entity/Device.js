@@ -31,10 +31,14 @@ module.exports = function() {
     
     return {
         
-        create: function(filename) {
+        create: function(filename, write) {
             
             var record = new _Record({filename: filename});
-            record.write();
+            
+            write (write === undefined ? true : write);
+            if (write) {
+                record.write();
+            }
                         
         },
         

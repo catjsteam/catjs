@@ -26,7 +26,8 @@ module.exports = function () {
                 id: "t-b-b",
                 device: "device",
                 type: "android",
-                entity: "info"
+                entity: "info",
+                data: {}
             });
             */
             
