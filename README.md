@@ -1,4 +1,4 @@
-CatJS 0.4.25
+CatJS 0.4.26
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -71,3 +71,4 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 
 <br/>
+<div style="position: fixed; padding: 10px; top: 0; right:0; width:100%; text-align:right; cursor:pointer;" onclick="window.location.href='http://catjsteam.github.io/docs/user_guide.html'" > <span style="position: relative; right: 10px; top: 10px; padding-top:10px; font-size:10px; color:#444444">Applications That Test Themselves</span> <img align="right" width="50" height="24" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png"></div><script> (function(){ for(var els = document.getElementsByTagName ('a'), i = els.length; i--;) { var elt = els[i]; elt.setAttribute("target","_blank"); if (elt.href.lastIndexOf(".md") !== -1) {elt.href = elt.href.split(".md").join(".html") } } })(); </script> <script> (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','//www.google-analytics.com/analytics.js','ga'); ga('create', 'UA-53626536-1', 'auto'); ga('send', 'pageview');</script>
