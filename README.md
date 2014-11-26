@@ -48,12 +48,8 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 [![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/catjsyoutube-s.png)](https://t.co/vBgLx9tEFF)  
 
 ### GTAC & Ignite Velocity events
-<div style="display:table-cell;padding: 0 10px 0 10px; width:200px"> 
-    [![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/gtac.jpg)](https://www.youtube.com/watch?v=gGdDc5SlBq4) 
-</div>
-<div style="width: 200px; display:table-cell;padding: 0 10px 0 10px;">
-    [![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/velocity.jpg)](https://www.youtube.com/watch?v=nRcKAFS-Gyg)
-</div>
+[![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/gtac.jpg)](https://www.youtube.com/watch?v=gGdDc5SlBq4) [![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/velocity.jpg)](https://www.youtube.com/watch?v=nRcKAFS-Gyg)
+
 
 ## Documentation
 
