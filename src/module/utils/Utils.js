@@ -130,6 +130,7 @@ module.exports = function () {
          *              key {String} The property key
          *              obj {Object} [optional] The object to be copied the property from
          *              default {Object} [optional] A default value
+         *              require {Boolean} Warning about undefined value, default set to false              
          *              
          */
         prepareProps: function (value) {
@@ -145,16 +146,22 @@ module.exports = function () {
                         
                         var defaultval;
                         
+                        if (! ("require" in prop) ) {
+                            prop.require = false;
+                        }
                         if (!"key" in prop) {
                             throw new Error("[catjs utils] 'key' is a required property for method 'getProps' ");
                         }
                         
                         defaultval = ("default" in prop ? prop.default : undefined);
-                        refobj = ("obj" in prop ? prop[obj] : globalreference);
+                        refobj = ("obj" in prop ? prop.obj : globalreference);
                         
-                        if ("obj" in prop) {
-                            refobj[prop.key] = (prop.key in refobj ?  refobj[prop.key] : defaultval);
+                        refobj[prop.key] = (prop.key in refobj ?  refobj[prop.key] : defaultval);
+                        
+                        if (refobj[prop.key] === undefined || refobj[prop.key] === null) {
+                            throw new Error("[catjs utils prepareProps] property '" + prop.key + "' is required ");
                         }
+                        
                         
                     });
                 }
