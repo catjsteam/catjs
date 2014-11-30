@@ -120,11 +120,11 @@ exports.get = function (req, res) {
 
 
     var phantomStatus = (hasPhantom === "true" ? "phantom" : "");
-    file = "./" + reportType + "-" + phantomStatus + id + ".xml";
+    file = "./" + id + ".xml";
 
     if (!_reportCreator[id]) {
         _reportCreator[id] = new _ReportCreator({
-            id: (reportType + id),
+            id: id,
             status: status,
             name: name,
             filename: file,
