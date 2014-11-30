@@ -8,65 +8,22 @@ var _fs = require("fs"),
 
 module.exports = function () {
     
-    return {
-                
-        /**
-         * Create/Update the CAT metadata file
-         *      
-         *
-         * @param config The configuration for the metadata
-         *          recordFn({Object} JSON object) {Function} Record functionality with update method     
-         *         
-         * @param override True for taking the incoming config over the existing
-         */
-        update: function (config, override) {
-
-            var data,
-                content,
-                store,
-                Record = config.recordFn;
-
-            if (!Record) {
-
-                _utils.error("[catjs JSON utility] Missing Record functionality ");
-                return undefined;
-                
-            } 
-            
-            if (!override) {
-                data = (this.exists() ? this.read() : undefined);
-                if (!data) {
-                    data = new Record(config);
-
-                } else {
-                    content = JSON.parse(data);
-                    data = new Record(content);
-                    if (data.update) {
-                        data.update(config, true);
-                    } else {
-                        _utils.error("[catjs JSON utility] Missing Record 'update' implementation, ignore ");
-                    }
-                }
-                store = data;
-
-            } else {
-                store = config;
-            }
-
-            this.write(JSON.stringify(store));
-
-        },
+    return {                
 
         /**
          * 
          * @param config {Object}
          *          filename {String} The file name
          *          content {String} The file content
+         *          opt Object
+         *                encoding String | Null default = 'utf8'
+         *                mode Number default = 438 (aka 0666 in Octal)
+         *                flag String default = 'w'
          * 
          */
         write: function (config) {
 
-            var content, filename;
+            var content, filename, opt, extname;
             
             if (!config) {
                 return undefined;
@@ -74,9 +31,14 @@ module.exports = function () {
             
             content = _utils.getProp({key: "content", obj: config});
             filename = _utils.getProp({key: "filename", obj: config});
+            opt = _utils.getProp({key: "opt", obj: config});
+            extname = _path.extname(filename);
+            if (extname === ".json") {
+                content = _beautify(content, { indent_size: 2 });
+            }
             
             try {
-                _fs.writeFileSync(filename, _beautify(content, { indent_size: 2 }));
+                _fs.writeFileSync(filename, content, opt);
 
             } catch(e) {
                 _utils.error(_props.get("cat.error").format("[cat mdata]", e));
@@ -101,12 +63,10 @@ module.exports = function () {
             filename = _utils.getProp({key: "filename", obj: config});
             
             try {
-                if (_fs.existsSync()) {
+                if (_fs.existsSync(filename)) {
                     content = _fs.readFileSync(filename, "utf8");
 
-                } else {
-                    _log.warning(_props.get("cat.mdata.file.not.exists").format("[cat mdata]"));
-                }
+                } 
             } catch (e) {
                 _utils.error(_props.get("cat.error").format("[cat mdata]", e));
             }
