@@ -91,8 +91,8 @@ module.exports = function () {
             if (model) {
                 name.push(model);
             }
-            name = name.toLowerCase();
             name = name.join("_") + (entity === "junit" ? ".xml" : ".json");
+            name = name.toLowerCase();
 
         } else {
             _utils.error("[catjs info] Failed to generate the file system path for the test report, some of the arguments are missing or not exists");
