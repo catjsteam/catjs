@@ -5,17 +5,16 @@ var _date = require("date-format-lite"),
     _utils = catrequire("cat.utils"),
     _fs = require("fs"),
     _wrench = require("wrench"),
-    _jsonutils = catrequire("cat.jsonutils"),
-    _devicentity = require("./entity/Device.js");
+    _devicentity = require("./entity/Device.js"),
+    _Generic = require("./entity/Generic.js"),
+    _geneic = new _Generic();
 
-module.exports = function() {
+module.exports = function () {
 
-    var files = {};
-    
     function _getTimeFolder() {
         return (new Date()).format("DD-MM-YYYY");
-    }   
-    
+    }
+
     function _getBasePath() {
 
         return _global.get("home").working.path;
@@ -24,81 +23,77 @@ module.exports = function() {
     function _getEntityRecord(entity) {
         var map = {
             device: _devicentity,
-            browser: function() { console.log("[catjs browser info] Not implemented yet"); },
-            runner: function() { console.log("[catjs runner info] Not implemented yet"); }
-            
+            junit: _geneic,           
+            runner: function () {
+                console.log("[catjs runner info] Not implemented yet");
+            }
+
         };
-        
+
         return (entity ? map[entity] : undefined);
     }
-    
-    function _createFS(config) {
+
+    function _updateFS(config) {
 
         var name, path, filename,
-            entity, record, data;
-        
+            entity, data;
+
         if (!config) {
             return undefined;
         }
 
-        /*_utils.prepareProps({ 
-            global: {obj: config}, 
+        _utils.prepareProps({
+            global: {obj: config},
             props: [
                 {key: "name"},
                 {key: "path"},
                 {key: "entity"},
-                {key: "data"}                
-            ] 
-        });*/
-        
-        name = _utils.getProp({key: "name", obj: config});
-        path = _utils.getProp({key: "path", obj: config});
-        entity = _utils.getProp({key: "entity", obj: config});
-        data = _utils.getProp({key: "data", obj: config, default:[]});
-        
+                {key: "data"}
+            ]
+        });
+
+        name = config.name;
+        path = config.path;
+        entity = config.entity;
+        data = config.data;
+
         if (!_fs.existsSync(path)) {
             _wrench.mkdirSyncRecursive(path, 0777);
         }
 
         entity = _getEntityRecord(entity);
-        if (entity) { 
+        if (entity) {
             filename = _path.join(path, name);
-            if (!_fs.existsSync(filename) ) {
-                files[filename] = entity.create(filename);
-            } else {
-                if (files[filename]) {
-                    record = files[filename]; 
-                } else {
-                    record = entity.create(filename, false);
-                }   
-            }
+            entity.update(filename, data);
+
         } else {
             _utils.error("[catjs info] 'entity' is not valid");
         }
     }
-    
+
     function _getFileSystemInfo(config) {
-        
+
         var id, type, device, entity, model, name,
             time, basepath, path;
-        
+
         if (!config) {
             return undefined;
         }
-        
+
         id = _utils.getProp({key: "id", obj: config});
         type = _utils.getProp({key: "type", obj: config});
         device = _utils.getProp({key: "device", obj: config});
         entity = _utils.getProp({key: "entity", obj: config});
         model = _utils.getProp({key: "model", obj: config});
-        
+
         if (type && device && entity) {
             name = [entity, device, type];
             if (model) {
                 name.push(model);
             }
-            name = name.join("_") + ".json";
-            
+            name = name.toLowerCase();
+            name = name.join("_") + (entity === "junit" ? ".xml" : ".json");
+
         } else {
             _utils.error("[catjs info] Failed to generate the file system path for the test report, some of the arguments are missing or not exists");
             return undefined;
@@ -106,53 +101,55 @@ module.exports = function() {
 
         time = _getTimeFolder();
         basepath = _getBasePath();
-        
+
         if (id) {
             path = _path.join(basepath, "reports", time, id);
-            
+
         } else {
             _utils.error("[catjs info] Failed to generate the file system path for the test report, 'id' argument is nod valid or not exists ");
             return undefined;
         }
-             
+
         return {name: name, path: path};
     }
-        
+
     return {
 
         /**
          * Creates Report folder with: device | runner info
          * e.g. 1-1-2014/_ID_/info_device_android.json
-         * 
+         *
          * @param config
          *          id {String} the test id
          *          device {String} device type: browser | device
          *          type {String} available types: android | ios
          *          entity {String} available entities: info | test
          *          data {Object} the data that should be set to the file
-         * 
+         *
          * @returns {undefined}
          */
-        createFS: function(config) {
-            
-                      
+        updateFS: function (config) {
+
+
             if (!config) {
-                return undefined;   
-            }                     
-         
-            var fsinfo =  _getFileSystemInfo(config),
-                device = _utils.getProp({key: "device", obj: config})
-                ;
+                return undefined;
+            }
+
+            var fsinfo = _getFileSystemInfo(config),
+                entity = _utils.getProp({key: "entity", obj: config}),
+                data = _utils.getProp({key: "data", obj: config});
+
             if (fsinfo) {
-                
-                fsinfo.entity = device; 
-                _createFS(
+
+                fsinfo.entity = entity;
+                fsinfo.data  = data;
+                _updateFS(
                     fsinfo
                 );
             }
-            
+
         }
-        
+
     };
-    
+
 };
