@@ -97,6 +97,14 @@
             "exports": "JSPath",
             "globals": true,
             "install": "static"
+        },
+        {
+            "name": "jasmine",
+            "prod" :["lib/jasmine.js", "lib/jasmine-tap-reporter.js", "lib/catjs-jasmine-boot.js"],
+            "dev" :["lib/jasmine.js", "lib/jasmine-tap-reporter.js", "lib/catjs-jasmine-boot.js"],
+            "exports": "jasmine",
+            "globals": true,
+            "install": "static"
         }
     ]
 }
