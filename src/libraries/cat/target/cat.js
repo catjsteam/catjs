@@ -638,7 +638,8 @@ _cat.core = function () {
                     if (catObj) {
                         _context["$$put"]({
                             scrap: scrap,
-                            arguments: passedArguments
+                            arguments: passedArguments,
+                            scrapinfo: ("scrapinfo" in config ? config.scrapinfo : undefined)
 
                         }, pkgName);
                         catObj.apply(_context, passedArguments);
@@ -1398,6 +1399,9 @@ _cat.core.clientmanager = function () {
 
                         function _add2Queue(config) {
                             config.args = args;
+                            if (args.length && args.length > 1 && (_cat.utils.Utils.getType(args[1]) === "object") ) {
+                                args[1].scrapinfo = config.scrapInfo;
+                            }
                             testQueue[config.scrapInfo.index] = config;
                         }
 
@@ -2922,7 +2926,7 @@ _cat.plugins.deviceinfo = function () {
                      interval = true;
                  }
 
-                var url = "catjsdeviceinfo:\\interval=" + interval,
+                var url = "catjsdeviceinfo://interval=" + interval,
                     iframe = document.createElement("IFRAME");
 
                 iframe.setAttribute("src", url);

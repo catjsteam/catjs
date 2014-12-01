@@ -214,6 +214,9 @@ _cat.core.clientmanager = function () {
 
                         function _add2Queue(config) {
                             config.args = args;
+                            if (args.length && args.length > 1 && (_cat.utils.Utils.getType(args[1]) === "object") ) {
+                                args[1].scrapinfo = config.scrapInfo;
+                            }
                             testQueue[config.scrapInfo.index] = config;
                         }
 

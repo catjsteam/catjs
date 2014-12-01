@@ -638,7 +638,8 @@ _cat.core = function () {
                     if (catObj) {
                         _context["$$put"]({
                             scrap: scrap,
-                            arguments: passedArguments
+                            arguments: passedArguments,
+                            scrapinfo: ("scrapinfo" in config ? config.scrapinfo : undefined)
 
                         }, pkgName);
                         catObj.apply(_context, passedArguments);
