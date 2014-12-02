@@ -493,7 +493,12 @@ _cat.core = function () {
                 i, j;
 
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
-                _cat.core.clientmanager.signScrap(scrap, catConfig, arguments, tests);
+                if (tests.length > 0) {
+                    _cat.core.clientmanager.signScrap(scrap, catConfig, arguments, tests);
+                } else {
+                    _cat.core.TestManager.send({signal: 'NOTEST'});
+                    _cat.core.TestManager.send({signal: 'TESTEND'});
+                }
 
             } else {
                 if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER_OFFLINE)) {
@@ -1520,6 +1525,40 @@ _cat.core.TestAction = function () {
 
     return {
 
+        NOTEST: function(opt) {
+            var guid = _cat.core.guid(),
+                testdata,
+                config = _cat.core.getConfig();
+
+            opt = (opt || {});
+
+            // server signal notification
+            if (config.isReport()) {
+                
+                testdata = _cat.core.TestManager.addTestData({
+                    name: "NOTEST",
+                    displayName: "No valid tests were found",
+                    message: "See cat.json configuration file for adding tests to scenarios",
+                    status: "sysout",
+                    error: (opt.error || ""),
+                    reportFormats: opt.reportFormats
+                });
+
+                _cat.core.ui.setContent({
+                    header: testdata.getDisplayName(),
+                    desc: testdata.getMessage(),
+                    tips: {},
+                    style: "color:gray"
+                });
+                
+                if (config) {
+                    _cat.utils.AJAX.sendRequestSync({
+                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                    });
+                }
+            }  
+        },
+        
         TESTSTART: function (opt) {
 
             var guid = _cat.core.guid(),
@@ -1697,6 +1736,7 @@ _cat.core.TestManager = function() {
             _cat.utils.Signal.register([
                 {signal: "KILL", impl: _cat.core.TestAction.KILL},
                 {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND},
+                {signal: "NOTEST", impl: _cat.core.TestAction.NOTEST},
                 {signal: "TESTSTART", impl: _cat.core.TestAction.TESTSTART}
             ]);
 
@@ -1815,7 +1855,7 @@ _cat.core.TestManager = function() {
          * @param testdata
          *      name - The test Name
          *      message - The test message
-         *      status - The test status
+         *      status - The test status ["Start" | "End" | "success" | "failure" | "sysout"]
          *
          * @returns {string} The assertion URL
          */

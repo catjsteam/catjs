@@ -11,7 +11,7 @@ var _jmr = require("test-model-reporter"),
  * @param filename The test's file name
  * @param id The id of the test
  * @param scenario The current scenario
- * @param status The status of the test ["Start" | "End"]
+ * @param status The status of the test ["Start" | "End" | "success" | "failure" | "sysout"]
  * @constructor
  */
 function Reporter(config) {
@@ -170,6 +170,16 @@ Reporter.prototype.addTestCase = function (config) {
         if (status === 'failure') {
             result = _jmr.create({
                 type: "model.failure",
+                data: {
+                    message: message,
+                    type: status
+                }
+            });
+            testCase.add(result);
+            
+        } else if (status === "sysout") {
+            result = _jmr.create({
+                type: "system.out",
                 data: {
                     message: message,
                     type: status
