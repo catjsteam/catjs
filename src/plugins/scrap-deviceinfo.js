@@ -77,12 +77,7 @@ module.exports = function () {
 
                         if (deviceinfoRows && deviceinfoRows.join) {
 
-                            dm.add({
-                                rows:[_elutils.uicontent({ rows: deviceinfoRows, scrap: scrap})]
-
-                            }, function(row) {
-                                return row;
-                            });
+                            deviceinfoRows.add(_elutils.uicontent({ rows: deviceinfoRows, scrap: scrap}));
                         }
 
 

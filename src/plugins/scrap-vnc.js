@@ -141,12 +141,7 @@ module.exports = function () {
 
                         if (vncRows && vncRows.join) {
 
-                            dm.add({
-                                rows:[_elutils.uicontent({ rows: vncRows, scrap: scrap})]
-
-                            }, function(row) {
-                                return row;
-                            });
+                            vncRows.add(_elutils.uicontent({ rows: vncRows, scrap: scrap}));
                         }
 
 

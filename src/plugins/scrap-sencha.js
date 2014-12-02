@@ -242,14 +242,8 @@ module.exports = function () {
 
                             if (senchaRows && senchaRows.join) {
 
-                                dm.add({
-                                    rows:[_elutils.uicontent({ rows: senchaRows, scrap: scrap})]
-
-                                }, function(row) {
-                                    return row;
-                                });
+                                senchaRows.add(_elutils.uicontent({ rows: senchaRows, scrap: scrap}));
                             }
-
 
                             dm.add({
                                 rows:senchaRows
