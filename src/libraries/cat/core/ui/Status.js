@@ -106,6 +106,10 @@ _cat.core.ui = function () {
             catElement = _getCATElt();
         if (catElement) {
             catStatusElt = (catElement.childNodes[0] ? catElement.childNodes[0] : undefined);
+
+            if ( __cache.length > 0) {
+                _me.setContent(__cache.shift());
+            }
         }
 
         return catStatusElt;
@@ -130,14 +134,15 @@ _cat.core.ui = function () {
         _me.setContent({
             header: "",
             desc: "",
-            tips: "",
+            tips: {tests: "?" ,passed: "?", failed: "?", total: "?"},
             reset: true
         });
     }
 
-    var __catElement,
+    var __cache = [],
+        __catElement,
         _disabled = false,
-        _onloadIstener,
+        _onloadIstener = false,
         _loaderListener = false,
         _me = {
 
@@ -159,7 +164,7 @@ _cat.core.ui = function () {
                     return;
                 }
 
-                if (!_loaderListener) {
+                if (!_loaderListener && !_onloadIstener) {
                     _loaderListener = true;
                     _addEventListener(window, "load", function (e) {
 
@@ -248,9 +253,9 @@ _cat.core.ui = function () {
 
                         catStatusElt.classList.toggle("cat-status-close");
 
-                        if (catStatusContentElt) {
-                            catStatusContentElt.classList.toggle("displayoff");
-                        }
+                        //if (catStatusContentElt) {
+                        //    catStatusContentElt.classList.toggle("displayoff");
+                        //}
                     }
                 }
 
@@ -356,9 +361,10 @@ _cat.core.ui = function () {
                     catElement = _getCATElt(),
                     isOpen = false,
                     reset = ("reset" in config ? config.reset : false),
-                    me = this;
-
-                if (catElement) {
+                    me = this;                
+                
+                if (catElement) {                                     
+                    
                     catStatusContentElt = _getCATStatusContentElt();
                     if (catStatusContentElt) {
                         if (config) {
@@ -391,27 +397,30 @@ _cat.core.ui = function () {
                                 setTimeout(function () {
 
                                     // add element to ui test list
-                                    if ("header" in config) {
+                                    if ("header" in config && config.header) {
                                         _setText(newLI.childNodes[0], config.header, config.style);
                                     }
-                                    if ("desc" in config) {
+                                    if ("desc" in config && config.desc) {
                                         _setText(newLI.childNodes[1], config.desc, config.style);
                                     }
 
                                     me.setContentTip(config);
 
-                                    if ("elementType" in config) {
-                                        newLI.className = newLI.className + " " + config.elementType;
-
-                                    } else {
-                                        newLI.className = newLI.className + " listImageInfo";
+                                    if (config.header || config.desc) {
+                                        if ("elementType" in config) {
+                                            newLI.className = newLI.className + " " + config.elementType;
+    
+                                        } else {
+                                            newLI.className = newLI.className + " listImageInfo";
+                                        }
                                     }
-
                                 }, 300);
                             }
 
                         }
                     }
+                } else {
+                    __cache.push(config);
                 }
             }
 
