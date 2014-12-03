@@ -2,6 +2,40 @@ _cat.core.TestAction = function () {
 
     return {
 
+        NOTEST: function(opt) {
+            var guid = _cat.core.guid(),
+                testdata,
+                config = _cat.core.getConfig();
+
+            opt = (opt || {});
+
+            // server signal notification
+            if (config.isReport()) {
+                
+                testdata = _cat.core.TestManager.addTestData({
+                    name: "NOTEST",
+                    displayName: "No valid tests were found",
+                    message: "See cat.json configuration file for adding tests to scenarios",
+                    status: "sysout",
+                    error: (opt.error || ""),
+                    reportFormats: opt.reportFormats
+                });
+
+                _cat.core.ui.setContent({
+                    header: testdata.getDisplayName(),
+                    desc: testdata.getMessage(),
+                    tips: {},
+                    style: "color:gray"
+                });
+                
+                if (config) {
+                    _cat.utils.AJAX.sendRequestSync({
+                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                    });
+                }
+            }  
+        },
+        
         TESTSTART: function (opt) {
 
             var guid = _cat.core.guid(),

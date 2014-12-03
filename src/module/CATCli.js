@@ -64,6 +64,7 @@ module.exports = function () {
                         "cat.jsonutils": "src/module/utils/fs/JSON.js",
                         "cat.watch": "src/module/Watch.js",
                         "cat.cache": "src/module/Cache.js",
+                        "cat.info": "src/module/info/Info.js",
 
                         "cat.lib.utils": "src/libraries/cat/core/utils/Utils.js",
                         "cat.utils": "src/module/utils/Utils.js",

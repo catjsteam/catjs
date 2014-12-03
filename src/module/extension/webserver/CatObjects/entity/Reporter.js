@@ -1,6 +1,7 @@
 var _jmr = require("test-model-reporter"),
     _colors = require("./../helpers/colors.js"),
     _global = catrequire("cat.global"),
+    _catinfo = catrequire("cat.info"),
     _log = _global.log(),
     _fs = require("fs");
 
@@ -10,7 +11,7 @@ var _jmr = require("test-model-reporter"),
  * @param filename The test's file name
  * @param id The id of the test
  * @param scenario The current scenario
- * @param status The status of the test ["Start" | "End"]
+ * @param status The status of the test ["Start" | "End" | "success" | "failure" | "sysout"]
  * @constructor
  */
 function Reporter(config) {
@@ -118,10 +119,14 @@ Reporter.prototype.getTestConfigMap = function () {
     return this._testConfigMap;
 };
 
+Reporter.prototype.getName = function () {
+    return ( (this._name && this._name !== "End" && this._name !== "Start") ? this._name : "");
+};
+
 Reporter.prototype.getTitle = function () {
     var ua = this._ua, uainfo;
 
-    uainfo = (ua ? [" ", this._name, " ", ua.Browser, " " , ua.Version, " " , ua.OS, " "].join("") : "");
+    uainfo = (ua ? [" ", this.getName(), " ", ua.Browser, " " , ua.Version, " " , ua.OS, " "].join("") : "");
 
     return uainfo;
 };
@@ -144,7 +149,7 @@ Reporter.prototype.addTestCase = function (config) {
     function _printTest2Console(msg) {
         var message, title;
 
-        if (this._isconsole) {
+        if (me._isconsole) {
             title = me.getTitle();
             message = ["[" , id , "] ", title, msg].join("");
 
@@ -171,6 +176,16 @@ Reporter.prototype.addTestCase = function (config) {
                 }
             });
             testCase.add(result);
+            
+        } else if (status === "sysout") {
+            result = _jmr.create({
+                type: "system.out",
+                data: {
+                    message: message,
+                    type: status
+                }
+            });
+            testCase.add(result);
         }
 
         return testCase;
@@ -183,7 +198,20 @@ Reporter.prototype.addTestCase = function (config) {
         if (_fs.existsSync(me._fileName)) {
             _fs.unlinkSync(me._fileName);
         }
-        _jmr.write(me._fileName, output);
+
+        var ua = me._ua, ismobile = ("isMobile" in ua && ua.isMobile) ;
+         
+        _catinfo.set({
+            id: me._id,
+            device: (ismobile ? "device" : "browser"), 
+            model : (ua.Version),
+            type: (ismobile ? ua.Platform : ua.Browser),
+            entity: "junit",
+            data: output
+        });
+        
+        // @deprecated
+        //_jmr.write(me._fileName, output);
     }
 
     // set console color

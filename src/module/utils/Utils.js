@@ -5,7 +5,8 @@ var _ = require("underscore"),
     _log = _global.log(),
     _props = catrequire("cat.props"),
     _os = require("os"),
-    _globmatch = require("glob");
+    _globmatch = require("glob"),
+    _nodeutil = require("util");
 
 module.exports = function () {
 
@@ -13,22 +14,22 @@ module.exports = function () {
      * Synchronized process for creating folder recursively
      */
     var _mkdirSync = function (folder) {
-        if (!_fs.existsSync(folder)) {
-            try {
-                _fs.mkdirRecursiveSync(folder);
-                //_log.debug("[copy action] target folder was created: " + folder);
+            if (!_fs.existsSync(folder)) {
+                try {
+                    _fs.mkdirRecursiveSync(folder);
+                    //_log.debug("[copy action] target folder was created: " + folder);
 
-            } catch (e) {
-                _log.error("[copy action] failed to create target dir: " + folder);
-                throw e;
+                } catch (e) {
+                    _log.error("[copy action] failed to create target dir: " + folder);
+                    throw e;
+                }
             }
-        }
-    },
+        },
 
-    /**
-     * Copy file synchronized
-     */
-        _copySync = function (source, target, cb) {
+        /**
+         * Copy file synchronized
+         */
+            _copySync = function (source, target, cb) {
             var cbCalled = false,
                 me = this,
                 rd, wr;
@@ -68,8 +69,8 @@ module.exports = function () {
     return {
 
         /**
-         * 
-         * 
+         *
+         *
          * @param refobject {Object} The target object
          * @param values {Array} The properties to be assigned to the target object
          *              key {String} The property key
@@ -78,14 +79,14 @@ module.exports = function () {
          */
         setProps: function (refobject, values) {
             if (values) {
-                values.forEach(function(value) {
-                    
+                values.forEach(function (value) {
+
                     var defaultval = ("default" in value ? value["default"] : undefined);
                     if (value) {
                         if (value.key in value.val) {
                             if (value.val !== undefined) {
                                 refobject[value.key] = value.val;
-                                
+
                             } else if (defaultval !== undefined) {
                                 refobject[value.key] = defaultval;
                             }
@@ -96,24 +97,76 @@ module.exports = function () {
         },
 
         /**
-         * 
-         * 
+         *
+         *
          * @param value {Object} The source object
-         *          key {String} The property key 
+         *          key {String} The property key
          *          obj {Object} The object to be copied the property from
-         *          default {Object} A default value
-         *          
+         *          default {Object} [optional] A default value
+         *
          * @returns {*}
          */
-        getProp: function(value) {
-            
+        getProp: function (value) {
+
             if (value) {
                 var defaultval = ("default" in value ? value["default"] : undefined);
-                return (value.key in value.obj ? value.obj[value.key] : (undefined));
+                return (value.key in value.obj ? value.obj[value.key] : (defaultval || undefined));
             }
 
             return undefined;
-        },        
+        },
+
+
+        /**
+         * Setting the reference object with default values or undefined for unassigned properties 
+         * e.g. { global: {obj: obj}, props: [{key: "test", default: 1}] }
+         * 
+         * 
+         * @param value {Object} props values
+         *          global {Object} global references
+         *               obj {Object} [optional] The object to be copied the property from
+         *
+         *          props {Array} prop value
+         *              key {String} The property key
+         *              obj {Object} [optional] The object to be copied the property from
+         *              default {Object} [optional] A default value
+         *              require {Boolean} Warning about undefined value, default set to false              
+         *              
+         */
+        prepareProps: function (value) {
+
+            var globalreference, refobj;
+
+            if (value) {
+                if ("global" in value && value.global) {
+                    globalreference = value.global.obj
+                }
+                if ("props" in value && value.props && _nodeutil.isArray(value.props)) {
+                    value.props.forEach(function (prop) {
+                        
+                        var defaultval;
+                        
+                        if (! ("require" in prop) ) {
+                            prop.require = false;
+                        }
+                        if (!"key" in prop) {
+                            throw new Error("[catjs utils] 'key' is a required property for method 'getProps' ");
+                        }
+                        
+                        defaultval = ("default" in prop ? prop.default : undefined);
+                        refobj = ("obj" in prop ? prop.obj : globalreference);
+                        
+                        refobj[prop.key] = (prop.key in refobj ?  refobj[prop.key] : defaultval);
+                        
+                        if (refobj[prop.key] === undefined || refobj[prop.key] === null) {
+                            throw new Error("[catjs utils prepareProps] property '" + prop.key + "' is required ");
+                        }
+                        
+                        
+                    });
+                }
+            }
+        },
 
         isWindows: function () {
             var type = _os.platform();
@@ -128,7 +181,7 @@ module.exports = function () {
 
         copySync: _copySync,
 
-        globmatch: function(config) {
+        globmatch: function (config) {
 
             var lsrc, match,
                 src = config.src,
@@ -152,7 +205,7 @@ module.exports = function () {
                         if (item) {
                             try {
                                 match = __match(item, opt);
-                                if (match  && match.length > 0) {
+                                if (match && match.length > 0) {
                                     lsrc = lsrc.concat(match);
                                 } else {
                                     lsrc.push(item);
@@ -220,21 +273,21 @@ module.exports = function () {
         },
 
         error: function () {
-            
+
             function parseArgs(args) {
-                var i=0, size = args.length, out = [];
-                
+                var i = 0, size = args.length, out = [];
+
                 if (size > 0) {
-                    for (; i<size;i++) {
+                    for (; i < size; i++) {
                         out.push(args[i]);
                     }
                 } else {
                     return "General error occurred";
                 }
-                
+
                 return out.join("; ");
             }
-            
+
             _log.error.apply(_log, arguments);
             if (console) {
                 console.error.apply(console, arguments);
@@ -317,7 +370,7 @@ module.exports = function () {
             function convertTestDataRexp(codeRows) {
                 var patt;
 
-                patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*)(\\).*\\).*)","g");
+                patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*)(\\).*\\).*)", "g");
 
                 while (codeRows.match(patt)) {
                     codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2\".$3\"$4");
@@ -493,7 +546,7 @@ module.exports = function () {
             function process(pid, exclude) {
                 if (pid !== exclude) {
                     try {
-                        _log.error("[kill process] sending SIGKILL signal to pid: " + pid );
+                        _log.error("[kill process] sending SIGKILL signal to pid: " + pid);
                         process.kill(pid, "SIGKILL");
 
                     } catch (e) {

@@ -493,7 +493,12 @@ _cat.core = function () {
                 i, j;
 
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
-                _cat.core.clientmanager.signScrap(scrap, catConfig, arguments, tests);
+                if (tests.length > 0) {
+                    _cat.core.clientmanager.signScrap(scrap, catConfig, arguments, tests);
+                } else {
+                    _cat.core.TestManager.send({signal: 'NOTEST'});
+                    _cat.core.TestManager.send({signal: 'TESTEND'});
+                }
 
             } else {
                 if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER_OFFLINE)) {
@@ -638,7 +643,8 @@ _cat.core = function () {
                     if (catObj) {
                         _context["$$put"]({
                             scrap: scrap,
-                            arguments: passedArguments
+                            arguments: passedArguments,
+                            scrapinfo: ("scrapinfo" in config ? config.scrapinfo : undefined)
 
                         }, pkgName);
                         catObj.apply(_context, passedArguments);

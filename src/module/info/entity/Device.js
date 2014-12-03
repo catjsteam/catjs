@@ -1,54 +1,12 @@
 var  _utils = catrequire("cat.utils"),
-    _JSONUtils = catrequire("cat.jsonutils");
+    _JSONUtils = catrequire("cat.jsonutils"),
+    _nodeutil = require("util"),
+    _fs = require("fs"),
+    _Generic = require("./Generic.js"),
+    _generic = new _Generic();
 
-module.exports = function() {
-  
-    function _Record(config) {
-        
-        if (!config) {
-            return undefined;
-        }
-        
-        var me = this;
-        
-        this.filename = _utils.getProp({key: "filename", obj: config}); 
-        this.data = [];
-      
-    }
-    
-    _Record.prototype.add = function(record) {
-        this.data.push(record);
-    };
-    
-    _Record.prototype.write = function() {
-        
-        _JSONUtils.write({
-            filename: this.filename,
-            content: JSON.stringify(this.data)
-        });
-        
-    };
-    
-    return {
-        
-        create: function(filename) {
-            
-            var record = new _Record({filename: filename});
-            record.write();
-                        
-        },
-        
-        update: function(config) {
-         
-            var data, record;
+_generic.setProto("init", function() {
+    this.read(); 
+});
 
-            data = _utils.getProp({key: "data", obj: config});   
-            record = _utils.getProp({key: "record", obj: config});
-            
-            if (record && data) {
-                record.add(data);
-            }
-        }
-        
-    };
-}();
+module.exports = _generic; 

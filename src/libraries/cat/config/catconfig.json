@@ -32,7 +32,7 @@
     "assert": {
         "errors": true
     },
-    "run-mode": "all",
+    "run-mode": "tests",
     "run-test-delay": 500,
     "test-failure-timeout": 20
 }

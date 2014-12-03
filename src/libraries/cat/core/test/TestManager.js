@@ -91,6 +91,7 @@ _cat.core.TestManager = function() {
             _cat.utils.Signal.register([
                 {signal: "KILL", impl: _cat.core.TestAction.KILL},
                 {signal: "TESTEND", impl: _cat.core.TestAction.TESTEND},
+                {signal: "NOTEST", impl: _cat.core.TestAction.NOTEST},
                 {signal: "TESTSTART", impl: _cat.core.TestAction.TESTSTART}
             ]);
 
@@ -209,7 +210,7 @@ _cat.core.TestManager = function() {
          * @param testdata
          *      name - The test Name
          *      message - The test message
-         *      status - The test status
+         *      status - The test status ["Start" | "End" | "success" | "failure" | "sysout"]
          *
          * @returns {string} The assertion URL
          */
