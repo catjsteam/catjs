@@ -9,7 +9,8 @@ var _url = require("url"),
      _winston = require('winston'),
     _projectmanager = require('../projectmanager/action'),
     _assert = require('./CatObjects/assert'),
-    _runner = require('./CatObjects/runner');
+    _runner = require('./CatObjects/runner'),
+    _screenshot = require('./CatObjects/screenshot');
 
 /**
  * Web Server support mainly for serving static pages
@@ -100,42 +101,7 @@ var webserver  = function() {
                 }
             });
 
-            _server.post('/screenshot', function(req, res){
-                var isAndroid,
-                    pic,
-                    imageBuffer,
-                    scrapName,
-                    deviceName,
-                    finalScreenshotName;
-                // check if it android device or ios
-                isAndroid = (req.body.pic) ? true : false;
-                if (isAndroid) {
-                    pic = (req.body.pic);
-                    pic = pic.replace(new RegExp('\n| ', 'g'), '');
-
-                    imageBuffer = new Buffer(pic, 'base64');
-                    _fs.writeFile('image_decoded.jpg', imageBuffer, function(err) {
-                        console.log("write image");
-                    });
-
-                } else {
-                    _fs.readFile(req.files.photo.path, function (err, data) {
-
-                        scrapName = req.body.scrapName;
-                        deviceName = req.body.deviceName;
-
-                        finalScreenshotName = scrapName + "_" + deviceName +".png";
-
-                        _fs.writeFile(finalScreenshotName, data, function (err) {
-                            res.redirect("back");
-                        });
-                    });
-
-                }
-
-
-
-            });
+            _server.post('/screenshot', _screenshot.post);
 
 
             _server.get('/test', function(req, res){
