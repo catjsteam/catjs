@@ -42,7 +42,12 @@ module.exports = function () {
 
                         if (screenshotRows && screenshotRows.join) {
 
-                            screenshotRows.add(_elutils.uicontent({ rows: screenshotRows, scrap: scrap}));
+                            dm.add({
+                                rows:[_elutils.uicontent({ rows: screenshotRows, scrap: scrap})]
+
+                            }, function(row) {
+                                return row;
+                            });
                         }
 
 

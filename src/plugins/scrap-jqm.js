@@ -232,7 +232,12 @@ module.exports = function () {
 
                         if (jqmRows && jqmRows.join) {
 
-                            jqmRows.add(_elutils.uicontent({ rows: jqmRows, scrap: scrap}));
+                            dm.add({
+                                rows:[_elutils.uicontent({ rows: jqmRows, scrap: scrap})]
+
+                            }, function(row) {
+                                return row;
+                            });
                         }
 
 

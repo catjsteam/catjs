@@ -98,7 +98,12 @@ module.exports = function () {
 
                         if (enyoRows && enyoRows.join) {
 
-                            enyoRows.add(_elutils.uicontent({ rows: enyoRows, scrap: scrap}));
+                            dm.add({
+                                rows:[_elutils.uicontent({ rows: enyoRows, scrap: scrap})]
+
+                            }, function(row) {
+                                return row;
+                            });
                         }
 
 

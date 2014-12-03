@@ -172,8 +172,13 @@ module.exports = function () {
                         if (codeRows) {
 
                             if (codeRows && codeRows.join) {
-                                
-                                codeRows.add(_elutils.uicontent({ rows: codeRows, scrap: scrap}));
+
+                                dm.add({
+                                    rows: [_elutils.uicontent({ rows: codeRows, scrap: scrap})]
+
+                                }, function (row) {
+                                    return row;
+                                });
                             }
 
 
