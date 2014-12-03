@@ -100,20 +100,48 @@ var webserver  = function() {
                 }
             });
 
-
             _server.post('/screenshot', function(req, res){
+                var isAndroid,
+                    pic,
+                    imageBuffer,
+                    scrapName,
+                    deviceName,
+                    finalScreenshotName;
+                // check if it android device or ios
+                isAndroid = (req.body.pic) ? true : false;
+                if (isAndroid) {
+                    pic = (req.body.pic);
+                    pic = pic.replace(new RegExp('\n| ', 'g'), '');
 
-                _fs.readFile(req.files.photo.path, function (err, data) {
-
-                    var scrapName = req.body.scrapName;
-                    var deviceName = req.body.deviceName;
-
-                    var finalScreenshotName = scrapName + "_" + deviceName +".png";
-
-                    _fs.writeFile(finalScreenshotName, data, function (err) {
-                        res.redirect("back");
+                    imageBuffer = new Buffer(pic, 'base64');
+                    _fs.writeFile('image_decoded.jpg', imageBuffer, function(err) {
+                        console.log("write image");
                     });
-                });
+
+                } else {
+                    _fs.readFile(req.files.photo.path, function (err, data) {
+
+                        scrapName = req.body.scrapName;
+                        deviceName = req.body.deviceName;
+
+                        finalScreenshotName = scrapName + "_" + deviceName +".png";
+
+                        _fs.writeFile(finalScreenshotName, data, function (err) {
+                            res.redirect("back");
+                        });
+                    });
+
+                }
+
+
+
+            });
+
+
+            _server.get('/test', function(req, res){
+                console.log("hello from test");
+                res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+                res.send('{"exit": 1}');
 
             });
 

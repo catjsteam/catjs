@@ -2922,7 +2922,7 @@ _cat.plugins.deviceinfo = function () {
                      interval = true;
                  }
 
-                var url = "catjsdeviceinfo:\\interval=" + interval,
+                var url = "catjsdeviceinfo://interval=" + interval,
                     iframe = document.createElement("IFRAME");
 
                 iframe.setAttribute("src", url);
@@ -3416,7 +3416,7 @@ _cat.plugins.screenshot = function () {
             screenshot: function (scrapName) {
 
                 console.log("screenshot");
-                var url = "catjsgetscreenshot:\\scrapName=" + scrapName,
+                var url = "catjsgetscreenshot://scrapName=" + scrapName,
                 iframe = document.createElement("IFRAME");
 
                 iframe.setAttribute("src", url);
