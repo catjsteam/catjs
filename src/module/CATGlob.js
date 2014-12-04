@@ -1,8 +1,14 @@
 var _fs = require('fs'),
     _Log = require('log'),
-    _date = require("date-format-lite");
+    _path = require('path'),
+    _date = require("date-format-lite"),
+    _logsfolder = "logs";
 
-module.exports = function () {
+(function() {
+    // create log folder
+    if (!_fs.existsSync(_logsfolder)) {
+        _fs.mkdirSync(_logsfolder, 0777);
+    }
 
     if (!global.CAT) {
         global.CAT = {
@@ -11,20 +17,26 @@ module.exports = function () {
 
                 var log,
                     logfile = 'CAT.log',
+                    logfilepath,
+                    backlogfilepath,
                     logstat;
 
                 if (!global.CAT._log) {
 
                     // split log file if it's too long
-                    if (_fs.existsSync(logfile)) {
-                        logstat = _fs.statSync(logfile);
+                    logfilepath = _path.join(_logsfolder, logfile);
+                    if (_fs.existsSync(logfilepath)) {
+                        logstat = _fs.statSync(logfilepath);
                         if (logstat.size && logstat.size > 100000) {
-                            _fs.renameSync(logfile, ["CAT_", (new Date()).format("YYYY_MM_DD_mm_ss"), ".log"].join(""));
+                            _fs.renameSync(logfilepath, [_logsfolder, "/CAT_", (new Date()).format("YYYY_MM_DD_mm_ss"), ".log"].join(""));
                         }
                     }
 
-                    log = new _Log('debug', _fs.createWriteStream(logfile, { flags: 'a',
-                        encoding: null}));
+                    log = new _Log('debug', _fs.createWriteStream(logfilepath, {
+                        flags: 'a',
+                        encoding: null,
+                        mode: 0777
+                    }));
 
                     log.info("\n\n[CAT] Initial LOG -----------------------------------------------------------------------");
                     log.info("[CAT] Initial CAT process: " + process.pid);
@@ -47,7 +59,7 @@ module.exports = function () {
             }
         };
 
-    }
+    }    
+})();
 
-    return global.CAT;
-}();
+module.exports =  global.CAT;

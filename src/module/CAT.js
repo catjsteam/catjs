@@ -1,12 +1,12 @@
 var _flow,
+    _global = catrequire("cat.global"),
     _prompt = require('prompt'),
     _jsutils = require("js.utils"),
     _analytics = require("./analytics/analytics");
 
 var CAT = function () {
 
-    var _global,
-        _stringFormat,
+    var _stringFormat,
         _log,
         _project,
         _catconfig,
@@ -114,8 +114,7 @@ var CAT = function () {
 
                 basedir = _basedir(config);
                 projectDir = basedir.path;
-
-                _global = catrequire("cat.global");
+               
                 _log = _global.log();
 
                 _project = catrequire("cat.project");
@@ -128,8 +127,6 @@ var CAT = function () {
 
                 _cache = catrequire("cat.cache");
                 _cache.set("pid", process.pid);
-
-
 
             })(config);
 

@@ -241,23 +241,28 @@ Reporter.prototype.addTestCase = function (config) {
     } else {
 
         if (status === 'End') {
-            if (error) {
-                this._colors.setTheme({'color': "red"});
-                result = "Test end with error: " + error;
-                result = "======== Test End - " + result + " ========";
-
-            } else {
-                result = this._hasFailed ? "failed" : "succeeded";
-                result = "======== Test End - " + result + " ========";
+            
+            // if the test has been started (1), end it, else if it already ended (0) do nothing  
+            if (this._status === 1) {
+            
+                if (error) {
+                    this._colors.setTheme({'color': "red"});
+                    result = "Test end with error: " + error;
+                    result = "======== Test End - " + result + " ========";
+    
+                } else {
+                    result = this._hasFailed ? "failed" : "succeeded";
+                    result = "======== Test End - " + result + " ========";
+                }
+    
+                // print to console the test info
+                _printTest2Console(result);
+    
+                // delete the color on test end
+                this._colors.deleteColor(id);
+    
+                this._status = 0;
             }
-
-            // print to console the test info
-            _printTest2Console(result);
-
-            // delete the color on test end
-            this._colors.deleteColor(id);
-
-            this._status = 0;
 
         } else if (status === 'Start') {
 

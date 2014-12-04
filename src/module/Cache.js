@@ -1,6 +1,7 @@
 var _fs = require("fs"),
     _global = catrequire("cat.global"),
     _home = _global.get("home"),
+    _path = require("path"),
     _workingDir,
     _fileName;
 
@@ -8,7 +9,17 @@ if (_home && _home.working) {
     _workingDir = _home.working.path;
 }
 
-_fileName = [_workingDir, ".cat"].join("/");
+(function() {
+    var path = _path.join(_workingDir, "cache");
+    
+    // create log folder
+    if (!_fs.existsSync(path)) {
+        _fs.mkdirSync(path, 0777);
+    }
+
+    _fileName = _path.join(path, ".cat");
+
+})();
 
 /**
  * Persist a property style data (key=value) to a file named .cat
@@ -21,7 +32,7 @@ module.exports = function () {
         option = (option || "appendFileSync");
         try {
             if (option) {
-                _fs[option](_fileName, data, "utf8");
+                _fs[option](_fileName, data, {encoding: "utf8", mode: 0777});
             }
         } catch (e) {
             console.log("[catcli] ", e);
