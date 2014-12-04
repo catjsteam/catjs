@@ -40,7 +40,6 @@ module.exports = function () {
         for (; i<size; i++) {
             patharr = folders.slice(0, (folders.length  - i));
             path = patharr.join(_path.sep);
-            console.log(path);
 
             _fs.chmodSync(path, mode);
         }
