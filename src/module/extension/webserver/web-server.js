@@ -9,7 +9,8 @@ var _url = require("url"),
      _winston = require('winston'),
     _projectmanager = require('../projectmanager/action'),
     _assert = require('./CatObjects/assert'),
-    _runner = require('./CatObjects/runner');
+    _runner = require('./CatObjects/runner'),
+    _screenshot = require('./CatObjects/screenshot');
 
 /**
  * Web Server support mainly for serving static pages
@@ -100,20 +101,13 @@ var webserver  = function() {
                 }
             });
 
+            _server.post('/screenshot', _screenshot.post);
 
-            _server.post('/screenshot', function(req, res){
 
-                _fs.readFile(req.files.photo.path, function (err, data) {
-
-                    var scrapName = req.body.scrapName;
-                    var deviceName = req.body.deviceName;
-
-                    var finalScreenshotName = scrapName + "_" + deviceName +".png";
-
-                    _fs.writeFile(finalScreenshotName, data, function (err) {
-                        res.redirect("back");
-                    });
-                });
+            _server.get('/test', function(req, res){
+                console.log("hello from test");
+                res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+                res.send('{"exit": 1}');
 
             });
 
