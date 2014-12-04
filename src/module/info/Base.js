@@ -32,19 +32,6 @@ module.exports = function () {
 
         return (entity ? map[entity] : undefined);
     }
-
-    function _grantPermissions(path, mode, offset) {
-        var folders = path.split(_path.sep), patharr,
-            i= 0, size=offset+1;
-
-        for (; i<size; i++) {
-            patharr = folders.slice(0, (folders.length  - i));
-            path = patharr.join(_path.sep);
-
-            _fs.chmodSync(path, mode);
-        }
-        
-    }
     
     function _updateFS(config) {
 
@@ -73,7 +60,7 @@ module.exports = function () {
         if (!_fs.existsSync(path)) {
             _wrench.mkdirSyncRecursive(path, 0777);
         }
-        _grantPermissions(path, 0777, 3);
+        _utils.chmodSyncOffset(path, 0777, 3);
 
 
         entity = _getEntityRecord(entity);

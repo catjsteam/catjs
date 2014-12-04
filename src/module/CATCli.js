@@ -2,8 +2,7 @@ var _nopt = require("nopt"),
     _path = require("path"),
     _fs = require("fs"),
     _Mapper = require("require-mapper"),
-    _mapper = new _Mapper(),
-    _global;
+    _mapper = new _Mapper();
 
 module.exports = function () {
 
@@ -89,8 +88,7 @@ module.exports = function () {
                 global.cathome = home;
                 global.catlibs = _path.join(home, "src/libraries/");
 
-                _global = catrequire("cat.global");
-                
+
             })();
 
             // Everything looks good. Require local grunt and run it.

@@ -6,7 +6,8 @@ var _ = require("underscore"),
     _props = catrequire("cat.props"),
     _os = require("os"),
     _globmatch = require("glob"),
-    _nodeutil = require("util");
+    _nodeutil = require("util"),
+    _path = require("path");
 
 module.exports = function () {
 
@@ -118,10 +119,10 @@ module.exports = function () {
 
 
         /**
-         * Setting the reference object with default values or undefined for unassigned properties 
+         * Setting the reference object with default values or undefined for unassigned properties
          * e.g. { global: {obj: obj}, props: [{key: "test", default: 1}] }
-         * 
-         * 
+         *
+         *
          * @param value {Object} props values
          *          global {Object} global references
          *               obj {Object} [optional] The object to be copied the property from
@@ -130,8 +131,8 @@ module.exports = function () {
          *              key {String} The property key
          *              obj {Object} [optional] The object to be copied the property from
          *              default {Object} [optional] A default value
-         *              require {Boolean} Warning about undefined value, default set to false              
-         *              
+         *              require {Boolean} Warning about undefined value, default set to false
+         *
          */
         prepareProps: function (value) {
 
@@ -143,31 +144,52 @@ module.exports = function () {
                 }
                 if ("props" in value && value.props && _nodeutil.isArray(value.props)) {
                     value.props.forEach(function (prop) {
-                        
+
                         var defaultval;
-                        
-                        if (! ("require" in prop) ) {
+
+                        if (!("require" in prop)) {
                             prop.require = false;
                         }
                         if (!"key" in prop) {
                             throw new Error("[catjs utils] 'key' is a required property for method 'getProps' ");
                         }
-                        
+
                         defaultval = ("default" in prop ? prop.default : undefined);
                         refobj = ("obj" in prop ? prop.obj : globalreference);
-                        
-                        refobj[prop.key] = (prop.key in refobj ?  refobj[prop.key] : defaultval);
-                        
+
+                        refobj[prop.key] = (prop.key in refobj ? refobj[prop.key] : defaultval);
+
                         if (refobj[prop.key] === undefined || refobj[prop.key] === null) {
                             throw new Error("[catjs utils prepareProps] property '" + prop.key + "' is required ");
                         }
-                        
-                        
+
+
                     });
                 }
             }
         },
 
+        /**
+         * Grant permission to a path with folder offset
+         * e.g. /home/myhome/test offet:2 will apply chmod only for myhome/test folders
+         * 
+         * @param path {String} The path 
+         * @param mode {Number} The mode e.g. 0777
+         * @param offset {Number} The offset of the folders to grant permission. From the end of the path
+         */
+        chmodSyncOffset: function (path, mode, offset) {
+            var folders = path.split(_path.sep), patharr,
+                i = 0, size = offset + 1;
+
+            for (; i < size; i++) {
+                patharr = folders.slice(0, (folders.length - i));
+                path = patharr.join(_path.sep);
+
+                _fs.chmodSync(path, mode);
+            }
+
+        },
+        
         isWindows: function () {
             var type = _os.platform();
             if (type.toLocaleLowerCase() === "win32") {

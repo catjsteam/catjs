@@ -2,13 +2,9 @@ var _fs = require('fs'),
     _Log = require('log'),
     _path = require('path'),
     _date = require("date-format-lite"),
-    _logsfolder = "logs";
+    _logsfolder;
 
 (function() {
-    // create log folder
-    if (!_fs.existsSync(_logsfolder)) {
-        _fs.mkdirSync(_logsfolder, 0777);
-    }
 
     if (!global.CAT) {
         global.CAT = {
@@ -56,6 +52,10 @@ var _fs = require('fs'),
                     (value !== undefined && value !== null) ) {
                     global.CAT[key] = value;
                 }
+            },
+             
+            init: function(logfolder) {
+                _logsfolder = logfolder;
             }
         };
 
