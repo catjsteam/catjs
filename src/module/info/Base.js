@@ -91,6 +91,8 @@ module.exports = function () {
         model = _utils.getProp({key: "model", obj: config});
         filename = _utils.getProp({key: "filename", obj: config});
 
+        console.log("config : "  + JSON.stringify( config));
+        console.log("filename : "  + filename);
         if (type && device && entity) {
             name = [entity, device, type];
             if (model) {
@@ -105,6 +107,7 @@ module.exports = function () {
                 fileType = ".json";
             }
             name = (filename ? filename : name.join("_")) + fileType;
+            console.log("create filename of screenshot : " + name);
             name = name.toLowerCase();
         } else {
             _utils.error("[catjs info] Failed to generate the file system path for the test report, some of the arguments are missing or not exists");
