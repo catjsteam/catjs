@@ -57,7 +57,7 @@ var webserver  = function() {
 
             var logger = new (_winston.Logger)({
                 transports: [
-                    new (_winston.transports.File)({ filename: 'express_server.log',  level: 'info', json: false })
+                    new (_winston.transports.File)({ filename: 'logs/express_server.log',  level: 'info', json: false })
                 ]
             });
 

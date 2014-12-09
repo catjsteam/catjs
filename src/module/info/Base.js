@@ -34,7 +34,7 @@ module.exports = function () {
 
         return (entity ? map[entity] : undefined);
     }
-
+    
     function _updateFS(config) {
 
         var name, path, filename,
@@ -62,6 +62,8 @@ module.exports = function () {
         if (!_fs.existsSync(path)) {
             _wrench.mkdirSyncRecursive(path, 0777);
         }
+        _utils.chmodSyncOffset(path, 0777, 3);
+
 
         entity = _getEntityRecord(entity);
         if (entity) {
