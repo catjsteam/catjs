@@ -41,7 +41,7 @@
     "test": "node ./test/test.js"
   },
   "dependencies": {
-    "mobilerunner": "~0.2.30",
+    "mobilerunner": "latest",
     "fs.extra": "~1.2.1",
     "typedas": "~1.0.0",
     "log": "~1.4.0",
