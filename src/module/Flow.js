@@ -1,6 +1,6 @@
 var _fs = require("fs"),
     _global = catrequire("cat.global"),
-    _fileName = [_global.get("home").working.path, "cat.flow.log"].join("/"),
+    _fileName = [_global.get("home").working.path, "logs/cat.flow.log"].join("/"),
     _date = require("date-format-lite"),
     _props = catrequire("cat.props");
 
@@ -18,17 +18,20 @@ module.exports = function () {
                 _fs[option](_fileName, data, "utf8");
             }
         } catch (e) {
-            console.log("[catcli] ", e);
+            console.log("[catcli flow] ", e);
         }
     }
 
     function _load() {
         try {
-            return _fs.readFileSync(_fileName, "utf8");
-
+            if (_fs.existsSync(_fileName)) {
+                return _fs.readFileSync(_fileName, "utf8");
+            } 
         } catch (e) {
-            console.log("[catcli] ", e);
+            console.log("[catcli flow] ", e);
         }
+        
+        return undefined;
     }
 
 

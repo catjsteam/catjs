@@ -193,12 +193,6 @@ _cat.core = function () {
                 hasPhantomjs: hasPhantomjs
             });
 
-            // Test Manager Init
-            _cat.core.TestManager.init();
-            
-            // set scrap data info
-            _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());
-            
             // display the ui, if you didn't already
             if (_config.isUI()) {
                 _cat.core.ui.enable();
@@ -210,6 +204,12 @@ _cat.core = function () {
                 _cat.core.ui.off();
                 _cat.core.ui.destroy();
             }
+            
+            // Test Manager Init
+            _cat.core.TestManager.init();
+            
+            // set scrap data info
+            _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());                       
 
             if (_config.isErrors()) {
 
@@ -492,10 +492,16 @@ _cat.core = function () {
                 managerScrap, tempScrap,
                 i, j;
 
+            // The test ended ignore any action called
+            if (_cat.core.TestManager.isTestEnd()) {                
+                return undefined;
+            }
+                        
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
                 if (tests.length > 0) {
                     _cat.core.clientmanager.signScrap(scrap, catConfig, arguments, tests);
                 } else {
+                    
                     _cat.core.TestManager.send({signal: 'NOTEST'});
                     _cat.core.TestManager.send({signal: 'TESTEND'});
                 }

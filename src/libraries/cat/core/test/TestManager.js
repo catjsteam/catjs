@@ -80,6 +80,7 @@ _cat.core.TestManager = function() {
         _testsData = [],
         _counter = 0,
         _hasFailed = false,
+        _testEnd = false,
         _globalTestData = {};
 
 
@@ -169,6 +170,14 @@ _cat.core.TestManager = function() {
             return (_globalTestData.delay || 0);
         },
 
+        testEnd: function() {
+            _testEnd = true;            
+        },
+        
+        isTestEnd: function() {
+            return _testEnd;            
+        },
+        
         /**
          * Send an action to the server
          * 

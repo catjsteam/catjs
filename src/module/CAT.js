@@ -1,7 +1,8 @@
 var _flow,
     _prompt = require('prompt'),
     _jsutils = require("js.utils"),
-    _analytics = require("./analytics/analytics");
+    _analytics = require("./analytics/analytics"),
+    _fs = require("fs");
 
 var CAT = function () {
 
@@ -82,6 +83,22 @@ var CAT = function () {
         _runTask(_targets[_counter], watch);
     }
 
+    function _createFolder(folder) {
+
+        function _getBasePath() {
+            return _global.get("home").working.path;
+        }
+        
+        var targetfolder = _path.join(_getBasePath(), folder);
+
+        // create log folder
+        if (!_fs.existsSync(targetfolder)) {
+            _fs.mkdirSync(targetfolder, 0777);
+        }
+        
+        return targetfolder;
+    }
+    
     (function () {
 
         _stringFormat = require("string-format");
@@ -115,13 +132,7 @@ var CAT = function () {
                 basedir = _basedir(config);
                 projectDir = basedir.path;
 
-                _global = catrequire("cat.global");
-                _log = _global.log();
-
-                _project = catrequire("cat.project");
-                _catconfig = catrequire("cat.config");
-                _properties = catrequire("cat.props");
-                _utils = catrequire("cat.utils");
+                _global = catrequire("cat.global");             
 
                 // initial global "home" property
                 _global.set("home", basedir);
@@ -130,7 +141,28 @@ var CAT = function () {
                 _cache.set("pid", process.pid);
 
 
+                (function() {
+                    
+                    var logsfolder = _createFolder("logs"),
+                        reportsfolder = _createFolder("reports"),
+                        cachefolder = _createFolder("cache");
+                    
+                    _global.init(logsfolder);
+                    
+                    
+                    _log = _global.log();                    
+                    _utils = catrequire("cat.utils");
+                    _project = catrequire("cat.project");
+                    _catconfig = catrequire("cat.config");
+                    _properties = catrequire("cat.props");
 
+                    // grant permission to the folders
+                    _utils.chmodSyncOffset(logsfolder, 0777, 1);
+                    _utils.chmodSyncOffset(reportsfolder, 0777, 1);
+                    _utils.chmodSyncOffset(cachefolder, 0777, 1);
+                    
+                })();
+                
             })(config);
 
 

@@ -193,12 +193,6 @@ _cat.core = function () {
                 hasPhantomjs: hasPhantomjs
             });
 
-            // Test Manager Init
-            _cat.core.TestManager.init();
-            
-            // set scrap data info
-            _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());
-            
             // display the ui, if you didn't already
             if (_config.isUI()) {
                 _cat.core.ui.enable();
@@ -210,6 +204,12 @@ _cat.core = function () {
                 _cat.core.ui.off();
                 _cat.core.ui.destroy();
             }
+            
+            // Test Manager Init
+            _cat.core.TestManager.init();
+            
+            // set scrap data info
+            _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());                       
 
             if (_config.isErrors()) {
 
@@ -492,10 +492,16 @@ _cat.core = function () {
                 managerScrap, tempScrap,
                 i, j;
 
+            // The test ended ignore any action called
+            if (_cat.core.TestManager.isTestEnd()) {                
+                return undefined;
+            }
+                        
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
                 if (tests.length > 0) {
                     _cat.core.clientmanager.signScrap(scrap, catConfig, arguments, tests);
                 } else {
+                    
                     _cat.core.TestManager.send({signal: 'NOTEST'});
                     _cat.core.TestManager.send({signal: 'TESTEND'});
                 }
@@ -1028,12 +1034,12 @@ _cat.utils.assert = function () {
                     total = _cat.core.TestManager.getTestCount();
                     passed = _cat.core.TestManager.getTestSucceededCount();
                     failed = total - passed;
-                    tests =  (_cat.core.TestManager.getSummaryInfo().assert.total || 0);
+                    tests =  (_cat.core.TestManager.getSummaryInfo().assert.total || "?");
                     _cat.core.ui.setContent({
                         style: ( (testdata.getStatus() === "success") ? "color:green" : "color:red" ),
                         header: testdata.getDisplayName(),
                         desc: testdata.getMessage(),
-                        tips: {tests: tests ,passed: (!isNaN(passed) ? passed : 0), failed: (!isNaN(failed) ? failed : 0), total: (!isNaN(total) ? total: 0)},
+                        tips: {tests: tests ,passed: (!isNaN(passed) ? passed : "?"), failed: (!isNaN(failed) ? failed : "?"), total: (!isNaN(total) ? total: "?")},
                         elementType : ( (testdata.getStatus() === "success") ? "listImageCheck" : "listImageCross" )
                     });
                 }
@@ -1532,25 +1538,27 @@ _cat.core.TestAction = function () {
 
             opt = (opt || {});
 
-            // server signal notification
-            if (config.isReport()) {
-                
-                testdata = _cat.core.TestManager.addTestData({
-                    name: "NOTEST",
-                    displayName: "No valid tests were found",
-                    message: "See cat.json configuration file for adding tests to scenarios",
-                    status: "sysout",
-                    error: (opt.error || ""),
-                    reportFormats: opt.reportFormats
-                });
+            testdata = _cat.core.TestManager.addTestData({
+                name: "NOTEST",
+                displayName: "No valid tests were found",
+                message: "See cat.json configuration file for adding tests to scenarios",
+                status: "sysout",
+                error: (opt.error || ""),
+                reportFormats: opt.reportFormats
+            });
 
+            if (config.isUI()) {
                 _cat.core.ui.setContent({
                     header: testdata.getDisplayName(),
                     desc: testdata.getMessage(),
-                    tips: {},
+                    tips: {tests: "?" ,passed: "?", failed: "?", total: "?"},
                     style: "color:gray"
                 });
-                
+            }
+            
+            // server signal notification
+            if (config.isReport()) {
+                               
                 if (config) {
                     _cat.utils.AJAX.sendRequestSync({
                         url: _cat.core.TestManager.generateAssertCall(config, testdata)
@@ -1628,6 +1636,7 @@ _cat.core.TestAction = function () {
                     _cat.utils.AJAX.sendRequestSync({
                         url: _cat.core.TestManager.generateAssertCall(config, testdata)
                     });
+                    _cat.core.TestManager.testEnd();
                 }
             }
 
@@ -1725,6 +1734,7 @@ _cat.core.TestManager = function() {
         _testsData = [],
         _counter = 0,
         _hasFailed = false,
+        _testEnd = false,
         _globalTestData = {};
 
 
@@ -1814,6 +1824,14 @@ _cat.core.TestManager = function() {
             return (_globalTestData.delay || 0);
         },
 
+        testEnd: function() {
+            _testEnd = true;            
+        },
+        
+        isTestEnd: function() {
+            return _testEnd;            
+        },
+        
         /**
          * Send an action to the server
          * 
@@ -1994,6 +2012,10 @@ _cat.core.ui = function () {
             catElement = _getCATElt();
         if (catElement) {
             catStatusElt = (catElement.childNodes[0] ? catElement.childNodes[0] : undefined);
+
+            if ( __cache.length > 0) {
+                _me.setContent(__cache.shift());
+            }
         }
 
         return catStatusElt;
@@ -2018,14 +2040,15 @@ _cat.core.ui = function () {
         _me.setContent({
             header: "",
             desc: "",
-            tips: "",
+            tips: {tests: "?" ,passed: "?", failed: "?", total: "?"},
             reset: true
         });
     }
 
-    var __catElement,
+    var __cache = [],
+        __catElement,
         _disabled = false,
-        _onloadIstener,
+        _onloadIstener = false,
         _loaderListener = false,
         _me = {
 
@@ -2047,7 +2070,7 @@ _cat.core.ui = function () {
                     return;
                 }
 
-                if (!_loaderListener) {
+                if (!_loaderListener && !_onloadIstener) {
                     _loaderListener = true;
                     _addEventListener(window, "load", function (e) {
 
@@ -2136,9 +2159,9 @@ _cat.core.ui = function () {
 
                         catStatusElt.classList.toggle("cat-status-close");
 
-                        if (catStatusContentElt) {
-                            catStatusContentElt.classList.toggle("displayoff");
-                        }
+                        //if (catStatusContentElt) {
+                        //    catStatusContentElt.classList.toggle("displayoff");
+                        //}
                     }
                 }
 
@@ -2244,9 +2267,10 @@ _cat.core.ui = function () {
                     catElement = _getCATElt(),
                     isOpen = false,
                     reset = ("reset" in config ? config.reset : false),
-                    me = this;
-
-                if (catElement) {
+                    me = this;                
+                
+                if (catElement) {                                     
+                    
                     catStatusContentElt = _getCATStatusContentElt();
                     if (catStatusContentElt) {
                         if (config) {
@@ -2279,27 +2303,30 @@ _cat.core.ui = function () {
                                 setTimeout(function () {
 
                                     // add element to ui test list
-                                    if ("header" in config) {
+                                    if ("header" in config && config.header) {
                                         _setText(newLI.childNodes[0], config.header, config.style);
                                     }
-                                    if ("desc" in config) {
+                                    if ("desc" in config && config.desc) {
                                         _setText(newLI.childNodes[1], config.desc, config.style);
                                     }
 
                                     me.setContentTip(config);
 
-                                    if ("elementType" in config) {
-                                        newLI.className = newLI.className + " " + config.elementType;
-
-                                    } else {
-                                        newLI.className = newLI.className + " listImageInfo";
+                                    if (config.header || config.desc) {
+                                        if ("elementType" in config) {
+                                            newLI.className = newLI.className + " " + config.elementType;
+    
+                                        } else {
+                                            newLI.className = newLI.className + " listImageInfo";
+                                        }
                                     }
-
                                 }, 300);
                             }
 
                         }
                     }
+                } else {
+                    __cache.push(config);
                 }
             }
 

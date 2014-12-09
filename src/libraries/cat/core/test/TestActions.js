@@ -9,25 +9,27 @@ _cat.core.TestAction = function () {
 
             opt = (opt || {});
 
-            // server signal notification
-            if (config.isReport()) {
-                
-                testdata = _cat.core.TestManager.addTestData({
-                    name: "NOTEST",
-                    displayName: "No valid tests were found",
-                    message: "See cat.json configuration file for adding tests to scenarios",
-                    status: "sysout",
-                    error: (opt.error || ""),
-                    reportFormats: opt.reportFormats
-                });
+            testdata = _cat.core.TestManager.addTestData({
+                name: "NOTEST",
+                displayName: "No valid tests were found",
+                message: "See cat.json configuration file for adding tests to scenarios",
+                status: "sysout",
+                error: (opt.error || ""),
+                reportFormats: opt.reportFormats
+            });
 
+            if (config.isUI()) {
                 _cat.core.ui.setContent({
                     header: testdata.getDisplayName(),
                     desc: testdata.getMessage(),
-                    tips: {},
+                    tips: {tests: "?" ,passed: "?", failed: "?", total: "?"},
                     style: "color:gray"
                 });
-                
+            }
+            
+            // server signal notification
+            if (config.isReport()) {
+                               
                 if (config) {
                     _cat.utils.AJAX.sendRequestSync({
                         url: _cat.core.TestManager.generateAssertCall(config, testdata)
@@ -105,6 +107,7 @@ _cat.core.TestAction = function () {
                     _cat.utils.AJAX.sendRequestSync({
                         url: _cat.core.TestManager.generateAssertCall(config, testdata)
                     });
+                    _cat.core.TestManager.testEnd();
                 }
             }
 
