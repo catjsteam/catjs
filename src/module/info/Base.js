@@ -6,6 +6,7 @@ var _date = require("date-format-lite"),
     _fs = require("fs"),
     _wrench = require("wrench"),
     _devicentity = require("./entity/Device.js"),
+    _screenshotentity = require("./entity/Screenshot.js"),
     _Generic = require("./entity/Generic.js"),
     _geneic = new _Generic();
 
@@ -23,6 +24,7 @@ module.exports = function () {
     function _getEntityRecord(entity) {
         var map = {
             device: _devicentity,
+            screenshot : _screenshotentity,
             junit: _geneic,           
             runner: function () {
                 console.log("[catjs runner info] Not implemented yet");
@@ -73,7 +75,7 @@ module.exports = function () {
 
     function _getFileSystemInfo(config) {
 
-        var id, type, device, entity, model, name,
+        var id, type, device, entity, model, name, fileType, filename,
             time, basepath, path;
 
         if (!config) {
@@ -85,15 +87,23 @@ module.exports = function () {
         device = _utils.getProp({key: "device", obj: config});
         entity = _utils.getProp({key: "entity", obj: config});
         model = _utils.getProp({key: "model", obj: config});
+        filename = _utils.getProp({key: "filename", obj: config});
 
         if (type && device && entity) {
             name = [entity, device, type];
             if (model) {
                 name.push(model);
             }
-            name = name.join("_") + (entity === "junit" ? ".xml" : ".json");
-            name = name.toLowerCase();
 
+            if (entity === "screenshot") {
+                fileType = ".png";
+            } else if  (entity === "junit") {
+                fileType = ".xml";
+            } else {
+                fileType = ".json";
+            }
+            name = (filename ? filename : name.join("_")) + fileType;
+            name = name.toLowerCase();
         } else {
             _utils.error("[catjs info] Failed to generate the file system path for the test report, some of the arguments are missing or not exists");
             return undefined;
