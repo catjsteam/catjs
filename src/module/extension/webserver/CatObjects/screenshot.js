@@ -36,6 +36,7 @@ exports.post = function (req, res) {
 
     saveScreenshot = function (data) {
         var filename = [scrapName, deviceName ,deviceId].join("_");
+        console.log("save screenshot : " + filename);
         _catinfo.set({
                 id: deviceId,
                 device: (ismobile ? "device" : "browser"),
