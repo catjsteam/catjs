@@ -31,6 +31,7 @@ module.exports = function () {
                     {key: "type", require: true},
                     {key: "entity", require: true},
                     {key: "model"},
+                    {key: "filename"},
                     {key: "data"}
                 ]
             });
@@ -41,6 +42,7 @@ module.exports = function () {
                 type: config.type,
                 entity: config.entity,
                 data: config.data,
+                filename: config.filename,
                 model : config.model
             });
           

@@ -159,7 +159,7 @@ module.exports = function () {
 
                         refobj[prop.key] = (prop.key in refobj ? refobj[prop.key] : defaultval);
 
-                        if (refobj[prop.key] === undefined || refobj[prop.key] === null) {
+                        if (prop.require && (refobj[prop.key] === undefined || refobj[prop.key] === null)) {
                             throw new Error("[catjs utils prepareProps] property '" + prop.key + "' is required ");
                         }
 

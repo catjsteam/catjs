@@ -104,14 +104,6 @@ var webserver  = function() {
             _server.post('/screenshot', _screenshot.post);
 
 
-            _server.get('/test', function(req, res){
-                console.log("hello from test");
-                res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
-                res.send('{"exit": 1}');
-
-            });
-
-
             _server.post('/deviceinfo', function(req, res){
                 console.log("got device info : " + JSON.stringify(req.body));
                 _fs.readFile("deviceinfo.json", function (err, data) {
