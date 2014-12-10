@@ -68,6 +68,7 @@ module.exports = function () {
 
                         "cat.lib.utils": "src/libraries/cat/core/utils/Utils.js",
                         "cat.utils": "src/module/utils/Utils.js",
+                        "cat.sys.utils": "src/module/utils/SysUtils.js",
                         "cat.ext.utils": "src/module/utils/ExtUtils.js",
                         "cat.tpl.utils": "src/module/utils/TemplateUtils.js",
                         "cat.regexp.utils": "src/module/utils/RegExp.js",

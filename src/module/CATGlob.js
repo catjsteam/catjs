@@ -2,6 +2,7 @@ var _fs = require('fs'),
     _Log = require('log'),
     _path = require('path'),
     _date = require("date-format-lite"),
+    _sysutils = catrequire("cat.sys.utils"),
     _logsfolder;
 
 (function() {
@@ -14,11 +15,14 @@ var _fs = require('fs'),
                 var log,
                     logfile = 'CAT.log',
                     logfilepath,
-                    backlogfilepath,
                     logstat;
 
                 if (!global.CAT._log) {
 
+                    if (!_logsfolder) {
+                        global.CAT.init();
+                    }
+                    
                     // split log file if it's too long
                     logfilepath = _path.join(_logsfolder, logfile);
                     if (_fs.existsSync(logfilepath)) {
@@ -54,8 +58,8 @@ var _fs = require('fs'),
                 }
             },
              
-            init: function(logfolder) {
-                _logsfolder = logfolder;
+            init: function() {
+                _logsfolder = _sysutils.createSystemFolder("logs");
             }
         };
 

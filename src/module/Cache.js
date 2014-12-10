@@ -1,5 +1,7 @@
 var _fs = require("fs"),
     _global = catrequire("cat.global"),
+    _utils = catrequire("cat.utils"),
+    _sysutils = catrequire("cat.sys.utils"),
     _home = _global.get("home"),
     _path = require("path"),
     _workingDir,
@@ -9,17 +11,18 @@ if (_home && _home.working) {
     _workingDir = _home.working.path;
 }
 
-(function() {
-    var path = _path.join(_workingDir, "cache");
-    
+function _init() {
+    var path = _path.join(_workingDir);
+
     // create log folder
     if (!_fs.existsSync(path)) {
-        _fs.mkdirSync(path, 0777);
+        _sysutils.createSystemFolder("cache");
+        _utils.chmodSyncOffset(path, 0777, 1);
     }
 
     _fileName = _path.join(path, ".cat");
 
-})();
+}
 
 /**
  * Persist a property style data (key=value) to a file named .cat
@@ -32,19 +35,28 @@ module.exports = function () {
         option = (option || "appendFileSync");
         try {
             if (option) {
+                if (!_fs.existsSync(_fileName)) {
+                    _init(); 
+                }
                 _fs[option](_fileName, data, {encoding: "utf8", mode: 0777});
+                
             }
         } catch (e) {
-            console.log("[catcli] ", e);
+            console.log("[catcli cache store] ", e);
         }
     }
 
     function _load() {
         try {
-            return _fs.readFileSync(_fileName, "utf8");
+            if (_fs.existsSync(_fileName)) {
+                return _fs.readFileSync(_fileName, "utf8");
+                
+            } else {
+                console.warn("[catcli cache load] warning, no valid .cat file was found");
+            }
 
         } catch (e) {
-            console.log("[catcli] ", e);
+            console.log("[catcli cache load] ", e);
         }
     }
 

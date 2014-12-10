@@ -185,7 +185,11 @@ module.exports = function () {
                 patharr = folders.slice(0, (folders.length - i));
                 path = patharr.join(_path.sep);
 
-                _fs.chmodSync(path, mode);
+                try {
+                    _fs.chmodSync(path, mode);
+                } catch(e) {
+                    this.log("warn", "[catjs utils chmodSyncOffset] failed to grant permissions: " + e);
+                }
             }
 
         },
@@ -591,6 +595,7 @@ module.exports = function () {
                 });
             }
         }
+        
     };
 
 }();
