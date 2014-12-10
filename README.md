@@ -53,8 +53,9 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 ## Release Notes
 
 * **Note! Reports location moved to be aggregated below "reports" folder** 
-* ** New Scrap Annotation - @@screenshot screenshot()**<br />
-  Code example :
+* ** New Scrap Annotation - @@screenshot screenshot()**
+
+Code example :
 
     <!--
       @[scrap
@@ -64,8 +65,8 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
       ]@
     -->
   
-  The saved screenshot will be in the reporter folder.<br />
-  Support in iOS and android
+The screenshot will be saved in the reports folder<br />
+Support in iOS and android
 
 
 ## Documentation
