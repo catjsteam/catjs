@@ -1907,15 +1907,26 @@ _cat.core.TestManager = function() {
 _cat.core.ui = function () {
 
     function _addEventListener(elem, event, fn) {
-        if (!elem) {
-            return undefined;
-        }
-        if (elem.addEventListener) {
-            elem.addEventListener(event, fn, false);
+        if ($) {
+           if (event === "load") {
+               $( document ).ready(fn);
+           } else {
+               $( elem ).on( event, fn);
+           }
+
+
         } else {
-            elem.attachEvent("on" + event, function () {
-                return(fn.call(elem, window.event));
-            });
+            if (!elem) {
+                return undefined;
+            }
+            if (elem.addEventListener) {
+                elem.addEventListener(event, fn, false);
+            } else {
+                elem.attachEvent("on" + event, function () {
+                    return(fn.call(elem, window.event));
+                });
+            }
+
         }
     }
 
@@ -2048,7 +2059,7 @@ _cat.core.ui = function () {
     var __cache = [],
         __catElement,
         _disabled = false,
-        _onloadIstener = false,
+
         _loaderListener = false,
         _me = {
 
@@ -2070,7 +2081,7 @@ _cat.core.ui = function () {
                     return;
                 }
 
-                if (!_loaderListener && !_onloadIstener) {
+                if ((!_loaderListener) || true) {
                     _loaderListener = true;
                     _addEventListener(window, "load", function (e) {
 
@@ -2088,9 +2099,6 @@ _cat.core.ui = function () {
                                 }
                             }
 
-                            if (catElement) {
-                                _onloadIstener = false;
-                            }
 
                             // set logo listener
                             var logoelt = document.getElementById("catlogo"),
