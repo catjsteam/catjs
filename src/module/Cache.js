@@ -17,7 +17,7 @@ function _init() {
     // create log folder
     if (!_fs.existsSync(path)) {
         _sysutils.createSystemFolder("cache");
-        _utils.chmodSyncOffset(path, 0777, 1);
+        _sysutils.chmodSyncOffset(path, 0777, 1);
     }
 
     _fileName = _path.join(path, ".cat");

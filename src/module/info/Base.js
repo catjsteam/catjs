@@ -3,6 +3,7 @@ var _date = require("date-format-lite"),
     _log = _global.log(),
     _path = require("path"),
     _utils = catrequire("cat.utils"),
+    _sysutils = catrequire("cat.sys.utils"),
     _fs = require("fs"),
     _wrench = require("wrench"),
     _devicentity = require("./entity/Device.js"),
@@ -62,7 +63,7 @@ module.exports = function () {
         if (!_fs.existsSync(path)) {
             _wrench.mkdirSyncRecursive(path, 0777);
         }
-        _utils.chmodSyncOffset(path, 0777, 3);
+        _sysutils.chmodSyncOffset(path, 0777, 3);
 
 
         entity = _getEntityRecord(entity);

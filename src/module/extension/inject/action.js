@@ -7,6 +7,7 @@ var _fs = require('fs'),
     _mdata = catrequire("cat.mdata"),
     _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
+    _sysutils = catrequire("cat.sys.utils"),
     _tplutils = catrequire("cat.tpl.utils"),
     _props = catrequire("cat.props"),
     _basePlugin = require("./../Base.js"),
@@ -62,7 +63,8 @@ module.exports = _basePlugin.ext(function () {
                     fileContent = _beautify(fileContent, { indent_size: 2 });
                     try {
                         info.file = _validateFileExt(info.file);
-                        _fs.writeFileSync(info.file, fileContent);
+                        _fs.writeFileSync(info.file, fileContent, {mode: 0777});
+                        _fs.chmodSync(info.file, 0777);
                         _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
                     } catch (e) {
                         _utils.error(_props.get("cat.error").format("[inject ext]", e));
@@ -75,7 +77,7 @@ module.exports = _basePlugin.ext(function () {
                 targetfile, targetfolder, targetInternalFolder, 
                 home = _global.get("home"),
                 catworkdir = (home ? home.working.path : undefined),
-                internalTargetfile;
+                internalTargetfile, folderCounter=0;
             
          
             /* 
@@ -92,13 +94,17 @@ module.exports = _basePlugin.ext(function () {
             targetfolder = _path.dirname(targetfile);
             if (targetfolder) {
                 if (!_fs.existsSync(targetfolder)) {
-                    _utils.mkdirSync(targetfolder, {mode: 0777});
+                    folderCounter = _sysutils.getFoldersCount(filepath);
+                    _fs.mkdirSync(targetfolder, {mode: 0777});
+                    _sysutils.chmodSyncOffset(targetfolder, 0777, folderCounter);
                 }
             }
             targetInternalFolder = _path.dirname(internalTargetfile);
             if (targetInternalFolder) {
                 if (!_fs.existsSync(targetInternalFolder)) {
-                    _utils.mkdirSync(targetInternalFolder, {mode: 0777});
+                    folderCounter = _sysutils.getFoldersCount(filepath);
+                    _fs.mkdirSync(targetInternalFolder, {mode: 0777});
+                    _sysutils.chmodSyncOffset(targetInternalFolder, 0777, folderCounter);
                 }
             }
 
@@ -194,7 +200,8 @@ module.exports = _basePlugin.ext(function () {
             }).then(function () {
 
                     try {
-                        _fs.writeFileSync(file, lines.join(""));
+                        _fs.writeFileSync(file, lines.join(""), {mode: 0777});
+                        _fs.chmodSync(file, 0777);
                         _log.debug(_props.get("cat.mdata.write").format("[inject ext]"));
 
                     } catch (e) {
