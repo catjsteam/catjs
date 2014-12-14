@@ -11,7 +11,7 @@ module.exports = function _generateCATFileInfo(scraps, sourcefile, targetfile) {
 
     scraps.forEach(function (scrap) {
 
-        var out,
+        var printer,
             runat,
             managerout,
             pkgname,
@@ -54,12 +54,13 @@ module.exports = function _generateCATFileInfo(scraps, sourcefile, targetfile) {
                 }
             ));
 
+            printer = scrap.printer;
             outputjs.push(_tplutils.template({
                     name: "scrap/_func",
                     data: {
                         name: pkgname,
                         arguments: (args ? ( args.join ? args.join(",") : args) : undefined),
-                        output: scrap.generate()}
+                        output: printer.generate()}
                 }
             ));
 

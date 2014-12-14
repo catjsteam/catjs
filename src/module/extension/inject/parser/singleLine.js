@@ -11,6 +11,7 @@ module.exports = function(config) {
     var content,
         scrapCtxArguments,
         scraplcl = config.scraplcl,
+        printer = (scraplcl ? scraplcl.printer : undefined),
         injectinfo = config.injectinfo,
         lineNumber = config.lineNumber,
         line = config.line.line,
@@ -80,17 +81,17 @@ module.exports = function(config) {
 
     } else if (engine === _scrapEnum.engines.HTML_IMPORT_JS) {
 
-        content = scraplcl.generate();
+        content = printer.generate();
         //content = (_utils.prepareCode(content) || "");
 
     } else if (engine === _scrapEnum.engines.JS_EMBED_INSERT) {
-        content = scraplcl.generate();
+        content = printer.generate();
         content = (_utils.prepareCode(content) || "");
 
     } else if (engine === _scrapEnum.engines.HTML_EMBED_INSERT) {
 
         // Inject the scrap line to the file untouched
-        content = scraplcl.generate();
+        content = printer.generate();
         content = (_utils.prepareCode(content) || "");
 
     }

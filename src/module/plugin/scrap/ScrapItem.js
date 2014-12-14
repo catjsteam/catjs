@@ -8,7 +8,8 @@ var _utils = catrequire("cat.utils"),
     _catlibtils = catrequire("cat.lib.utils"),
     _scraputils = catrequire("cat.scrap.utils"),
     _jsutils = require("js.utils"),
-
+    _Printer = require("./printer/Generic.js"),
+    
     _scrapId = function () {
         var __id = _catlibtils.generateGUID();
         return ["scrap", __id].join("_");
@@ -131,8 +132,7 @@ _clazz = function (config) {
                         return undefined;
                     }
                 }
-            }
-            ;
+            }            
 
             if (_typedas.isArray(defaultValue)) {
                 if (defaultValue.length > 0) {
@@ -199,11 +199,13 @@ _clazz = function (config) {
         _utils.error(_props.get("cat.error.config").format("[scrap class]"));
     }
 
-    this.config = config;
-    this.output = [];
+    this.config = config;            
     this.arguments = [];
     this.$$context = new _ScrapContext();
 
+    this.printer = new _Printer();
+    this.userprinter = new _Printer();
+    
     this.getEnum = _scrapEnum.getScrapEnum;
 
     this.set = function (key, value) {
@@ -272,6 +274,10 @@ _clazz = function (config) {
 
 _clazz.prototype.isSingle = function (key) {
     return this.config.single[key];
+};
+
+_clazz.prototype.print = function(line) {
+    this.printer.print(line);
 };
 
 /**
@@ -403,20 +409,6 @@ _clazz.prototype.setCtxArguments = function (arr) {
 _clazz.prototype.generateCtxArguments = function () {
     var ctx = this.get("arguments");
     return ( ctx && ctx.join ? ctx.join(", ") : "");
-};
-
-_clazz.prototype.generate = function () {
-    return ( this.output ? this.output.join(" \n ") : "");
-};
-
-_clazz.prototype.print = function (line) {
-    if (line) {
-        if (_typedas.isArray(line)) {
-            this.output = this.output.concat(line);
-        } else {
-            this.output.push(line);
-        }
-    }
 };
 
 _clazz.prototype.apply = function () {

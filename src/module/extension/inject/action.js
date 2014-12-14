@@ -1,4 +1,3 @@
-debugger;
 var _fs = require('fs'),
     _path = require('path'),
     _lineReader = require('line-reader'),
