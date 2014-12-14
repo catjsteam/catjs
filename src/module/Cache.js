@@ -39,7 +39,7 @@ module.exports = function () {
                     _init(); 
                 }
                 _fs[option](_fileName, data, {encoding: "utf8", mode: 0777});
-                
+                _fs.chmodSync(_fileName, 0777);
             }
         } catch (e) {
             console.log("[catcli cache store] ", e);

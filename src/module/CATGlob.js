@@ -37,6 +37,7 @@ var _fs = require('fs'),
                         encoding: null,
                         mode: 0777
                     }));
+                    _fs.chmodSync(logfilepath, 0777);
 
                     log.info("\n\n[CAT] Initial LOG -----------------------------------------------------------------------");
                     log.info("[CAT] Initial CAT process: " + process.pid);
