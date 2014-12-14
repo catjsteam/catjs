@@ -1913,8 +1913,6 @@ _cat.core.ui = function () {
            } else {
                $( elem ).on( event, fn);
            }
-
-
         } else {
             if (!elem) {
                 return undefined;
