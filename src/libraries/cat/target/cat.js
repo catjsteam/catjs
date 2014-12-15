@@ -1553,13 +1553,12 @@ _cat.core.clientmanager = function () {
             (function init() {
                 if (config) {
                     codeCommands = ("commands" in config ? config.commands : undefined);
-                    methods = ("methods" in config ? config.methods : undefined);
                     context = ("context" in config ? config.context : undefined); 
                 }
             })();
 
             commands = commands.concat((codeCommands || []));
-            commands = commands.concat((methods || []));            
+     
             
             delayManagerCommands(commands, context);
         }

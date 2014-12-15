@@ -10,7 +10,7 @@ module.exports = function (config) {
             scrapargs = _scrap.getArgumentsNames(),
             scrapargsstr;
 
-        scrapargsstr = scrapargs.join(",") + ", context";
+        scrapargsstr = "context" + (",") + scrapargs.join(",");
 
         return {
 
@@ -29,10 +29,8 @@ module.exports = function (config) {
                 rows.forEach(function (row) {
 
                     if (row) {
-
                         _commandsCode.push((process ? process.call(_scrap, row) : row));
                     }
-
                     counter++;
                 });
 
@@ -46,18 +44,15 @@ module.exports = function (config) {
                         // execute the commands separately
                         _commandsCode.forEach(function(command) {
                             if (command) {
-                                prepare.push([command]);
+                                prepare.push(command);
                             }
                         });
                     }
-                    
-                    prepare.forEach(function(command) {
-                        if (command) {
-                            _scrap.print(["_cat.core.clientmanager.delayManager({ commands: ", JSON.stringify(command), ", context: {",
-                                args,
-                                "}});"].join(""));
-                        }
-                    });
+
+                   _scrap.print(["_cat.core.clientmanager.delayManager({" +
+                       "commands:[function(", scrapargsstr, ") { ", prepare.join(";"), "}]," +
+                       "context:{", args, "}" +
+                       "});"].join(""));
                     
                 } else {
                     print.call(_scrap, rows, counter);

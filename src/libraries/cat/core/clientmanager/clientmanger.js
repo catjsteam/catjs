@@ -215,12 +215,14 @@ _cat.core.clientmanager = function () {
                         }
                     }
                     
-                    if (_cat.utils.Utils.getType(commandObj) === "string") {
-                        commandObj = (commandObj ? commandObj.trim() : undefined);                        
-                        new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
 
-                    } else if (_cat.utils.Utils.getType(commandObj) === "function") {
-                        commandObj.apply(this, functionargs);
+                        if (_cat.utils.Utils.getType(commandObj) === "string") {
+                            commandObj = (commandObj ? commandObj.trim() : undefined);                        
+                            new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
+    
+                        } else if (_cat.utils.Utils.getType(commandObj) === "function") {
+                            commandObj.apply(this, functionargs);
+                        }
                     }
 
                 } else {
