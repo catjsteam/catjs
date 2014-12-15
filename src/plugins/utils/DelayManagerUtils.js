@@ -1,11 +1,16 @@
+var _jsutils = require("js.utils");
+
 module.exports = function (config) {
 
     function DelayManager(config) {
 
         var _commandsCode = [],
             _config = config,
-            _scrap = _config.scrap;
+            _scrap = _config.scrap,
+            scrapargs = _scrap.getArgumentsNames(),
+            scrapargsstr;
 
+        scrapargsstr = scrapargs.join(",") + ", context";
 
         return {
 
@@ -14,8 +19,8 @@ module.exports = function (config) {
                 var rows = config.rows,
                     concatflag = ("concat" in config || false),
                     prepare = [],
-                    counter=0,
-                    args = (config.args || []);
+                    args = (config.args || []),
+                    counter=0;
 
                 _commandsCode = [];
                 args.push("scrap : _ipkg.scrap");
@@ -32,10 +37,10 @@ module.exports = function (config) {
                 });
 
                 if (!print) {
-
+ 
                     if (concatflag) {
                         // concat all of the given commands
-                        prepare.push(JSON.stringify(_commandsCode));
+                        prepare.push(_commandsCode);
 
                     } else {
                         // execute the commands separately
@@ -45,14 +50,15 @@ module.exports = function (config) {
                             }
                         });
                     }
-
+                    
                     prepare.forEach(function(command) {
                         if (command) {
-                            _scrap.print(["_cat.core.clientmanager.delayManager(", JSON.stringify(command), ", {",
+                            _scrap.print(["_cat.core.clientmanager.delayManager({ commands: ", JSON.stringify(command), ", context: {",
                                 args,
-                                "});"].join(""));
+                                "}});"].join(""));
                         }
                     });
+                    
                 } else {
                     print.call(_scrap, rows, counter);
                 }

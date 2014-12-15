@@ -9,6 +9,7 @@ _cat.core.clientmanager = function () {
         updateTimeouts,
         catConfig,
         startInterval,
+        delayManagerCommands,
         getScrapInterval,
         setupInterval,
         intervalObj,
@@ -179,6 +180,81 @@ _cat.core.clientmanager = function () {
         setupInterval(catConfig, scrap);
     };
 
+    delayManagerCommands = function (commands, context) {
+
+        var indexCommand = 0,
+            catConfig = _cat.core.getConfig(),
+            _enum = catConfig.getTestsTypes(),
+            executeCode,
+            delay = catConfig.getTestDelay();
+
+        executeCode = function (codeCommandsArg, context) {
+            var commandObj,
+                scrap = context.scrap,
+                size = (codeCommandsArg ? codeCommandsArg.length : undefined),
+                functionargskeys = [],
+                functionargs = [],
+                contextkey;
+
+
+            updateTimeouts(scrap);
+
+            for (indexCommand = 0; indexCommand < size; indexCommand++) {
+                commandObj = codeCommandsArg[indexCommand];
+
+                if (commandObj) {
+                    functionargskeys.push("context");
+                    functionargs.push(context);
+                    
+                    if (context && context.args) {
+                        for (contextkey in context.args) {
+                            if (context.args.hasOwnProperty(contextkey)) {
+                                functionargskeys.push(contextkey);
+                                functionargs.push(context.args[contextkey]);
+                            }
+                        }
+                    }
+                    
+                    if (_cat.utils.Utils.getType(commandObj) === "string") {
+                        commandObj = (commandObj ? commandObj.trim() : undefined);                        
+                        new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
+
+                    } else if (_cat.utils.Utils.getType(commandObj) === "function") {
+                        commandObj.apply(this, functionargs);
+                    }
+
+                } else {
+                    console.warn("[CatJS] Ignore, Not a valid command: ", commandObj);
+                }
+            }
+
+            runStatus.numRanSubscrap = runStatus.numRanSubscrap + size;
+
+            if ((runStatus.numRanSubscrap === runStatus.subscrapReady) && runStatus.scrapReady === runStatus.scrapsNumber) {
+                var reportFormats;
+                if (catConfig.isReport()) {
+                    reportFormats = catConfig.getReportFormats();
+                }
+
+                // TODO change clear interval
+                endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
+            }
+
+        };
+
+        runStatus.subscrapReady = runStatus.subscrapReady + commands.length;
+
+        if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
+            setTimeout(function () {
+                executeCode(commands, context);
+            }, totalDelay);
+            totalDelay += delay;
+        } else {
+            executeCode(commands, context);
+        }
+
+    };
+    
     return {
 
 
@@ -264,70 +340,32 @@ _cat.core.clientmanager = function () {
 
         },
 
-        delayManager: function (codeCommands, context) {
-            var indexCommand = 0,
-                catConfig = _cat.core.getConfig(),
-                _enum = catConfig.getTestsTypes(),
-                executeCode,
-                delay = catConfig.getTestDelay();
-
-            executeCode = function (codeCommandsArg, context) {
-                var commandObj,
-                    scrap = context.scrap,
-                    size = (codeCommandsArg ? codeCommandsArg.length : undefined),
-                    functionargskeys = [],
-                    functionargs = [],
-                    contextkey;
-
-
-                updateTimeouts(scrap);
-
-                for (indexCommand = 0; indexCommand < size; indexCommand++) {
-                    commandObj = codeCommandsArg[indexCommand];
-                    commandObj = (commandObj ? commandObj.trim() : undefined);
-
-                    if (commandObj) {
-                        functionargskeys.push("context");
-                        functionargs.push(context);
-                        if (context && context.args) {
-                            for (contextkey in context.args) {
-                                if (context.args.hasOwnProperty(contextkey)) {
-                                    functionargskeys.push(contextkey);
-                                    functionargs.push(context.args[contextkey]);
-                                }
-                            }
-                        }
-                        new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
-                    } else {
-                        console.warn("[CatJS] Ignore, Not a valid command: ", commandObj);
-                    }
+        /**
+         * Delay a set of UI actions commands
+         * 
+         * Config:
+         *       methods {Array} string javascript functions reference
+         *       commands {Array} string javascript statements
+         *       context {Object} catjs context object
+         *
+         * 
+         * @param config
+         */
+        delayManager: function (config) {
+            var codeCommands, context, methods, commands = [];            
+            
+            (function init() {
+                if (config) {
+                    codeCommands = ("commands" in config ? config.commands : undefined);
+                    methods = ("methods" in config ? config.methods : undefined);
+                    context = ("context" in config ? config.context : undefined); 
                 }
+            })();
 
-                runStatus.numRanSubscrap = runStatus.numRanSubscrap + size;
-
-                if ((runStatus.numRanSubscrap === runStatus.subscrapReady) && runStatus.scrapReady === runStatus.scrapsNumber) {
-                    var reportFormats;
-                    if (catConfig.isReport()) {
-                        reportFormats = catConfig.getReportFormats();
-                    }
-
-                    // TODO change clear interval
-                    endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
-                }
-
-            };
-
-            runStatus.subscrapReady = runStatus.subscrapReady + codeCommands.length;
-
-            if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
-                setTimeout(function () {
-                    executeCode(codeCommands, context);
-                }, totalDelay);
-                totalDelay += delay;
-            } else {
-                executeCode(codeCommands, context);
-            }
-
+            commands = commands.concat((codeCommands || []));
+            commands = commands.concat((methods || []));            
+            
+            delayManagerCommands(commands, context);
         }
     };
 }();

@@ -24,14 +24,6 @@ module.exports = function () {
             ].join("");
 
 
-//            _cat.core.clientmanager.delayManager([
-//                {
-//                    "command" : "_cat.utils.chai.assert(",
-//                    "args" : "context",
-//                    "end" : ");"
-//                }
-//            ], { code:JSON.stringify(["assert", codeSnippetObject].join(".")), fail:true, scrap:_cat.core.getVar(pkgName).scrap, args:_args });
-
         }
     };
 

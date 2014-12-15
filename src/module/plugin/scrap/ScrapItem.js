@@ -393,6 +393,18 @@ _clazz.prototype.get = function (key) {
     return value;
 };
 
+_clazz.prototype.getArgumentsNames = function (arr) {
+    var args = this.arguments();
+    
+    args = (args || ["thi$"]);
+    if (args === "thi$") {
+        args = ["thi$"];
+    }
+    
+    return args;
+    
+};
+
 _clazz.prototype.setCtxArguments = function (arr) {
     if (arr) {
         if (_typedas.isArray(arr)) {
