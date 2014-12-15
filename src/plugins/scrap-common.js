@@ -120,27 +120,6 @@ module.exports = function () {
                     }
                 }});
 
-
-            /**
-             * Annotation for javascript code
-             *
-             *  properties:
-             *  name    - screenshot
-             *  single  - false
-             *  singleton - 1[default -1]
-             *  $type   - js
-             */
-//            _Scrap.add({name: "screenshot",
-//                single: false,
-//                singleton: 1,
-//                func: function (config) {
-//                    var me = this;
-//
-//
-//                    me.print("app.getScreenshot();");
-//
-//                }});
-
             /**
              * Annotation for javascript code
              *
@@ -164,13 +143,11 @@ module.exports = function () {
                     if (codeRows) {
                         codeRows = _utils.prepareCode(codeRows);
 
-
                         dm = new _delayManagerUtils({
                             scrap: me
                         });
 
                         if (codeRows) {
-
                             if (codeRows && codeRows.join) {
 
                                 dm.add({
@@ -180,19 +157,11 @@ module.exports = function () {
                                     return row;
                                 });
                             }
-
-
                             dm.add({
                                 rows: codeRows
-
                             });
                         }
-
                         dm.dispose();
-
-                      
-
-
                     }
                 }});
 
@@ -200,7 +169,52 @@ module.exports = function () {
              * Annotation for javascript code
              *
              *  properties:
-             *  name    - code
+             *  name    - js
+             *  single  - false
+             *  $type   - js
+             */
+            _Scrap.add({name: "js",
+                single: false,
+                func: function (config) {
+
+                    var codeRows,
+                        code,
+                        me = this,
+                        dm,
+                        scrap = me.config;
+
+                    codeRows = this.get("js");
+
+                    if (codeRows) {
+                        codeRows = _utils.prepareCode(codeRows);
+
+                        dm = new _delayManagerUtils({
+                            scrap: me
+                        });
+
+                        if (codeRows) {
+                            if (codeRows && codeRows.join) {
+
+                                dm.add({
+                                    rows: [_elutils.uicontent({ rows: codeRows, scrap: scrap})]
+
+                                }, function (row) {
+                                    return row;
+                                });
+                            }
+                            dm.add({
+                                rows: codeRows
+                            });
+                        }
+                        dm.dispose();
+                    }
+                }});
+
+            /**
+             * Annotation for javascript code
+             *
+             *  properties:
+             *  name    - log
              *  single  - false
              *  $type   - js
              */
