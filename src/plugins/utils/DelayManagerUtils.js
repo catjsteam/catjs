@@ -50,7 +50,7 @@ module.exports = function (config) {
                     }
 
                    _scrap.print(["_cat.core.clientmanager.delayManager({" +
-                       "commands:[function(", scrapargsstr, ") { ", prepare.join(";"), "}]," +
+                       "commands:[function(", scrapargsstr, ") { ", prepare.join(";").split(";;").join(";"), "}]," +
                        "context:{", args, "}" +
                        "});"].join(""));
                     
