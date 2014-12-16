@@ -2,7 +2,6 @@ var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _tplutils = catrequire("cat.tpl.utils"),
     _scraputils = require("./utils/Utils"),
-    _elutils = require("./utils/ExpressionUtils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 module.exports = function () {
@@ -94,21 +93,12 @@ module.exports = function () {
                     });
 
                     if (enyoRows) {
-                        scrap = scrapConf;
-
-                        if (enyoRows && enyoRows.join) {
-
-                            dm.add({
-                                rows:[_elutils.uicontent({ rows: enyoRows, scrap: scrap})]
-
-                            }, function(row) {
-                                return row;
-                            });
-                        }
-
 
                         dm.add({
-                            rows:enyoRows
+                            rows:enyoRows,
+                            args: [
+                                "scrapName: 'enyo'"
+                            ]
 
                         }, function(row) {
                             return generate(row);

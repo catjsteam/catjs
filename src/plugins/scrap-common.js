@@ -38,7 +38,7 @@ module.exports = function () {
     function __updateLibs(deplibs) {
         var result = [],
             manifest = project.getManifest();
-        
+
         function _Details(config) {
 
             var me = this;
@@ -46,23 +46,23 @@ module.exports = function () {
             function _init(config, props) {
 
                 var lib = config.lib;
-                
+
                 me.name = config.name;
                 me.path = config.path;
 
-                props.forEach(function(item) {
+                props.forEach(function (item) {
                     if (item in lib) {
                         me[item] = lib[item];
                     }
                 });
             }
-            
+
             _init(config, ["exports", "deps", "globals"]);
-            
+
         }
-        
+
         if (manifest) {
-            deplibs.forEach(function(item) {
+            deplibs.forEach(function (item) {
                 var lib, names;
                 if (item) {
                     lib = manifest.getLibrary(item);
@@ -70,12 +70,12 @@ module.exports = function () {
                         // get the actual file names
                         names = lib.getFileNames();
                         if (names && names.length > 0) {
-                            names.forEach(function(libpath) {
+                            names.forEach(function (libpath) {
                                 if (libpath) {
-                                   result.push(new _Details({name: item, path: libpath, lib: lib})) ;
+                                    result.push(new _Details({name: item, path: libpath, lib: lib}));
                                 }
                             });
-                            
+
 
                         } else {
 
@@ -92,7 +92,7 @@ module.exports = function () {
         }
         return result;
     }
-    
+
     return {
 
         init: function (config) {
@@ -148,17 +148,12 @@ module.exports = function () {
                         });
 
                         if (codeRows) {
-                            if (codeRows && codeRows.join) {
 
-                                dm.add({
-                                    rows: [_elutils.uicontent({ rows: codeRows, scrap: scrap})]
-
-                                }, function (row) {
-                                    return row;
-                                });
-                            }
                             dm.add({
-                                rows: codeRows
+                                rows: codeRows,
+                                args: [
+                                    "scrapName: 'code'"
+                                ]
                             });
                         }
                         dm.dispose();
@@ -193,17 +188,12 @@ module.exports = function () {
                         });
 
                         if (codeRows) {
-                            if (codeRows && codeRows.join) {
 
-                                dm.add({
-                                    rows: [_elutils.uicontent({ rows: codeRows, scrap: scrap})]
-
-                                }, function (row) {
-                                    return row;
-                                });
-                            }
                             dm.add({
-                                rows: codeRows
+                                rows: codeRows,
+                                args: [
+                                    "scrapName: 'js'"
+                                ]
                             });
                         }
                         dm.dispose();
@@ -425,11 +415,11 @@ module.exports = function () {
 
                     if (codeRows) {
                         codeRows = _utils.prepareCode(codeRows);
-                        codeSnippet = codeRows[0];                       
+                        codeSnippet = codeRows[0];
 
                         if (codeSnippet) {
                             try {
-                                                               
+
                                 // try to understand the code
                                 codeSnippetObject = _uglifyutils.getCodeSnippet({code: codeSnippet});
 
@@ -450,7 +440,9 @@ module.exports = function () {
                             rows: [_elutils.assert()],
                             args: [
                                 "'code': [\"assert\", " + JSON.stringify(codeSnippetObject) + "].join(\".\")",
-                                "'fail': true"
+                                "'fail': true",
+                                "scrapName: 'assert'"
+
                             ]
                         });
 
@@ -496,25 +488,25 @@ module.exports = function () {
 
                             }
                         }, globals = [];
-                    
-                    function _addGlobals(lib){
-                        
-                       var glob, exp;
-                       if (lib) {
-                           glob = ("globals" in lib ? lib.globals : false);
-                           exp = ("exports" in lib ? lib.exports : undefined);
-                           if (glob && exp) {
-                               globals.push(_tplutils.template({
-                                   content: requireGlobalsJSTpl,
-                                   data: {
-                                      handle: lib.name,
-                                      exports: exp
-                                   }
-                               }));
-                           }
-                       } 
+
+                    function _addGlobals(lib) {
+
+                        var glob, exp;
+                        if (lib) {
+                            glob = ("globals" in lib ? lib.globals : false);
+                            exp = ("exports" in lib ? lib.exports : undefined);
+                            if (glob && exp) {
+                                globals.push(_tplutils.template({
+                                    content: requireGlobalsJSTpl,
+                                    data: {
+                                        handle: lib.name,
+                                        exports: exp
+                                    }
+                                }));
+                            }
+                        }
                     }
-                    
+
                     if (requirerows) {
                         if (!_typedas.isArray(requirerows)) {
                             requirerows = [requirerows];
@@ -534,7 +526,7 @@ module.exports = function () {
 
                                         // update the libs according to the manifest
                                         libs = __updateLibs(libs);
-                                                                            
+
                                         libs.forEach(function (lib) {
                                             var fullpathlib,
                                                 key, libpath = lib.path;
@@ -544,16 +536,16 @@ module.exports = function () {
                                                     return undefined;
                                                 }
 
-                                                libpath = libpath.split(".js").join("");               
-                                                
+                                                libpath = libpath.split(".js").join("");
+
                                                 fullpathlib = basedir + libpath;
 
                                                 if (_catlibtils.extExists(libpath)) {
                                                     if (libpath.lastIndexOf(".css") !== -1) {
                                                         requirecsslist.push(basedir + libpath);
                                                         return undefined;
-                                                        
-                                                    } 
+
+                                                    }
                                                 }
 
                                                 key = lib.name.split(".").join("");
@@ -561,7 +553,7 @@ module.exports = function () {
                                                 if (lib.deps || lib.exports) {
                                                     if (!config.shim[key]) {
                                                         config.shim[key] = {};
-                                                    }      
+                                                    }
                                                     if (lib.deps) {
                                                         config.shim[key].deps = lib.deps;
                                                     }
@@ -574,7 +566,7 @@ module.exports = function () {
                                             }
                                         });
 
-                                        
+
                                         // override configuration
                                         if (config.paths.chai) {
                                             config.shim.catjs.deps = ["chai"];
@@ -588,7 +580,7 @@ module.exports = function () {
                                                 require: JSON.stringify(requirelist),
                                                 requirerefs: requirelist.join(",").split('"').join(""),
                                                 cssfiles: JSON.stringify(requirecsslist),
-                                                globals: (globals.length > 0 ? globals.join(" ") : "") 
+                                                globals: (globals.length > 0 ? globals.join(" ") : "")
                                             }
                                         }));
 
@@ -612,8 +604,8 @@ module.exports = function () {
                 single: false,
                 func: function (config) {
 
-                    var project = catrequire("cat.cli").getProject();                       
-                    
+                    var project = catrequire("cat.cli").getProject();
+
                     function _getType(value) {
 
                         var type = "js";
@@ -635,13 +627,13 @@ module.exports = function () {
 
                     function generateLibs(value) {
 
-                        var libs=[], deplibs=[], basedir,
+                        var libs = [], deplibs = [], basedir,
                             libcounter = 0,
                             libsrcs = [];
 
                         if (_isCatjs(value)) {
-                           
-                                                       
+
+
                             // handle cat library
                             deplibs = project.getInfo("dependencies");
 
@@ -651,13 +643,13 @@ module.exports = function () {
                             libs.forEach(function (lib) {
                                 if (lib.path === "cat") {
                                     libs.splice(libcounter, 1);
-                                }                                
+                                }
                                 libcounter++;
                             });
 
                             basedir = _path.dirname(value) + "/";
 
-                           
+
                             libs.forEach(function (lib) {
                                 if (lib.path.indexOf("cat.src") === -1) {
                                     libsrcs.push([basedir, lib.path].join(""));
@@ -669,7 +661,7 @@ module.exports = function () {
                         } else {
                             libsrcs.push(value);
                         }
-                        
+
                         return libsrcs;
                     }
 

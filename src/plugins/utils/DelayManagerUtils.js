@@ -20,7 +20,7 @@ module.exports = function (config) {
                     concatflag = ("concat" in config || false),
                     prepare = [],
                     args = (config.args || []),
-                    counter=0;
+                    counter= 0, rowcounter=0;
 
                 _commandsCode = [];
                 args.push("scrap : _ipkg.scrap");
@@ -41,19 +41,21 @@ module.exports = function (config) {
                         prepare.push(_commandsCode);
 
                     } else {
+                        rowcounter=0;
                         // execute the commands separately
                         _commandsCode.forEach(function(command) {
                             if (command) {
-                                prepare.push(command);
+                                //prepare.push(command);
+                                _scrap.print(["_cat.core.clientmanager.delayManager({" +
+                                    "commands:[function(", scrapargsstr, ") { ", command, "}]," +
+                                    "context:{", args.concat("scrapRowIdx:" + rowcounter), "}" +
+                                    "});"].join(""));
+                                rowcounter++;
+
                             }
                         });
                     }
-
-                   _scrap.print(["_cat.core.clientmanager.delayManager({" +
-                       "commands:[function(", scrapargsstr, ") { ", prepare.join(";").split(";;").join(";"), "}]," +
-                       "context:{", args, "}" +
-                       "});"].join(""));
-                    
+                
                 } else {
                     print.call(_scrap, rows, counter);
                 }

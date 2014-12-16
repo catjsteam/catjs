@@ -1,7 +1,6 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _scraputils = require("./utils/Utils"),
-    _elutils = require("./utils/ExpressionUtils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 var tipNum = 1;
@@ -40,19 +39,11 @@ module.exports = function () {
                     if (screenshotRows) {
                         scrap = scrapConf;
 
-                        if (screenshotRows && screenshotRows.join) {
-
-                            dm.add({
-                                rows:[_elutils.uicontent({ rows: screenshotRows, scrap: scrap})]
-
-                            }, function(row) {
-                                return row;
-                            });
-                        }
-
-
                         dm.add({
-                            rows:screenshotRows
+                            rows:screenshotRows,
+                            args: [
+                                "scrapName: 'screenshot'"
+                            ]
 
                         }, function(row) {
                             var screenshotCommand = '_cat.core.plugin("screenshot").actions.screenshot("' + scrap.name[0] + '")';

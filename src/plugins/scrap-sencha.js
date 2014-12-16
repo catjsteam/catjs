@@ -1,8 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _scraputils = require("./utils/Utils"),
-    _delayManagerUtils = require("./utils/DelayManagerUtils"),
-    _elutils = require("./utils/ExpressionUtils");
+    _delayManagerUtils = require("./utils/DelayManagerUtils");
 
 module.exports = function () {
 
@@ -238,21 +237,12 @@ module.exports = function () {
                         });
 
                         if (senchaRows) {
-                            scrap = scrapConf;
-
-                            if (senchaRows && senchaRows.join) {
-
-                                dm.add({
-                                    rows:[_elutils.uicontent({ rows: senchaRows, scrap: scrap})]
-
-                                }, function(row) {
-                                    return row;
-                                });
-                            }
-
 
                             dm.add({
-                                rows:senchaRows
+                                rows:senchaRows,
+                                args: [
+                                    "scrapName: 'sencha'"
+                                ]
 
                             }, function(row) {
                                 return generate(row);

@@ -407,7 +407,12 @@ _cat.core.ui = function () {
                                         _setText(newLI.childNodes[0], config.header, config.style);
                                     }
                                     if ("desc" in config && config.desc) {
-                                        _setText(newLI.childNodes[1], config.desc, config.style);
+                                        if (config.desc.indexOf("_$$_") !== -1) {
+                                            config.desc = config.desc.split("_$$_").join("<br/>");
+                                            _setHTML(newLI.childNodes[1], config.desc, config.style);
+                                        } else {
+                                            _setText(newLI.childNodes[1], config.desc, config.style);
+                                        }
                                     }
 
                                     me.setContentTip(config);

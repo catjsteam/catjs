@@ -1,7 +1,6 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _scraputils = require("./utils/Utils"),
-    _elutils = require("./utils/ExpressionUtils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 var tipNum = 1;
@@ -73,21 +72,12 @@ module.exports = function () {
                     });
 
                     if (deviceinfoRows) {
-                        scrap = scrapConf;
-
-                        if (deviceinfoRows && deviceinfoRows.join) {
-
-                            dm.add({
-                                rows:[_elutils.uicontent({ rows: deviceinfoRows, scrap: scrap})]
-
-                            }, function(row) {
-                                return row;
-                            });
-                        }
-
 
                         dm.add({
-                            rows:deviceinfoRows
+                            rows:deviceinfoRows,
+                            args: [
+                                "scrapName: 'deviceinfo'"
+                            ]
 
                         }, function(row) {
                             return generate(row);

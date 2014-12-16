@@ -1,7 +1,6 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
     _scraputils = require("./utils/Utils"),
-    _elutils = require("./utils/ExpressionUtils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 var tipNum = 1;
@@ -137,21 +136,12 @@ module.exports = function () {
                     });
 
                     if (vncRows) {
-                        scrap = scrapConf;
-
-                        if (vncRows && vncRows.join) {
-
-                            dm.add({
-                                rows:[_elutils.uicontent({ rows: vncRows, scrap: scrap})]
-
-                            }, function(row) {
-                                return row;
-                            });
-                        }
-
 
                         dm.add({
-                            rows:vncRows
+                            rows:vncRows,
+                            args: [
+                                "scrapName: 'vnc'"
+                            ]
 
                         }, function(row) {
                             return generate(row);

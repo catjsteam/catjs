@@ -1390,7 +1390,11 @@ _cat.core.clientmanager = function () {
                 size = (codeCommandsArg ? codeCommandsArg.length : undefined),
                 functionargskeys = [],
                 functionargs = [],
-                contextkey;
+                contextkey,
+                scrapName = ("scrapName" in context ? context.scrapName : undefined),
+                scrapRowIdx = ("scrapRowIdx" in context ? context.scrapRowIdx : undefined),
+                description = [],
+                rows, idx= 0, rowssize= 0, row;
 
 
             updateTimeouts(scrap);
@@ -1410,6 +1414,26 @@ _cat.core.clientmanager = function () {
                             }
                         }
                     }
+
+                    rows = ( (scrap && scrapName && scrapName in scrap) ? scrap[scrapName] : [commandObj]);
+                    if (rows) {
+                        description.push(rows[scrapRowIdx] || rows[0]);
+                    }
+                    
+//                    rowssize = rows.length;
+//                    for (; idx<rowssize; idx++) {
+//                        row = rows[idx];
+//                        if (row) {
+//                            description.push(row);
+//                        }
+//                    }
+
+                    _cat.core.ui.setContent({
+                        style: 'color:#0080FF, font-size: 10px', 
+                        header: ((scrap && "name" in scrap && scrap.name) || "'NA'"),
+                        desc: (description.length > 0 ? description.join("_$$_") :  description.join("")), 
+                        tips: ""
+                    });
                     
                     if (_cat.utils.Utils.getType(commandObj) === "string") {
                         commandObj = (commandObj ? commandObj.trim() : undefined);                        
@@ -1553,12 +1577,13 @@ _cat.core.clientmanager = function () {
             (function init() {
                 if (config) {
                     codeCommands = ("commands" in config ? config.commands : undefined);
+                    methods = ("methods" in config ? config.methods : undefined);
                     context = ("context" in config ? config.context : undefined); 
                 }
             })();
 
             commands = commands.concat((codeCommands || []));
-     
+            commands = commands.concat((methods || []));            
             
             delayManagerCommands(commands, context);
         }
@@ -2350,7 +2375,12 @@ _cat.core.ui = function () {
                                         _setText(newLI.childNodes[0], config.header, config.style);
                                     }
                                     if ("desc" in config && config.desc) {
-                                        _setText(newLI.childNodes[1], config.desc, config.style);
+                                        if (config.desc.indexOf("_$$_") !== -1) {
+                                            config.desc = config.desc.split("_$$_").join("<br/>");
+                                            _setHTML(newLI.childNodes[1], config.desc, config.style);
+                                        } else {
+                                            _setText(newLI.childNodes[1], config.desc, config.style);
+                                        }
                                     }
 
                                     me.setContentTip(config);
