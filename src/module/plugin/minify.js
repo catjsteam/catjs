@@ -59,6 +59,17 @@ module.exports = _basePlugin.ext(function () {
                         });
                     }
                 }
+                
+                if (jshint) {
+                    if (!jshint.globals) {
+                        jshint.globals = {};
+                    }
+                    jshint.globals["_cat"] = true;
+                    jshint.globals["chai"] = true;
+                    jshint.globals["document"] = true;
+                    jshint.globals["XMLHttpRequest"] = true;
+                }
+                
                 task({
                     src: src,
                     out: {

@@ -30,7 +30,7 @@ var _global = catrequire("cat.global"),
             librariesConfig = [],
             librariesDefault = ["underscore", "js.utils", "tmr", "jspath", "chai",  "cat"],
             libraryBuildConfig, dependenciesInfo,
-            appTargetPath, appPath,
+            appTargetPath, appPath, jshint, minifyplugin,
             scrapfilter, projectcopy,
             scrapscan, customPlugins,
             cattarget, targetfolder,
@@ -136,6 +136,18 @@ var _global = catrequire("cat.global"),
                     }
                     customPlugins.push(scrapscan);
 
+                    jshint = project.getInfo("jshint");
+                    minifyplugin = {
+                        "name": "p@project.minify",
+                        "type": "minify",
+                        "path": _path.join(appTargetPath, cattarget, "/cat/lib"),
+                        "filename": "cat.src.js",
+                        "src":[["./cache/",  project.name, "/**/*.js"].join(""), "./src/**/*.js"]
+                    };
+                    if (jshint) {
+                        minifyplugin.jshint = jshint;
+                    }
+                    
                     customPlugins = customPlugins.concat([
                         {
                             "name": "p@lib.copy",
@@ -166,14 +178,7 @@ var _global = catrequire("cat.global"),
                             "to": {
                                 "path": _path.join(appTargetPath, cattarget, "/cat/config")
                             }
-                        },
-                        {
-                            "name": "p@project.minify",
-                            "type": "minify",
-                            "path": _path.join(appTargetPath, cattarget, "/cat/lib"),
-                            "filename": "cat.src.js",
-                            "src":[["./cache/",  project.name, "/**/*.js"].join(""), "./src/**/*.js"]
-                        }
+                        }, minifyplugin                        
                         ]);
 
                     dependenciesInfo = project.getInfo("dependencies");

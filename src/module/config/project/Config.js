@@ -5,6 +5,7 @@ var _typedas = require('typedas'),
     _global = catrequire("cat.global"),
     _log = _global.log(),
     _utils = catrequire("cat.utils"),
+    _sysutils = catrequire("cat.sys.utils"),
     _props = catrequire("cat.props"),
     _fs = require("fs.extra"),
     _path = require("path"),
@@ -148,7 +149,7 @@ var _typedas = require('typedas'),
                             // copy common
                             commonpath = _path.join(sourcefolder, "common");
                             if (!_fs.existsSync(commonpath)) {
-                                _utils.mkdirSync(commonpath);
+                                _utils.mkdirSync(commonpath, 0777);
 
                                 // copy source's resources to the project
                                 // TODO copy recursive sync...
@@ -157,15 +158,18 @@ var _typedas = require('typedas'),
                             // copy config
                             configpath = _path.join(sourcefolder, "config");
                             if (!_fs.existsSync(configpath)) {
-                                _utils.mkdirSync(configpath);
+                                _utils.mkdirSync(configpath, 0777);
                             }
-
+                                                   
                             // copy source's resources to the project
                             // TODO copy recursive sync...
                             testdatapath = _path.join(configpath, "testdata.json");
                             if (!_fs.existsSync(testdatapath)) {
                                 _utils.copySync(_path.join(_cathome.path, "src/module/project/src/config/testdata.json"), testdatapath);
                             }
+
+                            _sysutils.chmodSyncOffset(commonpath, 0777, 2);
+                            _sysutils.chmodSyncOffset(configpath, 0777, 2);
 
                         }
 
@@ -192,7 +196,7 @@ var _typedas = require('typedas'),
             _mkEnvDir("target");
 
             // set the info properties incoming from the cat's project
-            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "appcontext", "cattarget", "analytics", "runner", "dependencies"]);
+            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "appcontext", "cattarget", "analytics", "runner", "dependencies", "jshint"]);
 
         }
 
