@@ -172,7 +172,7 @@ var _global = catrequire("cat.global"),
                             "type": "minify",
                             "path": _path.join(appTargetPath, cattarget, "/cat/lib"),
                             "filename": "cat.src.js",
-                            "src":["./src/**/*.js"]
+                            "src":[["./cache/",  project.name, "/**/*.js"].join(""), "./src/**/*.js"]
                         }
                         ]);
 

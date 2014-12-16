@@ -1,11 +1,16 @@
+var _jsutils = require("js.utils");
+
 module.exports = function (config) {
 
     function DelayManager(config) {
 
         var _commandsCode = [],
             _config = config,
-            _scrap = _config.scrap;
+            _scrap = _config.scrap,
+            scrapargs = _scrap.getArgumentsNames(),
+            scrapargsstr;
 
+        scrapargsstr = "context" + (",") + scrapargs.join(",");
 
         return {
 
@@ -14,8 +19,8 @@ module.exports = function (config) {
                 var rows = config.rows,
                     concatflag = ("concat" in config || false),
                     prepare = [],
-                    counter=0,
-                    args = (config.args || []);
+                    args = (config.args || []),
+                    counter=0;
 
                 _commandsCode = [];
                 args.push("scrap : _ipkg.scrap");
@@ -24,35 +29,31 @@ module.exports = function (config) {
                 rows.forEach(function (row) {
 
                     if (row) {
-
                         _commandsCode.push((process ? process.call(_scrap, row) : row));
                     }
-
                     counter++;
                 });
 
                 if (!print) {
-
+ 
                     if (concatflag) {
                         // concat all of the given commands
-                        prepare.push(JSON.stringify(_commandsCode));
+                        prepare.push(_commandsCode);
 
                     } else {
                         // execute the commands separately
                         _commandsCode.forEach(function(command) {
                             if (command) {
-                                prepare.push([command]);
+                                prepare.push(command);
                             }
                         });
                     }
 
-                    prepare.forEach(function(command) {
-                        if (command) {
-                            _scrap.print(["_cat.core.clientmanager.delayManager(", JSON.stringify(command), ", {",
-                                args,
-                                "});"].join(""));
-                        }
-                    });
+                   _scrap.print(["_cat.core.clientmanager.delayManager({" +
+                       "commands:[function(", scrapargsstr, ") { ", prepare.join(";").split(";;").join(";"), "}]," +
+                       "context:{", args, "}" +
+                       "});"].join(""));
+                    
                 } else {
                     print.call(_scrap, rows, counter);
                 }

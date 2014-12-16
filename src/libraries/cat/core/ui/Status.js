@@ -1,7 +1,7 @@
 _cat.core.ui = function () {
 
     function _addEventListener(elem, event, fn) {
-        if ($) {
+        if (typeof($) !== "undefined") {
            if (event === "load") {
                $( document ).ready(fn);
            } else {

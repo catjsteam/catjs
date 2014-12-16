@@ -6,12 +6,16 @@ var _fs = require('fs'),
     _mdata = catrequire("cat.mdata"),
     _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
+    _sysutils = catrequire("cat.sys.utils"),
     _tplutils = catrequire("cat.tpl.utils"),
     _props = catrequire("cat.props"),
     _basePlugin = require("./../Base.js"),
     _project = catrequire("cat.project"),
     _beautify = require('js-beautify').js_beautify,
-    _extutils = catrequire("cat.ext.utils");
+    _processReplacenfo = require("./parser/replaceInfo.js"),
+    _processSingleLine = require("./parser/singleLine.js"),
+    _generateUserFileInfo = require("./build/user.js"),
+    _generateCATFileInfo = require("./build/cache.js");
 
 
 /**
@@ -33,114 +37,9 @@ module.exports = _basePlugin.ext(function () {
          */
             _generateSourceProject = function (scraps, file) {
 
-            function _generateCATFileInfo(scraps, targetfile) {
-
-                var outputjs = [],
-                    projectTarget = _me._project.getInfo("target");
-
-                scraps.forEach(function (scrap) {
-                    
-                    var out,
-                        runat,
-                        managerout,
-                        pkgname,
-                        engine = scrap.$getEngine(),
-                        args = scrap.get("arguments"),
-                        scrapvar;
-
-                    if (engine === _scrapEnum.engines.JS ||
-                        engine === _scrapEnum.engines.HTML_EMBED_JS) {
-
-                        runat = scrap.get("run@");
-                        pkgname = _extutils.getCATInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName;
-                        scrap.set("pkgName", pkgname);
-
-                        pkgname = [pkgname, "cat"].join("$$");
-                        scrapvar = ["{ scrap:", JSON.stringify(scrap.serialize()), "}"].join("");
-
-                        if (runat) {
-                            managerout = _tplutils.template({
-                                    name: "scrap/_func_manager",
-                                    data: {
-                                        name: pkgname,
-                                        runat: runat
-                                    }
-                                }
-                            );
-                        }
-
-                        if (managerout) {
-                            outputjs.push(managerout);
-                        }
-
-                        outputjs.push(_tplutils.template({
-                                name: "scrap/_func_declare",
-                                data: {
-                                    name: pkgname,
-                                    scrap: scrapvar,
-                                    type: "scrap"
-                                }
-                            }
-                        ));
-
-                        outputjs.push(_tplutils.template({
-                                name: "scrap/_func",
-                                data: {
-                                    name: pkgname,
-                                    arguments: (args ? ( args.join ? args.join(",") : args) : undefined),
-                                    output: scrap.generate()}
-                            }
-                        ));
-
-
-                    }
-                });
-
-                return {
-                    output: outputjs.join(""),
-                    file: _extutils.getCATInfo({file: targetfile}).file
-                };
-
-            }
-
-            function _generateUserFileInfo(scraps, targetfile) {
-
-                var outputjs = [],
-                    projectTarget = _me._project.getInfo("target");
-
-                scraps.forEach(function (scrap) {
-                    var out,
-                        engine = scrap.$getEngine(),
-                        pkgName;
-
-                    if (engine === _scrapEnum.engines.JS ||
-                        engine === _scrapEnum.engines.HTML_EMBED_JS) {
-
-                        pkgName = _extutils.getUserInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName;
-                        scrap.set("pkgName", pkgName);
-
-                        out = _tplutils.template({
-                                name: "scrap/_func_user",
-                                data: {name: _extutils.getUserInfo({scrap: scrap, file: file, basepath: projectTarget}).pkgName,
-                                    func: "" }
-                            }
-                        );
-
-                        outputjs.push(out);
-
-                    }
-                });
-
-                return {
-                    output: outputjs.join(""),
-                    file: _extutils.getUserInfo({file: targetfile}).file
-                };
-
-            }
-
             function _writeJSContentToFile(scraps, contentFunc, targetfile) {
 
-                var info = contentFunc.call(this, scraps, targetfile),
+                var info = contentFunc.call(_me, scraps, file, targetfile),
                     fileContent = info.output;
 
                 function _validateFileExt(file) {
@@ -163,7 +62,8 @@ module.exports = _basePlugin.ext(function () {
                     fileContent = _beautify(fileContent, { indent_size: 2 });
                     try {
                         info.file = _validateFileExt(info.file);
-                        _fs.writeFileSync(info.file, fileContent);
+                        _fs.writeFileSync(info.file, fileContent, {mode: 0777});
+                        _fs.chmodSync(info.file, 0777);
                         _log.debug(_props.get("cat.source.project.file.create").format("[inject ext]", targetfile));
                     } catch (e) {
                         _utils.error(_props.get("cat.error").format("[inject ext]", e));
@@ -172,44 +72,46 @@ module.exports = _basePlugin.ext(function () {
 
             }
 
-            /**
-             * Copy any resources to the project environment in here
-             */
-            function copyResources() {
+            var filepath,
+                targetfile, targetfolder, targetInternalFolder, 
+                home = _global.get("home"),
+                catworkdir = (home ? home.working.path : undefined),
+                internalTargetfile, folderCounter=0;
+            
+         
+            /* 
+                TODO replace path resolving with require("path")
+                Get the current file information and write it to the sources project location
+            */
+            
+            // 
+            filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
 
-            }
-
-            var filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
-                targetfile, targetfolder;
-
-            // copy resources
-            copyResources();
-
+            internalTargetfile = _path.join(catworkdir, "cache", filepath);            
             targetfile = _path.join(_project.getInfo("source"), filepath);
+            
             targetfolder = _path.dirname(targetfile);
             if (targetfolder) {
                 if (!_fs.existsSync(targetfolder)) {
-                    _utils.mkdirSync(targetfolder, {mode: 0777});
+                    folderCounter = _sysutils.getFoldersCount(filepath);
+                    _fs.mkdirSync(targetfolder, {mode: 0777});
+                    _sysutils.chmodSyncOffset(targetfolder, 0777, folderCounter);
                 }
             }
-//            if (_fs.existsSync(targetfile)) {
-//                _log.debug(_props.get("cat.source.project.file.exists").format("[inject ext]", targetfile));
-//            }
-
-            // TODO filter scraps arrays according to its $type (js, html, etc)
-
-//            // apply all scraps
-//            scraps.forEach(function (scrap) {
-//                scrap.apply(scrap);
-//            });
+            targetInternalFolder = _path.dirname(internalTargetfile);
+            if (targetInternalFolder) {
+                if (!_fs.existsSync(targetInternalFolder)) {
+                    folderCounter = _sysutils.getFoldersCount(filepath);
+                    _fs.mkdirSync(targetInternalFolder, {mode: 0777});
+                    _sysutils.chmodSyncOffset(targetInternalFolder, 0777, folderCounter);
+                }
+            }
 
             // inject and generate proper content for JS files type
-            _writeJSContentToFile(scraps, _generateCATFileInfo, targetfile);
+            _writeJSContentToFile(scraps, _generateCATFileInfo, internalTargetfile);
             if (!_fs.existsSync(targetfile)) {
                 _writeJSContentToFile(scraps, _generateUserFileInfo, targetfile);
             }
-
-            //_Scrap.apply({scraps: scraps});
 
         },
 
@@ -219,7 +121,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param file The reference file to be processed
          */
-            _injectScrapCall = function (scraps, file, callback) {
+         _injectScrapCall = function (scraps, file, callback) {
 
             var lines = [] , lineNumber = 1,
                 commentinfos = [];
@@ -230,149 +132,15 @@ module.exports = _basePlugin.ext(function () {
                  *  In case there are more than one scrap per comment we need to store the
                  *  Info for all the scrap related to that comment.
                  */
-                var prevCommentInfo,
+                var  lineobj = {line: line},
                     counter = 0;
 
                 commentinfos.forEach(function (info) {
 
-                    var content,
-                        scraplcl = info.scrap,
-                        injectinfo = scraplcl.get("injectinfo"),
-                        scrapCtxArguments,
-                        param1,
-                        engine,
+                        var scraplcl = info.scrap,
+                        injectinfo = scraplcl.get("injectinfo"),                    
                         replaceinfo,
                         isLineNumber = false;
-
-                    function removeOldCall() {
-                        var startpos, endpos;
-
-                        if (injectinfo && injectinfo.start) {
-                            startpos = [injectinfo.start.line, injectinfo.start.col];
-                            endpos = [injectinfo.end.line, injectinfo.end.col];
-
-                            if (lineNumber === startpos[0]) {
-                                line = [line.substring(0, startpos[1]), line.substring(endpos[1])].join("");
-                            }
-                        }
-                    }
-
-                    /**
-                     * Process a single line according to a given info by line.
-                     */
-                    function processSingleLine() {
-
-                        function setActualMeArg(param1) {
-                            // me === this
-                            if (param1 && param1[1]) {
-                                if (param1[1].split) {
-                                    param1[1] = param1[1].split("thi$").join("this");
-                                } else if (param1[1] === "thi$") {
-                                    param1[1] = "this";
-                                }
-                            }
-                        }
-
-                        scrapCtxArguments = scraplcl.generateCtxArguments();
-                        param1 = [JSON.stringify({ "pkgName": scraplcl.getPkgName()})];
-
-                        // add context arguments if exists
-                        if (scrapCtxArguments && scrapCtxArguments.length > 0) {
-                            param1 = param1.concat(scrapCtxArguments);
-                            setActualMeArg(param1);
-                        }
-                        // we need to reevaluate the injected calls
-                        if (injectinfo) {
-                            removeOldCall();
-                        }
-
-                        if (replaceinfo) {
-                            return line;
-                        }
-
-                        if (engine === _scrapEnum.engines.JS) {
-                            // JS file type call
-                            content = _tplutils.template({
-                                    name: "scrap/_cat_call",
-                                    data: {param1: param1.join(",")}
-                                }
-                            );
-                            content = (_utils.prepareCode(content) || "");
-
-                        } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
-                            // Embed Javascript block for HTML file
-                            content = _tplutils.template({
-                                    name: "scrap/_cat_embed_js",
-                                    data: {param1: param1.join(",")}
-                                }
-                            );
-
-                        } else if (engine === _scrapEnum.engines.HTML_IMPORT_JS) {
-
-                            content = scraplcl.generate();
-                            //content = (_utils.prepareCode(content) || "");
-
-                        } else if (engine === _scrapEnum.engines.JS_EMBED_INSERT) {
-                            content = scraplcl.generate();
-                            content = (_utils.prepareCode(content) || "");
-
-                        } else if (engine === _scrapEnum.engines.HTML_EMBED_INSERT) {
-
-                            // Inject the scrap line to the file untouched
-                            content = scraplcl.generate();
-                            content = (_utils.prepareCode(content) || "");
-
-                        }
-
-                        if (prevCommentInfo) {
-                            line = [line.substring(0, prevCommentInfo.end.col), content , line.substring(prevCommentInfo.end.col, line.length)].join("");
-                        } else {
-                            line = [line.substring(0, info.col), content , line.substring(info.col, line.length)].join("");
-                        }
-
-                        /*
-                         *  In case we already injected content related to that comment.
-                         *  We can get more than one scrap per comment.
-                         *  Get the last injected call info.
-                         */
-                        if (prevCommentInfo) {
-                            prevCommentInfo = {start: {line: lineNumber, col: prevCommentInfo.end.col}, end: {line: lineNumber, col: (prevCommentInfo.end.col + content.length)}};
-                        } else {
-                            prevCommentInfo = {start: {line: lineNumber, col: info.col}, end: {line: lineNumber, col: (info.col + (content ? content.length: 0))}};
-                        }
-                        scraplcl.set("injectinfo", prevCommentInfo);
-                    }
-
-                    /**
-                     * Process replace info
-                     */
-                    function processReplaceInfo() {
-                        var markDefault = {
-                            prefix: "/*",
-                            suffix: "*/"
-                        }, mark;
-
-                        if (scraplcl.$getBehavior()) {
-
-                            if (engine === _scrapEnum.engines.JS) {
-                                // JS file type call
-                                mark = markDefault;
-
-                            } else if (engine === _scrapEnum.engines.JS_EMBED_INSERT) {
-                                // Embed Javascript block for JS file
-                                mark = markDefault;
-
-                            } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
-                                // Embed Javascript block for HTML file
-                                mark = markDefault;
-
-                            }
-
-                            return replaceinfo.apply({lines: lines, line: line, row: lineNumber, mark: mark});
-                        }
-
-                        return undefined;
-                    }
 
 
                     if (scraplcl) {
@@ -383,12 +151,25 @@ module.exports = _basePlugin.ext(function () {
                     if (lineNumber === info.line || replaceinfo) {
 
                         isLineNumber = (lineNumber === info.line);
-                        engine = scraplcl.$getEngine();
 
-                        processReplaceInfo();
+                        _processReplacenfo({
+                            lines: lines,
+                            line: lineobj,
+                            scraplcl: scraplcl,
+                            lineNumber: lineNumber,
+                            replaceinfo: replaceinfo
+                        });
 
                         if (isLineNumber) {
-                            processSingleLine();
+
+                            _processSingleLine({                       
+                                injectinfo: injectinfo,
+                                info:info,                                                            
+                                line: lineobj,
+                                scraplcl: scraplcl,
+                                lineNumber: lineNumber,
+                                replaceinfo: replaceinfo
+                            });
                         }
 
                     }
@@ -396,7 +177,7 @@ module.exports = _basePlugin.ext(function () {
                     counter++;
                 });
 
-                return line;
+                return lineobj.line;
             }
 
             // get scrap info
@@ -418,7 +199,8 @@ module.exports = _basePlugin.ext(function () {
             }).then(function () {
 
                     try {
-                        _fs.writeFileSync(file, lines.join(""));
+                        _fs.writeFileSync(file, lines.join(""), {mode: 0777});
+                        _fs.chmodSync(file, 0777);
                         _log.debug(_props.get("cat.mdata.write").format("[inject ext]"));
 
                     } catch (e) {

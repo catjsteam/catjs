@@ -168,27 +168,6 @@ module.exports = function () {
                 }
             }
         },
-
-        /**
-         * Grant permission to a path with folder offset
-         * e.g. /home/myhome/test offet:2 will apply chmod only for myhome/test folders
-         * 
-         * @param path {String} The path 
-         * @param mode {Number} The mode e.g. 0777
-         * @param offset {Number} The offset of the folders to grant permission. From the end of the path
-         */
-        chmodSyncOffset: function (path, mode, offset) {
-            var folders = path.split(_path.sep), patharr,
-                i = 0, size = offset + 1;
-
-            for (; i < size; i++) {
-                patharr = folders.slice(0, (folders.length - i));
-                path = patharr.join(_path.sep);
-
-                _fs.chmodSync(path, mode);
-            }
-
-        },
         
         isWindows: function () {
             var type = _os.platform();
@@ -591,6 +570,7 @@ module.exports = function () {
                 });
             }
         }
+        
     };
 
 }();
