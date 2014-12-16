@@ -1,13 +1,15 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _scrapEnum = _Scrap.getScrapEnum(),
     _tplutils = catrequire("cat.tpl.utils"),
-    _extutils = catrequire("cat.ext.utils");
+    _extutils = catrequire("cat.ext.utils"),
+    _project = catrequire("cat.project");
 
 
-module.exports = function _generateCATFileInfo(scraps, sourcefile, targetfile) {
+module.exports = function (scraps, sourcefile, targetfile) {
 
-    var outputjs = [],
-        projectTarget = this._project.getInfo("target");
+    var cacheOutput = [], cacheIncludeOutput = [],
+        projectTarget = _project.getInfo("target"),
+        catinfo;
 
     scraps.forEach(function (scrap) {
 
@@ -17,13 +19,15 @@ module.exports = function _generateCATFileInfo(scraps, sourcefile, targetfile) {
             pkgname,
             engine = scrap.$getEngine(),
             args = scrap.get("arguments"),
-            scrapvar;
+            scrapvar,
+            catsourceinfo;
 
         if (engine === _scrapEnum.engines.JS ||
             engine === _scrapEnum.engines.HTML_EMBED_JS) {
 
             runat = scrap.get("run@");
-            pkgname = _extutils.getCATInfo({scrap: scrap, file: sourcefile, basepath: projectTarget}).pkgName;
+            catsourceinfo = _extutils.getCATInfo({scrap: scrap, file: sourcefile, basepath: projectTarget});
+            pkgname = catsourceinfo.pkgName;
             scrap.set("pkgName", pkgname);
 
             pkgname = [pkgname, "cat"].join("$$");
@@ -41,10 +45,10 @@ module.exports = function _generateCATFileInfo(scraps, sourcefile, targetfile) {
             }
 
             if (managerout) {
-                outputjs.push(managerout);
+                cacheIncludeOutput.push(managerout);
             }
 
-            outputjs.push(_tplutils.template({
+            cacheIncludeOutput.push(_tplutils.template({
                     name: "scrap/_func_declare",
                     data: {
                         name: pkgname,
@@ -55,7 +59,7 @@ module.exports = function _generateCATFileInfo(scraps, sourcefile, targetfile) {
             ));
 
             printer = scrap.printer;
-            outputjs.push(_tplutils.template({
+            cacheOutput.push(_tplutils.template({
                     name: "scrap/_func",
                     data: {
                         name: pkgname,
@@ -68,9 +72,18 @@ module.exports = function _generateCATFileInfo(scraps, sourcefile, targetfile) {
         }
     });
 
+    catinfo = _extutils.getCATInfo({file: targetfile});
+
+
     return {
-        output: outputjs.join(""),
-        file: _extutils.getCATInfo({file: targetfile}).file
+        include: {
+            output: cacheIncludeOutput.join(""),
+            file: catinfo.includeFile
+        },
+        cache: {
+            output: cacheOutput.join(""),
+            file: catinfo.file
+        }
     };
 
 };

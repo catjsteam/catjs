@@ -14,8 +14,7 @@ var _fs = require('fs'),
     _beautify = require('js-beautify').js_beautify,
     _processReplacenfo = require("./parser/replaceInfo.js"),
     _processSingleLine = require("./parser/singleLine.js"),
-    _generateUserFileInfo = require("./build/user.js"),
-    _generateCATFileInfo = require("./build/cache.js");
+    _generateManagerInfo = require("./build/manager.js");
 
 
 /**
@@ -108,9 +107,10 @@ module.exports = _basePlugin.ext(function () {
             }
 
             // inject and generate proper content for JS files type
-            _writeJSContentToFile(scraps, _generateCATFileInfo, internalTargetfile);
+            _writeJSContentToFile(scraps, _generateManagerInfo.getCache, internalTargetfile);
+            _writeJSContentToFile(scraps, _generateManagerInfo.getIncludeCache, internalTargetfile);
             if (!_fs.existsSync(targetfile)) {
-                _writeJSContentToFile(scraps, _generateUserFileInfo, targetfile);
+                _writeJSContentToFile(scraps, _generateManagerInfo.getUser, targetfile);
             }
 
         },

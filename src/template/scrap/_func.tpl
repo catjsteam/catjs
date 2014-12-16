@@ -5,7 +5,6 @@ _cat.core.define("{{name}}", function({{arguments}}) {
         _argsnames = "{{arguments}}",
         _args = {},
         _ipkg = _cat.core.getVar(pkgName),
-        _actions = [],
         context,
         _counter=0;
 

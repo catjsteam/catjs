@@ -20,7 +20,7 @@ module.exports = function () {
          * @return {*} The pkgname and the target file name to be saved
          */
         getCATInfo: function (config) {
-
+            
             if (!config) {
                 return undefined;
             }
@@ -31,7 +31,12 @@ module.exports = function () {
                 fileName = _path.basename(file, ".js"),
                 path,
                 pkgName,
-                newFile;
+                newFile,
+                newHeaderFile;
+
+            function _getFile(prefix) {
+                return _path.join(_path.dirname(file), fileName.replace(fileName, [prefix, fileName].join("_")));
+            }
 
             if (!file) {
                 _log.warning("[CAT extutils] No valid file was found, scrap info:" + (scrap || ""));
@@ -46,12 +51,14 @@ module.exports = function () {
                 path = path.substring(1);
             }
 
-            newFile = _path.join(_path.dirname(file), fileName.replace(fileName, ["_cat", fileName].join("_")));
+            newFile = _getFile("_cat");
+            newHeaderFile = _getFile("_cat_header");
             pkgName = (scrap ? [path.split("/").join("."), fileName, scrap.get("name")].join(".") : undefined);
 
             return {
                 pkgName: pkgName,
-                file: newFile
+                file: newFile,
+                includeFile: newHeaderFile
             };
 
         },

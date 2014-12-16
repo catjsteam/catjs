@@ -1,12 +1,13 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _scrapEnum = _Scrap.getScrapEnum(),
     _tplutils = catrequire("cat.tpl.utils"),
-    _extutils = catrequire("cat.ext.utils");
+    _extutils = catrequire("cat.ext.utils"),
+    _project = catrequire("cat.project");
 
 module.exports = function (scraps, sourcefile, targetfile) {
 
     var outputjs = [],
-        projectTarget = this._project.getInfo("target");
+        projectTarget = _project.getInfo("target");
 
     scraps.forEach(function (scrap) {
         var out,
