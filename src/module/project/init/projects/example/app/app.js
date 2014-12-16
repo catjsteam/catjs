@@ -8,6 +8,19 @@ $( document ).ready(function() {
         description = $("#description"),
         counter = 0;
 
+    /*
+     This is a simple scrap that test the button's click event functionality
+     You can repeat the scrap on cat-project/src/config/cat.json
+     @[scrap
+         @@name testButtonClick
+         @@context testButton
+         @@assert ok(testButton[0], "No valid test element button")
+         @@code testButton.click()
+         @@code testButton.click()
+         @@code testButton.click()
+     ]@
+     */
+
     if (testButton) {
         testButton.on("click", function () {
             description = $("#description");
@@ -29,32 +42,4 @@ $( document ).ready(function() {
         });
     }
 
-    /*
-     This is a simple scrap that test the button's click event functionality
-
-     @[scrap
-         @@name testButtonClick
-         @@run@ manager
-         @@context testButton
-         @@assert ok(testButton[0], "No valid test element button")
-         @@code testButton.click()
-     ]@
-     */
-
-    /*
-     The Manager annotation is optional and enables a play mode that makes the ui flow understandable to the user
-     With the manager enabled CAT ui will be available and the test will be played with delay
-     The manager also have a built it actions (delay, repeat) to be applied on the tests
-
-     @[scrap
-         @@name manager
-         @@perform[
-             @@testButtonClick repeat(3)
-         ]
-         @@catui on
-         @@manager true
-         @@signal TESTEND
-     ]@
-
-     */
 });
