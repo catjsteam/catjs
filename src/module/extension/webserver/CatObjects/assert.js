@@ -3,7 +3,6 @@ var _global = catrequire("cat.global"),
     _reportCreator = {},
     _catcli = (catrequire ? catrequire("cat.cli") : null),
     _fs = require("fs"),
-    _checkIfAlive,
     _testconfig,   
     _useragent = require('express-useragent'),
     _Assert = require("./entity/Assert"),
@@ -18,16 +17,14 @@ var _global = catrequire("cat.global"),
  * - Loading colors module
  * - Loading cat configuration
  */
-function init() {
+function loadConfig() {
   
     // load cat.json test data...
     _testconfig = _config.get();
 
 }
 
-
-// Initialization
-init();
+loadConfig();
 
 
 exports.get = function (req, res) {
@@ -60,7 +57,8 @@ exports.get = function (req, res) {
         reportsArr = [],
         reportKey,
         testConfigMap,
-        key, ua = _userAgent(req);
+        key, ua = _userAgent(req),
+        checkIfAlive;
 
     if (reports) {
         reportsArr = reports.split(",");
@@ -73,19 +71,22 @@ exports.get = function (req, res) {
 
     }
 
-    clearTimeout(_checkIfAlive);
+    clearTimeout(checkIfAlive);
 
     // TODO Session validation for end the test and start a new one...
     if (status !== 'End') {
 
-        _checkIfAlive = setTimeout(function () {
+        checkIfAlive = setTimeout(function () {
             if (_reportCreator == {}) {
                 _reportCreator['notest'] = new _ReportCreator({
                     filename: "notestname.xml",
                     id: 'notest',
                     scenario: scenario,
                     ua: ua,
-                    name: name
+                    name: name,
+                    callback: function() {
+                        delete _reportCreator['notest']; 
+                    }
                 });
                 _log.info("[CAT] No asserts received, probably a network problem, failing the rest of the tests ");
 
@@ -131,7 +132,10 @@ exports.get = function (req, res) {
             scenario: scenario,
             ua: ua,
             testConfig: _testconfig,
-            reports: reports
+            reports: reports,
+            callback: function() {                
+                // delete _reportCreator[id];
+            }
         });
     }
 

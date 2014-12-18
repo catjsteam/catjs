@@ -31,6 +31,7 @@ Reporter.prototype.init = function (config) {
     this._name = config.name;
     this._ua = config.ua;
     this._id = config.id;
+    this._callback = config.callback;
     this._status = 0;
     this._fileName = config.filename;
     this._reports = ("reports" in config && config.reports ? config.reports : undefined);
@@ -214,6 +215,20 @@ Reporter.prototype.addTestCase = function (config) {
         //_jmr.write(me._fileName, output);
     }
 
+    function _testEnd(id, result) {
+        
+        // print to console the test info
+        _printTest2Console(result);
+
+        // delete the color on test end
+        me._colors.deleteColor(id);
+        
+        // test callback
+        if (me._callback) {
+            me._callback.call(me);
+        }
+    }
+    
     // set console color
     this._colors.setCurrentTheme(id);
 
@@ -254,12 +269,8 @@ Reporter.prototype.addTestCase = function (config) {
                     result = this._hasFailed ? "failed" : "succeeded";
                     result = "======== Test End - " + result + " ========";
                 }
-    
-                // print to console the test info
-                _printTest2Console(result);
-    
-                // delete the color on test end
-                this._colors.deleteColor(id);
+
+                _testEnd(id, result);
     
                 this._status = 0;
             }
@@ -270,11 +281,8 @@ Reporter.prototype.addTestCase = function (config) {
                 // todo call end.. fail the test!!!
 
                 result = "======== Test End - Aborted ========";
-                // print to console the test info
-                _printTest2Console(result);
-
-                // delete the color on test end
-                this._colors.deleteColor(id);
+                
+                _testEnd(id, result)
             }
 
             this.reset();
