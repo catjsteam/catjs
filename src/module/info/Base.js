@@ -17,11 +17,6 @@ module.exports = function () {
         return (new Date()).format("DD-MM-YYYY");
     }
 
-    function _getBasePath() {
-
-        return _global.get("home").working.path;
-    }
-
     function _getEntityRecord(entity) {
         var map = {
             device: _devicentity,
@@ -114,7 +109,7 @@ module.exports = function () {
         }
 
         time = _getTimeFolder();
-        basepath = _getBasePath();
+        basepath = _sysutils.getCatProjectPath();
 
         if (id) {
             path = _path.join(basepath, "reports", time, id);

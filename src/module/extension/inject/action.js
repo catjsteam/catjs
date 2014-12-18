@@ -74,7 +74,7 @@ module.exports = _basePlugin.ext(function () {
             var filepath,
                 targetfile, targetfolder, targetInternalFolder, 
                 home = _global.get("home"),
-                catworkdir = (home ? home.working.path : undefined),
+                catworkdir = _sysutils.getCatProjectPath(),
                 internalTargetfile, folderCounter=0;
             
          

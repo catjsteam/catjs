@@ -299,7 +299,7 @@ module.exports = function () {
         getRelativePath: function (file, basePath) {
             return ((file && basePath) ? file.substring(basePath.length) : undefined);
         },
-
+        
         /**
          * Inspect a given string and try to resolve its object
          *

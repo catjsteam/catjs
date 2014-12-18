@@ -26,7 +26,7 @@ module.exports = function () {
             
             return counter;
         },
-        
+
         /**
          * Grant permission to a path with folder offset
          * e.g. /home/myhome/test offet:2 will apply chmod only for myhome/test folders
@@ -55,6 +55,13 @@ module.exports = function () {
             }
         },
         
+        getCatProjectPath: function() {
+            var global = catrequire("cat.global"),
+                workpath = global.get("home").working.path;
+                       
+            return workpath;
+        },
+        
         /**
          * Create the basic skeleton system folders (e.g. logs, cache .. etc)
          *
@@ -63,13 +70,9 @@ module.exports = function () {
          */
         createSystemFolder: function (folder) {
 
-            var global = catrequire("cat.global");
-            
-            function _getBasePath() {
-                return global.get("home").working.path;
-            }
+            var catprojectpath = _module.getCatProjectPath();
 
-            var targetfolder = _path.join(_getBasePath(), folder);
+            var targetfolder = _path.join(catprojectpath, folder);
 
             // create log folder
             if (!_fs.existsSync(targetfolder)) {
