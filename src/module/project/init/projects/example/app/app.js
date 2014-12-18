@@ -34,9 +34,13 @@ $( document ).ready(function() {
 
              @[scrap
                  @@name testButtonListener
-                 @@context description
+                 @@standalone true
+                 @@context[
+                     counter
+                     description
+                 ]
                  @@log "Description: ", description.text().trim()
-                 @@assert ok((description.text().trim() !== "Clicks +3"), "More then 2 clicks is too much...")
+                 @@assert ok((counter < 3), "More then 2 clicks is too much...")
              ]@
              */
         });

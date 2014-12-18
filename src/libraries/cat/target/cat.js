@@ -2095,7 +2095,7 @@ _cat.core.ui = function () {
                     '<div class="text-tips">' +
                     '   <div class="tests">Tests <span style="color:green">passed</span> : <span  id="tests_passed">0</span></div>' +
                     '   <div class="tests">Tests <span style="color:red">failed</span> : <span  id="tests_failed">0</span></div>' +
-                    '   <div class="tests"><span  id="tests_total_counter">0</span> Tests Total (<span  id="tests_total">0</span>)</div>' +
+                    '   <div class="tests"><span  id="tests_total_counter">0</span> Tests Total </div>' +
                     '   <div class="tests"><span  id="tests_status"></span></div>' +
                     '</div>' +
                     '<div id="cat-status-content">' +
@@ -2351,9 +2351,9 @@ _cat.core.ui = function () {
                             if ("passed" in testStatus) {
                                 _setText(testsPassed, testStatus.passed);
                             }
-                            if ("tests" in testStatus) {
-                                _setText(testsTotal, testStatus.tests);
-                            }
+//                            if ("tests" in testStatus) {
+//                                _setText(testsTotal, testStatus.tests);
+//                            }
                             if ("total" in testStatus) {
                                 _setText(testsTotalCounter, testStatus.total);
                             }
