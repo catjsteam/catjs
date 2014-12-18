@@ -1211,6 +1211,7 @@ _cat.core.clientmanager = function () {
         intervalObj,
         endTest,
         testQueue = {},
+        testQueueLast,
         currentState = { index: 0 };
 
     endTest = function (opt, interval) {
@@ -1247,18 +1248,18 @@ _cat.core.clientmanager = function () {
         if (intervalObj) {
             clearInterval(intervalObj.interval);
         }
-        
+
         return runStatus.intervalObj;
     };
 
 
     setupInterval = function (config, scrap) {
-        
-        var tests,            
+
+        var tests,
             testManager;
-        
+
         intervalObj = getScrapInterval(scrap);
-        
+
         tests = config.getTests();
         if (tests) {
             testManager = (tests[tests.length - 1].name || "NA");
@@ -1272,14 +1273,14 @@ _cat.core.clientmanager = function () {
                 intervalObj.counter++;
 
                 msg.push(intervalObj.counter);
-                
+
                 _cat.core.ui.setContent({
                     header: "Test Status",
                     desc: msg.join(""),
                     tips: {},
                     style: "color:gray"
                 });
-                
+
                 console.log("[CatJS manager] ", msg.join(""));
 
             } else {
@@ -1290,7 +1291,7 @@ _cat.core.clientmanager = function () {
                 clearInterval(intervalObj.interval);
             }
         }, config.getTimeout() / 3);
-        
+
         return;
     };
 
@@ -1303,7 +1304,7 @@ _cat.core.clientmanager = function () {
             repeatIndex,
             size;
 
-        scrapInfoArr = getScrapTestInfo(scrap.name);
+        scrapInfoArr = getScrapTestInfo(scrap);
         size = scrapInfoArr.length;
         for (infoIndex = 0; infoIndex < size; infoIndex++) {
             scrapInfo = scrapInfoArr[infoIndex];
@@ -1315,26 +1316,39 @@ _cat.core.clientmanager = function () {
     };
 
 
-    getScrapTestInfo = function (scrapName) {
+    getScrapTestInfo = function (scrap) {
         var scrapTests = [],
             i, size,
             validate = 0,
             tempInfo,
-            reportFormats;
+            reportFormats,
+            scrapName = scrap.name,
+            isStandalone = _isStandalone(scrap);
 
-        if (tests && scrapName) {
+        function setScrapTests(test) {
+            tempInfo = {
+                "name": test.name,
+                "scenario": (test.scenario || undefined),
+                "wasRun": (test.wasRun || false),
+                "delay": (test.delay || undefined),
+                "repeat": (test.repeat || undefined)
+            };
+            tempInfo.index = i;
+            scrapTests.push(tempInfo);
+            validate++;
+        }
+
+        if (isStandalone) {
+            setScrapTests({
+                name: scrapName
+            });
+
+        } else if (tests && scrapName) {
             size = tests.length;
             for (i = 0; i < size; i++) {
 
                 if (tests[i].name === scrapName) {
-                    tempInfo = {"name": tests[i].name,
-                        "scenario": tests[i].scenario,
-                        "wasRun": tests[i].wasRun,
-                        "delay": tests[i].delay,
-                        "repeat": tests[i].repeat};
-                    tempInfo.index = i;
-                    scrapTests.push(tempInfo);
-                    validate++;
+                    setScrapTests(tests[i]);
                 }
             }
         }
@@ -1356,10 +1370,10 @@ _cat.core.clientmanager = function () {
         for (; indexScrap < size; indexScrap++) {
             testitem = tests[indexScrap];
             if (testitem && testitem.name === scrapName) {
-                return true;
+                return {scrap: testitem, idx: indexScrap};
             }
         }
-        return false;
+        return undefined;
     };
 
     totalDelay = 0;
@@ -1376,25 +1390,27 @@ _cat.core.clientmanager = function () {
         setupInterval(catConfig, scrap);
     };
 
-    delayManagerCommands = function (commands, context) {
+    delayManagerCommands = function (dmcommands, dmcontext) {
 
         var indexCommand = 0,
             catConfig = _cat.core.getConfig(),
             _enum = catConfig.getTestsTypes(),
             executeCode,
-            delay = catConfig.getTestDelay();
+            delay = catConfig.getTestDelay(),
+            scrap = ("scrap" in dmcontext  ? dmcontext.scrap : undefined),
+            standalone = _isStandalone(scrap);
 
-        executeCode = function (codeCommandsArg, context) {
+        executeCode = function (codeCommandsArg, contextArg) {
             var commandObj,
-                scrap = context.scrap,
+                scrap = contextArg.scrap,
                 size = (codeCommandsArg ? codeCommandsArg.length : undefined),
                 functionargskeys = [],
                 functionargs = [],
                 contextkey,
-                scrapName = ("scrapName" in context ? context.scrapName : undefined),
-                scrapRowIdx = ("scrapRowIdx" in context ? context.scrapRowIdx : undefined),
+                scrapName = ("scrapName" in contextArg ? contextArg.scrapName : undefined),
+                scrapRowIdx = ("scrapRowIdx" in contextArg ? contextArg.scrapRowIdx : undefined),
                 description = [],
-                rows, idx= 0, rowssize= 0, row;
+                rows, idx = 0, rowssize = 0, row;
 
 
             updateTimeouts(scrap);
@@ -1404,13 +1420,13 @@ _cat.core.clientmanager = function () {
 
                 if (commandObj) {
                     functionargskeys.push("context");
-                    functionargs.push(context);
-                    
-                    if (context && context.args) {
-                        for (contextkey in context.args) {
-                            if (context.args.hasOwnProperty(contextkey)) {
+                    functionargs.push(contextArg);
+
+                    if (contextArg && contextArg.args) {
+                        for (contextkey in contextArg.args) {
+                            if (contextArg.args.hasOwnProperty(contextkey)) {
                                 functionargskeys.push(contextkey);
-                                functionargs.push(context.args[contextkey]);
+                                functionargs.push(contextArg.args[contextkey]);
                             }
                         }
                     }
@@ -1419,7 +1435,7 @@ _cat.core.clientmanager = function () {
                     if (rows) {
                         description.push(rows[scrapRowIdx] || rows[0]);
                     }
-                    
+
 //                    rowssize = rows.length;
 //                    for (; idx<rowssize; idx++) {
 //                        row = rows[idx];
@@ -1429,14 +1445,14 @@ _cat.core.clientmanager = function () {
 //                    }
 
                     _cat.core.ui.setContent({
-                        style: 'color:#0080FF, font-size: 10px', 
+                        style: 'color:#0080FF, font-size: 10px',
                         header: ((scrap && "name" in scrap && scrap.name) || "'NA'"),
-                        desc: (description.length > 0 ? description.join("_$$_") :  description.join("")), 
+                        desc: (description.length > 0 ? description.join("_$$_") : description.join("")),
                         tips: ""
                     });
-                    
+
                     if (_cat.utils.Utils.getType(commandObj) === "string") {
-                        commandObj = (commandObj ? commandObj.trim() : undefined);                        
+                        commandObj = (commandObj ? commandObj.trim() : undefined);
                         new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
 
                     } else if (_cat.utils.Utils.getType(commandObj) === "function") {
@@ -1462,19 +1478,63 @@ _cat.core.clientmanager = function () {
 
         };
 
-        runStatus.subscrapReady = runStatus.subscrapReady + commands.length;
+        runStatus.subscrapReady = runStatus.subscrapReady + dmcommands.length;
 
-        if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
+        if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
             setTimeout(function () {
-                executeCode(commands, context);
+                executeCode(dmcommands, dmcontext);
             }, totalDelay);
             totalDelay += delay;
         } else {
-            executeCode(commands, context);
+            executeCode(dmcommands, dmcontext);
+        }
+    };
+
+    function _preScrapProcess(config, args) {
+        config.args = args;
+        if (args.length && args.length > 1 && (_cat.utils.Utils.getType(args[1]) === "object")) {
+            args[1].scrapinfo = config.scrapInfo;
+        }
+    }
+
+    function _process(config) {
+        var scrap = config.scrapInfo,
+            args = config.args;
+
+        if (scrap) {
+            runStatus.scrapReady = parseInt(scrap ? scrap.index : 0) + 1;
+            commitScrap(scrap, args);
+        }
+    }
+
+    function _isStandalone(scrap) {
+        var standalone = ("$standalone" in scrap ? scrap.$standalone : undefined);
+        return standalone;
+    }
+
+    function _nextScrap(config) {
+
+        var scrap = config.scrap,
+            tests = config.tests,
+            args = config.args,
+            testsize = tests.length,
+            currentStateIdx = currentState.index,
+            exists = checkIfExists(scrap.name[0], tests),
+            preScrapConfig;
+
+        if ((exists && (!testQueue[currentStateIdx - 1]) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
+            preScrapConfig = {scrapInfo: scrap, args: args};
+            _preScrapProcess(preScrapConfig, args);
+            commitScrap({$standalone: scrap.$standalone, name: scrap.name[0]}, args);
+
+        } else if (exists && (currentStateIdx < testsize)) {
+            return true;
         }
 
-    };
-    
+
+        return false;
+    }
+
     return {
 
 
@@ -1487,7 +1547,7 @@ _cat.core.clientmanager = function () {
 
             startInterval(catConfig, scrap);
 
-            if (checkIfExists(scrap.name[0], tests)) {
+            if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
 
                 urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrap.name[0] + "&" + "testId=" + _cat.core.guid();
 
@@ -1498,21 +1558,8 @@ _cat.core.clientmanager = function () {
                         var response = JSON.parse(this.responseText),
                             scraplist;
 
-                        function _process(config) {
-                            var scrap = config.scrapInfo,
-                                args = config.args;
-
-                            if (scrap) {
-                                runStatus.scrapReady = parseInt(scrap ? scrap.index : 0) + 1;
-                                commitScrap(scrap, args);
-                            }
-                        }
-
                         function _add2Queue(config) {
-                            config.args = args;
-                            if (args.length && args.length > 1 && (_cat.utils.Utils.getType(args[1]) === "object") ) {
-                                args[1].scrapinfo = config.scrapInfo;
-                            }
+                            _preScrapProcess(config, args);
                             testQueue[config.scrapInfo.index] = config;
                         }
 
@@ -1523,7 +1570,7 @@ _cat.core.clientmanager = function () {
                                 var config = testQueue[idx];
                                 if (config) {
                                     _process(config);
-                                    testQueue[idx] = undefined;
+                                    delete testQueue[idx];
                                     currentState.index++;
                                     _processReadyScraps();
                                 }
@@ -1562,29 +1609,29 @@ _cat.core.clientmanager = function () {
 
         /**
          * Delay a set of UI actions commands
-         * 
+         *
          * Config:
          *       methods {Array} string javascript functions reference
          *       commands {Array} string javascript statements
          *       context {Object} catjs context object
          *
-         * 
+         *
          * @param config
          */
         delayManager: function (config) {
-            var codeCommands, context, methods, commands = [];            
-            
+            var codeCommands, context, methods, commands = [];
+
             (function init() {
                 if (config) {
                     codeCommands = ("commands" in config ? config.commands : undefined);
                     methods = ("methods" in config ? config.methods : undefined);
-                    context = ("context" in config ? config.context : undefined); 
+                    context = ("context" in config ? config.context : undefined);
                 }
             })();
 
             commands = commands.concat((codeCommands || []));
-            commands = commands.concat((methods || []));            
-            
+            commands = commands.concat((methods || []));
+
             delayManagerCommands(commands, context);
         }
     };

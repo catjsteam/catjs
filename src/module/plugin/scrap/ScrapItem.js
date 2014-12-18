@@ -231,6 +231,7 @@ _clazz = function (config) {
         _init("context", ["thi$"]);
         _init("auto", true);
         _init("injectcode", false);
+        _init("$standalone", false);
         _init("id", idArg);
         _init("$type", _scrapEnum.scrapEnum.defaultFileType);
 
@@ -377,6 +378,11 @@ _clazz.prototype.$getEngine = function () {
 _clazz.prototype.$setType = function (type) {
     var valid = _validateConfigEntry(type, this.config);
     this.config["$type"] = type;
+};
+
+_clazz.prototype.$setStandalone = function (bol) {
+    var valid = _validateConfigEntry(bol, this.config);
+    this.config["$standalone"] = bol;
 };
 
 _clazz.prototype.$setBehavior = function (behavior) {

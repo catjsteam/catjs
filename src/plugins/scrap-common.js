@@ -274,6 +274,25 @@ module.exports = function () {
                 }});
 
             /**
+             * Annotation for javascript catui
+             *
+             *  properties:
+             *  name    - catui
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "standalone",
+                func: function (config) {
+
+                    var me = this,
+                        standalone = me.get("standalone");
+
+                    if (standalone && standalone.trim().toLowerCase() === "true") {
+                        this.$setStandalone(true);
+                    }
+                }});
+
+            /**
              * Annotation for javascript signal
              *
              *  properties:
