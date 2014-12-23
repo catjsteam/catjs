@@ -9,7 +9,8 @@ var _utils = catrequire("cat.utils"),
     _scraputils = catrequire("cat.scrap.utils"),
     _jsutils = require("js.utils"),
     _Printer = require("./printer/Generic.js"),
-    
+    _cache = require("./Cache.js"),
+    _ = require("underscore"),
     _scrapId = function () {
         var __id = _catlibtils.generateGUID();
         return ["scrap", __id].join("_");
@@ -406,6 +407,9 @@ _clazz.prototype.getArgumentsNames = function (arr) {
     if (args === "thi$") {
         args = ["thi$"];
     }
+    if (!_.isArray(args)) {
+        args = ["thi$", args];
+    }
     
     return args;
     
@@ -429,22 +433,32 @@ _clazz.prototype.generateCtxArguments = function () {
     return ( ctx && ctx.join ? ctx.join(", ") : "");
 };
 
+/**
+ * TODO: The singleton implementation currently depends on the _scrap.apply occurrences, that has to be changed!
+ * 
+ */
 _clazz.prototype.apply = function () {
     var me = this,
         singleton;
 
     _utils.forEachProp(this.config, function (prop) {
-        var func;
+        var func, id, cachekey;
         if (prop) {
             func = me[prop + "Apply"];
             if (func) {
-                singleton = me.getSingleton(prop);
+                id = me.get("id");
+                cachekey = [id, prop, "singleton"].join(".");
+                singleton = _cache.get(cachekey);
+                if (singleton === undefined) {
+                    singleton = me.getSingleton(prop);
+                }
 
-                if (singleton < 2) {
+                if (singleton === 2 || singleton === -1) {
                     func.call(me, {});
                 }
-                if (singleton === 1) {
+                if (singleton >= 1) {
                     me.setSingleton(prop, singleton++);
+                   _cache.set(cachekey,  singleton++);
                 }
 
             }

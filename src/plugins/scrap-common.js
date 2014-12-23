@@ -130,6 +130,7 @@ module.exports = function () {
              */
             _Scrap.add({name: "code",
                 single: false,
+                singleton: 1,
                 func: function (config) {
 
                     var codeRows,
@@ -170,6 +171,7 @@ module.exports = function () {
              */
             _Scrap.add({name: "js",
                 single: false,
+                singleton: 1,
                 func: function (config) {
 
                     var codeRows,
@@ -209,6 +211,7 @@ module.exports = function () {
              *  $type   - js
              */
             _Scrap.add({name: "log",
+                singleton: 1,
                 func: function (config) {
 
                     var logRow,

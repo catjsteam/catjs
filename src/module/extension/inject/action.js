@@ -308,7 +308,7 @@ module.exports = _basePlugin.ext(function () {
                             // update the scrap data w/o running scrap apply
                             _Scrap.apply({
                                 scraps: scraps, 
-                                apply: false,
+                                apply: true,
                                 callback: function(scraps) {
                                   
                                 }
@@ -350,7 +350,7 @@ module.exports = _basePlugin.ext(function () {
                                     counter = 0;
                                     _apply(filesArr[counter], function() {
                                         var scrapslcl = _Scrap.getScraps();
-                                        _Scrap.apply({scraps: scrapslcl, apply: true});
+                                        _Scrap.apply({scraps: scrapslcl, apply: false});
                                     });
                                 }
                             }

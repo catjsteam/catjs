@@ -47,7 +47,14 @@ var _fs = require('fs'),
             },
             get: function(key) {
                 if (global.CAT) {
-                    return global.CAT[key];
+                    return (key in global.CAT ? global.CAT[key] : undefined);
+                }
+            },  
+            delete: function(key) {
+                if (global.CAT) {
+                    if (key in global.CAT) {
+                        delete global.CAT[key];    
+                    }
                 }
             },
             set: function(key, value) {

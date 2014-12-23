@@ -9,7 +9,11 @@ var _utils = catrequire("cat.utils"),
     _scrapEnum = require("./ScrapEnum.js"),
     _commonparser = require("./parser/CommonParser.js"),
     _ScrapConfigItem = require("./ScrapConfigItem.js"),
-    _scrapUtils = require("./ScrapUtils.js");
+    _scrapUtils = require("./ScrapUtils.js"),
+    _cache = require("./Cache.js");
+
+// destroy scraps cache
+_cache.destroy();    
 
 
 module.exports = function () {

@@ -103,6 +103,9 @@
         {
             "name": "p@scrap.jqm",
             "type": "scrap-jqm"
+        },{
+            "name": "p@scrap.jasmine",
+            "type": "scrap-jasmine"
         },
         {
             "name": "p@scrap.screenshot",
@@ -198,11 +201,11 @@
         },
         {
             "name": "t@scrap",
-            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.vnc", "p@scrap.enyo", "p@scrap.screenshot", "p@scrap.deviceinfo", "p@custom.plugin", "p@init.scrap"]
+            "plugins": ["p@scrap.common", "p@scrap.jasmine", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.vnc", "p@scrap.enyo", "p@scrap.screenshot", "p@scrap.deviceinfo", "p@custom.plugin"]
         },
         {
             "name": "t@inject",
-            "plugins": ["p@scrap.common", "p@scrap.sencha", "p@scrap.jqm", "p@scrap.enyo", "p@scrap.screenshot", "p@scrap.deviceinfo", "p@custom.plugin", "p@project.inject", "p@project.minify"]
+            "plugins": ["p@init.scrap", "p@project.inject", "p@project.minify"]
         }
     ]
 
