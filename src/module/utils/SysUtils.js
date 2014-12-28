@@ -58,7 +58,7 @@ module.exports = function () {
         getCatProjectPath: function() {
             var global = catrequire("cat.global"),
                 workpath = global.get("home").working.path;
-                       
+                 console.log(" working path ", _path.resolve(workpath));      
             return workpath;
         },
         
@@ -66,13 +66,25 @@ module.exports = function () {
          * Create the basic skeleton system folders (e.g. logs, cache .. etc)
          *
          * @param folder
+         * @param verify {Boolean} Make sure that the path includes "cat-project"
          * @returns {*}
          */
-        createSystemFolder: function (folder) {
+        createSystemFolder: function (folder, verify) {
 
-            var catprojectpath = _module.getCatProjectPath();
 
-            var targetfolder = _path.join(catprojectpath, folder);
+            var catprojectpath = _module.getCatProjectPath(),
+                targetfolder = _path.join(catprojectpath, folder),
+                pathitems;
+
+            if (verify === undefined) {
+                verify = false;
+            }
+            if (verify) {
+                pathitems = catprojectpath.split(_path.sep);
+                if ( !(catprojectpath && pathitems && pathitems[pathitems.length-1] === "cat-project") ) {
+                   return undefined;
+                }
+            }
 
             // create log folder
             if (!_fs.existsSync(targetfolder)) {

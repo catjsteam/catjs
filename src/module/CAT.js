@@ -129,8 +129,8 @@ var CAT = function () {
                 (function() {                   
 
                     // initial folders
-                    _sysutils.createSystemFolder("cache");
-                    _sysutils.createSystemFolder("reports");
+                    _sysutils.createSystemFolder("cache", true);
+                    _sysutils.createSystemFolder("reports", true);
                     _global.init();
                     
                     
