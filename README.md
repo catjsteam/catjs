@@ -52,6 +52,7 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes
 
+* ** Command-Line fix - Failed to load one of catjs modules that lead to unwanted task runner behavior
 * **Note! Reports location moved to be aggregated below "reports" folder** 
 * **New Scrap Annotation - @@screenshot screenshot()**
   Code example :
