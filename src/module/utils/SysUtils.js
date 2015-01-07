@@ -57,8 +57,7 @@ module.exports = function () {
         
         getCatProjectPath: function() {
             var global = catrequire("cat.global"),
-                workpath = global.get("home").working.path;
-                 console.log(" working path ", _path.resolve(workpath));      
+                workpath = global.get("home").working.path;  
             return workpath;
         },
         
