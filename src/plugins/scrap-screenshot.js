@@ -46,7 +46,7 @@ module.exports = function () {
                             ]
 
                         }, function(row) {
-                            var screenshotCommand = '_cat.core.plugin("screenshot").actions.screenshot("' + scrap.name[0] + '")';
+                            var screenshotCommand = '_cat.core.plugin("screenshot").actions.screenshot("' + scrap.name[0] + '");';
                             return screenshotCommand;
                         });
                     }

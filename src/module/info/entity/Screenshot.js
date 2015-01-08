@@ -14,7 +14,12 @@ _generic.setProto("write", function() {
 _generic.setProto("add", function(record) {
 
     _fs.writeFile(this.filename, record, function (err) {
-        console.log("add screenshot : " + this.filename);
+        if (err) {
+            console.log("screenshot error");
+        } else {
+            console.log("screenshot saved");
+        }
+
     });
 });
 
