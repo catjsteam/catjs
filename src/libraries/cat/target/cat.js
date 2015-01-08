@@ -3113,7 +3113,7 @@ _cat.plugins.deviceinfo = function () {
                      interval = true;
                  }
 
-                var url = "catjsdeviceinfo://interval=" + interval,
+                var url = "catjsdeviceinfo://interval=" + interval + "&deviceId=" + _cat.core.guid(),
                     iframe = document.createElement("IFRAME");
 
                 iframe.setAttribute("src", url);
