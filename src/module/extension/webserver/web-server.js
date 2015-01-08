@@ -10,7 +10,8 @@ var _url = require("url"),
     _projectmanager = require('../projectmanager/action'),
     _assert = require('./CatObjects/assert'),
     _runner = require('./CatObjects/runner'),
-    _screenshot = require('./CatObjects/screenshot');
+    _screenshot = require('./CatObjects/screenshot'),
+    _deviceinfo = require('./CatObjects/deviceinfo');
 
 /**
  * Web Server support mainly for serving static pages
@@ -103,20 +104,8 @@ var webserver  = function() {
 
             _server.post('/screenshot', _screenshot.post);
 
+            _server.post('/deviceinfo', _deviceinfo.post);
 
-            _server.post('/deviceinfo', function(req, res){
-                console.log("got device info : " + JSON.stringify(req.body));
-                _fs.readFile("deviceinfo.json", function (err, data) {
-                    var deviceinfoData = JSON.parse(data);
-                    var newDeviceInfo = (req.body);
-                    deviceinfoData.push(newDeviceInfo);
-                    var deviceInfoStr = JSON.stringify(deviceinfoData);
-                    _fs.writeFile("deviceinfo.json", deviceInfoStr, function (err) {
-                        res.redirect("back");
-                    });
-                });
-
-            });
 
             _server.listen(port, function() {
                 _utils.log("info", ("[catjs server] Server Started, listening to port:" + port));

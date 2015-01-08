@@ -8,6 +8,7 @@ var _date = require("date-format-lite"),
     _wrench = require("wrench"),
     _devicentity = require("./entity/Device.js"),
     _screenshotentity = require("./entity/Screenshot.js"),
+    _deviceinfoentity = require("./entity/Deviceinfo.js"),
     _Generic = require("./entity/Generic.js"),
     _geneic = new _Generic();
 
@@ -21,6 +22,7 @@ module.exports = function () {
         var map = {
             device: _devicentity,
             screenshot : _screenshotentity,
+            deviceinfo : _deviceinfoentity,
             junit: _geneic,           
             runner: function () {
                 console.log("[catjs runner info] Not implemented yet");
@@ -99,8 +101,9 @@ module.exports = function () {
             } else if  (entity === "junit") {
                 fileType = ".xml";
             } else {
-                fileType = ".json";
-            }
+                    fileType = ".json"
+                    };
+
             name = (filename ? filename : name.join("_")) + fileType;
             name = name.toLowerCase();
         } else {
