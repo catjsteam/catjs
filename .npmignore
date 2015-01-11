@@ -5,7 +5,6 @@
 .DS_Store
 *.log
 how-to.txt
-build
 chromext
 resources/images
 test/test-apps-master/
