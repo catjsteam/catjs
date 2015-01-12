@@ -1,6 +1,6 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _scrapEnum = _Scrap.getScrapEnum(),
-    _utils = catrequire("cat.utils"),
+    _codeutils = catrequire("cat.code.utils"),
     _tplutils = catrequire("cat.tpl.utils");
 
 /**
@@ -69,7 +69,7 @@ module.exports = function(config) {
                 data: {param1: param1.join(",")}
             }
         );
-        content = (_utils.prepareCode(content) || "");
+        content = (_codeutils.prepareCode(content) || "");
 
     } else if (engine === _scrapEnum.engines.HTML_EMBED_JS) {
         // Embed Javascript block for HTML file
@@ -82,17 +82,16 @@ module.exports = function(config) {
     } else if (engine === _scrapEnum.engines.HTML_IMPORT_JS) {
 
         content = printer.generate();
-        //content = (_utils.prepareCode(content) || "");
 
     } else if (engine === _scrapEnum.engines.JS_EMBED_INSERT) {
         content = printer.generate();
-        content = (_utils.prepareCode(content) || "");
+        content = (_codeutils.prepareCode(content) || "");
 
     } else if (engine === _scrapEnum.engines.HTML_EMBED_INSERT) {
 
         // Inject the scrap line to the file untouched
         content = printer.generate();
-        content = (_utils.prepareCode(content) || "");
+        content = (_codeutils.prepareCode(content) || "");
 
     }
 

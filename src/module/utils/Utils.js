@@ -1,6 +1,5 @@
 var _ = require("underscore"),
     _fs = require("fs.extra"),
-    _typedas = require("typedas"),
     _global = catrequire("cat.global"),
     _log = _global.log(),
     _props = catrequire("cat.props"),
@@ -168,7 +167,7 @@ module.exports = function () {
                 }
             }
         },
-        
+
         isWindows: function () {
             var type = _os.platform();
             if (type.toLocaleLowerCase() === "win32") {
@@ -198,7 +197,7 @@ module.exports = function () {
             }
 
             if (src) {
-                if (_typedas.isArray(src)) {
+                if (_.isArray(src)) {
                     lsrc = [];
                     src.forEach(function (item) {
                         var match;
@@ -219,7 +218,7 @@ module.exports = function () {
                         }
                     });
 
-                } else if (_typedas.isString(src)) {
+                } else if (_.isString(src)) {
 
                     try {
                         match = __match(src, opt);
@@ -299,7 +298,7 @@ module.exports = function () {
         getRelativePath: function (file, basePath) {
             return ((file && basePath) ? file.substring(basePath.length) : undefined);
         },
-        
+
         /**
          * Inspect a given string and try to resolve its object
          *
@@ -343,7 +342,7 @@ module.exports = function () {
             var row,
                 nextText,
 
-                size = (codeRows && _typedas.isArray(codeRows) ? codeRows.length : 0), idx = 0;
+                size = (codeRows && _.isArray(codeRows) ? codeRows.length : 0), idx = 0;
 
             function _row(row, ref, idx) {
                 var rowTrimmed;
@@ -416,7 +415,7 @@ module.exports = function () {
             var newArr = [],
                 counter = 0;
 
-            if (arr && _typedas.isArray(arr)) {
+            if (arr && _.isArray(arr)) {
 
                 arr.forEach(function (item) {
                     if (idx !== counter) {
@@ -432,7 +431,7 @@ module.exports = function () {
             var newArr = [],
                 counter = 0;
 
-            if (arr && _typedas.isArray(arr)) {
+            if (arr && _.isArray(arr)) {
 
                 arr.forEach(function (item) {
                     if (item !== value && item !== null && item !== undefined) {
@@ -448,7 +447,7 @@ module.exports = function () {
         cleanupArray: function (arr) {
             var newArr = [];
 
-            if (arr && _typedas.isArray(arr)) {
+            if (arr && _.isArray(arr)) {
                 arr.forEach(function (item) {
                     if (item !== null && item !== undefined) {
                         newArr.push(item);
@@ -482,18 +481,12 @@ module.exports = function () {
 
                         obj = destObj[name];
 
-                        if (_typedas.isObject(srcObj[name])) {
-                            if (!destObj[name]) {
-                                destObj[name] = {};
-                            }
-                            arguments.callee.call(me, srcObj[name], destObj[name], override);
-
-                        } else if (_typedas.isArray(srcObj[name])) {
+                        if (_.isArray(srcObj[name])) {
 
                             if (!obj) {
                                 destObj[name] = srcObj[name];
 
-                            } else if (_typedas.isArray(obj)) {
+                            } else if (_.isArray(obj)) {
 
                                 me.cleanupArray(srcObj[name]);
                                 if (override) {
@@ -510,6 +503,12 @@ module.exports = function () {
                             } else {
                                 _log.warning(_props.get("cat.utils.copy.object.array.warn").format("[utils copy object]", name, typeof(obj)));
                             }
+                            
+                        } else if (_.isObject(srcObj[name])) {
+                            if (!destObj[name]) {
+                                destObj[name] = {};
+                            }
+                            arguments.callee.call(me, srcObj[name], destObj[name], override);
 
                         } else {
                             if (override || obj === undefined) {
@@ -570,7 +569,7 @@ module.exports = function () {
                 });
             }
         }
-        
+
     };
 
 }();
