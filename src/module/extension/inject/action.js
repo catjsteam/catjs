@@ -109,9 +109,11 @@ module.exports = _basePlugin.ext(function () {
             // inject and generate proper content for JS files type
             _writeJSContentToFile(scraps, _generateManagerInfo.getCache, internalTargetfile);
             _writeJSContentToFile(scraps, _generateManagerInfo.getIncludeCache, internalTargetfile);
-            if (!_fs.existsSync(targetfile)) {
-                _writeJSContentToFile(scraps, _generateManagerInfo.getUser, targetfile);
-            }
+            /* @Obsolete - user code generation is being refactored [WIP]
+                if (!_fs.existsSync(targetfile)) {            
+                    _writeJSContentToFile(scraps, _generateManagerInfo.getUser, targetfile);
+                }
+            */
 
         },
 
@@ -351,6 +353,10 @@ module.exports = _basePlugin.ext(function () {
                                     _apply(filesArr[counter], function() {
                                         var scrapslcl = _Scrap.getScraps();
                                         _Scrap.apply({scraps: scrapslcl, apply: false});
+                                                                   
+                                        var _jasmine = _Scrap.getEntity("jasmine");
+                                        _jasmine.flush();
+
                                     });
                                 }
                             }

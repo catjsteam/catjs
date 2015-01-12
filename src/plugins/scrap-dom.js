@@ -1,5 +1,5 @@
 var _Scrap = catrequire("cat.common.scrap"),
-    _utils = catrequire("cat.utils"),
+    _codeutils = catrequire("cat.code.utils"),
     _scraputils = require("./utils/Utils");
 
 module.exports = function () {
@@ -30,7 +30,7 @@ module.exports = function () {
                     var scrapConf = me.config;
 
                     if (domRows) {
-                        domRows = _utils.prepareCode(domRows);
+                        domRows = _codeutils.prepareCode(domRows);
                         dom = domRows.join("\n");
                         var scrap = scrapConf,
                             scrapName = (scrap.name ? scrap.name[0] : undefined);

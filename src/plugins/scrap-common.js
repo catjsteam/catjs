@@ -1,6 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _tplutils = catrequire("cat.tpl.utils"),
     _utils = catrequire("cat.utils"),
+    _codeutils = catrequire("cat.code.utils"),
     _uglifyutils = catrequire("cat.uglify.utils"),
     _typedas = require("typedas"),
     _behavior = require("./Behavior.js"),
@@ -142,7 +143,7 @@ module.exports = function () {
                     codeRows = this.get("code");
 
                     if (codeRows) {
-                        codeRows = _utils.prepareCode(codeRows);
+                        codeRows = _codeutils.prepareCode(codeRows);
 
                         dm = new _delayManagerUtils({
                             scrap: me
@@ -154,7 +155,8 @@ module.exports = function () {
                                 rows: codeRows,
                                 args: [
                                     "scrapName: 'code'"
-                                ]
+                                ],
+                                type: "code"
                             });
                         }
                         dm.dispose();
@@ -183,7 +185,7 @@ module.exports = function () {
                     codeRows = this.get("js");
 
                     if (codeRows) {
-                        codeRows = _utils.prepareCode(codeRows);
+                        codeRows = _codeutils.prepareCode(codeRows);
 
                         dm = new _delayManagerUtils({
                             scrap: me
@@ -195,7 +197,8 @@ module.exports = function () {
                                 rows: codeRows,
                                 args: [
                                     "scrapName: 'js'"
-                                ]
+                                ], 
+                                type:"js"
                             });
                         }
                         dm.dispose();
@@ -211,28 +214,47 @@ module.exports = function () {
              *  $type   - js
              */
             _Scrap.add({name: "log",
+                single: false,
                 singleton: 1,
                 func: function (config) {
 
-                    var logRow,
-                        code,
-                        me = this;
+                    var logRows,
+                        code = [],
+                        me = this, dm;
 
-                    logRow = this.get("log");
+                    logRows = this.get("log");
 
-                    if (logRow) {
+                    if (logRows) {
 
-                        //logRow = _utils.prepareCode(logRow);
-                        code = ['console.log(', logRow, ");"];
-
-                        me.print(_tplutils.template({
-                            content: funcSnippetTpl,
-                            data: {
-                                comment: " Generated log statement according to the scrap comment (see @@code)",
-                                code: code.join("")
+                        logRows.forEach(function(row) {
+                            if (row) {
+                                code.push(_tplutils.template({
+                                    content: funcSnippetTpl,
+                                    data: {
+                                        comment: " Generated log statement according to the scrap comment (see @@code)",
+                                        code: ['console.log(', row, ");"].join("")
+                                    }
+                                }));
                             }
-                        }));
+                        });
 
+                        
+                        if (code) {
+
+                            dm = new _delayManagerUtils({
+                                scrap: me
+                            });
+                            
+                            dm.add({
+                                rows: code,
+                                args: [
+                                    "scrapName: 'log'"
+                                ],
+                                type: "log"
+                            });
+                            
+                            dm.dispose();
+                        }                                                
                     }
                 }});
 
@@ -436,7 +458,7 @@ module.exports = function () {
                     codeRows = this.get("assert");
 
                     if (codeRows) {
-                        codeRows = _utils.prepareCode(codeRows);
+                        codeRows = _codeutils.prepareCode(codeRows);
                         codeSnippet = codeRows[0];
 
                         if (codeSnippet) {
@@ -465,7 +487,7 @@ module.exports = function () {
                                 "'fail': true",
                                 "scrapName: 'assert'"
 
-                            ]
+                            ], type: "assert"
                         });
 
                         dm.dispose();
@@ -541,7 +563,7 @@ module.exports = function () {
                                 basedir = _path.dirname(lib) + "/";
 
                                 if (requirerows) {
-                                    requirerows = _utils.prepareCode(requirerows);
+                                    requirerows = _codeutils.prepareCode(requirerows);
                                     code = requirerows.join("\n");
 
                                     if (code) {

@@ -1,5 +1,5 @@
 var _Scrap = catrequire("cat.common.scrap"),
-    _utils = catrequire("cat.utils"),
+    _codeutils = catrequire("cat.code.utils"),
     _scraputils = require("./utils/Utils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
@@ -32,7 +32,7 @@ module.exports = function () {
 
                             var jqm;
 
-                            jqmRow = _utils.prepareCode(jqmRow);
+                            jqmRow = _codeutils.prepareCode(jqmRow);
 
                             if (jqmRow && jqmRow.join) {
                                 jqm = jqmRow.join("\n");
@@ -232,7 +232,8 @@ module.exports = function () {
                             rows:jqmRows,
                             args: [
                                 "scrapName: 'jqm'"
-                            ]
+                            ],
+                            type: "jqm"
 
                         }, function(row) {
                             return generate(row);

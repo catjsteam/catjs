@@ -15,7 +15,6 @@ var _utils = catrequire("cat.utils"),
         var __id = _catlibtils.generateGUID();
         return ["scrap", __id].join("_");
     },
-
     _clazz;
 
 function _validateConfigEntry(key, config) {
@@ -274,11 +273,18 @@ _clazz = function (config) {
     })();
 };
 
+_clazz.prototype.global = function (entity) {
+    
+};
+
 _clazz.prototype.isSingle = function (key) {
     return this.config.single[key];
 };
 
 _clazz.prototype.print = function(line) {
+    if (_.isString(line)) {
+        line = {line: line};
+    }
     this.printer.print(line);
 };
 
@@ -319,11 +325,15 @@ _clazz.prototype.setSingleton = function (key, bol) {
     this.config.singleton[key] = bol;
 };
 
-_clazz.prototype.getRunat = function (key) {
+_clazz.prototype.getRunat = function () {
     return this.config["run@"];
 };
 
-_clazz.prototype.getPkgName = function (key) {
+_clazz.prototype.getStack = function () {
+    return ("stack" in this.config ? this.config["stack"] : undefined);
+};
+
+_clazz.prototype.getPkgName = function () {
     return this.config["pkgName"];
 };
 

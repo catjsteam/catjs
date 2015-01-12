@@ -1,5 +1,5 @@
 var _Scrap = catrequire("cat.common.scrap"),
-    _utils = catrequire("cat.utils"),
+    _codeutils = catrequire("cat.code.utils"),
     _tplutils = catrequire("cat.tpl.utils"),
     _scraputils = require("./utils/Utils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
@@ -36,7 +36,7 @@ module.exports = function () {
                             if (enyoRows) {
                                 var enyo;
 
-                                enyoRow = _utils.prepareCode(enyoRow);
+                                enyoRow = _codeutils.prepareCode(enyoRow);
 
                                 if (enyoRow && enyoRow.join) {
                                     enyo = enyoRow.join("\n");
@@ -98,7 +98,8 @@ module.exports = function () {
                             rows:enyoRows,
                             args: [
                                 "scrapName: 'enyo'"
-                            ]
+                            ],
+                            type:"enyo"
 
                         }, function(row) {
                             return generate(row);

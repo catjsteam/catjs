@@ -1,42 +1,25 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _utils = catrequire("cat.utils"),
-    _scraputils = require("./utils/Utils");
+    _scraputils = require("./utils/Utils"),
+    _Jasmine = require("./jasmine/Jasmine.js");
 
 module.exports = function () {
 
-    var _specs = {};
-    
-    function _addSpec(config) {
-        var key = (config.name),
-            data = config.data;
-        
-        function _get(key, itemKey) {
-            return (_specs[key] && _specs[key][itemKey] ? _specs[key][itemKey] : undefined);
-        }
-        
-        function _getLast(key, itemKey) {
-            return (_specs[key] && _specs[key][itemKey] ? _specs[key][itemKey][_specs[key][itemKey].length-1] : undefined);
-        }
-        
-        if (!_specs[key]) {
-            _specs[key] = {
-            }
-        }
-        data.forEach(function(item) {
-            if (item) {
-                if (!_specs[key][item.key]) {
-                    _specs[key][item.key] = [];
-                }
-                _specs[key][item.key].push(item.value); 
-            }
-        });
-
-    }
-    
     return {
 
         init: function (config) {
 
+            /*
+                scrap entity
+                "inject" process will evaluate all of the entities
+                a user printer defined
+            */
+            var _jasmine = _Scrap.entity({
+                name: "jasmine", 
+                fn: _Jasmine,
+                printer: "user"
+            });
+            
             /**
              * Annotation for Jasmine describe 
              *
@@ -48,7 +31,7 @@ module.exports = function () {
              */
             _Scrap.add({name: "describe",
                 single: true,
-                singleton: 1,
+                singleton: -1,
                 func: function (config) {
 
                     var describeRow,
@@ -57,17 +40,16 @@ module.exports = function () {
                         scrap = scrapConf,
                         dm;
 
+                    me.set("auto", false);
                     describeRow = this.get("describe");
                     if (describeRow) {
-                        _addSpec({
-                            name: me.get("name"),
-                            data: [
-                                {
-                                    key: "describe",
-                                    value: describeRow
-                                }
-                            ]
+
+                        _jasmine.add({
+                            name: "describe",
+                            scrapname: me.get("name"),
+                            data: describeRow
                         });
+                        
                     }
                    
                 }
@@ -83,26 +65,21 @@ module.exports = function () {
              *  $type   - js
              */
             _Scrap.add({name: "it",
-                single: true,
-
+                single: false,
+                singleton: 1,
                 func: function (config) {
 
                     var itRow,
                         me = this,
-                        scrapConf = me.config,
-                        scrap = scrapConf,
-                        dm;
+                        scrapConf = me.config;
 
                     itRow = this.get("it");
                     if (itRow) {
-                        _addSpec({
-                            name: me.get("name"),
-                            data: [
-                                {
-                                    key: "it",
-                                    value: itRow
-                                }
-                            ]
+
+                        _jasmine.add({
+                            name: "it",
+                            scrapname: me.get("name"),
+                            data: itRow
                         });
                     }
                    

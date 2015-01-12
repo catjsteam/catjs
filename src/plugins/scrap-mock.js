@@ -1,10 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
-    _utils = catrequire("cat.utils"),
+    _codeutils = catrequire("cat.code.utils"),
     _scraputils = require("./utils/Utils"),
     _Faker = require('Faker');
-//var _tplutils = catrequire("cat.tpl.utils");
-//var importJSTpl = _tplutils.readTemplateFile("scrap/_import_js");
-
 
 
 module.exports = function () {
@@ -34,7 +31,7 @@ module.exports = function () {
                     mockRows = this.get("mock");
 
                     if (mockRows) {
-                        mockRows = _utils.prepareCode(mockRows);
+                        mockRows = _codeutils.prepareCode(mockRows);
                         mock = mockRows.join("\n");
 
 

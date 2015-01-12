@@ -1,5 +1,5 @@
 var _Scrap = catrequire("cat.common.scrap"),
-    _utils = catrequire("cat.utils"),
+    _codeutils = catrequire("cat.code.utils"),
     _scraputils = require("./utils/Utils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
@@ -32,7 +32,7 @@ module.exports = function () {
 
                             var vnc;
 
-                            vncRow = _utils.prepareCode(vncRow);
+                            vncRow = _codeutils.prepareCode(vncRow);
 
                             if (vncRow && vncRow.join) {
                                 vnc = vncRow.join("\n");
@@ -141,7 +141,8 @@ module.exports = function () {
                             rows:vncRows,
                             args: [
                                 "scrapName: 'vnc'"
-                            ]
+                            ],
+                            type: "vnc"
 
                         }, function(row) {
                             return generate(row);

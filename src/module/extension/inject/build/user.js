@@ -6,6 +6,9 @@ var _Scrap = catrequire("cat.common.scrap"),
 
 module.exports = function (scraps, sourcefile, targetfile) {
 
+    /* @Obsolete - user code is being refactored [WIP] 
+    
+
     var outputjs = [],
         projectTarget = _project.getInfo("target");
 
@@ -37,4 +40,5 @@ module.exports = function (scraps, sourcefile, targetfile) {
         file: _extutils.getUserInfo({file: targetfile}).file
     };
 
+    */
 };

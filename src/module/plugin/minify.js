@@ -68,6 +68,14 @@ module.exports = _basePlugin.ext(function () {
                     jshint.globals["chai"] = true;
                     jshint.globals["document"] = true;
                     jshint.globals["XMLHttpRequest"] = true;
+                    jshint.globals["describe"] = true;
+                    jshint.globals["xdescribe"] = true;
+                    jshint.globals["it"] = true;
+                    jshint.globals["xit"] = true;
+                    jshint.globals["before"] = true;
+                    jshint.globals["beforeEach"] = true;
+                    jshint.globals["after"] = true;
+                    jshint.globals["afterEach"] = true;
                 }
                 
                 task({
