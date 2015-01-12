@@ -64,12 +64,14 @@ exports.post = function (req, res) {
     });
 
 
-//    res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
-//    res.send('{"screenshot": "save",' +
-//        '"scrapName" : "' + scrapName + '",' +
-//        '"deviceName" : "' + deviceName + '",' +
-//        '"deviceId" : "' + deviceId + '",' +
-//        '}');
+    res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+    res.send('{"deviceinfo": "save",' +
+
+        '"deviceName" : "' + deviceName + '",' +
+        '"deviceId" : "' + deviceId + '",' +
+        '}');
+
+    console.log("send response");
 
 };
 
