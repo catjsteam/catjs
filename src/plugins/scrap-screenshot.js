@@ -43,7 +43,8 @@ module.exports = function () {
                             rows:screenshotRows,
                             args: [
                                 "scrapName: 'screenshot'"
-                            ]
+                            ],
+                            type: "screenshot"
 
                         }, function(row) {
                             var screenshotCommand = '_cat.core.plugin("screenshot").actions.screenshot("' + scrap.name[0] + '");';

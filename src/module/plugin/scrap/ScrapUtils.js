@@ -38,7 +38,8 @@ module.exports = function() {
             return {key: configKey, value: configVal};
         },
 
-        putScrapConfig: function(config, configKey, configVal) {
+        putScrapConfig: function(config, configKey, configVal, idx) {
+                
             if (configKey) {
                 configKey = configKey.trim();
                 if (!config[configKey]) {
@@ -47,12 +48,15 @@ module.exports = function() {
                     } else {
                         config[configKey] = [configVal];
                     }
+                    
+                    config.stack.push({ key: configKey, cell: (config[configKey] ? config[configKey].length-1 : 0) })
                 } else {
                     if (_typedas.isArray(configVal)) {
                         config[configKey] = config[configKey].concat(configVal);
                     } else {
                         config[configKey].push(configVal);
                     }
+                    config.stack.push({ key: configKey, cell: config[configKey].length-1})
                 }
             }
 

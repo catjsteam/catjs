@@ -21,6 +21,7 @@ module.exports = function () {
     var _scrapNames = ["name"],
         _scraps = [],
         _scrapmap,
+        _globalsmap = {};
 
         /**
          * Extract scrap block out of comment
@@ -44,6 +45,29 @@ module.exports = function () {
         clazz: _clazz,
 
 
+        /**
+         * 
+         * @param config
+         *      entity {function} The entity reference function
+         *      name {String} Unique global map key;
+         */
+        entity: function(config) {
+            var key = config.name,
+                entity = config.fn,
+                printer = config.printer;
+
+            if (_globalsmap[key]) {
+                _log.warn("[catjs Scrap] Override an existing global functionality: ", key);
+            }
+            _globalsmap[key] = new entity({printer: printer});
+            
+            return _globalsmap[key];
+        },
+        
+        getEntity: function(key) {
+            return _globalsmap[key];  
+        },
+        
         /**
          * Add custom functionality to CAT's Scrap entity
          *
@@ -99,7 +123,7 @@ module.exports = function () {
 
             var rows = scrapBlock.rows,
                 idx = 1, size = rows.length, row,
-                scrap, config = {},
+                scrap, config = { stack:[] },
                 configKey, configVal,
                 multiRowOpenExp = "@@(.*)([\\[]+)(.*)([\\s].*)",
                 multiRowCloseExp = "(.*)?([\\]])([\\s]?.*)",
@@ -158,7 +182,7 @@ module.exports = function () {
                             }
 
                             // set scrap property / value
-                            _scrapUtils.putScrapConfig(config, configKey, _ScrapConfigItem.create({value: configVal, sign:sign, hint:hint}));
+                            _scrapUtils.putScrapConfig(config, configKey, _ScrapConfigItem.create({value: configVal, sign:sign, hint:hint}), idx);
 
                         } else {
 
@@ -194,7 +218,7 @@ module.exports = function () {
                                     data = _scrapUtils.parseData(data);
                                     if (data) {
                                         configVal = (data ? JSON.parse(data.join("")) : undefined);
-                                        _scrapUtils.putScrapConfig(config, configKey, configVal);
+                                        _scrapUtils.putScrapConfig(config, configKey, configVal, idx);
                                     }
                                 } catch(e) {
                                     console.log(e);

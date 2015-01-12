@@ -1,5 +1,5 @@
 var _Scrap = catrequire("cat.common.scrap"),
-    _utils = catrequire("cat.utils"),
+    _codeutils = catrequire("cat.code.utils"),
     _scraputils = require("./utils/Utils"),
     _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
@@ -32,7 +32,7 @@ module.exports = function () {
 
                             var deviceinfo;
 
-                            deviceinfoRow = _utils.prepareCode(deviceinfoRow);
+                            deviceinfoRow = _codeutils.prepareCode(deviceinfoRow);
 
                             if (deviceinfoRow && deviceinfoRow.join) {
                                 deviceinfo = deviceinfoRow.join("\n");
@@ -77,7 +77,8 @@ module.exports = function () {
                             rows:deviceinfoRows,
                             args: [
                                 "scrapName: 'deviceinfo'"
-                            ]
+                            ],
+                            type:"deviceinfo"
 
                         }, function(row) {
                             return generate(row);

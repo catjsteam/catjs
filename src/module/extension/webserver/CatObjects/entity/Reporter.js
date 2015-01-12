@@ -24,6 +24,8 @@ Reporter.prototype.init = function (config) {
 
     var status = config.status;
 
+    _jmr.setReporter("junit");
+    
     this._isjunit = false;
     this._isconsole = false;
     this._colors = new _colors();
@@ -102,6 +104,8 @@ Reporter.prototype.reset = function () {
 
     this._status = 0;
     this._hasFailed = false;
+    
+    _jmr.setReporter("junit");
     this._testsuite = _jmr.create({
         type: "model.testsuite",
         data: {

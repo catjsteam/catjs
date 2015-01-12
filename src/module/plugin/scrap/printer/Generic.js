@@ -3,20 +3,80 @@ var _ = require("underscore");
 module.exports = function() {
 
     var _Printer = function() {
-        this.output = [];
+        this.scrap;
+        this.output = {};
+        this.enum = {
+            GENERAL: "_general",
+            ORDER: "_order"
+        }
 
     };
 
     _Printer.prototype.generate = function () {
-        return ( this.output ? this.output.join(" \n ") : "");
+        var output = (this.enum.GENERAL in this.output ? this.output[this.enum.GENERAL] : undefined),
+            order =  (this.enum.ORDER in this.output ? this.output[this.enum.ORDER] : undefined),
+            me =  this;
+
+        if (order) {
+            order.forEach(function(item) {
+                var cell, key, out;
+                
+                if (item) {
+                    cell = item.cell;
+                    key = item.key;
+                    out = (key in me.output ? me.output[key] : undefined);                    
+                    if (out) {
+                        out = out[cell];
+                        if (out) {
+                            output.push(out); 
+                        }
+                    }
+                }
+                
+            });
+        }
+        
+        return ( output ? output.join(" \n ") : "" );
     };
 
-    _Printer.prototype.print = function (line) {
-        if (line) {
+    _Printer.prototype.print = function (config) {
+        
+        var scraptype,
+            scrap = ("scrap" in config ? config.scrap : {}), scrapi,
+            line,
+            me = this;
+
+        function _set(key, line) {
+            if (!me.output[key]) {
+                me.output[key] = [];
+            }
             if (_.isArray(line)) {
-                this.output = this.output.concat(line);
+                me.output[key] = this.output[key].concat(line);
             } else {
-                this.output.push(line);
+                me.output[key].push(line);
+            }
+
+        }
+        
+        scraptype = scrap.type;
+        scrapi = scrap.scrap;
+        line = config.line;
+        if (line) {
+            if (!this.output[this.enum.GENERAL]) {
+                this.output[this.enum.GENERAL] = [];
+                if (scrapi) {
+                    if (!this.scrap) {
+                        this.scrap = scrapi;
+                    }
+                    this.output[this.enum.ORDER] = scrapi.getStack();
+                }
+            }
+            
+            if (!scraptype) {
+                _set(this.enum.GENERAL, line);
+                
+            } else {
+                _set(scraptype, line);
             }
         }
     };

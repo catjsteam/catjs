@@ -1,4 +1,5 @@
-var _jsutils = require("js.utils");
+var _jsutils = require("js.utils"),
+    _utils = catrequire("cat.utils");
 
 module.exports = function (config) {
 
@@ -20,6 +21,7 @@ module.exports = function (config) {
                     concatflag = ("concat" in config || false),
                     prepare = [],
                     args = (config.args || []),
+                    scrapType = (config.type || undefined),
                     counter= 0, rowcounter=0;
 
                 _commandsCode = [];
@@ -42,14 +44,22 @@ module.exports = function (config) {
 
                     } else {
                         rowcounter=0;
+                        
                         // execute the commands separately
                         _commandsCode.forEach(function(command) {
                             if (command) {
-                                //prepare.push(command);
-                                _scrap.print(["_cat.core.clientmanager.delayManager({" +
+                                
+                                if (!scrapType) {
+                                    _utils.log("warn", "[catjs DelayManagerUtils] Scrap type is not valid, skipping the scrap.print command. Make sure to check your plugins implementation");
+                                }
+                                
+                                _scrap.print({
+                                    scrap: {type: scrapType, scrap: _scrap},
+                                    line: ["_cat.core.clientmanager.delayManager({" +
                                     "commands:[function(", scrapargsstr, ") { ", command, "}]," +
                                     "context:{", args.concat("scrapRowIdx:" + rowcounter), "}" +
-                                    "});"].join(""));
+                                    "});"].join("")
+                                });
                                 rowcounter++;
 
                             }
