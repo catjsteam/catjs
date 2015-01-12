@@ -50,8 +50,10 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 ### GTAC & Ignite Velocity events
 [![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/gtac.jpg)](https://www.youtube.com/watch?v=gGdDc5SlBq4) [![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/velocity.jpg)](https://www.youtube.com/watch?v=nRcKAFS-Gyg)
 
-## Release Notes
+## Release Notes Log
 
+* **Scrap Annotation Order** The annotations are being executed in the same order as they appear. Until this point the annotations were aggregated. 
+* **.npmignore fix** excluded core folders
 * **Command-Line fix** Failed to load one of catjs modules that lead to unwanted task runner behavior
 * **Note! Reports location moved to be aggregated below "reports" folder** 
 * **New Scrap Annotation - @@screenshot screenshot()**
