@@ -14,7 +14,8 @@ var _fs = require('fs'),
     _beautify = require('js-beautify').js_beautify,
     _processReplacenfo = require("./parser/replaceInfo.js"),
     _processSingleLine = require("./parser/singleLine.js"),
-    _generateManagerInfo = require("./build/manager.js");
+    _generateManagerInfo = require("./build/manager.js"),
+    _entityutils = catrequire("cat.entity");
 
 
 /**
@@ -72,23 +73,23 @@ module.exports = _basePlugin.ext(function () {
             }
 
             var filepath,
-                targetfile, targetfolder, targetInternalFolder, 
+                targetfile, targetfolder, targetInternalFolder,
                 home = _global.get("home"),
                 catworkdir = _sysutils.getCatProjectPath(),
-                internalTargetfile, folderCounter=0;
-            
-         
+                internalTargetfile, folderCounter = 0;
+
+
             /* 
-                TODO replace path resolving with require("path")
-                Get the current file information and write it to the sources project location
-            */
-            
+             TODO replace path resolving with require("path")
+             Get the current file information and write it to the sources project location
+             */
+
             // 
             filepath = ((_mdobject.project && _mdobject.project.basepath) ? _utils.getRelativePath(file, _mdobject.project.basepath) : undefined),
 
-            internalTargetfile = _path.join(catworkdir, "cache", filepath);            
+                internalTargetfile = _path.join(catworkdir, "cache", filepath);
             targetfile = _path.join(_project.getInfo("source"), filepath);
-            
+
             targetfolder = _path.dirname(targetfile);
             if (targetfolder) {
                 if (!_fs.existsSync(targetfolder)) {
@@ -110,10 +111,10 @@ module.exports = _basePlugin.ext(function () {
             _writeJSContentToFile(scraps, _generateManagerInfo.getCache, internalTargetfile);
             _writeJSContentToFile(scraps, _generateManagerInfo.getIncludeCache, internalTargetfile);
             /* @Obsolete - user code generation is being refactored [WIP]
-                if (!_fs.existsSync(targetfile)) {            
-                    _writeJSContentToFile(scraps, _generateManagerInfo.getUser, targetfile);
-                }
-            */
+             if (!_fs.existsSync(targetfile)) {            
+             _writeJSContentToFile(scraps, _generateManagerInfo.getUser, targetfile);
+             }
+             */
 
         },
 
@@ -123,7 +124,7 @@ module.exports = _basePlugin.ext(function () {
          * @param scraps The scraps data
          * @param file The reference file to be processed
          */
-         _injectScrapCall = function (scraps, file, callback) {
+            _injectScrapCall = function (scraps, file, callback) {
 
             var lines = [] , lineNumber = 1,
                 commentinfos = [];
@@ -134,13 +135,13 @@ module.exports = _basePlugin.ext(function () {
                  *  In case there are more than one scrap per comment we need to store the
                  *  Info for all the scrap related to that comment.
                  */
-                var  lineobj = {line: line},
+                var lineobj = {line: line},
                     counter = 0;
 
                 commentinfos.forEach(function (info) {
 
-                        var scraplcl = info.scrap,
-                        injectinfo = scraplcl.get("injectinfo"),                    
+                    var scraplcl = info.scrap,
+                        injectinfo = scraplcl.get("injectinfo"),
                         replaceinfo,
                         isLineNumber = false;
 
@@ -164,9 +165,9 @@ module.exports = _basePlugin.ext(function () {
 
                         if (isLineNumber) {
 
-                            _processSingleLine({                       
+                            _processSingleLine({
                                 injectinfo: injectinfo,
-                                info:info,                                                            
+                                info: info,
                                 line: lineobj,
                                 scraplcl: scraplcl,
                                 lineNumber: lineNumber,
@@ -269,10 +270,11 @@ module.exports = _basePlugin.ext(function () {
              */
             apply: function (config) {
 
-                var data,
-                    files, filesArr = [],
+                var files, filesArr = [],
                     counter = -1,
-                    emitter = _me.getEmitter();
+                    emitter = _me.getEmitter(),
+                    // load Jasmine entity
+                    jasmine = _entityutils.getEntity("jasmine");
 
                 function _apply(filename, callback) {
 
@@ -301,21 +303,22 @@ module.exports = _basePlugin.ext(function () {
                         }
 
                         // apply all scraps
-                        _Scrap.apply({scraps: scraps,  apply: true});
+                        _Scrap.apply({scraps: scraps, apply: true});
 
                         _inject(scraps, filename, function () {
                             counter++;
                             _apply(filesArr[counter], callback);
 
-                            // update the scrap data w/o running scrap apply
+                            
+                            // update the scrap data 
                             _Scrap.apply({
-                                scraps: scraps, 
+                                scraps: scraps,
                                 apply: true,
-                                callback: function(scraps) {
-                                  
+                                callback: function (scraps) {
+                                    
                                 }
                             });
-                            
+
                             if (counter === filesArr.length) {
                                 if (callback) {
                                     callback.call(this);
@@ -323,16 +326,16 @@ module.exports = _basePlugin.ext(function () {
                             }
 
                         });
-                    } else {
-                        emitter.emit("job.done", {status: "done"});
-                    }
+                    } 
                 }
 
                 _me.apply(config);
 
                 if (_mdata) {
                     _mdata.readAsync(function () {
-                        var fileName;
+                        var fileName, 
+                            scrapslcl;
+                        
                         if (this.data) {
                             _mdobject = JSON.parse(this.data);
 
@@ -350,12 +353,19 @@ module.exports = _basePlugin.ext(function () {
 
                                 if (filesArr && filesArr.length > 0) {
                                     counter = 0;
-                                    _apply(filesArr[counter], function() {
-                                        var scrapslcl = _Scrap.getScraps();
+
+                                    _apply(filesArr[counter], function () {
+                                        scrapslcl = _Scrap.getScraps();
                                         _Scrap.apply({scraps: scrapslcl, apply: false});
-                                                                   
-                                        var _jasmine = _Scrap.getEntity("jasmine");
-                                        _jasmine.flush();
+
+                                        // apply Jasmine entity (generate the scrap data using jasmine printer)
+                                        jasmine.apply(scrapslcl);
+                                        
+                                        // flush Jasmine data to the files
+                                        jasmine.flush();
+
+                                        // Task has ended
+                                        emitter.emit("job.done", {status: "done"});
 
                                     });
                                 }
