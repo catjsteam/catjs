@@ -1,11 +1,11 @@
-var Row = require("./Row.js"),
-    _utils = catrequire("cat.utils"),
+var _Row = require("./Row.js"),
+     _utils = catrequire("cat.utils"),
     _codeutils = catrequire("cat.code.utils"),
     _tmr = require("test-model-reporter"),
     _project = catrequire("cat.project"),
     _path = require("path"),
     _fs = require("fs"),
-    underscore = require("underscore");
+    _underscore = require("underscore");
 
 function Jasmine(config) {
 
@@ -36,14 +36,14 @@ Jasmine.prototype.add = function (row) {
     var data = row.data,
         me = this;
     if (data) {
-        
-        if (!underscore.isArray(data)) {
+
+        if (!_underscore.isArray(data)) {
             data = [data];
         }
-        
+
         data.forEach(function(item){
             if (item) {
-                me._rows.push(new Row({
+                me._rows.push(new _Row({
                     data:item,
                     name: row.name,
                     scrapname: row.scrapname
@@ -54,6 +54,18 @@ Jasmine.prototype.add = function (row) {
 
 };
 
+Jasmine.prototype.apply = function(scraps) {
+    
+    if (scraps) {
+        // generate jasmine data
+        scraps.forEach(function(scrap) {
+            if (scrap) {
+                scrap.jasmineprinter.generate();
+            }
+        });
+    }
+}
+
 /**
  * Process tnd flush the data
  *
@@ -61,8 +73,8 @@ Jasmine.prototype.add = function (row) {
 Jasmine.prototype.flush = function () {
 
     var obj = {},
-        key, items, tmroot, out, valid, filename;
-
+        key, items, tmroot, tmlastdescribe, out, valid, filename;   
+    
     function _getFilename(model) {
         var title = model.get("title");
         if (title) {
@@ -98,22 +110,30 @@ Jasmine.prototype.flush = function () {
             items = obj[key];
             if (items) {
                 items.forEach(function (item) {
-                    var title;
+                    var title, tmpcreate;
 
                     if (item) {
                         if (item.name === "describe") {
                             title = item.data;
                             title = _codeutils.cleanDoubleQuotes(title);
-                            tmroot = _tmr.create({
+                            tmpcreate = _tmr.create({
                                 type: "model.jas.describe",
                                 data: {
                                     title: title
                                 }
                             });
+
+                            if (!tmroot) {
+                                tmroot = tmpcreate;
+                                tmlastdescribe = tmroot; 
+                            } else {
+                                tmlastdescribe.add(tmpcreate);
+                                tmlastdescribe = tmpcreate;                                
+                            }
                         } else if (item.name === "it") {
                             title = item.data;
                             title = _codeutils.cleanDoubleQuotes(title);
-                            tmroot.add(_tmr.create({
+                            tmlastdescribe.add(_tmr.create({
                                 type: "model.jas.it",
                                 data: {
                                     title: title
@@ -133,14 +153,12 @@ Jasmine.prototype.flush = function () {
             out = tmroot.compile();
             filename = _getFilePath();
 
-            console.log(out);
-            
             if (!_fs.existsSync(filename)) {
-                _tmr.write(filename, out);             
+                _tmr.write(filename, out);
             }
         }
     } else {
-        console.log("flush: NA");
+        // console.log("flush: NA");
     }
 };
 
