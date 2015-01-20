@@ -1,1 +1,1 @@
-<script src="{{src}}" {{events.onload}}></script>
+<script id="{{elementId}}" src="{{src}}" {{events.onload}}></script>

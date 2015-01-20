@@ -671,15 +671,24 @@ _cat.core = function () {
                 pathname,
                 result;
 
-            regHtml = "([/]?.*[/]*[/])+(.*[\\.html]?)";
-            endInPage = new RegExp(regHtml + "$");
-            pathname = window.location.pathname;
-            result = endInPage.exec(pathname);
+            var script, source, head;
 
-            if (result !== null) {
-                pathname = (RegExp.$1);
-            }
-            return  ([window.location.origin, pathname, (url || "")].join("") || "/");
+            script = document.getElementById("catjsscript");
+            source = script.src;
+            head = (source.split("cat/lib/cat.js")[0] || "");
+
+//
+//
+//            regHtml = "([/]?.*[/]*[/])+(.*[\\.html]?)";
+//            endInPage = new RegExp(regHtml + "$");
+//            pathname = window.location.pathname;
+//            result = endInPage.exec(pathname);
+//
+//            if (result !== null) {
+//                pathname = (RegExp.$1);
+//            }
+//            return  ([window.location.origin, pathname, (url || "")].join("") || "/");
+            return  ([head, (url || "")].join("") || "/");
         }
 
     };
@@ -1212,6 +1221,7 @@ _cat.core.clientmanager = function () {
         endTest,
         testQueue = {},
         testQueueLast,
+        initCurrentState = false,
         currentState = { index: 0 };
 
     endTest = function (opt, interval) {
@@ -1581,6 +1591,13 @@ _cat.core.clientmanager = function () {
 
                         if (response.ready) {
                             scraplist = response.readyScraps;
+
+
+                            if (!initCurrentState) {
+                                initCurrentState = true;
+                                currentState.index = response.readyScraps[0].index;
+                            }
+
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
                                     var config = testQueue[scrap.index];

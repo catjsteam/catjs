@@ -691,7 +691,7 @@ module.exports = function () {
                                 basedirsplit.pop();
                                 basedir = basedirsplit.join("/");
                             } else {
-                                value = basedir + "/cat/cat.js"  
+                                value = basedir + "cat/cat.js"
                             }
 
                             basedir += "/";
@@ -715,6 +715,7 @@ module.exports = function () {
                     function _printByType(type, value) {
 
                         var contentByType,
+                            elementId,
                             contents = {
                                 "js": importJSTpl,
                                 "css": importCSSTpl
@@ -724,13 +725,19 @@ module.exports = function () {
                             contentByType = contents[type];
                         }
 
+                        if (value.indexOf("cat.js") !== -1) {
+                            elementId = "catjsscript"
+                        } else {
+                            elementId = value.replace(/\.|\//g, "");
+                        }
 
                         if (contentByType) {
                             me.print(_tplutils.template({
                                 content: contentByType,
                                 data: {
                                     events: {onload: ( value.indexOf("cat.src.js") !== -1 ? "onload=\"_cat.core.init()\"" : undefined )},
-                                    src: value
+                                    src: value,
+                                    elementId: elementId
                                 }
                             }));
                         }

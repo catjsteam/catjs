@@ -16,6 +16,7 @@ _cat.core.clientmanager = function () {
         endTest,
         testQueue = {},
         testQueueLast,
+        initCurrentState = false,
         currentState = { index: 0 };
 
     endTest = function (opt, interval) {
@@ -385,6 +386,13 @@ _cat.core.clientmanager = function () {
 
                         if (response.ready) {
                             scraplist = response.readyScraps;
+
+
+                            if (!initCurrentState) {
+                                initCurrentState = true;
+                                currentState.index = response.readyScraps[0].index;
+                            }
+
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
                                     var config = testQueue[scrap.index];
