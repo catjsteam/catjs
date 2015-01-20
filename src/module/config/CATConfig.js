@@ -28,7 +28,7 @@ var _global = catrequire("cat.global"),
             idx = 0, size, project, pluginsPath = [],
             dependencies = [],
             librariesConfig = [],
-            librariesDefault = ["underscore", "js.utils", "tmr", "jspath", "chai",  "cat"],
+            librariesDefault = ["underscore", "js.utils", "jspath", "chai",  "cat"],
             libraryBuildConfig, dependenciesInfo,
             appTargetPath, appPath, jshint, minifyplugin,
             scrapfilter, projectcopy,
@@ -140,7 +140,7 @@ var _global = catrequire("cat.global"),
                     minifyplugin = {
                         "name": "p@project.minify",
                         "type": "minify",
-                        "path": _path.join(appTargetPath, cattarget, "/cat/lib"),
+                        "path": _path.join(appTargetPath, cattarget, "/cat/lib/cat"),
                         "filename": "cat.src.js",
                         "src":[["./cache/",  project.name, "/**/*.js"].join(""),["./src/",  project.name, "/**/*.js"].join(""), "./src/common/**/*.js"]
                     };
@@ -163,7 +163,7 @@ var _global = catrequire("cat.global"),
                             "name": "p@lib.parse",
                             "type": "fileparse",
                             "dependency": "manager",
-                            "files": [_path.join(appTargetPath, cattarget, "/cat/lib/cat.js")],
+                            "files": [_path.join(appTargetPath, cattarget, "/cat/lib/cat/cat.js")],
                             "pattern": "_getBase=\"(.*)\";",
                             "replace": "_getBase=\"" + cattarget + "\";",
                             "applyto":["content"],
@@ -211,8 +211,8 @@ var _global = catrequire("cat.global"),
                         }
                     }
 
-                    librariesConfig.unshift("cat.css");
-                    librariesConfig.push("cat.src.js");
+                    //librariesConfig.unshift("cat.css");
+                    //librariesConfig.push("cat.src.js");
 
                     project.setInfo("dependencies", librariesConfig);                                                  
                     

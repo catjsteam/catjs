@@ -197,8 +197,8 @@ module.exports = function () {
                                 rows: codeRows,
                                 args: [
                                     "scrapName: 'js'"
-                                ], 
-                                type:"js"
+                                ],
+                                type: "js"
                             });
                         }
                         dm.dispose();
@@ -226,7 +226,7 @@ module.exports = function () {
 
                     if (logRows) {
 
-                        logRows.forEach(function(row) {
+                        logRows.forEach(function (row) {
                             if (row) {
                                 code.push(_tplutils.template({
                                     content: funcSnippetTpl,
@@ -238,13 +238,13 @@ module.exports = function () {
                             }
                         });
 
-                        
+
                         if (code) {
 
                             dm = new _delayManagerUtils({
                                 scrap: me
                             });
-                            
+
                             dm.add({
                                 rows: code,
                                 args: [
@@ -252,9 +252,9 @@ module.exports = function () {
                                 ],
                                 type: "log"
                             });
-                            
+
                             dm.dispose();
-                        }                                                
+                        }
                     }
                 }});
 
@@ -654,26 +654,19 @@ module.exports = function () {
 
                         var type = "js";
                         if (value) {
+                            type = _path.extname(value);
 
-                            if (value.indexOf(".css") !== -1) {
-                                type = "css";
-                            } else if (value.indexOf(".map") !== -1) {
-                                type = "map";
-                            } else if (value.indexOf(".js") !== -1) {
-                                type = "js";
-                            } else {
-                                value += "." + type;
-                            }
                         }
 
-                        return {type: type, value: value};
+                        return {type: type.split(".").join(""), value: value};
                     }
 
                     function generateLibs(value) {
 
                         var libs = [], deplibs = [], basedir,
                             libcounter = 0,
-                            libsrcs = [];
+                            libsrcs = [],
+                            basedirsplit;
 
                         if (_isCatjs(value)) {
 
@@ -691,8 +684,17 @@ module.exports = function () {
                                 libcounter++;
                             });
 
-                            basedir = _path.dirname(value) + "/";
+                            basedir = _path.dirname(value);
 
+                            basedirsplit = basedir.split("/");
+                            if (basedirsplit[basedirsplit.length - 1] === "cat") {
+                                basedirsplit.pop();
+                                basedir = basedirsplit.join("/");
+                            } else {
+                                value = basedir + "/cat/cat.js"  
+                            }
+
+                            basedir += "/";
 
                             libs.forEach(function (lib) {
                                 if (lib.path.indexOf("cat.src") === -1) {
@@ -700,7 +702,8 @@ module.exports = function () {
                                 }
                             });
                             libsrcs.push(value);
-                            libsrcs.push([basedir, "cat.src.js"].join(""));
+                            libsrcs.push([basedir, "cat/cat.src.js"].join(""));
+                            libsrcs.push([basedir, "cat/cat.css"].join(""));
 
                         } else {
                             libsrcs.push(value);
@@ -722,13 +725,15 @@ module.exports = function () {
                         }
 
 
-                        me.print(_tplutils.template({
-                            content: contentByType,
-                            data: {
-                                events: {onload: ( value.indexOf("cat.src.js") !== -1 ? "onload=\"_cat.core.init()\"" : undefined )},
-                                src: value
-                            }
-                        }));
+                        if (contentByType) {
+                            me.print(_tplutils.template({
+                                content: contentByType,
+                                data: {
+                                    events: {onload: ( value.indexOf("cat.src.js") !== -1 ? "onload=\"_cat.core.init()\"" : undefined )},
+                                    src: value
+                                }
+                            }));
+                        }
                     }
 
                     var importannos = this.get("import"),
