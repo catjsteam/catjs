@@ -9,6 +9,7 @@ var _utils = catrequire("cat.utils"),
     _scraputils = catrequire("cat.scrap.utils"),
     _jsutils = require("js.utils"),
     _Printer = require("./printer/Generic.js"),
+    _JasminePrinter = require("./printer/Jasmine.js"),
     _cache = require("./Cache.js"),
     _ = require("underscore"),
     _scrapId = function () {
@@ -146,7 +147,7 @@ _clazz = function (config) {
 
         // set default values
         if (me.config[name] === undefined) {
-            me.set(name, defaultValue);
+            me.set(name, defaultValue, true);
 
         } else {
             items = me.config[name];
@@ -205,11 +206,12 @@ _clazz = function (config) {
 
     this.printer = new _Printer();
     this.userprinter = new _Printer();
+    this.jasmineprinter = new _JasminePrinter();
     
     this.getEnum = _scrapEnum.getScrapEnum;
 
-    this.set = function (key, value) {
-        if (key) {
+    this.set = function (key, value, defaultval) {
+        if (key) {          
             config[key] = value;
             this[key] = function () {
                 return this.config[key];
@@ -286,6 +288,10 @@ _clazz.prototype.print = function(line) {
         line = {line: line};
     }
     this.printer.print(line);
+};
+
+_clazz.prototype.jasminePrint = function(config) {
+    this.jasmineprinter.print(config);
 };
 
 /**

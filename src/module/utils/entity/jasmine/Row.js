@@ -2,7 +2,7 @@ var _BaseEntity = require("./../BaseEntity.js");
 
 
 function Row(config) {
-        
+
     var me = this,
         key;
 

@@ -20,8 +20,7 @@ module.exports = function () {
 
     var _scrapNames = ["name"],
         _scraps = [],
-        _scrapmap,
-        _globalsmap = {};
+        _scrapmap;
 
         /**
          * Extract scrap block out of comment
@@ -43,30 +42,6 @@ module.exports = function () {
         },
 
         clazz: _clazz,
-
-
-        /**
-         * 
-         * @param config
-         *      entity {function} The entity reference function
-         *      name {String} Unique global map key;
-         */
-        entity: function(config) {
-            var key = config.name,
-                entity = config.fn,
-                printer = config.printer;
-
-            if (_globalsmap[key]) {
-                _log.warn("[catjs Scrap] Override an existing global functionality: ", key);
-            }
-            _globalsmap[key] = new entity({printer: printer});
-            
-            return _globalsmap[key];
-        },
-        
-        getEntity: function(key) {
-            return _globalsmap[key];  
-        },
         
         /**
          * Add custom functionality to CAT's Scrap entity

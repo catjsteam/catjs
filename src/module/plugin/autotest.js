@@ -60,7 +60,7 @@ module.exports = _basePlugin.ext(function () {
                 if (scraps) {
 
                     scraps.forEach(function(scrap) {
-                        if (scrap && scrap.get("auto") && !scrap.get("$standalone")) {
+                        if (scrap && scrap.get("auto") && !scrap.get("$standalone")) {                            
                             args.push({"name":scrap.get("name")});
                         }
                     });
