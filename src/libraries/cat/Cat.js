@@ -671,15 +671,24 @@ _cat.core = function () {
                 pathname,
                 result;
 
-            regHtml = "([/]?.*[/]*[/])+(.*[\\.html]?)";
-            endInPage = new RegExp(regHtml + "$");
-            pathname = window.location.pathname;
-            result = endInPage.exec(pathname);
+            var script, source, head;
 
-            if (result !== null) {
-                pathname = (RegExp.$1);
-            }
-            return  ([window.location.origin, pathname, (url || "")].join("") || "/");
+            script = document.getElementById("catjsscript");
+            source = script.src;
+            head = (source.split("cat/lib/cat.js")[0] || "");
+
+//
+//
+//            regHtml = "([/]?.*[/]*[/])+(.*[\\.html]?)";
+//            endInPage = new RegExp(regHtml + "$");
+//            pathname = window.location.pathname;
+//            result = endInPage.exec(pathname);
+//
+//            if (result !== null) {
+//                pathname = (RegExp.$1);
+//            }
+//            return  ([window.location.origin, pathname, (url || "")].join("") || "/");
+            return  ([head, (url || "")].join("") || "/");
         }
 
     };
