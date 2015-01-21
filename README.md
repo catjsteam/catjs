@@ -1,4 +1,4 @@
-CatJS 0.4.51
+CatJS 0.4.55
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,24 +52,19 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
-* **Scrap Annotation Order** The annotations are being executed in the same order as they appear. Until this point the annotations were aggregated. 
-* **.npmignore fix** excluded core folders
-* **Command-Line fix** Failed to load one of catjs modules that lead to unwanted task runner behavior
-* **Note! Reports location moved to be aggregated below "reports" folder** 
-* **New Scrap Annotation - @@screenshot screenshot()**
-  Code example :
-  
-      <!--
-        @[scrap
-          @@name takeScreenshot
-          @@embed true
-          @@screenshot screenshot()
-        ]@
-      -->
-    
-  The screenshot will be saved in the reports folder<br />
-  Support in iOS and android
-
+* **third-party libraries** aggregation using the library name. catjs import should be modified using the new path cat/lib/cat/cat.js although the old path is supported  
+* **filters attribute** support for the scan extension, filtering unwanted folders/files to be processed
+        
+        "filters": [
+            {
+                "type": "folder",
+                "pattern": ["**/*.txt", "**/*.png"],
+                "exclude": true
+            }
+        ]
+ 
+* **cat-project folder location fix**  -  When created below the target application's folder a nasty endless folders creation occurred
+* **Jasmin support** WIP 
 
 ## Documentation
 
