@@ -187,8 +187,7 @@ _cat.core = function () {
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();
-
-            // 
+            
             _config = new _cat.core.Config({
                 hasPhantomjs: hasPhantomjs
             });
@@ -675,8 +674,14 @@ _cat.core = function () {
 
             script = document.getElementById("catjsscript");
             source = script.src;
-            head = (source.split("cat/lib/cat.js")[0] || "");
 
+            if (source.indexOf("cat/lib/cat.js") !== -1) {
+                head = (source.split("cat/lib/cat.js")[0] || "");                
+            } else {
+                head = (source.split("cat/lib/cat/cat.js")[0] || "");
+            }
+            
+            
 //
 //
 //            regHtml = "([/]?.*[/]*[/])+(.*[\\.html]?)";

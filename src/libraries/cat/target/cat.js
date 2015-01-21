@@ -187,8 +187,7 @@ _cat.core = function () {
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();
-
-            // 
+            
             _config = new _cat.core.Config({
                 hasPhantomjs: hasPhantomjs
             });
@@ -675,8 +674,14 @@ _cat.core = function () {
 
             script = document.getElementById("catjsscript");
             source = script.src;
-            head = (source.split("cat/lib/cat.js")[0] || "");
 
+            if (source.indexOf("cat/lib/cat.js") !== -1) {
+                head = (source.split("cat/lib/cat.js")[0] || "");                
+            } else {
+                head = (source.split("cat/lib/cat/cat.js")[0] || "");
+            }
+            
+            
 //
 //
 //            regHtml = "([/]?.*[/]*[/])+(.*[\\.html]?)";
@@ -763,6 +768,15 @@ _cat.core.Config = function(args) {
             }
         };
 
+        this.isTests = function() {
+            var tests = this.getTests();
+            if (tests && tests.length && tests.length > 0) {
+                return true;
+            }
+            
+            return false;
+        };
+        
         this.getTests = function () {
 
             function _GetTestsClass(config) {
@@ -1878,10 +1892,16 @@ _cat.core.TestManager = function() {
 
             // START test signal
             var config = _cat.core.getConfig();
+            
             // TODO we need to set test start signal via an API
             if (config.getTests()) {
                 _cat.core.ui.on();
                 _cat.core.TestManager.send({signal:"TESTSTART"});
+                
+                if (!config.isTests()) {
+                    _cat.core.TestManager.send({signal: 'NOTEST'});
+                    _cat.core.TestManager.send({signal: 'TESTEND'});
+                }
             }
         },
 

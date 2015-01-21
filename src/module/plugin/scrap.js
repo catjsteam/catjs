@@ -101,53 +101,47 @@ module.exports = _basePlugin.ext(function () {
                 return undefined;
             }
             if (file) {
-                from = _utils.getRelativePath(file, _basePath);
-                //_log.debug("[scrap Action] scan file: " + from);
+         
+                if (!_parsers["Comment"]) {
+                    _parsers["Comment"] = _parser.get("Comment");
+                }
+                _parsers["Comment"].parse({file: file, callback: function (comments) {
 
-                if (!_me.applyFileExtFilters(filters, file)) {
-                    if (!_parsers["Comment"]) {
-                        _parsers["Comment"] = _parser.get("Comment");
-                    }
-                    _parsers["Comment"].parse({file: file, callback: function (comments) {
+                    var scrapComment,
+                        scrap, scraps, scrapObjs=[],
+                        size = 0, idx = 0;
 
-                        var scrapComment,
-                            scrap, scraps, scrapObjs=[],
-                            size = 0, idx = 0;
+                    if (comments && _typedas.isArray(comments)) {
 
-                        if (comments && _typedas.isArray(comments)) {
+                        scraps = _extractValidScrapRoot(comments);
+                        if (scraps && _typedas.isArray(scraps) && scraps.length > 0) {
+                            size = scraps.length;
+                            for (idx = 0; idx < size; idx++) {
+                                scrapComment = scraps[idx];
+                                scrap = _Scrap.create({
+                                    file: file,
+                                    scrapComment: scrapComment
+                                });
 
-                            scraps = _extractValidScrapRoot(comments);
-                            if (scraps && _typedas.isArray(scraps) && scraps.length > 0) {
-                                size = scraps.length;
-                                for (idx = 0; idx < size; idx++) {
-                                    scrapComment = scraps[idx];
-                                    scrap = _Scrap.create({
-                                        file: file,
-                                        scrapComment: scrapComment
+                                if (scrap) {
+                                    scrapObjs.push(scrap);
+
+                                    _Scrap.apply({
+                                        basePath: _basePath,
+                                        scraps: [scrap],
+                                        apply: true
                                     });
-
-                                    if (scrap) {
-                                        scrapObjs.push(scrap);
-
-                                        _Scrap.apply({
-                                            basePath: _basePath,
-                                            scraps: [scrap],
-                                            apply: true
-                                        });
-                                    }
                                 }
-                                _Scrap.normalize(scrapObjs);
                             }
-
+                            _Scrap.normalize(scrapObjs);
                         }
 
-                        _emitter.emit("job.scrap.wait", {status: "wait"});
+                    }
 
-                    }});
-                } else {
-                    //_log.debug("[Copy Action] filter match, skipping file: " + from);
                     _emitter.emit("job.scrap.wait", {status: "wait"});
-                }
+
+                }});
+            
             }
         },
 

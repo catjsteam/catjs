@@ -208,8 +208,12 @@ module.exports = _basePlugin.ext(function () {
                                 jshint: jshint
                             });
                         }
+                    } else {
+                        _fs.writeFileSync(_path.join(path, name), "",  { mode: 0777 })
                     }
                 } else {
+                    
+                    
                     _log.error("[CAT clean plugin] 'src' property is required ");
                 }
 

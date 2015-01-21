@@ -1,5 +1,9 @@
 var _log = catrequire("cat.global").log(),
-    _props = catrequire("cat.props");
+    _props = catrequire("cat.props"),
+    _ = require("underscore"),
+    _path = require("path"),
+    _fs = require("fs"),
+    _minimatch = require("minimatch");
 
 /**
  * Abstract Base extension functionality
@@ -26,6 +30,7 @@ module.exports = function () {
             if (config.internalConfig) {
                 pluginHandle = config.internalConfig.pluginHandle;
                 this._data = (pluginHandle ? pluginHandle.data : undefined);
+                this._plugin = (pluginHandle ? pluginHandle : undefined);
             }
         };
 
@@ -75,6 +80,82 @@ module.exports = function () {
 
         proto.getMode = function() {
             return this._mode;
+        };
+
+        /**
+         * Filters for excluding/include file extensions
+         *
+         *  "filters": [{ 
+         *     "type": "*",
+         *     "pattern": ["/cat-project"],
+         *     "exclude": true
+         *  }]
+         *          
+         * @param filters
+         * @param file The reference object of type file|folder
+         * @isdirectory {String} [optional] * || file || folder 
+         * 
+         * @returns {boolean} true filter match or else false
+         */
+        proto.applyFilters = function (filters, file, isdirectory) {
+
+            var exitCondition = 0;
+
+            function patternMatch() {
+                
+                if (!this.pattern) {
+                    return false;
+                }
+                var size = this.pattern.length, idx = 0, 
+                    item
+
+                for (; idx < size; idx++) {
+                    
+                    item = this.pattern[idx];
+                    if (_minimatch(file, item, { matchBase: true })) {
+                        return true;
+                    }
+                    
+                }
+                return false;
+            }
+            
+
+            if (file && filters && _.isArray(filters)) {
+
+                filters.forEach(function (filter) {
+                    if (filter) {
+                        filter.apply(function () {
+                            
+                            var isPattern;
+                            
+                            if (this.type === isdirectory || this.type === "*") {
+                                
+                                // take the parent into the condition
+                                if (this.pattern) {
+                                    isPattern = patternMatch.call(this);
+                                    if (!isPattern) {
+                                        return undefined;
+                                    }
+                                }
+
+                                if (!this.exclude) {
+                                    exitCondition = 0;
+                                } else {
+                                    exitCondition = 1;
+                                }
+                            }
+                        });
+                    }
+                });
+
+                if (exitCondition > 0) {
+                    return true;
+                }
+
+            }
+
+            return false;
         };
 
     };

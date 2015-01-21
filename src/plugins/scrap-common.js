@@ -690,11 +690,14 @@ module.exports = function () {
                             if (basedirsplit[basedirsplit.length - 1] === "cat") {
                                 basedirsplit.pop();
                                 basedir = basedirsplit.join("/");
-                            } else {
-                                value = basedir + "cat/cat.js"
                             }
 
+                            // set the base directory according to the cat.js path
                             basedir += "/";
+
+                            // override the cat.js file path
+                            value = basedir + "cat/cat.js"
+
 
                             libs.forEach(function (lib) {
                                 if (lib.path.indexOf("cat.src") === -1) {

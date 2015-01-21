@@ -63,6 +63,15 @@ _cat.core.Config = function(args) {
             }
         };
 
+        this.isTests = function() {
+            var tests = this.getTests();
+            if (tests && tests.length && tests.length > 0) {
+                return true;
+            }
+            
+            return false;
+        };
+        
         this.getTests = function () {
 
             function _GetTestsClass(config) {

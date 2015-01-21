@@ -37,12 +37,6 @@
             "src": ["target", "_cat_md.json", "lib"]
         },
         {
-            "name": "p@project.wipe",
-            "type": "clean",
-            "dependency": "manager",
-            "src": ["src", "lib", "logs/*.log", "cache", "*.log", "*.xml", "phantom/app-view.png"]
-        },
-        {
             "name": "p@mobile.start",
             "type": "mobile",
             "device": "android",
