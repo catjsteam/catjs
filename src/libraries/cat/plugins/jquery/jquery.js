@@ -46,22 +46,55 @@ _cat.plugins.jquery = function () {
                  * @private
                  */
                 trigger: function () {
-                    var e, idx = 0, size,
+                    var e, newEvent, newEventOpt, idx = 0, size,
                         args = arguments,
                         elt = (args ? _cat.plugins.jquery.utils.getElt(args[0]) : undefined),
                         eventType = (args ? args[1] : undefined),
-                        typeOfEventArgument = _cat.utils.Utils.getType(eventType);
+                        typeOfEventArgument = _cat.utils.Utils.getType(eventType),
+                        typeOfEventArrayItem;
 
+                    function getOpt(opt) {
+                        var key, newOpt = {};
+                        if (opt) {
+                            for (key in opt) {
+                                if (opt.hasOwnProperty(key)) {
+                                    newOpt[key] = opt[key];
+                                }
+                            }
+                            if ("keyCode" in newOpt) {
+                               newOpt.which = newOpt.keyCode;
+                                
+                            } else if ("which" in newOpt) {
+                                newOpt.keyCode = newOpt.which;
+                            }                             
+                        }
+                        
+                        return newOpt;
+                    }
+                    
                     if (elt && eventType) {
                         if (typeOfEventArgument === "string") {
                             elt.trigger(eventType);
+
+                        } else if (typeOfEventArgument === "object") {
+                            newEventOpt = getOpt(eventType.opt);
+                            newEvent = $.Event(eventType.type, newEventOpt);
+                            elt.trigger(newEvent);
 
                         } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
                             size = typeOfEventArgument.length;
                             for (idx = 0; idx < size; idx++) {
                                 e = eventType[idx];
                                 if (e) {
-                                    elt.trigger(e);
+                                    typeOfEventArrayItem = _cat.utils.Utils.getType(eventType);
+                                    if (typeOfEventArrayItem === "string") {
+                                     elt.trigger(e);
+                                    } else {
+                                        newEventOpt = getOpt(eventType.opt);
+                                        newEvent = $.Event(eventType.type, newEventOpt);
+                                        elt.trigger(newEvent);
+                                    }
+                                    
                                 }
                             }
                         }
@@ -183,7 +216,13 @@ _cat.plugins.jquery = function () {
                     _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
                 });
             },
-
+            
+            getValue: function(idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+                    elt.val();
+                });                
+            },
 
             checkRadio: function (className, idName) {
                 $(document).ready(function () {

@@ -120,8 +120,7 @@ module.exports = function () {
                                         apiname: "collapsible",
                                         exp: jquery
                                     });
-                                }
-
+                                }                               
 
                                 if (match) {
 
