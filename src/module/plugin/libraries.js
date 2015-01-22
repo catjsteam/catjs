@@ -483,7 +483,7 @@ module.exports = _basePlugin.ext(function () {
                                 // set the static name if found or else generate the name according to the project env
                                 filename = (staticname ? staticname : [concatItem.key].join(""));
 
-                                if (concatItem.key === "cat/cat.json") {
+                                if (concatItem.key === _path.normalize("cat/cat.json")) {
                                     // parse content..
                                     if (parse) {
                                         contentValue = _jsutils.Template.template({
@@ -495,15 +495,15 @@ module.exports = _basePlugin.ext(function () {
                                     }
                                 }
                                 // specific condition for cat.json TODO put a generic property
-                                if ( concatItem.key !== "cat/cat.json" ) {
-                                    targetfilename = _path.join(catProjectLibTarget, filename);
+                                if ( concatItem.key !== _path.normalize("cat/cat.json") ) {
+                                    targetfilename = _path.normalize(_path.join(catProjectLibTarget, filename));
                                     targetfolder = _path.dirname(targetfilename);
                                     _utils.mkdirSync(targetfolder);
                                     _fs.writeFileSync(targetfilename, contentValue);
 
                                 } else {                                    
-                                    if (concatItem.key === "cat/cat.json") {
-                                        catjsonpath = _path.join(catProjectSrc, "/config/cat.json");
+                                    if (concatItem.key === _path.normalize("cat/cat.json")) {
+                                        catjsonpath = _path.normalize(_path.join(catProjectSrc, "/config/cat.json"));
                                         if (!_fs.existsSync(catjsonpath)) {
                                             _fs.writeFileSync(catjsonpath, contentValue);
                                         }                                        
