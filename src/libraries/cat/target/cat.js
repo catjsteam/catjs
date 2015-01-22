@@ -2113,10 +2113,12 @@ _cat.core.ui = function () {
     function _create() {
 
         if (typeof document !== "undefined") {
+            var isIframe = _cat.utils.iframe.isIframe() ? "catuiiframe" : "";
+
             __catElement = document.createElement("DIV");
 
             __catElement.id = "__catelement";
-            __catElement.className = "cat-status-container";
+            __catElement.className = "cat-status-container " + isIframe;
             __catElement.style.width = "200px";
             __catElement.style.height = "200px";
             __catElement.style.position = "fixed";
@@ -2485,6 +2487,20 @@ _cat.core.ui = function () {
                 } else {
                     __cache.push(config);
                 }
+
+                this.iframeBrodcast(config);
+            },
+
+            iframeBrodcast : function(config) {
+                var isIframe = _cat.utils.iframe.isIframe(),
+                    catParent;
+
+                if (isIframe && (config.header || config.desc)) {
+                    catParent = window.parent._cat;
+                    catParent.core.ui.setContent(config);
+
+                }
+
             }
 
         };
@@ -2576,6 +2592,17 @@ _cat.utils.AJAX = function () {
 
     };
 
+}();
+_cat.utils.iframe = function() {
+    return {
+        isIframe : function() {
+            try {
+                return window.self !== window.top;
+            } catch (e) {
+                return true;
+            }
+        }
+    };
 }();
 _cat.utils.Loader = function () {
 
