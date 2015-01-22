@@ -183,7 +183,21 @@ _cat.core = function () {
         },
 
         init: function () {
-                      
+
+            // plugin initialization
+            (function() {
+                var key;
+                if (typeof _cat.plugins.jquery !== "undefined") {
+                    for (key in _cat.plugins.jquery.actions) {
+                        if (_cat.plugins.jquery.actions.hasOwnProperty(key)) {
+                            _cat.plugins.jqm.actions[key] = _cat.plugins.jquery.actions[key];
+                        }
+                    }
+                }
+            })();
+
+
+
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();

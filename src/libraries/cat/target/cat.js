@@ -183,7 +183,21 @@ _cat.core = function () {
         },
 
         init: function () {
-                      
+
+            // plugin initialization
+            (function() {
+                var key;
+                if (typeof _cat.plugins.jquery !== "undefined") {
+                    for (key in _cat.plugins.jquery.actions) {
+                        if (_cat.plugins.jquery.actions.hasOwnProperty(key)) {
+                            _cat.plugins.jqm.actions[key] = _cat.plugins.jquery.actions[key];
+                        }
+                    }
+                }
+            })();
+
+
+
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();
@@ -1543,13 +1557,14 @@ _cat.core.clientmanager = function () {
             args = config.args,
             testsize = tests.length,
             currentStateIdx = currentState.index,
-            exists = checkIfExists(scrap.name[0], tests),
+            scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name),
+            exists = checkIfExists(scrapName, tests),
             preScrapConfig;
 
         if ((exists && (!testQueue[currentStateIdx - 1]) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
             preScrapConfig = {scrapInfo: scrap, args: args};
             _preScrapProcess(preScrapConfig, args);
-            commitScrap({$standalone: scrap.$standalone, name: scrap.name[0]}, args);
+            commitScrap({$standalone: scrap.$standalone, name: scrapName}, args);
 
         } else if (exists && (currentStateIdx < testsize)) {
             return true;
@@ -1565,15 +1580,18 @@ _cat.core.clientmanager = function () {
 
         signScrap: function (scrap, catConfig, args, _tests) {
             var urlAddress,
-                config;
+                config,
+                scrapName;
+            
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
+            scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name);
 
             startInterval(catConfig, scrap);
 
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
 
-                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrap.name[0] + "&" + "testId=" + _cat.core.guid();
+                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid();
 
                 config = {
                     url: urlAddress,
@@ -3041,7 +3059,7 @@ if (typeof(_cat) !== "undefined") {
 
     _cat.utils.Utils = function () {
 
-        return {
+        var _module = {
 
             querystring: function(name, query){
                 var re, r=[], m;
@@ -3113,6 +3131,24 @@ if (typeof(_cat) !== "undefined") {
                 return false;
             }
         };
+
+        (function(){
+            var types = ['Array','Function','Object','String','Number'],
+                typesLength = types.length;
+
+            function _getType(type){
+                return function(o) {
+                    return !!o && ( Object.prototype.toString.call(o) === '[object ' + type + ']' );
+                };
+            }
+            
+            while (typesLength--) {
+                                
+                _module['is' + types[typesLength]] = _getType(types[typesLength]);
+            }
+        })();
+        
+        return _module;
 
     }();
 
@@ -3352,147 +3388,23 @@ var animation = false;
 
 _cat.plugins.jqm = function () {
 
-    var oldElement = "";
-    var setBoarder = function(element) {
-        if (oldElement) {
-
-            oldElement.classList.remove("markedElement");
-        }
-
-        if (element) {
-            element.className = element.className + " markedElement";
-        }
-        oldElement = element;
-        
-    };
-
-    function _getElt(val) {
-        var sign;
-        if (_cat.utils.Utils.getType(val) === "string") {
-            val = val.trim();
-            sign = val.charAt(0);
-
-            return ($ ? $(val) : undefined);
-
-        } else if (_cat.utils.Utils.getType(val) === "object") {
-            return val;
-        }
-    }
-
-    /**
-     * Trigger an event with a given object
-     *
-     * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
-     * @param eventType {String} The event type name
-     *
-     * @private
-     */
-    function _trigger() {
-        var e, idx= 0, size,
-            args = arguments,
-            elt = (args ? _getElt(args[0]) : undefined),
-            eventType = (args ? args[1] : undefined),
-            typeOfEventArgument = _cat.utils.Utils.getType(eventType);
-
-        if (elt && eventType) {
-            if (typeOfEventArgument === "string") {
-                elt.trigger(eventType);
-
-            } else  if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
-                size = typeOfEventArgument.length;
-                for (idx=0; idx<size; idx++) {
-                    e = eventType[idx];
-                    if (e) {
-                        elt.trigger(e);
-                    }
-                }
-            }
-        }
-    }
-
-    return {
+    var _module = {
 
         actions: {
 
-
-            scrollTo: function (idName) {
-
-                $(document).ready(function(){
-                    var elt = _getElt(idName),
-                        stop = elt.offset().top,
-                        delay = 1000;
-
-                    $('body,html').animate({scrollTop: stop}, delay);
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-
-            },
-
-
-
-            scrollTop: function () {
-
-                $(document).ready(function(){
-                    $('html, body').animate({scrollTop : 0},1000);
-                });
-
-            },
-
-            scrollToWithRapper : function (idName, rapperId) {
-
-                $(document).ready(function(){
-                    var elt = _getElt(idName),
-                        stop = elt.offset().top,
-                        delay = 1000;
-
-                    _getElt(rapperId).animate({scrollTop: stop}, delay);
-                    setBoarder( _getElt(idName).eq(0)[0]);
-                });
-
-            },
-
-            clickRef: function (idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    elt.trigger('click');
-                    window.location = elt.attr('href');
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-
-            },
-
-
-            clickButton: function (idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    $('.ui-btn').removeClass('ui-focus');
-                    elt.trigger('click');
-                    elt.closest('.ui-btn').addClass('ui-focus');
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-
-            },
-
             selectTab: function (idName) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('click');
 
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
 
             },
-
-
 
             selectMenu : function (selectId, value) {
                 $(document).ready(function(){
-                    var elt = _getElt(selectId);
+                    var elt =  _cat.plugins.jquery.utils.getElt(selectId);
                     if (typeof value === 'number') {
                         elt.find(" option[value=" + value + "]").attr('selected','selected');
                     } else if (typeof value === 'string') {
@@ -3500,41 +3412,34 @@ _cat.plugins.jqm = function () {
                     }
                     elt.selectmenu("refresh", true);
 
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
-
             },
-
 
             swipeItemLeft : function(idName) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.swipeleft();
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
             },
-
 
             swipeItemRight : function(idName) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.swiperight();
 
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
             },
-
 
             swipePageLeft : function() {
                 $(document).ready(function(){
                     $( ".ui-page-active" ).swipeleft();
 
                 });
-
-
             },
-
 
             swipePageRight : function() {
                 $(document).ready(function(){
@@ -3544,103 +3449,27 @@ _cat.plugins.jqm = function () {
                 });
             },
 
-
-            click: function (idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-                    elt.trigger('click');
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-            },
-
             tap: function (idName) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('tap');
 
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
-            },
-
-            setCheck: function (idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    elt.prop("checked",true).checkboxradio("refresh");
-                    setBoarder( elt.eq(0)[0]);
-                });
-
             },
 
             slide : function (idName, value) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.val(value).slider("refresh");
-                    setBoarder( elt.eq(0)[0]);
-                });
-            },
-
-            setText : function (idName, value) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    _trigger(elt, "mouseenter");
-                    _trigger(elt, "mouseover");
-                    _trigger(elt, "mousemove");
-                    _trigger(elt, "focus");
-                    _trigger(elt, "mousedown");
-                    _trigger(elt, "mouseup");
-                    _trigger(elt, "click");
-                    elt.val(value);
-                    _trigger(elt, "keydown");
-                    _trigger(elt, "keypress");
-                    _trigger(elt, "input");
-                    _trigger(elt, "keyup");
-                    _trigger(elt, "mousemove");
-                    _trigger(elt, "mouseleave");
-                    _trigger(elt, "mouseout");
-                    _trigger(elt, "blur");
-
-
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-            },
-
-
-            checkRadio: function (className, idName) {
-                $(document).ready(function(){
-                    $( "." + className ).prop( "checked", false ).checkboxradio( "refresh" );
-                    $( "#" + idName ).prop( "checked", true ).checkboxradio( "refresh" );
-
-
-                    setBoarder($("label[for='" + idName + "']").eq(0)[0]);
-
-                });
-
-            },
-
-            collapsible : function(idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    elt.children( ".ui-collapsible-heading" ).children(".ui-collapsible-heading-toggle").click();
-                    setBoarder( elt.eq(0)[0]);
-                });
-
-            },
-
-            backClick : function () {
-                $(document).ready(function(){
-                    $('[data-rel="back"]')[0].click();
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
             },
 
             searchInListView : function (listViewId, newValue) {
                 $(document).ready(function(){
-                    var elt = _getElt(listViewId),
+                    var elt =  _cat.plugins.jquery.utils.getElt(listViewId),
                         listView = elt[0],
                         parentElements = listView.parentElement.children,
                         form = parentElements[$.inArray( listView, parentElements ) - 1];
@@ -3650,12 +3479,231 @@ _cat.plugins.jqm = function () {
                     $( form ).find( "input" ).trigger( 'change' );
                 });
             }
-
-
         }
-
-
     };
+    
+    return _module;
+
+}();
+
+var animation = false;
+
+
+_cat.plugins.jquery = function () {
+
+    var _module = {
+
+        utils: function () {
+
+            var oldElement = "";
+
+            return {
+                
+                setBoarder: function (element) {
+                    if (oldElement) {
+
+                        oldElement.classList.remove("markedElement");
+                    }
+
+                    if (element) {
+                        element.className = element.className + " markedElement";
+                    }
+                    oldElement = element;
+
+                },
+
+                getElt: function (val) {
+                    var sign;
+                    if (_cat.utils.Utils.getType(val) === "string") {
+                        val = val.trim();
+                        sign = val.charAt(0);
+
+                        return ($ ? $(val) : undefined);
+
+                    } else if (_cat.utils.Utils.getType(val) === "object") {
+                        return val;
+                    }
+                },
+
+                /**
+                 * Trigger an event with a given object
+                 *
+                 * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
+                 * @param eventType {String} The event type name
+                 *
+                 * @private
+                 */
+                trigger: function () {
+                    var e, idx = 0, size,
+                        args = arguments,
+                        elt = (args ? _cat.plugins.jquery.utils.getElt(args[0]) : undefined),
+                        eventType = (args ? args[1] : undefined),
+                        typeOfEventArgument = _cat.utils.Utils.getType(eventType);
+
+                    if (elt && eventType) {
+                        if (typeOfEventArgument === "string") {
+                            elt.trigger(eventType);
+
+                        } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
+                            size = typeOfEventArgument.length;
+                            for (idx = 0; idx < size; idx++) {
+                                e = eventType[idx];
+                                if (e) {
+                                    elt.trigger(e);
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+        }(),
+
+        actions: {
+
+
+            scrollTo: function (idName) {
+
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName),
+                        stop = elt.offset().top,
+                        delay = 1000;
+
+                    $('body,html').animate({scrollTop: stop}, delay);
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+
+            scrollTop: function () {
+
+                $(document).ready(function () {
+                    $('html, body').animate({scrollTop: 0}, 1000);
+                });
+
+            },
+
+            scrollToWithRapper: function (idName, rapperId) {
+
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName),
+                        stop = elt.offset().top,
+                        delay = 1000;
+
+                    _cat.plugins.jquery.utils.getElt(rapperId).animate({scrollTop: stop}, delay);
+                    _cat.plugins.jquery.utils.setBoarder(_cat.plugins.jquery.utils.getElt(idName).eq(0)[0]);
+                });
+
+            },
+
+            clickRef: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    elt.trigger('click');
+                    window.location = elt.attr('href');
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+
+            clickButton: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    $('.ui-btn').removeClass('ui-focus');
+                    elt.trigger('click');
+                    elt.closest('.ui-btn').addClass('ui-focus');
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+
+            click: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+                    elt.trigger('click');
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+            },
+
+
+            setCheck: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    elt.prop("checked", true).checkboxradio("refresh");
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+
+            setText: function (idName, value) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseenter");
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseover");
+                    _cat.plugins.jquery.utils.trigger(elt, "mousemove");
+                    _cat.plugins.jquery.utils.trigger(elt, "focus");
+                    _cat.plugins.jquery.utils.trigger(elt, "mousedown");
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseup");
+                    _cat.plugins.jquery.utils.trigger(elt, "click");
+                    elt.val(value);
+                    _cat.plugins.jquery.utils.trigger(elt, "keydown");
+                    _cat.plugins.jquery.utils.trigger(elt, "keypress");
+                    _cat.plugins.jquery.utils.trigger(elt, "input");
+                    _cat.plugins.jquery.utils.trigger(elt, "keyup");
+                    _cat.plugins.jquery.utils.trigger(elt, "mousemove");
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseleave");
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseout");
+                    _cat.plugins.jquery.utils.trigger(elt, "blur");
+
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+            },
+
+
+            checkRadio: function (className, idName) {
+                $(document).ready(function () {
+                    $("." + className).prop("checked", false).checkboxradio("refresh");
+                    $("#" + idName).prop("checked", true).checkboxradio("refresh");
+
+
+                    _cat.plugins.jquery.utils.setBoarder($("label[for='" + idName + "']").eq(0)[0]);
+
+                });
+
+            },
+
+            collapsible: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    elt.children(".ui-collapsible-heading").children(".ui-collapsible-heading-toggle").click();
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+            backClick: function () {
+                $(document).ready(function () {
+                    $('[data-rel="back"]')[0].click();
+                });
+            }
+        }
+    };
+
+    return _module;
 
 }();
 
