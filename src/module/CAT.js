@@ -375,7 +375,8 @@ var CAT = function () {
                                 schema.properties.appath = new Schema({
                                     type: "string",
                                     required: true,
-                                    description: "Enter your project's (application) path"
+                                    default: "./..",
+                                    description: "Enter application's directory [./..] "
                                 });
                             }
                         }

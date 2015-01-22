@@ -46,11 +46,11 @@ module.exports = function () {
              _Library.prototype.getFileNames = function() {
                  var result;
                  
-                 function _getNames(entity) {
+                 function _getNames(entity, files) {
                      var names = [];
                      
-                     if (entity) {
-                         entity.forEach(function(item) {
+                     if (files) {
+                         files.forEach(function(item) {
                              var startpos;
                              if (item && _.isString(item)) {
 
@@ -59,7 +59,7 @@ module.exports = function () {
                                  item = item.substring(startpos, item.length);
                                  
                                  if (item) {
-                                     names.push(item);
+                                     names.push(_npmpath.join(entity.name, item));
                                  }
                              }
                          });
@@ -70,9 +70,9 @@ module.exports = function () {
                  
                  if (this.isStatic) {
                      if (me.getMode() === "dev") {
-                         result = _getNames(this.dev);
+                         result = _getNames(this, this.dev);
                      } else {
-                         result = _getNames(this.prod);
+                         result = _getNames(this, this.prod);
                      }
                  }
                  

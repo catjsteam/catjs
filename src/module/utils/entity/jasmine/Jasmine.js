@@ -148,6 +148,7 @@ Jasmine.prototype.flush = function () {
 
     if (tmroot) {
 
+        console.log("[catjs] Jasmine Model Validation: ");
         valid = _tmr.validate(tmroot);
         if (valid) {
             out = tmroot.compile();

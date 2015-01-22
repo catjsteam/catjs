@@ -28,7 +28,7 @@ var _global = catrequire("cat.global"),
             idx = 0, size, project, pluginsPath = [],
             dependencies = [],
             librariesConfig = [],
-            librariesDefault = ["underscore", "js.utils", "tmr", "jspath", "chai",  "cat"],
+            librariesDefault = ["underscore", "js.utils", "jspath", "chai",  "cat"],
             libraryBuildConfig, dependenciesInfo,
             appTargetPath, appPath, jshint, minifyplugin,
             scrapfilter, projectcopy,
@@ -104,8 +104,9 @@ var _global = catrequire("cat.global"),
 
                     appTargetPath = _path.join("./", _path.relative(_path.resolve("."), targetfolder), project.name);
                     appPath = project.getInfo("apppath");
-
+                    
                     if (appPath) {
+                        appPath = _path.resolve(appPath); 
                         projectcopy= {
                             "name": "p@project.copy",
                             "type": "copy",
@@ -116,7 +117,15 @@ var _global = catrequire("cat.global"),
                             },
                             "to": {
                                 "path": appTargetPath
-                            }
+                            },
+                            "filters": [
+                                {
+                                    "type": "folder",
+                                    "pattern": ["**/cat-project**", "**/cat-project/**"],
+                                    "exclude": true
+                                }
+                            ]
+
                         };
                         customPlugins.push(projectcopy);
 
@@ -140,7 +149,7 @@ var _global = catrequire("cat.global"),
                     minifyplugin = {
                         "name": "p@project.minify",
                         "type": "minify",
-                        "path": _path.join(appTargetPath, cattarget, "/cat/lib"),
+                        "path": _path.join(appTargetPath, cattarget, "/cat/lib/cat"),
                         "filename": "cat.src.js",
                         "src":[["./cache/",  project.name, "/**/*.js"].join(""),["./src/",  project.name, "/**/*.js"].join(""), "./src/common/**/*.js"]
                     };
@@ -149,6 +158,12 @@ var _global = catrequire("cat.global"),
                     }
                     
                     customPlugins = customPlugins.concat([
+                        {
+                            "name": "p@project.wipe",
+                            "type": "clean",
+                            "dependency": "manager",
+                            "src": ["src/" + project.name, "lib", "logs/*.log", "cache", "*.log", "*.xml", "phantom/app-view.png"]
+                        },
                         {
                             "name": "p@lib.copy",
                             "type": "copy",
@@ -163,7 +178,7 @@ var _global = catrequire("cat.global"),
                             "name": "p@lib.parse",
                             "type": "fileparse",
                             "dependency": "manager",
-                            "files": [_path.join(appTargetPath, cattarget, "/cat/lib/cat.js")],
+                            "files": [_path.join(appTargetPath, cattarget, "/cat/lib/cat/cat.js")],
                             "pattern": "_getBase=\"(.*)\";",
                             "replace": "_getBase=\"" + cattarget + "\";",
                             "applyto":["content"],
@@ -211,8 +226,8 @@ var _global = catrequire("cat.global"),
                         }
                     }
 
-                    librariesConfig.unshift("cat.css");
-                    librariesConfig.push("cat.src.js");
+                    //librariesConfig.unshift("cat.css");
+                    //librariesConfig.push("cat.src.js");
 
                     project.setInfo("dependencies", librariesConfig);                                                  
                     

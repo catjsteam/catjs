@@ -100,8 +100,8 @@
         },
         {
             "name": "jasmine",
-            "prod" :["lib/jasmine.js", "lib/jasmine-tap-reporter.js", "lib/catjs-jasmine-boot.js"],
-            "dev" :["lib/jasmine.js", "lib/jasmine-tap-reporter.js", "lib/catjs-jasmine-boot.js"],
+            "prod" :["lib/jasmine.js", "lib/jasmine-tap-reporter.js", "lib/catjs-jasmine-boot.js", "lib/jasmine-console.js", "lib/jasmine-boot.js", "lib/jasmine-html.js", "lib/jasmine.css", "lib/jasmine_favicon.png", "lib/jasmine-spec-runner.html"],
+            "dev" :["lib/jasmine.js", "lib/jasmine-tap-reporter.js", "lib/catjs-jasmine-boot.js", "lib/jasmine-console.js", "lib/jasmine-boot.js", "lib/jasmine-html.js", "lib/jasmine.css", "lib/jasmine_favicon.png", "lib/jasmine-spec-runner.html"],            
             "exports": "jasmine",
             "globals": true,
             "install": "static"

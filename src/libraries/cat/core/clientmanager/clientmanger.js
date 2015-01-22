@@ -16,7 +16,7 @@ _cat.core.clientmanager = function () {
         endTest,
         testQueue = {},
         testQueueLast,
-        initCurrentState = false,3
+        initCurrentState = false,
         currentState = { index: 0 };
 
     endTest = function (opt, interval) {

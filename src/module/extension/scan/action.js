@@ -43,23 +43,42 @@ module.exports = _basePlugin.ext(function () {
 
                         file = dir + '/' + file;
                         file = file.split("//").join("/");
+                        
                         _fs.stat(file, function (err, stat) {
+                            
+                            var validfilter;
+                            
+                            if (err) {
+                                _utils.error("[scan extension] Error occur while scanning the file system, error", err);
+                            }
+                                                        
                             if (stat && stat.isDirectory()) {
-                                // On Directory
-                                _emitter.emit("scan.folder", file);
-                                //_log.debug("[SCAN] folder: " + file);
-                                walk(file, function (err, res) {
-                                    //results = results.concat(res);
-                                    //copyAction.folder(res);
+                                
+                                validfilter = _me.applyFilters(_me._plugin.filters, file, "folder");
+                                if (validfilter) {
                                     next();
-                                });
+                                    
+                                } else {
+                                
+                                    // On Directory
+                                    _emitter.emit("scan.folder", file);
+                                    walk(file, function (err, res) {
+                                        next();
+                                    });
+                                }
+                                
                             } else {
-                                // On File
-                                //copyAction.file(file);
-                                _emitter.emit("scan.file", file);
-                                //_log.debug("[SCAN] file: " + file + "; ext: " + _path.extname(file));
-                                results.push(file);
-                                next();
+                                
+                                validfilter = _me.applyFilters(_me._plugin.filters, file, "file");
+                                if (validfilter) {
+                                    next();
+                                    
+                                } else {
+                                    // On File
+                                    _emitter.emit("scan.file", file);
+                                    results.push(file);
+                                    next();
+                                }                                
                             }
                         });
                     })();
@@ -123,16 +142,15 @@ module.exports = _basePlugin.ext(function () {
                 _me.apply(config);
                 data = _me._data;
 
-                if (data.path) {
+                if (data && data.path) {
                     dir = data.path;
 
                 } else {
                     dir = config.path;
                 }
 
-
                 if (!dir) {
-                    _utils.error(_props.get("cat.error.config").format("[scan ext]"));
+                    _utils.error(_props.get("cat.error.config").format("[scan extension]"));
                 }
                 _walk(dir);
             },

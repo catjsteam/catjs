@@ -110,18 +110,15 @@ module.exports = _basePlugin.ext(function () {
             }
             if (file) {
                 from = _getRelativeFile(file);
-
-                if (!_me.applyFileExtFilters(filters, file)) {
-
-                    _utils.copySync(file, _path.normalize(_to + "/" + from), function (err) {
-                        if (err) {
-                            _log.error("[copy action] failed to copy file: " + file + "err: " + err);
-                            throw err;
-                        }
-                    });
-
-
-                }
+                
+                _utils.copySync(file, _path.normalize(_to + "/" + from), function (err) {
+                    if (err) {
+                        _log.error("[copy action] failed to copy file: " + file + "err: " + err);
+                        throw err;
+                    }
+                });
+    
+    
             }
 
             _emitter.emit("job.copy.wait", {status: "wait"});
