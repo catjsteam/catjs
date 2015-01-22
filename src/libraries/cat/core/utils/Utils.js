@@ -2,7 +2,7 @@ if (typeof(_cat) !== "undefined") {
 
     _cat.utils.Utils = function () {
 
-        return {
+        var _module = {
 
             querystring: function(name, query){
                 var re, r=[], m;
@@ -74,6 +74,24 @@ if (typeof(_cat) !== "undefined") {
                 return false;
             }
         };
+
+        (function(){
+            var types = ['Array','Function','Object','String','Number'],
+                typesLength = types.length;
+
+            function _getType(type){
+                return function(o) {
+                    return !!o && ( Object.prototype.toString.call(o) === '[object ' + type + ']' );
+                };
+            }
+            
+            while (typesLength--) {
+                                
+                _module['is' + types[typesLength]] = _getType(types[typesLength]);
+            }
+        })();
+        
+        return _module;
 
     }();
 
