@@ -57,7 +57,7 @@ _cat.utils.chai = function () {
                 fail,
                 failure,
                 scrap = config.scrap,
-                scrapName = (scrap.name ? scrap.name[0] : undefined),
+                scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name),
                 scrapDescription = (scrap.description ? scrap.description[0] : undefined),
                 testName = (scrapName || "NA"),
                 key, items=[], args=[],
