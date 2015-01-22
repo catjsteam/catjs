@@ -1543,13 +1543,14 @@ _cat.core.clientmanager = function () {
             args = config.args,
             testsize = tests.length,
             currentStateIdx = currentState.index,
-            exists = checkIfExists(scrap.name[0], tests),
+            scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name),
+            exists = checkIfExists(scrapName, tests),
             preScrapConfig;
 
         if ((exists && (!testQueue[currentStateIdx - 1]) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
             preScrapConfig = {scrapInfo: scrap, args: args};
             _preScrapProcess(preScrapConfig, args);
-            commitScrap({$standalone: scrap.$standalone, name: scrap.name[0]}, args);
+            commitScrap({$standalone: scrap.$standalone, name: scrapName}, args);
 
         } else if (exists && (currentStateIdx < testsize)) {
             return true;
@@ -1565,15 +1566,18 @@ _cat.core.clientmanager = function () {
 
         signScrap: function (scrap, catConfig, args, _tests) {
             var urlAddress,
-                config;
+                config,
+                scrapName;
+            
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
+            scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name);
 
             startInterval(catConfig, scrap);
 
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
 
-                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrap.name[0] + "&" + "testId=" + _cat.core.guid();
+                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid();
 
                 config = {
                     url: urlAddress,
@@ -3014,7 +3018,7 @@ if (typeof(_cat) !== "undefined") {
 
     _cat.utils.Utils = function () {
 
-        return {
+        var _module = {
 
             querystring: function(name, query){
                 var re, r=[], m;
@@ -3086,6 +3090,24 @@ if (typeof(_cat) !== "undefined") {
                 return false;
             }
         };
+
+        (function(){
+            var types = ['Array','Function','Object','String','Number'],
+                typesLength = types.length;
+
+            function _getType(type){
+                return function(o) {
+                    return !!o && ( Object.prototype.toString.call(o) === '[object ' + type + ']' );
+                };
+            }
+            
+            while (typesLength--) {
+                                
+                _module['is' + types[typesLength]] = _getType(types[typesLength]);
+            }
+        })();
+        
+        return _module;
 
     }();
 
