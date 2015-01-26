@@ -1,4 +1,4 @@
-var _fs = require('fs'),
+var _fs = require('fs.extra'),
     _path = require('path'),
     _lineReader = require('line-reader'),
     _global = catrequire("cat.global"),
@@ -94,15 +94,17 @@ module.exports = _basePlugin.ext(function () {
             if (targetfolder) {
                 if (!_fs.existsSync(targetfolder)) {
                     folderCounter = _sysutils.getFoldersCount(filepath);
-                    _fs.mkdirSync(targetfolder, {mode: 0777});
+                    console.log(targetfolder);
+                    _fs.mkdirpSync(targetfolder, {mode: 0777});
                     _sysutils.chmodSyncOffset(targetfolder, 0777, folderCounter);
                 }
             }
+            
             targetInternalFolder = _path.dirname(internalTargetfile);
             if (targetInternalFolder) {
                 if (!_fs.existsSync(targetInternalFolder)) {
                     folderCounter = _sysutils.getFoldersCount(filepath);
-                    _fs.mkdirSync(targetInternalFolder, {mode: 0777});
+                    _fs.mkdirpSync(targetInternalFolder, {mode: 0777});
                     _sysutils.chmodSyncOffset(targetInternalFolder, 0777, folderCounter);
                 }
             }
@@ -229,7 +231,9 @@ module.exports = _basePlugin.ext(function () {
 
             if (file) {
                 if (_fs.existsSync(file)) {
-                    _generateSourceProject(scraps, file);
+                    
+                    // @Obsoloete
+                    //_generateSourceProject(scraps, file);
 
                     _injectScrapCall(scraps, file, function () {
                         callback.call(this);
