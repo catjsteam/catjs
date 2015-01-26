@@ -20,6 +20,7 @@ module.exports = function () {
         requireJSTpl = _tplutils.readTemplateFile("scrap/_require_js"),
         requireGlobalsJSTpl = _tplutils.readTemplateFile("scrap/_require_globals_snippet"),
         importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css"),
+        assertTpl = _tplutils.readTemplateFile("scrap/_assert_call"),
         project = catrequire("cat.cli").getProject();
 
 
@@ -451,45 +452,42 @@ module.exports = function () {
 
                     var codeRows,
                         me = this,
-                        codeSnippet,
-                        codeSnippetObject,
-                        dm;
+                        dm, codeRow, size,
+                        scrap = me.config;
 
                     codeRows = this.get("assert");
 
                     if (codeRows) {
                         codeRows = _codeutils.prepareCode(codeRows);
-                        codeSnippet = codeRows[0];
-
-                        if (codeSnippet) {
-                            try {
-
-                                // try to understand the code
-                                codeSnippetObject = _uglifyutils.getCodeSnippet({code: codeSnippet});
-
-
-                            } catch (e) {
-                                // TODO use uglifyjs to see if there was any error in the code.
-                                // TODO throw a proper error
-                                console.log(e);
+                        
+                        size = codeRows.length;
+                        for (var idx=0; idx<size; idx++) {
+                            codeRow = codeRows[idx];
+                            if (codeRow) {
+                                if (codeRow.trim().indexOf("_cat.utils.chai.assert") === -1) {
+                                    
+                                    codeRows[idx] = _tplutils.template({
+                                        content: assertTpl,
+                                        data: {
+                                            code: ("function() { return chai.assert." + codeRow + "}")
+                                        }
+                                    });
+                                }
                             }
-                        }
+                        }                                               
 
                         dm = new _delayManagerUtils({
                             scrap: me
                         });
-
-
+                        
                         dm.add({
-                            rows: [_elutils.assert()],
-                            args: [
-                                "'code': [\"assert\", " + JSON.stringify(codeSnippetObject) + "].join(\".\")",
-                                "'fail': true",
+                            rows: codeRows,
+                            args: [                                
                                 "scrapName: 'assert'"
 
                             ], type: "assert"
                         });
-
+                                               
                         dm.dispose();
                     }
                 }

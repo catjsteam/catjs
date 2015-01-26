@@ -46,6 +46,34 @@ _cat.utils.chai = function () {
 
     return {
 
+        /**
+         * This is an assert
+         * In case of compile (nodejs) use assert_call.tpl 
+         * 
+         * Examples:
+         *   
+         *   // Code String case: 
+         *   _cat.core.clientmanager.delayManager({
+         *       commands: [
+         *           function(context, thi$, testButton) {
+         *               _cat.utils.chai.assert(context);
+         *           }
+         *       ],
+         *       context: {
+         *           'code': ["assert", "ok(testButton[0],\"No valid test element button\")\n"].join("."),
+         *           'fail': true,
+         *           scrapName: 'assert',
+         *           scrap: _ipkg.scrap,
+         *           args: _args,
+         *           scrapRowIdx: 0
+         *       }
+         *   });
+         *   
+         *   // Code function case:
+         *   
+         * @param config
+         * @constructor
+         */
         assert: function (config) {
 
             if (!_state) {
@@ -70,27 +98,33 @@ _cat.utils.chai = function () {
                     fail = config.fail;
                 }
                 if (assert) {
-                    // TODO well, I have to code the parsing section (uglifyjs) for getting a better impl in here (loosing the eval shit)
-                    // TODO js execusion will be replacing this code later on...
                     var success = true;
                     var output;
                     if (code) {
                         try {
-                            args.push("assert");
-                            items.push(assert);
-                            for (key in config.args) {
-                                if (config.args.hasOwnProperty(key)) {
-                                    args.push(key);
-                                    items.push(config.args[key]);
+                            
+                            if (_cat.utils.Utils.isFunction(code)) {
+                                
+                                result = code.apply(this, arguments);
+                                
+                            } else if (_cat.utils.Utils.isString(code)) { 
+                                
+                                items.push(assert);
+                                    args.push("assert");
+                                    for (key in config.args) {
+                                    if (config.args.hasOwnProperty(key)) {
+                                        args.push(key);
+                                        items.push(config.args[key]);
+                                    }
                                 }
-                            }
-
-                            if (code.indexOf("JSPath.") !== -1) {
-                                items.push((typeof JSPath !== "undefined" ? JSPath : undefined));
-                                args.push("JSPath");
-                                result =  new Function(args, "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, items);
-                            } else {
-                                result =  new Function(args, "return " + code).apply(this, items);
+    
+                                if (code.indexOf("JSPath.") !== -1) {
+                                    items.push((typeof JSPath !== "undefined" ? JSPath : undefined));
+                                    args.push("JSPath");
+                                    result =  new Function(args, "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, items);
+                                } else {
+                                    result =  new Function(args, "return " + code).apply(this, items);
+                                }
                             }
 
                         } catch (e) {
@@ -123,8 +157,7 @@ _cat.utils.chai = function () {
                     }
                 }
             }
-        },
-
+        },      
 
         /**
          * For the testing environment, set chai handle
