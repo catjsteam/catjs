@@ -389,103 +389,118 @@ if (typeof exports !== 'undefined') {
 }
 
 ;
-
-
 var _jsutilsUnderscore ,
     _jsutilsModuleTemplate = function () {
 
-    var _cache = {},
-        _vars = {};
+        var _cache = {},
+            _vars = {},
+            _defaultUnderscoreSettings,
+            _isMustache = false;
 
-    return {
 
-        internal: function(refs) {
-            _vars = refs;
-        },
+        return {
 
-        underscore: _vars._,
+            setMustache: function (bool) {
+                _isMustache = bool;
 
-        /**
-         * Load template file content of tpl type
-         * Note: No need for the extension on the file name
-         *
-         * @param name The name of the template e.g. /scraps/test
-         * @param path The full path where the templates exists (optional) e.g. /home/../test
-         * @returns {*}
-         */
-        readTemplateFile: function (name, path) {
-            if (!path) {
-                _vars.log.error("[js.utils Template.readTemplateFile] 'path' argument is no valid ");
-            }
+                if (_isMustache) {
+                    // underscore settings for like mustache parametrization style {{foo}}
+                    _vars._.templateSettings = {
+                        interpolate: /\{\{(.+?)\}\}/g
+                    };
 
-            var content,
-                file = [path, name].join("/");
+                } else {
+                    _vars._.templateSettings = _defaultUnderscoreSettings;
+                }
+            },
 
-            file = _vars.path.normalize(file);
+            isMustache: function () {
+                return _isMustache;
+            },
 
-            try {
-                file = [file, "tpl"].join(".");
-                content = _cache[file];
-                if (!content) {
-                    content = _vars.fs.readFileSync(file, "utf8");
+            internal: function (refs) {
+                _vars = refs;
+                _defaultUnderscoreSettings = _vars._.templateSettings;
+            },
+
+            underscore: _vars._,
+
+            /**
+             * Load template file content of tpl type
+             * Note: No need for the extension on the file name
+             *
+             * @param name The name of the template e.g. /scraps/test
+             * @param path The full path where the templates exists (optional) e.g. /home/../test
+             * @returns {*}
+             */
+            readTemplateFile: function (name, path) {
+                if (!path) {
+                    _vars.log.error("[js.utils Template.readTemplateFile] 'path' argument is no valid ");
                 }
 
-                // cache the file content
-                _cache[file] = content;
+                var content,
+                    file = [path, name].join("/");
 
-            } catch (e) {
-                _vars.log.warn("[js.utils Template.readTemplateFile] File failed to load ", file, e);
-            }
+                file = _vars.path.normalize(file);
 
-            return content;
-        },
+                try {
+                    file = [file, "tpl"].join(".");
+                    content = _cache[file];
+                    if (!content) {
+                        content = _vars.fs.readFileSync(file, "utf8");
+                    }
 
-        /**
-         * Load and compile template with underscore
-         *
-         * @param config The params:
-         *      name The name of the template e.g. /scraps/test (optional in case content exists)
-         *      path The full path where the templates exists (optional) e.g. /home/../test.tpl
-         *      content The string content instead of the file content (optional in case name exists & overrides the file content)
-         *      data The data object properties (see underscore template)
-         */
-        template: function (config) {
-            if (!config) {
-                return undefined;
-            }
-            var name = config.name,
-                path = config.path,
-                data = config.data,
-                content = config.content,
-                funcTpl = (content || this.readTemplateFile(name, path)),
-                template;
+                    // cache the file content
+                    _cache[file] = content;
 
-            if (funcTpl) {
-                template = _vars._.template(funcTpl);
+                } catch (e) {
+                    _vars.log.warn("[js.utils Template.readTemplateFile] File failed to load ", file, e);
+                }
 
-            } else {
-                _vars.log.warn("[js.utils Template.template] Failed to process template ");
-                return undefined;
-            }
+                return content;
+            },
 
-            if (template) {
-                return template(data);
+            /**
+             * Load and compile template with underscore
+             *
+             * @param config The params:
+             *      name The name of the template e.g. /scraps/test (optional in case content exists)
+             *      path The full path where the templates exists (optional) e.g. /home/../test.tpl
+             *      content The string content instead of the file content (optional in case name exists & overrides the file content)
+             *      data The data object properties (see underscore template)
+             */
+            template: function (config) {
+                if (!config) {
+                    return undefined;
+                }
+                var name = config.name,
+                    path = config.path,
+                    data = config.data,
+                    content = config.content,
+                    funcTpl = (content || this.readTemplateFile(name, path)),
+                    template;
+
+                if (funcTpl) {
+                    template = _vars._.template(funcTpl);
+
+                } else {
+                    _vars.log.warn("[js.utils Template.template] Failed to process template ");
+                    return undefined;
+                }
+
+                if (template) {
+                    return template(data);
+                }
             }
         }
-    }
 
-}();
+    }();
 
 if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
         // nodejs support
 
         _jsutilsUnderscore = require("underscore");
-
-        // underscore settings for like mustache parametrization style {{foo}}
-        _jsutilsUnderscore.templateSettings = {
-            interpolate: /\{\{(.+?)\}\}/g
-        };
 
         _jsutilsModuleTemplate.internal({
             fs: require("fs"),
@@ -499,14 +514,31 @@ if (typeof exports !== 'undefined') {
 } else {
     define('jsutilsTemplateModule',["underscore"], function (underscore) {
         // browser support
-        _jsutilsModuleTemplate = function() {
+        _jsutilsModuleTemplate = function () {
 
-            // underscore settings for like mustache parametrization style {{foo}}
-            _.templateSettings = {
-                interpolate: /\{\{(.+?)\}\}/g
-            };
+            var _defaultUnderscoreSettings = _.templateSettings,
+                _isMustache = false;
+
 
             return {
+
+                setMustache: function (bool) {
+                    _isMustache = bool;
+
+                    if (_isMustache) {
+                        // underscore settings for like mustache parametrization style {{foo}}
+                        _.templateSettings = {
+                            interpolate: /\{\{(.+?)\}\}/g
+                        };
+
+                    } else {
+                        _.templateSettings = _defaultUnderscoreSettings;
+                    }
+                },
+
+                isMustache: function () {
+                    return _isMustache;
+                },
 
                 /**
                  * Load and compile template with underscore

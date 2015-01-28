@@ -1,7 +1,7 @@
 {
   "name": "catjs",
   "description": "(Mobile) Web Automation Framework",
-  "version": "0.4.56",
+  "version": "0.4.57",
   "homepage": "http://catjsteam.github.io",
   "author": {
     "name": "arik",
@@ -58,8 +58,8 @@
     "uglify-js": "~2.4.0",
     "jshint": "~2.1.10",
     "express": "~3.4.4",
-    "test-model-reporter": "~0.1.5",
-    "js.utils": "~0.2.0",
+    "test-model-reporter": "~0.1.83",
+    "js.utils": "~0.2.01",
     "require-mapper": "~0.0.3",
     "glob": "~3.2.7",
     "my-ip": "~1.1.0",
