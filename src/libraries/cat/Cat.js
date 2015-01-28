@@ -17,7 +17,8 @@ _cat.core = function () {
         _config, _log,
         _guid,
         _enum,
-        _runModeValidation;
+        _runModeValidation,
+        _catjspath;
 
     addScrapToManager = function (testsInfo, scrap) {
 
@@ -79,7 +80,7 @@ _cat.core = function () {
         }
 
         if (!validate) {
-            _log.log("[CAT Info] skipping scrap: '" + scrapName + ";  Not included in the test project: [ " + (tests && testsNames ? testsNames.join(", ") : "" ) + "]");
+            _log.log("[catjs Info] skipping scrap: '" + scrapName + ";  Not included in the test project: [ " + (tests && testsNames ? testsNames.join(", ") : "" ) + "]");
         }
         return scrapTests;
     };
@@ -182,9 +183,18 @@ _cat.core = function () {
 
         },
 
-        init: function () {
+        init: function (config) {
 
-            // plugin initialization
+            // set catjs path
+            if (config) {
+                if ("catjspath" in config) {
+                    _catjspath = config.catjspath;
+                }
+            }
+
+            _cat.utils.TestsDB.init();
+
+                // plugin initialization
             (function() {
                 var key;
                 if (typeof _cat.plugins.jquery !== "undefined") {
@@ -194,9 +204,7 @@ _cat.core = function () {
                         }
                     }
                 }
-            })();
-
-
+            })();            
 
             _enum = _cat.core.TestManager.enum;
             
@@ -557,7 +565,7 @@ _cat.core = function () {
 
                             pkgname = managerScrap.scrap.pkgName;
                             if (!pkgname) {
-                                _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
+                                _cat.core.log.error("[catjs action] Scrap's Package name is not valid");
                             } else {
 
 
@@ -595,7 +603,7 @@ _cat.core = function () {
                             if (manager) {
                                 pkgname = scrap.pkgName;
                                 if (!pkgname) {
-                                    _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
+                                    _cat.core.log.error("[catjs action] Scrap's Package name is not valid");
                                 } else {
                                     _cat.core.defineImpl(pkgname, function () {
                                         _cat.core.actionimpl.apply(this, args);
@@ -607,7 +615,7 @@ _cat.core = function () {
                             _cat.core.actionimpl.apply(this, arguments);
                         }
                     } else {
-                        _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
+                        _cat.core.log.info("[catjs action] " + scrap.name[0] + " was not run as it does not appears in testManager");
                     }
                 }
 
@@ -669,7 +677,7 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                _log.log("[CAT] Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
+                _log.log("[catjs] Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
         },
@@ -687,14 +695,22 @@ _cat.core = function () {
             var script, source, head;
 
             script = document.getElementById("catjsscript");
-            source = script.src;
-
-            if (source.indexOf("cat/lib/cat.js") !== -1) {
-                head = (source.split("cat/lib/cat.js")[0] || "");                
+            if (script) {
+                source = script.src;
+                
             } else {
-                head = (source.split("cat/lib/cat/cat.js")[0] || "");
+                source = _catjspath;
             }
-            
+
+            if (source) {
+                if (source.indexOf("cat/lib/cat.js") !== -1) {
+                    head = (source.split("cat/lib/cat.js")[0] || "");                
+                } else {
+                    head = (source.split("cat/lib/cat/cat.js")[0] || "");
+                }
+            } else {
+                _log.warn("[catjs getBaseUrl] No valid base url was found ");
+            }            
             
 //
 //

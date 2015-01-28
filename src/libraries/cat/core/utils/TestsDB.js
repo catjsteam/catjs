@@ -4,17 +4,6 @@ _cat.utils.TestsDB = function() {
     var _data,
         _testnextcache = {};
 
-    (function() {
-        _cat.utils.AJAX.sendRequestAsync({
-            url :  _cat.core.getBaseUrl("cat/config/testdata.json"),
-            callback : {
-                call : function(check) {
-                    _data = JSON.parse(check.response);
-                }
-            }
-        });
-    })();
-
     function _TestsDB() {
 
         this._DB = undefined;
@@ -68,11 +57,14 @@ _cat.utils.TestsDB = function() {
         },
 
         init : function() {
-            /*
-                 @deprecated
-                 TestDB = new _TestsDB();
-                 return TestDB;
-             */
+            _cat.utils.AJAX.sendRequestAsync({
+                url :  _cat.core.getBaseUrl("cat/config/testdata.json"),
+                callback : {
+                    call : function(check) {
+                        _data = JSON.parse(check.response);
+                    }
+                }
+            });
         },
 
         getDB : function() {

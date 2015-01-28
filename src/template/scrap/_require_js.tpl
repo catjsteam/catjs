@@ -9,7 +9,7 @@ require({{require}}, function({{requirerefs}}) {
     _cat.utils.Loader.requires({{cssfiles}});
     
     if (_cat) {
-        _cat.core.init();     
+        _cat.core.init({ "catjspath": "{{catjspath}}" });     
     }
 
 });

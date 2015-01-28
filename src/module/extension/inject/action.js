@@ -232,8 +232,7 @@ module.exports = _basePlugin.ext(function () {
             if (file) {
                 if (_fs.existsSync(file)) {
                     
-                    // @Obsoloete
-                    //_generateSourceProject(scraps, file);
+                    _generateSourceProject(scraps, file);
 
                     _injectScrapCall(scraps, file, function () {
                         callback.call(this);
