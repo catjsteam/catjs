@@ -433,7 +433,41 @@ _cat.core = function () {
             
             return arr;  
         },
-        
+
+        getScrapByName : function(searchName) {
+            var scraps = this.getScraps(),
+                scrap,
+                scrapName,
+                i;
+
+            for (i = 0; i < scraps.length; i++) {
+                scrap = scraps[i];
+                scrapName = scrap.name;
+                if (Array.isArray(scrapName) && scrapName.length > 0 && scrapName[0] === searchName) {
+                    return scrap;
+                }
+            }
+
+        },
+
+
+        getScrapById : function(searchId) {
+            var scraps = this.getScraps(),
+                scrap,
+                scrapId,
+                i;
+
+            for (i = 0; i < scraps.length; i++) {
+                scrap = scraps[i];
+                scrapId = scrap.id;
+                if (scrapId && scrapId === searchId) {
+                    return scrap;
+                }
+            }
+
+        },
+
+
         getSummaryInfo: function() {
           
             var scraps = _cat.core.getScraps(),
@@ -1236,7 +1270,9 @@ _cat.core.clientmanager = function () {
         testQueue = {},
         testQueueLast,
         initCurrentState = false,
-        currentState = { index: 0 };
+        currentState = { index: 0 },
+        clientmanagerId;
+
 
     endTest = function (opt, interval) {
 
@@ -1404,6 +1440,7 @@ _cat.core.clientmanager = function () {
 
     updateTimeouts = function (scrap) {
         var scrapId = scrap.id;
+
         if (runStatus.intervalObj && (scrapId !== runStatus.intervalObj.signScrapId)) {
             runStatus.intervalObj.signScrapId = scrapId;
             runStatus.intervalObj.counter = 0;
@@ -1523,12 +1560,20 @@ _cat.core.clientmanager = function () {
 
     function _process(config) {
         var scrap = config.scrapInfo,
-            args = config.args;
+            args = config.args,
+            catParent,
+            fullScrap;
 
         if (scrap) {
             runStatus.scrapReady = parseInt(scrap ? scrap.index : 0) + 1;
             commitScrap(scrap, args);
         }
+
+        fullScrap = _cat.core.getScrapByName(scrap.name);
+        if (fullScrap) {
+            broadcastAfterProcess(fullScrap);
+        }
+
     }
 
     function _isStandalone(scrap) {
@@ -1543,13 +1588,14 @@ _cat.core.clientmanager = function () {
             args = config.args,
             testsize = tests.length,
             currentStateIdx = currentState.index,
-            exists = checkIfExists(scrap.name[0], tests),
+            scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name),
+            exists = checkIfExists(scrapName, tests),
             preScrapConfig;
 
         if ((exists && (!testQueue[currentStateIdx - 1]) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
             preScrapConfig = {scrapInfo: scrap, args: args};
             _preScrapProcess(preScrapConfig, args);
-            commitScrap({$standalone: scrap.$standalone, name: scrap.name[0]}, args);
+            commitScrap({$standalone: scrap.$standalone, name: scrapName}, args);
 
         } else if (exists && (currentStateIdx < testsize)) {
             return true;
@@ -1559,21 +1605,119 @@ _cat.core.clientmanager = function () {
         return false;
     }
 
+    function broadcastProcess() {
+
+        var topic = "process." + _cat.core.clientmanager.getClientmanagerId();
+
+        flyer.broadcast({
+            channel: "default",
+            topic: topic,
+            data: currentState
+        });
+    }
+
+
+    function _subscribeProcess() {
+        flyer.subscribe({
+            channel: "default",
+            topic: "process.*",
+            callback: function(data, topic, channel) {
+                var clientTopic = "process." + _cat.core.clientmanager.getClientmanagerId();
+                // check if it's the same frame
+                if (topic !== clientTopic) {
+                    currentState = data;
+
+                    _processReadyScraps(true);
+
+                }
+            }
+        });
+    }
+
+    _subscribeProcess();
+
+
+    function broadcastAfterProcess(fullScrap) {
+        var topic = "afterprocess." + _cat.core.clientmanager.getClientmanagerId();
+
+        flyer.broadcast({
+            channel: "default",
+            topic: topic,
+            data: fullScrap
+        });
+
+    }
+
+
+
+    function _subscribeAfterProcess() {
+        flyer.subscribe({
+            channel: "default",
+            topic: "afterprocess.*",
+            callback: function(data, topic, channel) {
+                var clientTopic = "afterprocess." + _cat.core.clientmanager.getClientmanagerId();
+                // check if it's the same frame
+                if (topic !== clientTopic) {
+                    _cat.core.clientmanager.removeIntervalFromBrodcast(data);
+                }
+
+            }
+        });
+    }
+
+    _subscribeAfterProcess();
+
+
+
+
+    function _processReadyScraps(cameFromBroadcast) {
+        var idx = currentState.index;
+
+        if (testQueue[idx]) {
+            var config = testQueue[idx];
+            if (config) {
+                console.log(config.scrapInfo.name);
+                _process(config);
+                delete testQueue[idx];
+
+                currentState.index++;
+                _processReadyScraps(false);
+            }
+        } else {
+            if (!cameFromBroadcast) {
+                broadcastProcess();
+            }
+        }
+    }
+
+    function scrapTestIndex(scrap) {
+        var index;
+        for (index = 0; index < tests.length; index++) {
+            if (scrap.name[0] === tests[index].name) {
+                return index;
+            }
+        }
+    }
+
+
+
+
     return {
 
 
 
         signScrap: function (scrap, catConfig, args, _tests) {
             var urlAddress,
-                config;
+                config,
+                scrapName;
+            
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
-
-            startInterval(catConfig, scrap);
+            scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name);
 
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
-
-                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrap.name[0] + "&" + "testId=" + _cat.core.guid();
+                startInterval(catConfig, scrap);
+                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid();
 
                 config = {
                     url: urlAddress,
@@ -1585,22 +1729,6 @@ _cat.core.clientmanager = function () {
                         function _add2Queue(config) {
                             _preScrapProcess(config, args);
                             testQueue[config.scrapInfo.index] = config;
-                        }
-
-                        function _processReadyScraps() {
-
-                            var idx = currentState.index;
-                            if (testQueue[idx]) {
-                                var config = testQueue[idx];
-                                if (config) {
-                                    _process(config);
-                                    delete testQueue[idx];
-                                    currentState.index++;
-                                    _processReadyScraps();
-                                }
-
-                            }
-
                         }
 
                         if (response.ready) {
@@ -1619,7 +1747,11 @@ _cat.core.clientmanager = function () {
                                         // already in queue;
 
                                     } else {
-                                        _add2Queue({scrapInfo: scrap, args: args});
+                                        var realScrap = _cat.core.getScrapByName(scrap.name);
+
+                                        if (args[1].pkgName === realScrap.pkgName) {
+                                            _add2Queue({scrapInfo: scrap, args: args});
+                                        }
                                     }
 
                                 });
@@ -1629,7 +1761,7 @@ _cat.core.clientmanager = function () {
                             _add2Queue({scrapInfo: response.scrapInfo, args: args});
                         }
 
-                        _processReadyScraps();
+                        _processReadyScraps(false);
                     }
                 };
 
@@ -1664,7 +1796,37 @@ _cat.core.clientmanager = function () {
             commands = commands.concat((methods || []));
 
             delayManagerCommands(commands, context);
+        },
+
+        removeIntervalFromBrodcast : function(scrap) {
+            var scrapRunId,
+                intervalScrap,
+                runIndex,
+                intervalIndex;
+
+            scrapRunId = scrap.id;
+            if (intervalObj) {
+                intervalScrap = _cat.core.getScrapById(intervalObj.signScrapId);
+
+                runIndex = scrapTestIndex(scrap);
+                intervalIndex = scrapTestIndex(intervalScrap);
+
+                // TODO: && scrap && (intervalObj.signScrapId === scrap.id)) {
+                if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
+
+                    clearInterval(intervalObj.interval);
+                }
+            }
+        },
+
+        getClientmanagerId : function() {
+
+            if (!clientmanagerId) {
+                clientmanagerId = _cat.utils.Utils.generateGUID();
+            }
+            return clientmanagerId;
         }
+
     };
 }();
 _cat.core.TestAction = function () {
@@ -2202,6 +2364,24 @@ _cat.core.ui = function () {
         });
     }
 
+
+    function _subscribeUI() {
+        flyer.subscribe({
+            channel: "default",
+            topic: "setContent.*",
+            callback: function(data, topic, channel) {
+                var clientTopic = "setContent." + _cat.core.clientmanager.getClientmanagerId();
+                // check if it's the same frame
+                if (topic !== clientTopic && !_cat.utils.iframe.isIframe()) {
+                    _cat.core.ui.setContent(data);
+                }
+
+            }
+        });
+    }
+
+    _subscribeUI();
+
     var __cache = [],
         __catElement,
         _disabled = false,
@@ -2493,11 +2673,17 @@ _cat.core.ui = function () {
 
             iframeBrodcast : function(config) {
                 var isIframe = _cat.utils.iframe.isIframe(),
-                    catParent;
+                    topic;
 
-                if (isIframe && (config.header || config.desc)) {
-                    catParent = window.parent._cat;
-                    catParent.core.ui.setContent(config);
+                if (isIframe) { // && (config.header || config.desc)) {
+//                    catParent = window.parent._cat;
+//                    catParent.core.ui.setContent(config);
+                    topic = "setContent." + _cat.core.clientmanager.getClientmanagerId();
+                    flyer.broadcast({
+                        channel: "default",
+                        topic: topic,
+                        data: config
+                    });
 
                 }
 
@@ -3041,7 +3227,7 @@ if (typeof(_cat) !== "undefined") {
 
     _cat.utils.Utils = function () {
 
-        return {
+        var _module = {
 
             querystring: function(name, query){
                 var re, r=[], m;
@@ -3113,6 +3299,24 @@ if (typeof(_cat) !== "undefined") {
                 return false;
             }
         };
+
+        (function(){
+            var types = ['Array','Function','Object','String','Number'],
+                typesLength = types.length;
+
+            function _getType(type){
+                return function(o) {
+                    return !!o && ( Object.prototype.toString.call(o) === '[object ' + type + ']' );
+                };
+            }
+            
+            while (typesLength--) {
+                                
+                _module['is' + types[typesLength]] = _getType(types[typesLength]);
+            }
+        })();
+        
+        return _module;
 
     }();
 
