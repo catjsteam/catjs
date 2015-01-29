@@ -91,6 +91,14 @@
             "install": "static"
         },
         {
+            "name": "flyer",
+            "prod" :["flyer.min.js"],
+            "dev" :["flyer.min.js"],
+            "exports": "flyer",
+            "globals": true,
+            "install": "static"
+        },
+        {
             "name": "jspath",
             "prod" :["lib/jspath.js"],
             "dev" :["lib/jspath.js"],

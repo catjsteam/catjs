@@ -332,7 +332,8 @@ module.exports = _basePlugin.ext(function () {
                                                     window : true,
                                                     chai: true,
                                                     phantom: true,
-                                                    JSPath: true
+                                                    JSPath: true,
+                                                    flyer : true
                                                 }
                                             }
                                         });
