@@ -1,4 +1,4 @@
-CatJS 0.4.55
+CatJS 0.4.57
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,6 +52,8 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **external example** We have created another project for testing catjs core and put the best practices in the same place. The application that we are using is the TodoMVC implementations, currently we have started with [JQuery](https://github.com/catjsteam/catjstests/tree/master/app/todomvc/jquery) 
+* **jquery plugin added** docs will be added in the next releases
 * **third-party libraries** aggregation using the library name. catjs import should be modified using the new path cat/lib/cat/cat.js although the old path is supported  
 * **filters attribute** support for the scan extension, filtering unwanted folders/files to be processed
         

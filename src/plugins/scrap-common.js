@@ -20,6 +20,7 @@ module.exports = function () {
         requireJSTpl = _tplutils.readTemplateFile("scrap/_require_js"),
         requireGlobalsJSTpl = _tplutils.readTemplateFile("scrap/_require_globals_snippet"),
         importCSSTpl = _tplutils.readTemplateFile("scrap/_import_css"),
+        assertTpl = _tplutils.readTemplateFile("scrap/_assert_call"),
         project = catrequire("cat.cli").getProject();
 
 
@@ -451,45 +452,42 @@ module.exports = function () {
 
                     var codeRows,
                         me = this,
-                        codeSnippet,
-                        codeSnippetObject,
-                        dm;
+                        dm, codeRow, size,
+                        scrap = me.config;
 
                     codeRows = this.get("assert");
 
                     if (codeRows) {
                         codeRows = _codeutils.prepareCode(codeRows);
-                        codeSnippet = codeRows[0];
-
-                        if (codeSnippet) {
-                            try {
-
-                                // try to understand the code
-                                codeSnippetObject = _uglifyutils.getCodeSnippet({code: codeSnippet});
-
-
-                            } catch (e) {
-                                // TODO use uglifyjs to see if there was any error in the code.
-                                // TODO throw a proper error
-                                console.log(e);
+                        
+                        size = codeRows.length;
+                        for (var idx=0; idx<size; idx++) {
+                            codeRow = codeRows[idx];
+                            if (codeRow) {
+                                if (codeRow.trim().indexOf("_cat.utils.chai.assert") === -1) {
+                                    
+                                    codeRows[idx] = _tplutils.template({
+                                        content: assertTpl,
+                                        data: {
+                                            code: ("function() { return chai.assert." + codeRow + "}")
+                                        }
+                                    });
+                                }
                             }
-                        }
+                        }                                               
 
                         dm = new _delayManagerUtils({
                             scrap: me
                         });
-
-
+                        
                         dm.add({
-                            rows: [_elutils.assert()],
-                            args: [
-                                "'code': [\"assert\", " + JSON.stringify(codeSnippetObject) + "].join(\".\")",
-                                "'fail': true",
+                            rows: codeRows,
+                            args: [                                
                                 "scrapName: 'assert'"
 
                             ], type: "assert"
                         });
-
+                                               
                         dm.dispose();
                     }
                 }
@@ -524,7 +522,7 @@ module.exports = function () {
                                 },
                                 "catsrcjs": {
                                     deps: [
-                                        "cat"
+                                        "catjs"
                                     ]
                                 }
                             },
@@ -556,12 +554,15 @@ module.exports = function () {
                             requirerows = [requirerows];
                         }
                         requirerows.forEach(function (lib) {
-
+                            
+                            var basedirsplit, catpath;
+                            
                             if (lib && _isCatjs(lib)) {
 
                                 libs = project.getInfo("dependencies");
-                                basedir = _path.dirname(lib) + "/";
 
+                                basedir = _path.dirname(lib) + "/";
+                                                        
                                 if (requirerows) {
                                     requirerows = _codeutils.prepareCode(requirerows);
                                     code = requirerows.join("\n");
@@ -579,20 +580,40 @@ module.exports = function () {
                                                 if (libpath.lastIndexOf(".map") !== -1) {
                                                     return undefined;
                                                 }
-
+                                               
                                                 libpath = libpath.split(".js").join("");
 
+                                                basedirsplit = basedir.split("/");
+                                                basedirsplit = basedirsplit.filter(function(n){ return (n !== undefined && n !== ""); });
+
+                                                if (basedirsplit[basedirsplit.length - 1] === "cat") {
+                                                    basedirsplit.pop();
+                                                    basedir = basedirsplit.join("/");
+                                                }
+
+                                                key = lib.name.split(".").join("");
+                                                if (key === "cat") {
+                                                    basedir = _path.join(basedir, "cat") + "/";
+                                                }
+                                                
                                                 fullpathlib = basedir + libpath;
 
+                                                if (key === "cat") {
+                                                    catpath = fullpathlib;
+                                                    
+                                                    config.paths["catsrcjs"] = fullpathlib + ".src";
+                                                    key = "catjs";
+                                                    
+                                                    requirecsslist.push([basedir, "cat.css"].join(""));                                                    
+                                                }
+                                                
                                                 if (_catlibtils.extExists(libpath)) {
                                                     if (libpath.lastIndexOf(".css") !== -1) {
                                                         requirecsslist.push(basedir + libpath);
                                                         return undefined;
-
                                                     }
-                                                }
-
-                                                key = lib.name.split(".").join("");
+                                                }                                               
+                                                
                                                 config.paths[key] = fullpathlib;
                                                 if (lib.deps || lib.exports) {
                                                     if (!config.shim[key]) {
@@ -607,6 +628,9 @@ module.exports = function () {
                                                     _addGlobals(lib);
                                                 }
                                                 requirelist.push(key);
+                                                if (key === "catjs") {
+                                                    requirelist.push("catsrcjs");
+                                                }
                                             }
                                         });
 
@@ -624,7 +648,8 @@ module.exports = function () {
                                                 require: JSON.stringify(requirelist),
                                                 requirerefs: requirelist.join(",").split('"').join(""),
                                                 cssfiles: JSON.stringify(requirecsslist),
-                                                globals: (globals.length > 0 ? globals.join(" ") : "")
+                                                globals: (globals.length > 0 ? globals.join(" ") : ""),
+                                                catjspath: (catpath + ".js")
                                             }
                                         }));
 

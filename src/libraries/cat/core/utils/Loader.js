@@ -64,6 +64,11 @@ _cat.utils.Loader = function () {
 
             return function (files, callback) {
                 _libslength = files.length;
+                
+                if (!_libslength) {
+                    return undefined;
+                }
+                
                 index += 1;
                 _module.require(files[index - 1], ((index === files.length) ? callback : undefined));
 
