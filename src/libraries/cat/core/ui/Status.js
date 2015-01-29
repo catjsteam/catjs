@@ -150,6 +150,24 @@ _cat.core.ui = function () {
         });
     }
 
+
+    function _subscribeUI() {
+        flyer.subscribe({
+            channel: "default",
+            topic: "setContent.*",
+            callback: function(data, topic, channel) {
+                var clientTopic = "setContent." + _cat.core.clientmanager.getClientmanagerId();
+                // check if it's the same frame
+                if (topic !== clientTopic && !_cat.utils.iframe.isIframe()) {
+                    _cat.core.ui.setContent(data);
+                }
+
+            }
+        });
+    }
+
+    _subscribeUI();
+
     var __cache = [],
         __catElement,
         _disabled = false,
@@ -441,11 +459,17 @@ _cat.core.ui = function () {
 
             iframeBrodcast : function(config) {
                 var isIframe = _cat.utils.iframe.isIframe(),
-                    catParent;
+                    topic;
 
-                if (isIframe && (config.header || config.desc)) {
-                    catParent = window.parent._cat;
-                    catParent.core.ui.setContent(config);
+                if (isIframe) { // && (config.header || config.desc)) {
+//                    catParent = window.parent._cat;
+//                    catParent.core.ui.setContent(config);
+                    topic = "setContent." + _cat.core.clientmanager.getClientmanagerId();
+                    flyer.broadcast({
+                        channel: "default",
+                        topic: topic,
+                        data: config
+                    });
 
                 }
 
