@@ -8,7 +8,8 @@ var _catglobal = catrequire("cat.global"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
     _jsutils = require("js.utils"),
-    _bower;
+    _bower,
+    _catlibrary = catrequire("cat.common.library");
 
 module.exports = _basePlugin.ext(function () {
 
@@ -207,7 +208,7 @@ module.exports = _basePlugin.ext(function () {
 
                 if (imports && library){
                     if (_typedas.isArray(imports)) {
-                        doImport = _utils.contains(imports, library.name);
+                        doImport = _catlibrary.exists(imports, library.name);
                     } else {
                         // we are installing all libraries ignore the import stuff
                         doImport = true;
@@ -544,10 +545,15 @@ module.exports = _basePlugin.ext(function () {
             _me.dataInit(_data);
             extensionParams = _data.data;
 
-            imports = (extensionParams.imports || "*");
+            imports = extensionParams.imports;
             action = extensionParams.action;
             wipe = ((extensionParams.wipe === "true") ? true : false);
 
+            if (imports) {
+                imports = _catlibrary.all(imports) ;
+                
+            }
+            
             if (config && extensionParams) {
 
                 // prepare libraries

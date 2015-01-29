@@ -51,6 +51,7 @@ module.exports = function () {
 
                 me.name = config.name;
                 me.path = config.path;
+                me.exclude = config.exclude;
 
                 props.forEach(function (item) {
                     if (item in lib) {
@@ -59,14 +60,16 @@ module.exports = function () {
                 });
             }
 
-            _init(config, ["exports", "deps", "globals"]);
+            _init(config, ["exports", "deps", "globals", "exclude"]);
 
         }
 
         if (manifest) {
-            deplibs.forEach(function (item) {
-                var lib, names;
-                if (item) {
+            deplibs.forEach(function (libitem) {
+                var lib, names,
+                    item;
+                if (libitem) {
+                    item = libitem.name;
                     lib = manifest.getLibrary(item);
                     if (lib) {
                         // get the actual file names
@@ -74,7 +77,7 @@ module.exports = function () {
                         if (names && names.length > 0) {
                             names.forEach(function (libpath) {
                                 if (libpath) {
-                                    result.push(new _Details({name: item, path: libpath, lib: lib}));
+                                    result.push(new _Details({name: item, path: libpath, lib: lib, exclude: (libitem.exclude||false) }));
                                 }
                             });
 
@@ -82,12 +85,12 @@ module.exports = function () {
                         } else {
 
                             // push the library name as is, [.js] will be concatenated
-                            result.push(new _Details({name: item, path: item, lib: lib}));
+                            result.push(new _Details({name: item, path: item, lib: lib, exclude: (libitem.exclude||false) }));
                         }
 
                     } else {
                         // push the library name as is, [.js] will be concatenated
-                        result.push(new _Details({name: item, path: item, lib: {}}));
+                        result.push(new _Details({name: item, path: item, lib: {}, exclude: (libitem.exclude||false) }));
                     }
                 }
             });
@@ -614,18 +617,21 @@ module.exports = function () {
                                                     }
                                                 }                                               
                                                 
-                                                config.paths[key] = fullpathlib;
-                                                if (lib.deps || lib.exports) {
-                                                    if (!config.shim[key]) {
-                                                        config.shim[key] = {};
+                                                if (!lib.exclude) {
+                                                    config.paths[key] = fullpathlib;
+                                                
+                                                    if (lib.deps || lib.exports) {
+                                                        if (!config.shim[key]) {
+                                                            config.shim[key] = {};
+                                                        }
+                                                        if (lib.deps) {
+                                                            config.shim[key].deps = lib.deps;
+                                                        }
+                                                        if (lib.exports) {
+                                                            config.shim[key].exports = lib.exports;
+                                                        }
+                                                        _addGlobals(lib);
                                                     }
-                                                    if (lib.deps) {
-                                                        config.shim[key].deps = lib.deps;
-                                                    }
-                                                    if (lib.exports) {
-                                                        config.shim[key].exports = lib.exports;
-                                                    }
-                                                    _addGlobals(lib);
                                                 }
                                                 requirelist.push(key);
                                                 if (key === "catjs") {

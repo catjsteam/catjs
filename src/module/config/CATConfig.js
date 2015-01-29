@@ -1,5 +1,6 @@
 var _global = catrequire("cat.global"),
     _utils = catrequire("cat.utils"),
+    _jsutils = require("js.utils"),
     _log = _global.log(),
     _path = require("path"),
     _fsconfig = catrequire("cat.config.utils"),
@@ -8,6 +9,7 @@ var _global = catrequire("cat.global"),
     _watch = catrequire("cat.watch"),
     _catconfig,
     _loadCATConfig,
+    _catlibrary = catrequire("cat.common.library"),
 
     /**
      * CAT Configuration class
@@ -28,7 +30,7 @@ var _global = catrequire("cat.global"),
             idx = 0, size, project, pluginsPath = [],
             dependencies = [],
             librariesConfig = [],
-            librariesDefault = ["underscore", "js.utils", "jspath", "chai",  "cat"],
+            librariesDefault = [{name: "underscore"}, {name: "js.utils"}, {name: "jspath"}, {name: "chai"},  {name:"cat"}],
             libraryBuildConfig, dependenciesInfo,
             appTargetPath, appPath, jshint, minifyplugin,
             scrapfilter, projectcopy,
@@ -97,8 +99,7 @@ var _global = catrequire("cat.global"),
                     });
                     project.addPluginLocations(pluginsPath);
 
-                    customPlugins = [];
-                    librariesConfig = ["cat"];
+                    customPlugins = [];                    
                     targetfolder = project.getInfo("target");
                     cattarget = (project.getInfo("cattarget") || "./");
 
@@ -196,12 +197,13 @@ var _global = catrequire("cat.global"),
                         }, minifyplugin                        
                         ]);
 
+                    librariesConfig = librariesDefault;
+                    librariesConfig = _catlibrary.all(librariesConfig);
+                    
                     dependenciesInfo = project.getInfo("dependencies");
-                    if (!dependenciesInfo) {
-                        librariesConfig = dependenciesInfo = librariesDefault;
-
-                    } else {
-                        librariesConfig = dependenciesInfo;
+                    if (dependenciesInfo) {
+                        dependenciesInfo = _catlibrary.all(dependenciesInfo);
+                        _catlibrary.merge(dependenciesInfo, librariesConfig);
                         if (!librariesConfig || (!_typedas.isArray(librariesConfig))) {
                             librariesConfig = librariesDefault;
 
@@ -209,7 +211,8 @@ var _global = catrequire("cat.global"),
                             libIdx= 0;
                             rmIdx=-1;
 
-                            librariesConfig.forEach(function(item) {
+                            librariesConfig.forEach(function(arg) {
+                                var item = arg.name;
                                 if (item === "cat") {
                                     rmIdx = libIdx;
                                 }
@@ -222,7 +225,7 @@ var _global = catrequire("cat.global"),
                             }
 
                             // set "cat" to be last
-                            librariesConfig.push("cat");
+                            librariesConfig.push({name: "cat"});
                         }
                     }
 

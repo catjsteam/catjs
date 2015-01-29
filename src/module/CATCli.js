@@ -85,6 +85,7 @@ module.exports = function () {
                         "cat.common.config": "src/module/config/project/Config.js",
                         "cat.common.manifest": "src/module/config/manifest/manifest.js",
                         "cat.common.parser": "src/module/common/parser/Parser.js",
+                        "cat.common.library": "src/module/common/Library.js",
 
                         "cat.scrap.utils": "src/module/plugin/scrap/ScrapUtils.js"
                     }
