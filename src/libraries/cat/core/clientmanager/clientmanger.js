@@ -256,7 +256,7 @@ _cat.core.clientmanager = function () {
                         style: 'color:#0080FF, font-size: 10px',
                         header: ((scrap && "name" in scrap && scrap.name) || "'NA'"),
                         desc: (description.length > 0 ? description.join("_$$_") : description.join("")),
-                        tips: ""
+                        tips: {}
                     });
 
                     if (_cat.utils.Utils.getType(commandObj) === "string") {

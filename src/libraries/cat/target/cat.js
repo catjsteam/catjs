@@ -17,7 +17,8 @@ _cat.core = function () {
         _config, _log,
         _guid,
         _enum,
-        _runModeValidation;
+        _runModeValidation,
+        _catjspath;
 
     addScrapToManager = function (testsInfo, scrap) {
 
@@ -79,7 +80,7 @@ _cat.core = function () {
         }
 
         if (!validate) {
-            _log.log("[CAT Info] skipping scrap: '" + scrapName + ";  Not included in the test project: [ " + (tests && testsNames ? testsNames.join(", ") : "" ) + "]");
+            _log.log("[catjs Info] skipping scrap: '" + scrapName + ";  Not included in the test project: [ " + (tests && testsNames ? testsNames.join(", ") : "" ) + "]");
         }
         return scrapTests;
     };
@@ -182,8 +183,29 @@ _cat.core = function () {
 
         },
 
-        init: function () {
-                      
+        init: function (config) {
+
+            // set catjs path
+            if (config) {
+                if ("catjspath" in config) {
+                    _catjspath = config.catjspath;
+                }
+            }
+
+            _cat.utils.TestsDB.init();
+
+                // plugin initialization
+            (function() {
+                var key;
+                if (typeof _cat.plugins.jquery !== "undefined") {
+                    for (key in _cat.plugins.jquery.actions) {
+                        if (_cat.plugins.jquery.actions.hasOwnProperty(key)) {
+                            _cat.plugins.jqm.actions[key] = _cat.plugins.jquery.actions[key];
+                        }
+                    }
+                }
+            })();            
+
             _enum = _cat.core.TestManager.enum;
             
             _guid = _cat.utils.Storage.getGUID();
@@ -577,7 +599,7 @@ _cat.core = function () {
 
                             pkgname = managerScrap.scrap.pkgName;
                             if (!pkgname) {
-                                _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
+                                _cat.core.log.error("[catjs action] Scrap's Package name is not valid");
                             } else {
 
 
@@ -615,7 +637,7 @@ _cat.core = function () {
                             if (manager) {
                                 pkgname = scrap.pkgName;
                                 if (!pkgname) {
-                                    _cat.core.log.error("[CAT action] Scrap's Package name is not valid");
+                                    _cat.core.log.error("[catjs action] Scrap's Package name is not valid");
                                 } else {
                                     _cat.core.defineImpl(pkgname, function () {
                                         _cat.core.actionimpl.apply(this, args);
@@ -627,7 +649,7 @@ _cat.core = function () {
                             _cat.core.actionimpl.apply(this, arguments);
                         }
                     } else {
-                        _cat.core.log.info("[CAT action] " + scrap.name[0] + " was not run as it does not appears in testManager");
+                        _cat.core.log.info("[catjs action] " + scrap.name[0] + " was not run as it does not appears in testManager");
                     }
                 }
 
@@ -689,7 +711,7 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                _log.log("[CAT] Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
+                _log.log("[catjs] Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
         },
@@ -707,14 +729,22 @@ _cat.core = function () {
             var script, source, head;
 
             script = document.getElementById("catjsscript");
-            source = script.src;
-
-            if (source.indexOf("cat/lib/cat.js") !== -1) {
-                head = (source.split("cat/lib/cat.js")[0] || "");                
+            if (script) {
+                source = script.src;
+                
             } else {
-                head = (source.split("cat/lib/cat/cat.js")[0] || "");
+                source = _catjspath;
             }
-            
+
+            if (source) {
+                if (source.indexOf("cat/lib/cat.js") !== -1) {
+                    head = (source.split("cat/lib/cat.js")[0] || "");                
+                } else {
+                    head = (source.split("cat/lib/cat/cat.js")[0] || "");
+                }
+            } else {
+                _log.warn("[catjs getBaseUrl] No valid base url was found ");
+            }            
             
 //
 //
@@ -1159,6 +1189,34 @@ _cat.utils.chai = function () {
 
     return {
 
+        /**
+         * This is an assert
+         * In case of compile (nodejs) use assert_call.tpl 
+         * 
+         * Examples:
+         *   
+         *   // Code String case: 
+         *   _cat.core.clientmanager.delayManager({
+         *       commands: [
+         *           function(context, thi$, testButton) {
+         *               _cat.utils.chai.assert(context);
+         *           }
+         *       ],
+         *       context: {
+         *           'code': ["assert", "ok(testButton[0],\"No valid test element button\")\n"].join("."),
+         *           'fail': true,
+         *           scrapName: 'assert',
+         *           scrap: _ipkg.scrap,
+         *           args: _args,
+         *           scrapRowIdx: 0
+         *       }
+         *   });
+         *   
+         *   // Code function case:
+         *   
+         * @param config
+         * @constructor
+         */
         assert: function (config) {
 
             if (!_state) {
@@ -1170,7 +1228,7 @@ _cat.utils.chai = function () {
                 fail,
                 failure,
                 scrap = config.scrap,
-                scrapName = (scrap.name ? scrap.name[0] : undefined),
+                scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name),
                 scrapDescription = (scrap.description ? scrap.description[0] : undefined),
                 testName = (scrapName || "NA"),
                 key, items=[], args=[],
@@ -1183,27 +1241,33 @@ _cat.utils.chai = function () {
                     fail = config.fail;
                 }
                 if (assert) {
-                    // TODO well, I have to code the parsing section (uglifyjs) for getting a better impl in here (loosing the eval shit)
-                    // TODO js execusion will be replacing this code later on...
                     var success = true;
                     var output;
                     if (code) {
                         try {
-                            args.push("assert");
-                            items.push(assert);
-                            for (key in config.args) {
-                                if (config.args.hasOwnProperty(key)) {
-                                    args.push(key);
-                                    items.push(config.args[key]);
+                            
+                            if (_cat.utils.Utils.isFunction(code)) {
+                                
+                                result = code.apply(this, arguments);
+                                
+                            } else if (_cat.utils.Utils.isString(code)) { 
+                                
+                                items.push(assert);
+                                    args.push("assert");
+                                    for (key in config.args) {
+                                    if (config.args.hasOwnProperty(key)) {
+                                        args.push(key);
+                                        items.push(config.args[key]);
+                                    }
                                 }
-                            }
-
-                            if (code.indexOf("JSPath.") !== -1) {
-                                items.push((typeof JSPath !== "undefined" ? JSPath : undefined));
-                                args.push("JSPath");
-                                result =  new Function(args, "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, items);
-                            } else {
-                                result =  new Function(args, "return " + code).apply(this, items);
+    
+                                if (code.indexOf("JSPath.") !== -1) {
+                                    items.push((typeof JSPath !== "undefined" ? JSPath : undefined));
+                                    args.push("JSPath");
+                                    result =  new Function(args, "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, items);
+                                } else {
+                                    result =  new Function(args, "return " + code).apply(this, items);
+                                }
                             }
 
                         } catch (e) {
@@ -1236,8 +1300,7 @@ _cat.utils.chai = function () {
                     }
                 }
             }
-        },
-
+        },      
 
         /**
          * For the testing environment, set chai handle
@@ -1509,7 +1572,7 @@ _cat.core.clientmanager = function () {
                         style: 'color:#0080FF, font-size: 10px',
                         header: ((scrap && "name" in scrap && scrap.name) || "'NA'"),
                         desc: (description.length > 0 ? description.join("_$$_") : description.join("")),
-                        tips: ""
+                        tips: {}
                     });
 
                     if (_cat.utils.Utils.getType(commandObj) === "string") {
@@ -2619,7 +2682,7 @@ _cat.core.ui = function () {
                                 if (!reset && isOpen) {
                                     setTimeout(function () {
                                         _me.toggle();
-                                    }, 300);
+                                    }, 0);
                                 }
                             }
                             var innerListElement =
@@ -2659,7 +2722,7 @@ _cat.core.ui = function () {
                                             newLI.className = newLI.className + " listImageInfo";
                                         }
                                     }
-                                }, 300);
+                                }, 0);
                             }
 
                         }
@@ -2856,6 +2919,11 @@ _cat.utils.Loader = function () {
 
             return function (files, callback) {
                 _libslength = files.length;
+                
+                if (!_libslength) {
+                    return undefined;
+                }
+                
                 index += 1;
                 _module.require(files[index - 1], ((index === files.length) ? callback : undefined));
 
@@ -3101,17 +3169,6 @@ _cat.utils.TestsDB = function() {
     var _data,
         _testnextcache = {};
 
-    (function() {
-        _cat.utils.AJAX.sendRequestAsync({
-            url :  _cat.core.getBaseUrl("cat/config/testdata.json"),
-            callback : {
-                call : function(check) {
-                    _data = JSON.parse(check.response);
-                }
-            }
-        });
-    })();
-
     function _TestsDB() {
 
         this._DB = undefined;
@@ -3165,11 +3222,14 @@ _cat.utils.TestsDB = function() {
         },
 
         init : function() {
-            /*
-                 @deprecated
-                 TestDB = new _TestsDB();
-                 return TestDB;
-             */
+            _cat.utils.AJAX.sendRequestAsync({
+                url :  _cat.core.getBaseUrl("cat/config/testdata.json"),
+                callback : {
+                    call : function(check) {
+                        _data = JSON.parse(check.response);
+                    }
+                }
+            });
         },
 
         getDB : function() {
@@ -3556,147 +3616,23 @@ var animation = false;
 
 _cat.plugins.jqm = function () {
 
-    var oldElement = "";
-    var setBoarder = function(element) {
-        if (oldElement) {
-
-            oldElement.classList.remove("markedElement");
-        }
-
-        if (element) {
-            element.className = element.className + " markedElement";
-        }
-        oldElement = element;
-        
-    };
-
-    function _getElt(val) {
-        var sign;
-        if (_cat.utils.Utils.getType(val) === "string") {
-            val = val.trim();
-            sign = val.charAt(0);
-
-            return ($ ? $(val) : undefined);
-
-        } else if (_cat.utils.Utils.getType(val) === "object") {
-            return val;
-        }
-    }
-
-    /**
-     * Trigger an event with a given object
-     *
-     * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
-     * @param eventType {String} The event type name
-     *
-     * @private
-     */
-    function _trigger() {
-        var e, idx= 0, size,
-            args = arguments,
-            elt = (args ? _getElt(args[0]) : undefined),
-            eventType = (args ? args[1] : undefined),
-            typeOfEventArgument = _cat.utils.Utils.getType(eventType);
-
-        if (elt && eventType) {
-            if (typeOfEventArgument === "string") {
-                elt.trigger(eventType);
-
-            } else  if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
-                size = typeOfEventArgument.length;
-                for (idx=0; idx<size; idx++) {
-                    e = eventType[idx];
-                    if (e) {
-                        elt.trigger(e);
-                    }
-                }
-            }
-        }
-    }
-
-    return {
+    var _module = {
 
         actions: {
 
-
-            scrollTo: function (idName) {
-
-                $(document).ready(function(){
-                    var elt = _getElt(idName),
-                        stop = elt.offset().top,
-                        delay = 1000;
-
-                    $('body,html').animate({scrollTop: stop}, delay);
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-
-            },
-
-
-
-            scrollTop: function () {
-
-                $(document).ready(function(){
-                    $('html, body').animate({scrollTop : 0},1000);
-                });
-
-            },
-
-            scrollToWithRapper : function (idName, rapperId) {
-
-                $(document).ready(function(){
-                    var elt = _getElt(idName),
-                        stop = elt.offset().top,
-                        delay = 1000;
-
-                    _getElt(rapperId).animate({scrollTop: stop}, delay);
-                    setBoarder( _getElt(idName).eq(0)[0]);
-                });
-
-            },
-
-            clickRef: function (idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    elt.trigger('click');
-                    window.location = elt.attr('href');
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-
-            },
-
-
-            clickButton: function (idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    $('.ui-btn').removeClass('ui-focus');
-                    elt.trigger('click');
-                    elt.closest('.ui-btn').addClass('ui-focus');
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-
-            },
-
             selectTab: function (idName) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('click');
 
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
 
             },
-
-
 
             selectMenu : function (selectId, value) {
                 $(document).ready(function(){
-                    var elt = _getElt(selectId);
+                    var elt =  _cat.plugins.jquery.utils.getElt(selectId);
                     if (typeof value === 'number') {
                         elt.find(" option[value=" + value + "]").attr('selected','selected');
                     } else if (typeof value === 'string') {
@@ -3704,41 +3640,34 @@ _cat.plugins.jqm = function () {
                     }
                     elt.selectmenu("refresh", true);
 
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
-
             },
-
 
             swipeItemLeft : function(idName) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.swipeleft();
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
             },
-
 
             swipeItemRight : function(idName) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.swiperight();
 
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
             },
-
 
             swipePageLeft : function() {
                 $(document).ready(function(){
                     $( ".ui-page-active" ).swipeleft();
 
                 });
-
-
             },
-
 
             swipePageRight : function() {
                 $(document).ready(function(){
@@ -3748,103 +3677,27 @@ _cat.plugins.jqm = function () {
                 });
             },
 
-
-            click: function (idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-                    elt.trigger('click');
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-            },
-
             tap: function (idName) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('tap');
 
-                    setBoarder( elt.eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
-            },
-
-            setCheck: function (idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    elt.prop("checked",true).checkboxradio("refresh");
-                    setBoarder( elt.eq(0)[0]);
-                });
-
             },
 
             slide : function (idName, value) {
                 $(document).ready(function(){
-                    var elt = _getElt(idName);
+                    var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.val(value).slider("refresh");
-                    setBoarder( elt.eq(0)[0]);
-                });
-            },
-
-            setText : function (idName, value) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    _trigger(elt, "mouseenter");
-                    _trigger(elt, "mouseover");
-                    _trigger(elt, "mousemove");
-                    _trigger(elt, "focus");
-                    _trigger(elt, "mousedown");
-                    _trigger(elt, "mouseup");
-                    _trigger(elt, "click");
-                    elt.val(value);
-                    _trigger(elt, "keydown");
-                    _trigger(elt, "keypress");
-                    _trigger(elt, "input");
-                    _trigger(elt, "keyup");
-                    _trigger(elt, "mousemove");
-                    _trigger(elt, "mouseleave");
-                    _trigger(elt, "mouseout");
-                    _trigger(elt, "blur");
-
-
-
-                    setBoarder( elt.eq(0)[0]);
-                });
-            },
-
-
-            checkRadio: function (className, idName) {
-                $(document).ready(function(){
-                    $( "." + className ).prop( "checked", false ).checkboxradio( "refresh" );
-                    $( "#" + idName ).prop( "checked", true ).checkboxradio( "refresh" );
-
-
-                    setBoarder($("label[for='" + idName + "']").eq(0)[0]);
-
-                });
-
-            },
-
-            collapsible : function(idName) {
-                $(document).ready(function(){
-                    var elt = _getElt(idName);
-
-                    elt.children( ".ui-collapsible-heading" ).children(".ui-collapsible-heading-toggle").click();
-                    setBoarder( elt.eq(0)[0]);
-                });
-
-            },
-
-            backClick : function () {
-                $(document).ready(function(){
-                    $('[data-rel="back"]')[0].click();
+                    _cat.plugins.jquery.utils.setBoarder( elt.eq(0)[0]);
                 });
             },
 
             searchInListView : function (listViewId, newValue) {
                 $(document).ready(function(){
-                    var elt = _getElt(listViewId),
+                    var elt =  _cat.plugins.jquery.utils.getElt(listViewId),
                         listView = elt[0],
                         parentElements = listView.parentElement.children,
                         form = parentElements[$.inArray( listView, parentElements ) - 1];
@@ -3854,12 +3707,270 @@ _cat.plugins.jqm = function () {
                     $( form ).find( "input" ).trigger( 'change' );
                 });
             }
-
-
         }
-
-
     };
+    
+    return _module;
+
+}();
+
+var animation = false;
+
+
+_cat.plugins.jquery = function () {
+
+    var _module = {
+
+        utils: function () {
+
+            var oldElement = "";
+
+            return {
+                
+                setBoarder: function (element) {
+                    if (oldElement) {
+
+                        oldElement.classList.remove("markedElement");
+                    }
+
+                    if (element) {
+                        element.className = element.className + " markedElement";
+                    }
+                    oldElement = element;
+
+                },
+
+                getElt: function (val) {
+                    var sign;
+                    if (_cat.utils.Utils.getType(val) === "string") {
+                        val = val.trim();
+                        sign = val.charAt(0);
+
+                        return ($ ? $(val) : undefined);
+
+                    } else if (_cat.utils.Utils.getType(val) === "object") {
+                        return val;
+                    }
+                },
+
+                /**
+                 * Trigger an event with a given object
+                 *
+                 * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
+                 * @param eventType {String} The event type name
+                 *
+                 * @private
+                 */
+                trigger: function () {
+                    var e, newEvent, newEventOpt, idx = 0, size,
+                        args = arguments,
+                        elt = (args ? _cat.plugins.jquery.utils.getElt(args[0]) : undefined),
+                        eventType = (args ? args[1] : undefined),
+                        typeOfEventArgument = _cat.utils.Utils.getType(eventType),
+                        typeOfEventArrayItem;
+
+                    function getOpt(opt) {
+                        var key, newOpt = {};
+                        if (opt) {
+                            for (key in opt) {
+                                if (opt.hasOwnProperty(key)) {
+                                    newOpt[key] = opt[key];
+                                }
+                            }
+                            if ("keyCode" in newOpt) {
+                               newOpt.which = newOpt.keyCode;
+                                
+                            } else if ("which" in newOpt) {
+                                newOpt.keyCode = newOpt.which;
+                            }                             
+                        }
+                        
+                        return newOpt;
+                    }
+                    
+                    if (elt && eventType) {
+                        if (typeOfEventArgument === "string") {
+                            elt.trigger(eventType);
+
+                        } else if (typeOfEventArgument === "object") {
+                            newEventOpt = getOpt(eventType.opt);
+                            newEvent = $.Event(eventType.type, newEventOpt);
+                            elt.trigger(newEvent);
+
+                        } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
+                            size = typeOfEventArgument.length;
+                            for (idx = 0; idx < size; idx++) {
+                                e = eventType[idx];
+                                if (e) {
+                                    typeOfEventArrayItem = _cat.utils.Utils.getType(eventType);
+                                    if (typeOfEventArrayItem === "string") {
+                                     elt.trigger(e);
+                                    } else {
+                                        newEventOpt = getOpt(eventType.opt);
+                                        newEvent = $.Event(eventType.type, newEventOpt);
+                                        elt.trigger(newEvent);
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+        }(),
+
+        actions: {
+
+
+            scrollTo: function (idName) {
+
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName),
+                        stop = elt.offset().top,
+                        delay = 1000;
+
+                    $('body,html').animate({scrollTop: stop}, delay);
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+
+            scrollTop: function () {
+
+                $(document).ready(function () {
+                    $('html, body').animate({scrollTop: 0}, 1000);
+                });
+
+            },
+
+            scrollToWithRapper: function (idName, rapperId) {
+
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName),
+                        stop = elt.offset().top,
+                        delay = 1000;
+
+                    _cat.plugins.jquery.utils.getElt(rapperId).animate({scrollTop: stop}, delay);
+                    _cat.plugins.jquery.utils.setBoarder(_cat.plugins.jquery.utils.getElt(idName).eq(0)[0]);
+                });
+
+            },
+
+            clickRef: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    elt.trigger('click');
+                    window.location = elt.attr('href');
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+
+            clickButton: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    $('.ui-btn').removeClass('ui-focus');
+                    elt.trigger('click');
+                    elt.closest('.ui-btn').addClass('ui-focus');
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+
+            click: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+                    elt.trigger('click');
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+            },
+
+
+            setCheck: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    elt.prop("checked", true).checkboxradio("refresh");
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+
+            setText: function (idName, value) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseenter");
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseover");
+                    _cat.plugins.jquery.utils.trigger(elt, "mousemove");
+                    _cat.plugins.jquery.utils.trigger(elt, "focus");
+                    _cat.plugins.jquery.utils.trigger(elt, "mousedown");
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseup");
+                    _cat.plugins.jquery.utils.trigger(elt, "click");
+                    elt.val(value);
+                    _cat.plugins.jquery.utils.trigger(elt, "keydown");
+                    _cat.plugins.jquery.utils.trigger(elt, "keypress");
+                    _cat.plugins.jquery.utils.trigger(elt, "input");
+                    _cat.plugins.jquery.utils.trigger(elt, "keyup");
+                    _cat.plugins.jquery.utils.trigger(elt, "mousemove");
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseleave");
+                    _cat.plugins.jquery.utils.trigger(elt, "mouseout");
+                    _cat.plugins.jquery.utils.trigger(elt, "blur");
+
+
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+            },
+            
+            getValue: function(idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+                    elt.val();
+                });                
+            },
+
+            checkRadio: function (className, idName) {
+                $(document).ready(function () {
+                    $("." + className).prop("checked", false).checkboxradio("refresh");
+                    $("#" + idName).prop("checked", true).checkboxradio("refresh");
+
+
+                    _cat.plugins.jquery.utils.setBoarder($("label[for='" + idName + "']").eq(0)[0]);
+
+                });
+
+            },
+
+            collapsible: function (idName) {
+                $(document).ready(function () {
+                    var elt = _cat.plugins.jquery.utils.getElt(idName);
+
+                    elt.children(".ui-collapsible-heading").children(".ui-collapsible-heading-toggle").click();
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+
+            },
+
+            backClick: function () {
+                $(document).ready(function () {
+                    $('[data-rel="back"]')[0].click();
+                });
+            }
+        }
+    };
+
+    return _module;
 
 }();
 

@@ -405,7 +405,7 @@ _cat.core.ui = function () {
                                 if (!reset && isOpen) {
                                     setTimeout(function () {
                                         _me.toggle();
-                                    }, 300);
+                                    }, 0);
                                 }
                             }
                             var innerListElement =
@@ -445,7 +445,7 @@ _cat.core.ui = function () {
                                             newLI.className = newLI.className + " listImageInfo";
                                         }
                                     }
-                                }, 300);
+                                }, 0);
                             }
 
                         }
