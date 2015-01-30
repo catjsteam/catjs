@@ -455,7 +455,41 @@ _cat.core = function () {
             
             return arr;  
         },
-        
+
+        getScrapByName : function(searchName) {
+            var scraps = this.getScraps(),
+                scrap,
+                scrapName,
+                i;
+
+            for (i = 0; i < scraps.length; i++) {
+                scrap = scraps[i];
+                scrapName = scrap.name;
+                if (Array.isArray(scrapName) && scrapName.length > 0 && scrapName[0] === searchName) {
+                    return scrap;
+                }
+            }
+
+        },
+
+
+        getScrapById : function(searchId) {
+            var scraps = this.getScraps(),
+                scrap,
+                scrapId,
+                i;
+
+            for (i = 0; i < scraps.length; i++) {
+                scrap = scraps[i];
+                scrapId = scrap.id;
+                if (scrapId && scrapId === searchId) {
+                    return scrap;
+                }
+            }
+
+        },
+
+
         getSummaryInfo: function() {
           
             var scraps = _cat.core.getScraps(),
