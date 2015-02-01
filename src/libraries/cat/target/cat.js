@@ -464,8 +464,8 @@ _cat.core = function () {
 
             for (i = 0; i < scraps.length; i++) {
                 scrap = scraps[i];
-                scrapName = scrap.name;
-                if (Array.isArray(scrapName) && scrapName.length > 0 && scrapName[0] === searchName) {
+                scrapName = (Array.isArray(scrapName) ? scrapName[0] : scrap.name);
+                if (scrapName === searchName) {
                     return scrap;
                 }
             }
