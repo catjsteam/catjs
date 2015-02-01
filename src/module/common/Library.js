@@ -9,6 +9,10 @@ var underscore = require("underscore"),
     _utils = catrequire("cat.utils"),
     _Library = function(config) {
         
+        if (!config || !underscore.isObject(config)) {
+            _utils.error("[catjs Library class] expects an Object but found: ", (config ? typeof(underscore) : "undefined"));   
+        }
+        
         _utils.prepareProps({ 
             global: {obj: config}, 
             props: [
@@ -47,7 +51,16 @@ module.exports = function() {
          * @returns {Library} new instance
          */
         get: function(config) {
-            return new _Library(config);
+            
+            var clazz;
+            try {
+                clazz = new _Library(config);
+                
+            } catch (e) {
+                
+            }
+            
+            return clazz;
         },
 
         /**
@@ -59,8 +72,12 @@ module.exports = function() {
             var arr = [];
             if (underscore.isArray(configArray)) {
                 configArray.forEach(function(config) {
+                    var lib;
                     if (config) {
-                        arr.push(_module.get(config))
+                        lib = _module.get(config);
+                        if (lib) {
+                            arr.push(lib);   
+                        }                  
                     }
                 });
             }

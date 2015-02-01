@@ -206,7 +206,7 @@ module.exports = _basePlugin.ext(function () {
                 library = libraries[slot];
 
 
-                if (imports && library){
+                if (imports && imports.length > 0 && library){
                     if (_typedas.isArray(imports)) {
                         doImport = _catlibrary.exists(imports, library.name);
                     } else {

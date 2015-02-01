@@ -17,13 +17,14 @@
             "name": "p@libraries.install",
             "type": "libraries",
             "dependency": "manager",
+            "imports": [{"name": "cat"}],
             "action": "install"
         },
         {
             "name": "p@libraries.clean",
             "type": "libraries",
             "dependency": "manager",
-            "imports": ["cat"],
+            "imports": [{"name": "cat"}],
             "action": "clean"
         },
         {
