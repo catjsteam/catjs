@@ -71,6 +71,30 @@ _cat.core.Config = function(args) {
             
             return false;
         };
+
+        /**
+         * Validate if the current test is in the test scenarios scope and 
+         * did not exceeded the test project index
+         * 
+         * @param currentidx {Number} The current test index 
+         * @returns {boolean} If the test has ended return true or else false
+         */
+        this.isTestEnd = function(currentidx) {
+
+            var tests = this.getTests(),
+                size;
+            
+            if (tests && tests.length) {
+                
+                size = tests.length;
+                if (currentidx >= size) {
+                
+                    return true;
+                }
+            }
+
+            return false;
+        };
         
         this.getTests = function () {
 

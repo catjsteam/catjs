@@ -464,7 +464,8 @@ _cat.core = function () {
 
             for (i = 0; i < scraps.length; i++) {
                 scrap = scraps[i];
-                scrapName = (Array.isArray(scrapName) ? scrapName[0] : scrap.name);
+                scrapName = scrap.name;
+                scrapName = (Array.isArray(scrapName) ? scrapName[0] : scrapName);
                 if (scrapName === searchName) {
                     return scrap;
                 }
@@ -538,15 +539,30 @@ _cat.core = function () {
         },
 
         action: function (thiz, config) {
-            var scrap = _cat.core.getVar(config.pkgName).scrap,
+            var scrap,
                 runat, manager,
                 pkgname, args = arguments,
-                catConfig = _cat.core.getConfig(),
-                tests = catConfig ? catConfig.getTests() : [],
+                catConfig,
+                tests,
                 storageEnum = _cat.utils.Storage.enum,
                 managerScrap, tempScrap,
-                i, j;
+                i, j, scrapobj;
 
+            try {
+                scrapobj = _cat.core.getVar(config.pkgName);
+                if (scrapobj) {
+                    scrap = scrapobj.scrap;
+                }
+
+                catConfig = _cat.core.getConfig();
+                tests = (catConfig ? catConfig.getTests() : []);
+                
+            } catch(e) {
+                _log.error("[catjs core] Could not load the following scrap by package name:", config.pkgName, " catjs project sources (cat.src.js) probably didn't load properly and catjs core not initialized. error: ", e );
+                
+                return undefined;
+            }
+            
             // The test ended ignore any action called
             if (_cat.core.TestManager.isTestEnd()) {                
                 return undefined;

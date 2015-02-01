@@ -17,12 +17,15 @@ _cat.core.clientmanager = function () {
         testQueue = {},
         testQueueLast,
         initCurrentState = false,
-        currentState = { index: 0 },
+        currentState = { index: 0, testend: false },
         clientmanagerId;
 
 
     endTest = function (opt, interval) {
 
+        // set state flag
+        currentState.testend = true;
+        
         _cat.core.TestManager.send({signal: 'TESTEND', error: opt.error});
         if (interval === -1) {
             console.log("Test End");
@@ -405,7 +408,7 @@ _cat.core.clientmanager = function () {
                 var clientTopic = "afterprocess." + _cat.core.clientmanager.getClientmanagerId();
                 // check if it's the same frame
                 if (topic !== clientTopic) {
-                    _cat.core.clientmanager.removeIntervalFromBrodcast(data);
+                    _cat.core.clientmanager.removeIntervalFromBroadcast(data);
                 }
 
             }
@@ -456,12 +459,28 @@ _cat.core.clientmanager = function () {
         signScrap: function (scrap, catConfig, args, _tests) {
             var urlAddress,
                 config,
-                scrapName;
+                scrapName,
+                currentStateIdx,
+                reportFormats;
             
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
             scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name);
 
+            currentStateIdx = currentState.index;
+            if (catConfig.isTestEnd(currentStateIdx)) {
+
+                //currentState.testend = true;
+                
+                return;
+                
+//                if (catConfig.isReport()) {
+//                    reportFormats = catConfig.getReportFormats();
+//                }
+//
+//                endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
+            }
+            
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
                 startInterval(catConfig, scrap);
                 urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid();
@@ -545,7 +564,7 @@ _cat.core.clientmanager = function () {
             delayManagerCommands(commands, context);
         },
 
-        removeIntervalFromBrodcast : function(scrap) {
+        removeIntervalFromBroadcast : function(scrap) {
             var scrapRunId,
                 intervalScrap,
                 runIndex,

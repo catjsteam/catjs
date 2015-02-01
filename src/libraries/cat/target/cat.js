@@ -464,7 +464,8 @@ _cat.core = function () {
 
             for (i = 0; i < scraps.length; i++) {
                 scrap = scraps[i];
-                scrapName = (Array.isArray(scrapName) ? scrapName[0] : scrap.name);
+                scrapName = scrap.name;
+                scrapName = (Array.isArray(scrapName) ? scrapName[0] : scrapName);
                 if (scrapName === searchName) {
                     return scrap;
                 }
@@ -538,15 +539,30 @@ _cat.core = function () {
         },
 
         action: function (thiz, config) {
-            var scrap = _cat.core.getVar(config.pkgName).scrap,
+            var scrap,
                 runat, manager,
                 pkgname, args = arguments,
-                catConfig = _cat.core.getConfig(),
-                tests = catConfig ? catConfig.getTests() : [],
+                catConfig,
+                tests,
                 storageEnum = _cat.utils.Storage.enum,
                 managerScrap, tempScrap,
-                i, j;
+                i, j, scrapobj;
 
+            try {
+                scrapobj = _cat.core.getVar(config.pkgName);
+                if (scrapobj) {
+                    scrap = scrapobj.scrap;
+                }
+
+                catConfig = _cat.core.getConfig();
+                tests = (catConfig ? catConfig.getTests() : []);
+                
+            } catch(e) {
+                _log.error("[catjs core] Could not load the following scrap by package name:", config.pkgName, " catjs project sources (cat.src.js) probably didn't load properly and catjs core not initialized. error: ", e );
+                
+                return undefined;
+            }
+            
             // The test ended ignore any action called
             if (_cat.core.TestManager.isTestEnd()) {                
                 return undefined;
@@ -838,6 +854,30 @@ _cat.core.Config = function(args) {
                 return true;
             }
             
+            return false;
+        };
+
+        /**
+         * Validate if the current test is in the test scenarios scope and 
+         * did not exceeded the test project index
+         * 
+         * @param currentidx {Number} The current test index 
+         * @returns {boolean} If the test has ended return true or else false
+         */
+        this.isTestEnd = function(currentidx) {
+
+            var tests = this.getTests(),
+                size;
+            
+            if (tests && tests.length) {
+                
+                size = tests.length;
+                if (currentidx >= size) {
+                
+                    return true;
+                }
+            }
+
             return false;
         };
         
@@ -1333,12 +1373,15 @@ _cat.core.clientmanager = function () {
         testQueue = {},
         testQueueLast,
         initCurrentState = false,
-        currentState = { index: 0 },
+        currentState = { index: 0, testend: false },
         clientmanagerId;
 
 
     endTest = function (opt, interval) {
 
+        // set state flag
+        currentState.testend = true;
+        
         _cat.core.TestManager.send({signal: 'TESTEND', error: opt.error});
         if (interval === -1) {
             console.log("Test End");
@@ -1721,7 +1764,7 @@ _cat.core.clientmanager = function () {
                 var clientTopic = "afterprocess." + _cat.core.clientmanager.getClientmanagerId();
                 // check if it's the same frame
                 if (topic !== clientTopic) {
-                    _cat.core.clientmanager.removeIntervalFromBrodcast(data);
+                    _cat.core.clientmanager.removeIntervalFromBroadcast(data);
                 }
 
             }
@@ -1772,12 +1815,28 @@ _cat.core.clientmanager = function () {
         signScrap: function (scrap, catConfig, args, _tests) {
             var urlAddress,
                 config,
-                scrapName;
+                scrapName,
+                currentStateIdx,
+                reportFormats;
             
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
             scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name);
 
+            currentStateIdx = currentState.index;
+            if (catConfig.isTestEnd(currentStateIdx)) {
+
+                //currentState.testend = true;
+                
+                return;
+                
+//                if (catConfig.isReport()) {
+//                    reportFormats = catConfig.getReportFormats();
+//                }
+//
+//                endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
+            }
+            
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
                 startInterval(catConfig, scrap);
                 urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid();
@@ -1861,7 +1920,7 @@ _cat.core.clientmanager = function () {
             delayManagerCommands(commands, context);
         },
 
-        removeIntervalFromBrodcast : function(scrap) {
+        removeIntervalFromBroadcast : function(scrap) {
             var scrapRunId,
                 intervalScrap,
                 runIndex,
