@@ -43,6 +43,7 @@ module.exports = function () {
                     catprojeccontent = _path.resolve(_path.join(path, "catproject.json"));
                     content = _fs.readFileSync(catprojeccontent, "utf8");
 
+                    _jsutils.Template.setMustache(true);
                     content = _jsutils.Template.template({
                         content: content,
                         data: data
