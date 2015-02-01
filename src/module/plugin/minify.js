@@ -60,54 +60,56 @@ module.exports = _basePlugin.ext(function () {
                     }
                 }
                 
-                if (jshint) {
-                    if (!jshint.globals) {
-                        jshint.globals = {};
-                    }
-                    jshint.globals["_cat"] = true;
-                    jshint.globals["chai"] = true;
-                    jshint.globals["document"] = true;
-                    jshint.globals["XMLHttpRequest"] = true;
-                    jshint.globals["describe"] = true;
-                    jshint.globals["xdescribe"] = true;
-                    jshint.globals["it"] = true;
-                    jshint.globals["xit"] = true;
-                    jshint.globals["before"] = true;
-                    jshint.globals["beforeEach"] = true;
-                    jshint.globals["after"] = true;
-                    jshint.globals["afterEach"] = true;
+                if (!jshint) {
+                    jshint = {};
+                }
+
+                if (!jshint.opt) {
+                    jshint.opt = {
+                        "evil": true,
+                        "strict": false,
+                        "curly": true,
+                        "eqeqeq": true,
+                        "immed": false,
+                        "latedef": true,
+                        "newcap": false,
+                        "noarg": true,
+                        "sub": true,
+                        "undef": true,
+                        "boss": true,
+                        "eqnull": true,
+                        "node": true,
+                        "es5": false
+                    };
+                }
+
+                if (!jshint.globals) {
+                    jshint.globals = {};
                 }
                 
+                jshint.globals["$"] = true;
+                jshint.globals["_cat"] = true;
+                jshint.globals["chai"] = true;
+                jshint.globals["$"] = true;
+                jshint.globals["document"] = true;
+                jshint.globals["XMLHttpRequest"] = true;
+                jshint.globals["describe"] = true;
+                jshint.globals["xdescribe"] = true;
+                jshint.globals["it"] = true;
+                jshint.globals["xit"] = true;
+                jshint.globals["before"] = true;
+                jshint.globals["beforeEach"] = true;
+                jshint.globals["after"] = true;
+                jshint.globals["afterEach"] = true;
+
+
                 task({
                     src: src,
                     out: {
                         name: name,
                         path: path
                     },
-                    jshint: (jshint || {
-                        opt: {
-                            "evil": true,
-                            "strict": false,
-                            "curly": true,
-                            "eqeqeq": true,
-                            "immed": false,
-                            "latedef": true,
-                            "newcap": false,
-                            "noarg": true,
-                            "sub": true,
-                            "undef": true,
-                            "boss": true,
-                            "eqnull": true,
-                            "node": true,
-                            "es5": false
-                        },
-                        "globals": {
-                            XMLHttpRequest: true,
-                            document: true,
-                            _cat: true,
-                            chai: true
-                        }
-                    })
+                    jshint: jshint
                 });
             }
 
@@ -209,11 +211,11 @@ module.exports = _basePlugin.ext(function () {
                             });
                         }
                     } else {
-                        _fs.writeFileSync(_path.join(path, name), "",  { mode: 0777 })
+                        _fs.writeFileSync(_path.join(path, name), "", { mode: 0777 })
                     }
                 } else {
-                    
-                    
+
+
                     _log.error("[CAT clean plugin] 'src' property is required ");
                 }
 
