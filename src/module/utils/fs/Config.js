@@ -36,7 +36,7 @@ module.exports = function () {
 
                     jsonlint = _jsonlint( json, {} );
                     if ( jsonlint.error ) {
-                        _utils.log("error", ["CAT project loader] catproject.json load with errors: \n ", jsonlint.error,
+                        _utils.error(["CAT project loader] catproject.json load with errors: \n ", jsonlint.error,
                         " \n at line: ", jsonlint.line,
                         " \n character: ", jsonlint.character,
                         " \n "].join(""));

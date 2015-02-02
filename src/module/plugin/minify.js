@@ -87,10 +87,10 @@ module.exports = _basePlugin.ext(function () {
                     jshint.globals = {};
                 }
                 
-                jshint.globals["$"] = true;
                 jshint.globals["_cat"] = true;
                 jshint.globals["chai"] = true;
                 jshint.globals["$"] = true;
+                jshint.globals["window"] = true;
                 jshint.globals["document"] = true;
                 jshint.globals["XMLHttpRequest"] = true;
                 jshint.globals["describe"] = true;

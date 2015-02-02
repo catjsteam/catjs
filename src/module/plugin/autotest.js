@@ -7,7 +7,8 @@ var _catglobal = catrequire("cat.global"),
     _fs = require("fs.extra"),
     _typedas = require("typedas"),
     _Scrap = catrequire("cat.common.scrap"),
-    _beautify = require('js-beautify').js_beautify;
+    _beautify = require('js-beautify').js_beautify,
+    _jsonlint = require("json-lint");
 
 module.exports = _basePlugin.ext(function () {
 
@@ -35,8 +36,9 @@ module.exports = _basePlugin.ext(function () {
                 extensionParams,
                 errors = ["[libraries plugin] No valid configuration"],
                 workDir = _catglobal.get("home").working.path,
-                catjson, catjsondata, args=[],
-                filedata;
+                catjson, catjsondata, args = [],
+                filedata, jsonlint,
+                isAutoOverride = false;
 
             if (!config) {
                 _log.error(errors[1]);
@@ -59,9 +61,9 @@ module.exports = _basePlugin.ext(function () {
                 scraps = _Scrap.getScraps();
                 if (scraps) {
 
-                    scraps.forEach(function(scrap) {
-                        if (scrap && scrap.get("auto") && !scrap.get("$standalone")) {                            
-                            args.push({"name":scrap.get("name")});
+                    scraps.forEach(function (scrap) {
+                        if (scrap && scrap.get("auto") && !scrap.get("$standalone")) {
+                            args.push({"name": scrap.get("name")});
                         }
                     });
 
@@ -70,26 +72,49 @@ module.exports = _basePlugin.ext(function () {
                         if (_fs.existsSync(catjson)) {
                             catjsondata = _fs.readFileSync(catjson, "utf8");
                             if (catjsondata) {
-                                catjsondata = JSON.parse(catjsondata);
-                                if (catjsondata.scenarios.general.tests && catjsondata.tests) {
-                                    catjsondata.scenarios.general.tests = args;
+
+                                try {
+                                    jsonlint = _jsonlint(catjsondata, {});
+                                    if (jsonlint.error) {
+                                        _utils.error("error", ["catjs auto-test] cat.json load with errors: \n ", jsonlint.error,
+                                            " \n at line: ", jsonlint.line,
+                                            " \n character: ", jsonlint.character,
+                                            " \n "].join(""));
+                                    }
+
+                                } catch (e) {
+                                    _utils.error("[CAT Core] cat.json parse error: ", e);
                                 }
+
+                                catjsondata = JSON.parse(catjsondata);
+                                isAutoOverride = (!("auto-override" in catjsondata) || ("auto-override" in catjsondata && catjsondata["auto-override"]));
+                                
+                                if (catjsondata && isAutoOverride) {
+                                    if (catjsondata.scenarios.general.tests && catjsondata.tests) {
+                                        catjsondata.scenarios.general.tests = args;
+                                    }
+
+                                    catjsondata["run-mode"] = "tests";
+
+                                    filedata = JSON.stringify(catjsondata);
+                                    if (filedata) {
+
+                                        try {
+                                            filedata = _beautify(filedata, { indent_size: 2 });
+                                            _fs.writeFileSync(catjson, filedata);
+                                        } catch (e) {
+                                            _utils.error("[catjs autotest] Error occurred while writing the configuration data. Error: ", e);
+                                        }
+                                    }                                    
+                                }
+                                
+                                if (!isAutoOverride) {
+                                    _utils.log("info", "[catjs autotest] \"auto-override\" set to false, Skipping auto-test ")
+                                }
+                               
                             }
-                            catjsondata["run-mode"] = "tests";
                         }
                     }
-
-                    filedata = JSON.stringify(catjsondata);
-                    if (filedata) {
-
-                        try {
-                            filedata = _beautify(filedata, { indent_size: 2 });
-                            _fs.writeFileSync(catjson, filedata);
-                        } catch(e) {
-                            _utils.error("[CAT autotest] Error occurred while writing the configuration data. Error: ", e);
-                        }
-                    }
-
                 }
             }
 
@@ -104,7 +129,7 @@ module.exports = _basePlugin.ext(function () {
          *
          * @returns {{dependencies: Array}}
          */
-        validate: function() {
+        validate: function () {
             return { dependencies: ["manager"]};
         }
 
