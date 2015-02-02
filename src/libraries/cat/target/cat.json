@@ -34,5 +34,6 @@
     },
     "run-mode": "tests",
     "run-test-delay": 500,
-    "test-failure-timeout": 20
+    "test-failure-timeout": 20,
+    "auto-override": true
 }

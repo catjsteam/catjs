@@ -1380,8 +1380,7 @@ _cat.core.clientmanager = function () {
         setupInterval,
         intervalObj,
         endTest,
-        testQueue = {},
-        testQueueLast,
+        testQueue,
         initCurrentState = false,
         currentState = { index: 0, testend: false },
         clientmanagerId;
@@ -1717,7 +1716,7 @@ _cat.core.clientmanager = function () {
             exists = checkIfExists(scrapName, tests),
             preScrapConfig;
 
-        if ((exists && (!testQueue[currentStateIdx - 1]) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
+        if ((exists && (!testQueue.get(currentStateIdx - 1).first()) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
             preScrapConfig = {scrapInfo: scrap, args: args};
             _preScrapProcess(preScrapConfig, args);
             commitScrap({$standalone: scrap.$standalone, name: scrapName}, args);
@@ -1796,18 +1795,22 @@ _cat.core.clientmanager = function () {
 
 
     function _processReadyScraps(cameFromBroadcast) {
-        var idx = currentState.index;
+        var idx = currentState.index,
+            testitem = testQueue.get(idx);
 
-        if (testQueue[idx]) {
-            var config = testQueue[idx];
-            if (config) {
-                console.log(config.scrapInfo.name);
-                _process(config);
-                delete testQueue[idx];
+        if (testitem.first()) {
+            var configs = testitem.all();
+            configs.forEach(function(config) {
+                if (config) {
+                    console.log(config.scrapInfo.name);
+                    _process(config);
+                  
+                    currentState.index++;
+                    _processReadyScraps(false);
+                } 
+            });
+            testitem.deleteAll();
 
-                currentState.index++;
-                _processReadyScraps(false);
-            }
         } else {
             if (!cameFromBroadcast) {
                 broadcastProcess();
@@ -1837,6 +1840,10 @@ _cat.core.clientmanager = function () {
                 scrapName,
                 currentStateIdx,
                 reportFormats;
+            
+            if (!testQueue) {
+                testQueue = new _cat.core.TestQueue();
+            }
             
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
@@ -1869,7 +1876,7 @@ _cat.core.clientmanager = function () {
 
                         function _add2Queue(config) {
                             _preScrapProcess(config, args);
-                            testQueue[config.scrapInfo.index] = config;
+                            testQueue.add(config.scrapInfo.index, config);
                         }
 
                         if (response.ready) {
@@ -1883,7 +1890,7 @@ _cat.core.clientmanager = function () {
 
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
-                                    var config = testQueue[scrap.index];
+                                    var config = testQueue.get(scrap.index).first();
                                     if (config) {
                                         // already in queue;
 
@@ -2353,6 +2360,72 @@ _cat.core.TestManager = function() {
 
 }();
 
+_cat.core.TestQueue = function() {
+
+    var _Queue = function(key) {
+        
+        this.key = key;
+        this.items = [];
+    }, 
+        _queue = {},
+        _module;
+
+    _Queue.prototype.empty = function() {
+        return (this.key ? false : true);
+    };
+    
+    _Queue.prototype.add = function(config) {
+        this.items.push(config);
+    };
+
+    _Queue.prototype.all = function() {
+        return this.items;
+    };
+    
+    _Queue.prototype.first = function() {
+        return (this.size() > 0 ? this.items[0] : undefined);
+    };
+    
+   _Queue.prototype.deleteFirst = function() {
+        if (this.size() > 0) {
+            this.items.shift();   
+        }
+    };   
+        
+   _Queue.prototype.delete = function(idx) {
+        if (this.size() > 0) {
+            this.items.splice(idx, 1);   
+        }
+    };   
+    
+    _Queue.prototype.deleteAll = function() {
+        if (this.size() > 0) {
+            this.items = []; 
+        }
+    };
+    
+    _Queue.prototype.size = function() {
+        return this.items.length;
+    };
+
+    _module = {
+        
+        get: function(key) {
+            var queue = _queue[key];
+            return (queue ? queue : new _Queue());
+        },
+        
+        add: function(key, config) {
+            var queue = _module.get(key);
+            if (queue.empty()) {
+                queue = _queue[key] = new _Queue();
+            }
+            queue.add(config);
+        }
+    };
+    
+    return _module;
+};
 _cat.core.ui = function () {
 
     function _addEventListener(elem, event, fn) {

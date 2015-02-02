@@ -14,8 +14,7 @@ _cat.core.clientmanager = function () {
         setupInterval,
         intervalObj,
         endTest,
-        testQueue = {},
-        testQueueLast,
+        testQueue,
         initCurrentState = false,
         currentState = { index: 0, testend: false },
         clientmanagerId;
@@ -351,7 +350,7 @@ _cat.core.clientmanager = function () {
             exists = checkIfExists(scrapName, tests),
             preScrapConfig;
 
-        if ((exists && (!testQueue[currentStateIdx - 1]) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
+        if ((exists && (!testQueue.get(currentStateIdx - 1).first()) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
             preScrapConfig = {scrapInfo: scrap, args: args};
             _preScrapProcess(preScrapConfig, args);
             commitScrap({$standalone: scrap.$standalone, name: scrapName}, args);
@@ -430,18 +429,22 @@ _cat.core.clientmanager = function () {
 
 
     function _processReadyScraps(cameFromBroadcast) {
-        var idx = currentState.index;
+        var idx = currentState.index,
+            testitem = testQueue.get(idx);
 
-        if (testQueue[idx]) {
-            var config = testQueue[idx];
-            if (config) {
-                console.log(config.scrapInfo.name);
-                _process(config);
-                delete testQueue[idx];
+        if (testitem.first()) {
+            var configs = testitem.all();
+            configs.forEach(function(config) {
+                if (config) {
+                    console.log(config.scrapInfo.name);
+                    _process(config);
+                  
+                    currentState.index++;
+                    _processReadyScraps(false);
+                } 
+            });
+            testitem.deleteAll();
 
-                currentState.index++;
-                _processReadyScraps(false);
-            }
         } else {
             if (!cameFromBroadcast) {
                 broadcastProcess();
@@ -471,6 +474,10 @@ _cat.core.clientmanager = function () {
                 scrapName,
                 currentStateIdx,
                 reportFormats;
+            
+            if (!testQueue) {
+                testQueue = new _cat.core.TestQueue();
+            }
             
             runStatus.scrapsNumber = _tests.length;
             tests = _tests;
@@ -503,7 +510,7 @@ _cat.core.clientmanager = function () {
 
                         function _add2Queue(config) {
                             _preScrapProcess(config, args);
-                            testQueue[config.scrapInfo.index] = config;
+                            testQueue.add(config.scrapInfo.index, config);
                         }
 
                         if (response.ready) {
@@ -517,7 +524,7 @@ _cat.core.clientmanager = function () {
 
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
-                                    var config = testQueue[scrap.index];
+                                    var config = testQueue.get(scrap.index).first();
                                     if (config) {
                                         // already in queue;
 
