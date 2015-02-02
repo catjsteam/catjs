@@ -881,6 +881,16 @@ _cat.core.Config = function(args) {
             return false;
         };
         
+        this.getTest = function(idx) {
+          
+            var tests = this.getTests();
+            if (tests && tests.length && tests.length > 0) {
+                return tests[idx];
+            }
+            
+            return undefined;
+        };
+        
         this.getTests = function () {
 
             function _GetTestsClass(config) {
@@ -1565,8 +1575,17 @@ _cat.core.clientmanager = function () {
             executeCode,
             delay = catConfig.getTestDelay(),
             scrap = ("scrap" in dmcontext  ? dmcontext.scrap : undefined),
-            standalone = _isStandalone(scrap);
+            standalone = _isStandalone(scrap),
+            testobj, currentTestIdx;
 
+        currentTestIdx = currentState.index;
+        testobj = catConfig.getTest(currentTestIdx);
+        if (testobj) {
+            if ("delay" in testobj) {
+                delay = testobj.delay; 
+            }
+        }
+        
         executeCode = function (codeCommandsArg, contextArg) {
             var commandObj,
                 scrap = contextArg.scrap,

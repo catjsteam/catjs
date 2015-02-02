@@ -96,6 +96,16 @@ _cat.core.Config = function(args) {
             return false;
         };
         
+        this.getTest = function(idx) {
+          
+            var tests = this.getTests();
+            if (tests && tests.length && tests.length > 0) {
+                return tests[idx];
+            }
+            
+            return undefined;
+        };
+        
         this.getTests = function () {
 
             function _GetTestsClass(config) {

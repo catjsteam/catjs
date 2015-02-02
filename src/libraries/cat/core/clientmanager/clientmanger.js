@@ -209,8 +209,17 @@ _cat.core.clientmanager = function () {
             executeCode,
             delay = catConfig.getTestDelay(),
             scrap = ("scrap" in dmcontext  ? dmcontext.scrap : undefined),
-            standalone = _isStandalone(scrap);
+            standalone = _isStandalone(scrap),
+            testobj, currentTestIdx;
 
+        currentTestIdx = currentState.index;
+        testobj = catConfig.getTest(currentTestIdx);
+        if (testobj) {
+            if ("delay" in testobj) {
+                delay = testobj.delay; 
+            }
+        }
+        
         executeCode = function (codeCommandsArg, contextArg) {
             var commandObj,
                 scrap = contextArg.scrap,
