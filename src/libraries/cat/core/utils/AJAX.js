@@ -12,6 +12,22 @@ _cat.utils.AJAX = function () {
         return {};
     }
 
+    var _queue = [],
+        _running = 0;
+    
+    
+    function _execAsync() {
+        var currentxmlhttp;
+        
+        if (_running === 0 && _queue.length > 0) {
+            currentxmlhttp = _queue.shift();
+
+            currentxmlhttp.xmlhttp.open(currentxmlhttp.config.method, currentxmlhttp.config.url, currentxmlhttp.config.async);
+            currentxmlhttp.xmlhttp.send();
+            _running++;
+        }
+    }
+    
     return {
 
         /**
@@ -31,14 +47,13 @@ _cat.utils.AJAX = function () {
 
             try {
                 xmlhttp.open(("GET" || config.method), config.url, false);
-                // TODO pass arguments on post
                 xmlhttp.send();
-
+                
             } catch (err) {
                 _cat.core.log.warn("[CAT CHAI] error occurred: ", err, "\n");
 
             }
-
+            
             return xmlhttp;
 
         },
@@ -56,17 +71,22 @@ _cat.utils.AJAX = function () {
          *      callback - [optional] instead of using onreadystatechange this callback will occur when the call is ready
          */
         sendRequestAsync: function(config) {
-
+            
             var xmlhttp = new XMLHttpRequest(),
                 onerror = function (e) {
                     _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
+                    console.log("ajax running: ", _running);
+                    
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         // _cat.core.log("completed\n" + xmlhttp.responseText);
                         if ("callback" in config && config.callback) {
                             config.callback.call(this, xmlhttp);
                         }
+
+                        _running--;
+                        _execAsync();
                     }
                 };
 
@@ -74,10 +94,10 @@ _cat.utils.AJAX = function () {
             xmlhttp.onreadystatechange = (("onreadystatechange" in config) ? config.onreadystatechange : onreadystatechange);
             xmlhttp.onerror = (("onerror" in config) ? config.onerror : onerror);
 
-            xmlhttp.open(("GET" || config.method), config.url, true);
+            _queue.push({xmlhttp: xmlhttp, config:{method: ("GET" || config.method), url: config.url, async: true}});
 
-            // TODO pass arguments on post
-            xmlhttp.send();
+            _execAsync();
+           
         }
 
     };

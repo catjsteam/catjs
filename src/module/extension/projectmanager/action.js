@@ -246,7 +246,7 @@ var path = require("path"),
                     
                     // test data for the test id
                     currReadyIndex = testsConfig.getIndex();
-
+                    
                     if (req.query && req.query.scrap && scrapsObj[req.query.scrap]) {
 
                         scrapName = req.query.scrap;
@@ -288,9 +288,10 @@ var path = require("path"),
                             "ready": isReady,
                             "readyScraps": readyScrapList,
                             "scrapInfo": currTest[scrap.index],
-                            status: 200
+                            status: 200,
+                            currentIndex: currReadyIndex
                         };
-
+                        
                         res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
                         res.send(result);
 

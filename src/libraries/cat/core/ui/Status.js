@@ -384,10 +384,21 @@ _cat.core.ui = function () {
             setContent: function (config) {
 
                 var catStatusContentElt,
-                    catElement = _getCATElt(),
+                    catElement,
                     isOpen = false,
-                    reset = ("reset" in config ? config.reset : false),
-                    me = this;                
+                    reset,
+                    me = this,
+                    isIframe = _cat.utils.iframe.isIframe(),
+                    rootcore = _cat.core.getRootCatCore();
+
+                if (isIframe && rootcore) {
+                    rootcore.core.ui.setContent(config);
+                    return undefined;
+                }
+
+
+                catElement = _getCATElt();
+                reset = ("reset" in config ? config.reset : false);
                 
                 if (catElement) {                                     
                     
@@ -454,7 +465,7 @@ _cat.core.ui = function () {
                     __cache.push(config);
                 }
 
-                this.iframeBrodcast(config);
+                //this.iframeBrodcast(config);
             },
 
             iframeBrodcast : function(config) {

@@ -18,7 +18,9 @@ _cat.core = function () {
         _guid,
         _enum,
         _runModeValidation,
-        _catjspath;
+        _catjspath,
+        _rootcatcore,
+        _rootWindow;
 
     addScrapToManager = function (testsInfo, scrap) {
 
@@ -185,6 +187,17 @@ _cat.core = function () {
 
         init: function (config) {
 
+            var parentWindow;
+            
+            if (_cat.utils.iframe.isIframe()) {
+                parentWindow = _rootWindow();
+                try {
+                    _rootcatcore = parentWindow.window._cat;
+                } catch(e) {
+                    _log.error("[catjs core] failed to resolve the parent window error:",e);
+                }
+             }
+            
             // set catjs path
             if (config) {
                 if ("catjspath" in config) {
@@ -213,7 +226,7 @@ _cat.core = function () {
             _config = new _cat.core.Config({
                 hasPhantomjs: hasPhantomjs
             });
-
+        
             // display the ui, if you didn't already
             if (_config.isUI()) {
                 _cat.core.ui.enable();
@@ -255,7 +268,7 @@ _cat.core = function () {
                         send: reportFormats
                     });
                 });
-            }
+            }           
         },
 
         setManager: function (managerKey, pkgName) {
@@ -436,11 +449,21 @@ _cat.core = function () {
             _vars[key] = value;
         },
 
+        getRootCatCore: function() {
+          return _rootcatcore;            
+        },
+        
         getVar: function (key) {
             if (key.indexOf("$$cat") === -1) {
                 key += "$$cat";
             }
             return _vars[key];
+        },
+        
+        getScrapName: function(scrapName) {
+            var scrapNameVal = (_cat.utils.Utils.isArray(scrapName) ?  scrapName[0] : scrapName);
+            
+            return scrapNameVal;
         },
         
         getScraps: function() {

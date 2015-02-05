@@ -97,10 +97,11 @@ _cat.core.TestManager = function() {
             ]);
 
             // START test signal
-            var config = _cat.core.getConfig();
+            var config = _cat.core.getConfig(),
+                isIframe = _cat.utils.iframe.isIframe();
             
             // TODO we need to set test start signal via an API
-            if (config.getTests()) {
+            if (config.getTests() && !isIframe) {
                 _cat.core.ui.on();
                 _cat.core.TestManager.send({signal:"TESTSTART"});
                 

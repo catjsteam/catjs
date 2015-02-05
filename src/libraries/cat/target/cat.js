@@ -18,7 +18,9 @@ _cat.core = function () {
         _guid,
         _enum,
         _runModeValidation,
-        _catjspath;
+        _catjspath,
+        _rootcatcore,
+        _rootWindow;
 
     addScrapToManager = function (testsInfo, scrap) {
 
@@ -185,6 +187,17 @@ _cat.core = function () {
 
         init: function (config) {
 
+            var parentWindow;
+            
+            if (_cat.utils.iframe.isIframe()) {
+                parentWindow = _rootWindow();
+                try {
+                    _rootcatcore = parentWindow.window._cat;
+                } catch(e) {
+                    _log.error("[catjs core] failed to resolve the parent window error:",e);
+                }
+             }
+            
             // set catjs path
             if (config) {
                 if ("catjspath" in config) {
@@ -213,7 +226,7 @@ _cat.core = function () {
             _config = new _cat.core.Config({
                 hasPhantomjs: hasPhantomjs
             });
-
+        
             // display the ui, if you didn't already
             if (_config.isUI()) {
                 _cat.core.ui.enable();
@@ -255,7 +268,7 @@ _cat.core = function () {
                         send: reportFormats
                     });
                 });
-            }
+            }           
         },
 
         setManager: function (managerKey, pkgName) {
@@ -436,11 +449,21 @@ _cat.core = function () {
             _vars[key] = value;
         },
 
+        getRootCatCore: function() {
+          return _rootcatcore;            
+        },
+        
         getVar: function (key) {
             if (key.indexOf("$$cat") === -1) {
                 key += "$$cat";
             }
             return _vars[key];
+        },
+        
+        getScrapName: function(scrapName) {
+            var scrapNameVal = (_cat.utils.Utils.isArray(scrapName) ?  scrapName[0] : scrapName);
+            
+            return scrapNameVal;
         },
         
         getScraps: function() {
@@ -1381,7 +1404,6 @@ _cat.core.clientmanager = function () {
         intervalObj,
         endTest,
         testQueue,
-        initCurrentState = false,
         currentState = { index: 0, testend: false },
         clientmanagerId;
 
@@ -1431,7 +1453,8 @@ _cat.core.clientmanager = function () {
     setupInterval = function (config, scrap) {
 
         var tests,
-            testManager;
+            testManager, 
+            validateExists;
 
         intervalObj = getScrapInterval(scrap);
 
@@ -1441,32 +1464,38 @@ _cat.core.clientmanager = function () {
         }
 
 
-        intervalObj.interval = setInterval(function () {
-
-            var msg = ["No test activity, retry: "];
-            if (intervalObj.counter < 3) {
-                intervalObj.counter++;
-
-                msg.push(intervalObj.counter);
-
-                _cat.core.ui.setContent({
-                    header: "Test Status",
-                    desc: msg.join(""),
-                    tips: {},
-                    style: "color:gray"
-                });
-
-                console.log("[CatJS manager] ", msg.join(""));
-
-            } else {
-                var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
-
-                console.log("[CatJS Error] ", err);
-                endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
-                clearInterval(intervalObj.interval);
-            }
-        }, config.getTimeout() / 3);
-
+        validateExists = _cat.core.getScrapById(intervalObj.signScrapId);
+        
+        if ( (_cat.core.getScrapName(scrap.name) === _cat.core.getScrapName(validateExists.name)) && !intervalObj.interval ) {
+        
+            intervalObj.interval = setInterval(function () {
+    
+                var msg = ["No test activity, retry: "];
+                if (intervalObj.counter < 3) {
+                    intervalObj.counter++;
+    
+                    msg.push(intervalObj.counter);
+    
+                    _cat.core.ui.setContent({
+                        header: "Test Status",
+                        desc: msg.join(""),
+                        tips: {},
+                        style: "color:gray",
+                        currentState: currentState
+                    });
+    
+                    console.log("[CatJS manager] ", msg.join(""));
+    
+                } else {
+                    var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
+    
+                    console.log("[CatJS Error] ", err);
+                    endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
+                    clearInterval(intervalObj.interval);
+                }
+            }, config.getTimeout() / 3);
+        }
+        
         return;
     };
 
@@ -1633,7 +1662,8 @@ _cat.core.clientmanager = function () {
                         style: 'color:#0080FF, font-size: 10px',
                         header: ((scrap && "name" in scrap && scrap.name) || "'NA'"),
                         desc: (description.length > 0 ? description.join("_$$_") : description.join("")),
-                        tips: {}
+                        tips: {},
+                        currentState: currentState
                     });
 
                     if (_cat.utils.Utils.getType(commandObj) === "string") {
@@ -1685,7 +1715,6 @@ _cat.core.clientmanager = function () {
     function _process(config) {
         var scrap = config.scrapInfo,
             args = config.args,
-            catParent,
             fullScrap;
 
         if (scrap) {
@@ -1729,29 +1758,60 @@ _cat.core.clientmanager = function () {
         return false;
     }
 
-    function broadcastProcess() {
+    /**
+     * Broadcast to execute the ready process and share the current state
+     * 
+     * @param doprocess {Boolean} Whether to process or not  
+     * 
+     * @private
+     */
+    function broadcastProcess(doprocess, dostate) {
 
         var topic = "process." + _cat.core.clientmanager.getClientmanagerId();
 
+        doprocess = (doprocess === undefined ? true : doprocess);
+        dostate = (dostate === undefined ? true : dostate);
+        
         flyer.broadcast({
             channel: "default",
             topic: topic,
-            data: currentState
+            data: {
+                totalDelay: totalDelay,
+                currentState: (dostate ? currentState : undefined),
+                doprocess: (doprocess || true)
+            }
         });
     }
 
 
+    /**
+     * Listener for the process broadcaster
+     * 
+     * @private
+     */
     function _subscribeProcess() {
         flyer.subscribe({
             channel: "default",
             topic: "process.*",
             callback: function(data, topic, channel) {
                 var clientTopic = "process." + _cat.core.clientmanager.getClientmanagerId();
+                
+                // update the current state
+                if ("currentState" in data && data.currentState) {
+                    currentState = data.currentState;   
+                }  
+                
+                // update the total delay
+                if ("currentState" in data && data.totalDelay) {
+                    totalDelay = data.totalDelay;   
+                }                
+                
                 // check if it's the same frame
-                if (topic !== clientTopic) {
-                    currentState = data;
-
-                    _processReadyScraps(true);
+                if (topic !== clientTopic) {      
+                    
+                    if (data.doprocess) {
+                        _processReadyScraps(true);
+                    }
 
                 }
             }
@@ -1781,9 +1841,9 @@ _cat.core.clientmanager = function () {
             callback: function(data, topic, channel) {
                 var clientTopic = "afterprocess." + _cat.core.clientmanager.getClientmanagerId();
                 // check if it's the same frame
-                if (topic !== clientTopic) {
+                //if (topic !== clientTopic) {
                     _cat.core.clientmanager.removeIntervalFromBroadcast(data);
-                }
+                //}
 
             }
         });
@@ -1806,14 +1866,19 @@ _cat.core.clientmanager = function () {
                     _process(config);
                   
                     currentState.index++;
+
+                    if (intervalObj && intervalObj.interval) {
+                        clearInterval(intervalObj.interval);
+                    }                   
                     _processReadyScraps(false);
                 } 
             });
             testitem.deleteAll();
-
+            broadcastProcess(false, true);
+            
         } else {
             if (!cameFromBroadcast) {
-                broadcastProcess();
+                broadcastProcess(true, true);
             }
         }
     }
@@ -1872,7 +1937,7 @@ _cat.core.clientmanager = function () {
                     callback: function () {
 
                         var response = JSON.parse(this.responseText),
-                            scraplist;
+                            scraplist, responseCurrentIndex = 0;
 
                         function _add2Queue(config) {
                             _preScrapProcess(config, args);
@@ -1881,13 +1946,6 @@ _cat.core.clientmanager = function () {
 
                         if (response.ready) {
                             scraplist = response.readyScraps;
-
-
-                            if (!initCurrentState) {
-                                initCurrentState = true;
-                                currentState.index = response.readyScraps[0].index;
-                            }
-
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
                                     var config = testQueue.get(scrap.index).first();
@@ -1947,19 +2005,16 @@ _cat.core.clientmanager = function () {
         },
 
         removeIntervalFromBroadcast : function(scrap) {
-            var scrapRunId,
-                intervalScrap,
+            var intervalScrap,
                 runIndex,
                 intervalIndex;
 
-            scrapRunId = scrap.id;
             if (intervalObj) {
                 intervalScrap = _cat.core.getScrapById(intervalObj.signScrapId);
 
                 runIndex = scrapTestIndex(scrap);
                 intervalIndex = scrapTestIndex(intervalScrap);
 
-                // TODO: && scrap && (intervalObj.signScrapId === scrap.id)) {
                 if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
 
                     clearInterval(intervalObj.interval);
@@ -2201,10 +2256,11 @@ _cat.core.TestManager = function() {
             ]);
 
             // START test signal
-            var config = _cat.core.getConfig();
+            var config = _cat.core.getConfig(),
+                isIframe = _cat.utils.iframe.isIframe();
             
             // TODO we need to set test start signal via an API
-            if (config.getTests()) {
+            if (config.getTests() && !isIframe) {
                 _cat.core.ui.on();
                 _cat.core.TestManager.send({signal:"TESTSTART"});
                 
@@ -2812,10 +2868,21 @@ _cat.core.ui = function () {
             setContent: function (config) {
 
                 var catStatusContentElt,
-                    catElement = _getCATElt(),
+                    catElement,
                     isOpen = false,
-                    reset = ("reset" in config ? config.reset : false),
-                    me = this;                
+                    reset,
+                    me = this,
+                    isIframe = _cat.utils.iframe.isIframe(),
+                    rootcore = _cat.core.getRootCatCore();
+
+                if (isIframe && rootcore) {
+                    rootcore.core.ui.setContent(config);
+                    return undefined;
+                }
+
+
+                catElement = _getCATElt();
+                reset = ("reset" in config ? config.reset : false);
                 
                 if (catElement) {                                     
                     
@@ -2882,7 +2949,7 @@ _cat.core.ui = function () {
                     __cache.push(config);
                 }
 
-                this.iframeBrodcast(config);
+                //this.iframeBrodcast(config);
             },
 
             iframeBrodcast : function(config) {
@@ -2922,6 +2989,22 @@ _cat.utils.AJAX = function () {
         return {};
     }
 
+    var _queue = [],
+        _running = 0;
+    
+    
+    function _execAsync() {
+        var currentxmlhttp;
+        
+        if (_running === 0 && _queue.length > 0) {
+            currentxmlhttp = _queue.shift();
+
+            currentxmlhttp.xmlhttp.open(currentxmlhttp.config.method, currentxmlhttp.config.url, currentxmlhttp.config.async);
+            currentxmlhttp.xmlhttp.send();
+            _running++;
+        }
+    }
+    
     return {
 
         /**
@@ -2941,14 +3024,14 @@ _cat.utils.AJAX = function () {
 
             try {
                 xmlhttp.open(("GET" || config.method), config.url, false);
-                // TODO pass arguments on post
                 xmlhttp.send();
-
+                
             } catch (err) {
                 _cat.core.log.warn("[CAT CHAI] error occurred: ", err, "\n");
 
             }
 
+            
             return xmlhttp;
 
         },
@@ -2966,17 +3049,22 @@ _cat.utils.AJAX = function () {
          *      callback - [optional] instead of using onreadystatechange this callback will occur when the call is ready
          */
         sendRequestAsync: function(config) {
-
+            
             var xmlhttp = new XMLHttpRequest(),
                 onerror = function (e) {
                     _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
+                    console.log("ajax running: ", _running);
+                    
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         // _cat.core.log("completed\n" + xmlhttp.responseText);
                         if ("callback" in config && config.callback) {
                             config.callback.call(this, xmlhttp);
                         }
+
+                        _running--;
+                        _execAsync();
                     }
                 };
 
@@ -2984,10 +3072,10 @@ _cat.utils.AJAX = function () {
             xmlhttp.onreadystatechange = (("onreadystatechange" in config) ? config.onreadystatechange : onreadystatechange);
             xmlhttp.onerror = (("onerror" in config) ? config.onerror : onerror);
 
-            xmlhttp.open(("GET" || config.method), config.url, true);
+            _queue.push({xmlhttp: xmlhttp, config:{method: ("GET" || config.method), url: config.url, async: true}});
 
-            // TODO pass arguments on post
-            xmlhttp.send();
+            _execAsync();
+           
         }
 
     };
@@ -4454,3 +4542,55 @@ _cat.plugins.vnc = function () {
     };
 
 }();
+
+function _catjs_settings() {
+    var _topWindow,
+        _isIframe = function() {
+            try {
+                return window.self !== window.top;
+
+            } catch (e) {
+                return true;
+            }
+        },
+
+        _rootWindow = function() {
+
+            function _getTopWindow(parentarg) {
+                if (!parentarg) {
+                    parentarg = window;
+                }
+                parentarg = parentarg.parent;
+                if(window.top !== parentarg) {
+                    _getTopWindow(parentarg);
+                }
+                return parentarg;
+            }
+
+            if(window.top === window.self) {
+
+                return window.top;
+
+            } else {
+
+                return _getTopWindow();
+            }
+        };
+
+    if (_isIframe() ){
+        _topWindow = _rootWindow();
+        if (_topWindow && _topWindow._cat) {
+            _cat = _topWindow._cat;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+if (typeof exports !== "object") {
+
+    _catjs_settings();
+
+}

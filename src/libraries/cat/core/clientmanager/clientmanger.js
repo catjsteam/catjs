@@ -15,7 +15,6 @@ _cat.core.clientmanager = function () {
         intervalObj,
         endTest,
         testQueue,
-        initCurrentState = false,
         currentState = { index: 0, testend: false },
         clientmanagerId;
 
@@ -65,7 +64,8 @@ _cat.core.clientmanager = function () {
     setupInterval = function (config, scrap) {
 
         var tests,
-            testManager;
+            testManager, 
+            validateExists;
 
         intervalObj = getScrapInterval(scrap);
 
@@ -75,32 +75,38 @@ _cat.core.clientmanager = function () {
         }
 
 
-        intervalObj.interval = setInterval(function () {
-
-            var msg = ["No test activity, retry: "];
-            if (intervalObj.counter < 3) {
-                intervalObj.counter++;
-
-                msg.push(intervalObj.counter);
-
-                _cat.core.ui.setContent({
-                    header: "Test Status",
-                    desc: msg.join(""),
-                    tips: {},
-                    style: "color:gray"
-                });
-
-                console.log("[CatJS manager] ", msg.join(""));
-
-            } else {
-                var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
-
-                console.log("[CatJS Error] ", err);
-                endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
-                clearInterval(intervalObj.interval);
-            }
-        }, config.getTimeout() / 3);
-
+        validateExists = _cat.core.getScrapById(intervalObj.signScrapId);
+        
+        if ( (_cat.core.getScrapName(scrap.name) === _cat.core.getScrapName(validateExists.name)) && !intervalObj.interval ) {
+        
+            intervalObj.interval = setInterval(function () {
+    
+                var msg = ["No test activity, retry: "];
+                if (intervalObj.counter < 3) {
+                    intervalObj.counter++;
+    
+                    msg.push(intervalObj.counter);
+    
+                    _cat.core.ui.setContent({
+                        header: "Test Status",
+                        desc: msg.join(""),
+                        tips: {},
+                        style: "color:gray",
+                        currentState: currentState
+                    });
+    
+                    console.log("[CatJS manager] ", msg.join(""));
+    
+                } else {
+                    var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
+    
+                    console.log("[CatJS Error] ", err);
+                    endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
+                    clearInterval(intervalObj.interval);
+                }
+            }, config.getTimeout() / 3);
+        }
+        
         return;
     };
 
@@ -267,7 +273,8 @@ _cat.core.clientmanager = function () {
                         style: 'color:#0080FF, font-size: 10px',
                         header: ((scrap && "name" in scrap && scrap.name) || "'NA'"),
                         desc: (description.length > 0 ? description.join("_$$_") : description.join("")),
-                        tips: {}
+                        tips: {},
+                        currentState: currentState
                     });
 
                     if (_cat.utils.Utils.getType(commandObj) === "string") {
@@ -319,7 +326,6 @@ _cat.core.clientmanager = function () {
     function _process(config) {
         var scrap = config.scrapInfo,
             args = config.args,
-            catParent,
             fullScrap;
 
         if (scrap) {
@@ -363,29 +369,60 @@ _cat.core.clientmanager = function () {
         return false;
     }
 
-    function broadcastProcess() {
+    /**
+     * Broadcast to execute the ready process and share the current state
+     * 
+     * @param doprocess {Boolean} Whether to process or not  
+     * 
+     * @private
+     */
+    function broadcastProcess(doprocess, dostate) {
 
         var topic = "process." + _cat.core.clientmanager.getClientmanagerId();
 
+        doprocess = (doprocess === undefined ? true : doprocess);
+        dostate = (dostate === undefined ? true : dostate);
+        
         flyer.broadcast({
             channel: "default",
             topic: topic,
-            data: currentState
+            data: {
+                totalDelay: totalDelay,
+                currentState: (dostate ? currentState : undefined),
+                doprocess: (doprocess || true)
+            }
         });
     }
 
 
+    /**
+     * Listener for the process broadcaster
+     * 
+     * @private
+     */
     function _subscribeProcess() {
         flyer.subscribe({
             channel: "default",
             topic: "process.*",
             callback: function(data, topic, channel) {
                 var clientTopic = "process." + _cat.core.clientmanager.getClientmanagerId();
+                
+                // update the current state
+                if ("currentState" in data && data.currentState) {
+                    currentState = data.currentState;   
+                }  
+                
+                // update the total delay
+                if ("currentState" in data && data.totalDelay) {
+                    totalDelay = data.totalDelay;   
+                }                
+                
                 // check if it's the same frame
-                if (topic !== clientTopic) {
-                    currentState = data;
-
-                    _processReadyScraps(true);
+                if (topic !== clientTopic) {      
+                    
+                    if (data.doprocess) {
+                        _processReadyScraps(true);
+                    }
 
                 }
             }
@@ -415,9 +452,9 @@ _cat.core.clientmanager = function () {
             callback: function(data, topic, channel) {
                 var clientTopic = "afterprocess." + _cat.core.clientmanager.getClientmanagerId();
                 // check if it's the same frame
-                if (topic !== clientTopic) {
+                //if (topic !== clientTopic) {
                     _cat.core.clientmanager.removeIntervalFromBroadcast(data);
-                }
+                //}
 
             }
         });
@@ -440,14 +477,19 @@ _cat.core.clientmanager = function () {
                     _process(config);
                   
                     currentState.index++;
+
+                    if (intervalObj && intervalObj.interval) {
+                        clearInterval(intervalObj.interval);
+                    }                   
                     _processReadyScraps(false);
                 } 
             });
             testitem.deleteAll();
-
+            broadcastProcess(false, true);
+            
         } else {
             if (!cameFromBroadcast) {
-                broadcastProcess();
+                broadcastProcess(true, true);
             }
         }
     }
@@ -506,7 +548,7 @@ _cat.core.clientmanager = function () {
                     callback: function () {
 
                         var response = JSON.parse(this.responseText),
-                            scraplist;
+                            scraplist, responseCurrentIndex = 0;
 
                         function _add2Queue(config) {
                             _preScrapProcess(config, args);
@@ -515,13 +557,6 @@ _cat.core.clientmanager = function () {
 
                         if (response.ready) {
                             scraplist = response.readyScraps;
-
-
-                            if (!initCurrentState) {
-                                initCurrentState = true;
-                                currentState.index = response.readyScraps[0].index;
-                            }
-
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
                                     var config = testQueue.get(scrap.index).first();
@@ -581,19 +616,16 @@ _cat.core.clientmanager = function () {
         },
 
         removeIntervalFromBroadcast : function(scrap) {
-            var scrapRunId,
-                intervalScrap,
+            var intervalScrap,
                 runIndex,
                 intervalIndex;
 
-            scrapRunId = scrap.id;
             if (intervalObj) {
                 intervalScrap = _cat.core.getScrapById(intervalObj.signScrapId);
 
                 runIndex = scrapTestIndex(scrap);
                 intervalIndex = scrapTestIndex(intervalScrap);
 
-                // TODO: && scrap && (intervalObj.signScrapId === scrap.id)) {
                 if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
 
                     clearInterval(intervalObj.interval);
