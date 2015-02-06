@@ -13,6 +13,7 @@ _cat.core = function () {
         testNumber = 0,
         getScrapTestInfo,
         addScrapToManager,
+        _module,
         _vars, _managers, _context,
         _config, _log,
         _guid,
@@ -20,7 +21,26 @@ _cat.core = function () {
         _runModeValidation,
         _catjspath,
         _rootcatcore,
-        _rootWindow;
+        _rootWindow,
+        _actionQueue = [],
+        _isStateReady = false,
+        _isReady = function() {
+
+            var me = this;
+            
+            if (_isStateReady) {
+                if (_actionQueue.length > 0) {
+                    _actionQueue.forEach(function(action) {
+                        if (action) {
+                            console.log(">>>>>>>>>>>>>> queue... running ");
+                            _module.action.apply(me, action.args);
+                        }
+                    });
+                }
+            }
+            
+            return _isStateReady;
+        };
 
     addScrapToManager = function (testsInfo, scrap) {
 
@@ -170,7 +190,7 @@ _cat.core = function () {
 
     }
 
-    return {
+    _module = {
 
         log: _log,
 
@@ -188,6 +208,9 @@ _cat.core = function () {
         init: function (config) {
 
             var parentWindow;
+
+            _isStateReady = true;
+            _isReady();
             
             if (_cat.utils.iframe.isIframe()) {
                 parentWindow = _rootWindow();
@@ -268,7 +291,8 @@ _cat.core = function () {
                         send: reportFormats
                     });
                 });
-            }           
+            }
+
         },
 
         setManager: function (managerKey, pkgName) {
@@ -496,7 +520,6 @@ _cat.core = function () {
 
         },
 
-
         getScrapById : function(searchId) {
             var scraps = this.getScraps(),
                 scrap,
@@ -512,7 +535,6 @@ _cat.core = function () {
             }
 
         },
-
 
         getSummaryInfo: function() {
           
@@ -561,7 +583,7 @@ _cat.core = function () {
             return _cat[item + "$$impl"];
         },
 
-        action: function (thiz, config) {
+        actionInternal: function (thiz, config) {
             var scrap,
                 runat, manager,
                 pkgname, args = arguments,
@@ -695,11 +717,19 @@ _cat.core = function () {
             }
 
         },
+        
+        action: function() {
+            if (!_isReady()) {
+                console.log("queue... ");
+                _actionQueue.push({args: arguments});
+            } else {
+                _module.actionInternal.apply(this, arguments);
+            }
+        },
 
         getConfig: function () {
             return (_config.available() ? _config : undefined);
         },
-
 
         /**
          * CAT core definition, used when injecting cat call
@@ -798,8 +828,9 @@ _cat.core = function () {
 //            return  ([window.location.origin, pathname, (url || "")].join("") || "/");
             return  ([head, (url || "")].join("") || "/");
         }
-
     };
+    
+    return _module;
 
 }();
 
@@ -3030,7 +3061,6 @@ _cat.utils.AJAX = function () {
                 _cat.core.log.warn("[CAT CHAI] error occurred: ", err, "\n");
 
             }
-
             
             return xmlhttp;
 
@@ -3055,7 +3085,6 @@ _cat.utils.AJAX = function () {
                     _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
-                    console.log("ajax running: ", _running);
                     
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         // _cat.core.log("completed\n" + xmlhttp.responseText);

@@ -77,7 +77,6 @@ _cat.utils.AJAX = function () {
                     _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
                 onreadystatechange = function () {
-                    console.log("ajax running: ", _running);
                     
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
                         // _cat.core.log("completed\n" + xmlhttp.responseText);
