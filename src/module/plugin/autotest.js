@@ -38,7 +38,8 @@ module.exports = _basePlugin.ext(function () {
                 workDir = _catglobal.get("home").working.path,
                 catjson, catjsondata, args = [],
                 filedata, jsonlint,
-                isAutoOverride = false;
+                isAutoOverride = false,
+                skip = false;
 
             if (!config) {
                 _log.error(errors[1]);
@@ -83,13 +84,31 @@ module.exports = _basePlugin.ext(function () {
                                     }
 
                                 } catch (e) {
-                                    _utils.error("[CAT Core] cat.json parse error: ", e);
+                                    _utils.error("[catjs auto-test] cat.json parse error: ", e);
                                 }
 
                                 catjsondata = JSON.parse(catjsondata);
                                 isAutoOverride = (!("auto-override" in catjsondata) || ("auto-override" in catjsondata && catjsondata["auto-override"]));
                                 
                                 if (catjsondata && isAutoOverride) {
+                                    
+                                    if (!("scenarios" in catjsondata)) {
+                                        skip = true;
+                                        _utils.log("warn", "[catjs auto-test] No valid scenarios property was found");
+                                        
+                                    } else  {
+                                        if (!("general" in catjsondata.scenarios)) {
+                                            skip = true;
+                                            _utils.log("warn", "[catjs auto-test] scenarios property was found, but no valid general property was found");
+                                        }
+                                    }        
+                                    
+                                    if (skip) {
+                                        _utils.log("[catjs auto-test] skipping auto-test process");
+                                        _emitter.emit("job.done", {status: "done"});
+                                        return undefined;
+                                    }
+                                    
                                     if (catjsondata.scenarios.general.tests && catjsondata.tests) {
                                         catjsondata.scenarios.general.tests = args;
                                     }
