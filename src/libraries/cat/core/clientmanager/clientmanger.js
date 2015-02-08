@@ -7,7 +7,7 @@ _cat.core.clientmanager = function () {
         runStatus,
         checkIfExists,
         updateTimeouts,
-        catConfig,
+        initCurrentState = false,
         startInterval,
         delayManagerCommands,
         getScrapInterval,
@@ -556,6 +556,13 @@ _cat.core.clientmanager = function () {
                         }
 
                         if (response.ready) {
+                            
+                            if (!initCurrentState && !_cat.utils.iframe.isIframe()) {
+                                initCurrentState = true;
+                                currentState.index = (response.readyScraps && response.readyScraps[0] ? response.readyScraps[0].index : 0);
+                            }
+
+
                             scraplist = response.readyScraps;
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
