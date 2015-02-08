@@ -27,7 +27,12 @@ _cat.core = function () {
         _isReady = function() {
 
             var me = this;
-            
+
+            /**
+             * [recursion] When catjs library is ready process the scraps waiting in the queue
+             * 
+             * @private
+             */
             function _processAction() {
                 var action;
                 
@@ -726,7 +731,6 @@ _cat.core = function () {
         
         action: function() {
             if (!_isReady()) {
-                console.log("queue... ");
                 _actionQueue.push({args: arguments});
             } else {
                 _module.actionInternal.apply(this, arguments);
