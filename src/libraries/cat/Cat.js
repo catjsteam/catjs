@@ -27,16 +27,28 @@ _cat.core = function () {
         _isReady = function() {
 
             var me = this;
+
+            /**
+             * [recursion] When catjs library is ready process the scraps waiting in the queue
+             * 
+             * @private
+             */
+            function _processAction() {
+                var action;
+                
+                if (_actionQueue.length > 0) {
+                    action = _actionQueue.shift();
+                    if (action) {
+                        _module.action.apply(me, action.args);
+                    }
+                    if (_actionQueue.length > 0) {
+                        _processAction();
+                    }
+                }
+            }                       
             
             if (_isStateReady) {
-                if (_actionQueue.length > 0) {
-                    _actionQueue.forEach(function(action) {
-                        if (action) {
-                            console.log(">>>>>>>>>>>>>> queue... running ");
-                            _module.action.apply(me, action.args);
-                        }
-                    });
-                }
+                _processAction();
             }
             
             return _isStateReady;
@@ -207,10 +219,7 @@ _cat.core = function () {
 
         init: function (config) {
 
-            var parentWindow;
-
-            _isStateReady = true;
-            _isReady();
+            var parentWindow;            
             
             if (_cat.utils.iframe.isIframe()) {
                 parentWindow = _rootWindow();
@@ -293,6 +302,8 @@ _cat.core = function () {
                 });
             }
 
+            _isStateReady = true;
+            _isReady();
         },
 
         setManager: function (managerKey, pkgName) {
@@ -720,7 +731,6 @@ _cat.core = function () {
         
         action: function() {
             if (!_isReady()) {
-                console.log("queue... ");
                 _actionQueue.push({args: arguments});
             } else {
                 _module.actionInternal.apply(this, arguments);
