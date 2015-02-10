@@ -219,7 +219,8 @@ _cat.core = function () {
 
         init: function (config) {
 
-            var parentWindow;            
+            var parentWindow,
+                me = this;            
             
             if (_cat.utils.iframe.isIframe()) {
                 parentWindow = _rootWindow();
@@ -302,6 +303,60 @@ _cat.core = function () {
                 });
             }
 
+            /*global angular */
+            function ngscript(ng) {
+                'use strict';
+
+                var app = ng.module('ng');
+
+                if (app) {
+                    app.directive('script', function() {
+                        return {
+                            restrict: 'E',
+                            scope: false,
+                            link: function(scope, elem, attr) {
+                                if (attr.id && attr.id === '__catjs_script_element') {
+                                    var code = (elem ? elem.text() : undefined),
+                                        _f;
+                                    
+                                    if (code) {
+                                        _f = new Function(code);
+                                        _f.call(this);
+                                    }
+                                }
+                            }
+                        };
+                    });
+    
+                    app.directive('link', function() {
+                        return {
+                            restrict: 'E',
+                            scope: false,
+                            link: function(scope, elem, attr) {
+                                if (attr.href.indexOf("cat.css" !== -1)) {
+                                    var head = document.querySelector("head"),
+                                        link;
+                                    if (head) {
+                                        link = document.createElement("link");
+                                        link.rel = "stylesheet";
+                                        link.href = attr.href;
+                                        head.appendChild(link);
+                                    }
+                                }
+                            }
+                        };
+                    });
+                }
+            }                      
+
+            if (!this.aon && typeof angular !== "undefined") {
+
+                this.aon = true;
+
+                ngscript(angular);
+
+            }
+            
             _isStateReady = true;
             _isReady();
         },
@@ -729,7 +784,9 @@ _cat.core = function () {
 
         },
         
-        action: function() {
+        action: function() {           
+
+
             if (!_isReady()) {
                 _actionQueue.push({args: arguments});
             } else {
@@ -825,17 +882,6 @@ _cat.core = function () {
                 _log.warn("[catjs getBaseUrl] No valid base url was found ");
             }            
             
-//
-//
-//            regHtml = "([/]?.*[/]*[/])+(.*[\\.html]?)";
-//            endInPage = new RegExp(regHtml + "$");
-//            pathname = window.location.pathname;
-//            result = endInPage.exec(pathname);
-//
-//            if (result !== null) {
-//                pathname = (RegExp.$1);
-//            }
-//            return  ([window.location.origin, pathname, (url || "")].join("") || "/");
             return  ([head, (url || "")].join("") || "/");
         }
     };

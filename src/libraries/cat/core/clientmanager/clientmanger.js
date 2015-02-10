@@ -473,7 +473,6 @@ _cat.core.clientmanager = function () {
             var configs = testitem.all();
             configs.forEach(function(config) {
                 if (config) {
-                    console.log(config.scrapInfo.name);
                     _process(config);
                   
                     currentState.index++;
