@@ -9,7 +9,15 @@ _cat.plugins.jquery = function () {
 
             var oldElement = "";
 
-            return {
+            return {                              
+                
+                $: (function() {
+                    if (typeof $ !== "undefined") {
+                        return $;
+                    } else  if (typeof angular !== "undefined") {
+                        return angular.element;
+                    }
+                })(),
                 
                 setBoarder: function (element) {
                     if (oldElement) {
@@ -30,7 +38,7 @@ _cat.plugins.jquery = function () {
                         val = val.trim();
                         sign = val.charAt(0);
 
-                        return ($ ? $(val) : undefined);
+                        return (_cat.plugins.jquery.utils.$ ? _cat.plugins.jquery.utils.$(val) : undefined);
 
                     } else if (_cat.utils.Utils.getType(val) === "object") {
                         return val;
@@ -78,7 +86,7 @@ _cat.plugins.jquery = function () {
 
                         } else if (typeOfEventArgument === "object") {
                             newEventOpt = getOpt(eventType.opt);
-                            newEvent = $.Event(eventType.type, newEventOpt);
+                            newEvent = _cat.plugins.jquery.utils.$.Event(eventType.type, newEventOpt);
                             elt.trigger(newEvent);
 
                         } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
@@ -91,7 +99,7 @@ _cat.plugins.jquery = function () {
                                      elt.trigger(e);
                                     } else {
                                         newEventOpt = getOpt(eventType.opt);
-                                        newEvent = $.Event(eventType.type, newEventOpt);
+                                        newEvent = _cat.plugins.jquery.utils.$.Event(eventType.type, newEventOpt);
                                         elt.trigger(newEvent);
                                     }
                                     
@@ -109,12 +117,12 @@ _cat.plugins.jquery = function () {
 
             scrollTo: function (idName) {
 
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName),
                         stop = elt.offset().top,
                         delay = 1000;
 
-                    $('body,html').animate({scrollTop: stop}, delay);
+                    _cat.plugins.jquery.utils.$('body,html').animate({scrollTop: stop}, delay);
 
                     _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
                 });
@@ -124,15 +132,15 @@ _cat.plugins.jquery = function () {
 
             scrollTop: function () {
 
-                $(document).ready(function () {
-                    $('html, body').animate({scrollTop: 0}, 1000);
+                _cat.plugins.jquery.utils.$(document).ready(function () {
+                    _cat.plugins.jquery.utils.$('html, body').animate({scrollTop: 0}, 1000);
                 });
 
             },
 
             scrollToWithRapper: function (idName, rapperId) {
 
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName),
                         stop = elt.offset().top,
                         delay = 1000;
@@ -144,7 +152,7 @@ _cat.plugins.jquery = function () {
             },
 
             clickRef: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.trigger('click');
@@ -157,10 +165,10 @@ _cat.plugins.jquery = function () {
 
 
             clickButton: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
-                    $('.ui-btn').removeClass('ui-focus');
+                    _cat.plugins.jquery.utils.$('.ui-btn').removeClass('ui-focus');
                     elt.trigger('click');
                     elt.closest('.ui-btn').addClass('ui-focus');
 
@@ -171,7 +179,7 @@ _cat.plugins.jquery = function () {
 
 
             click: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('click');
 
@@ -181,7 +189,7 @@ _cat.plugins.jquery = function () {
 
 
             setCheck: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.prop("checked", true).checkboxradio("refresh");
@@ -192,7 +200,7 @@ _cat.plugins.jquery = function () {
 
 
             setText: function (idName, value) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     _cat.plugins.jquery.utils.trigger(elt, "mouseenter");
@@ -218,26 +226,26 @@ _cat.plugins.jquery = function () {
             },
             
             getValue: function(idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
                     elt.val();
                 });                
             },
 
             checkRadio: function (className, idName) {
-                $(document).ready(function () {
-                    $("." + className).prop("checked", false).checkboxradio("refresh");
-                    $("#" + idName).prop("checked", true).checkboxradio("refresh");
+                _cat.plugins.jquery.utils.$(document).ready(function () {
+                    _cat.plugins.jquery.utils.$("." + className).prop("checked", false).checkboxradio("refresh");
+                    _cat.plugins.jquery.utils.$("#" + idName).prop("checked", true).checkboxradio("refresh");
 
 
-                    _cat.plugins.jquery.utils.setBoarder($("label[for='" + idName + "']").eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder(_cat.plugins.jquery.utils.$("label[for='" + idName + "']").eq(0)[0]);
 
                 });
 
             },
 
             collapsible: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.children(".ui-collapsible-heading").children(".ui-collapsible-heading-toggle").click();
@@ -247,8 +255,8 @@ _cat.plugins.jquery = function () {
             },
 
             backClick: function () {
-                $(document).ready(function () {
-                    $('[data-rel="back"]')[0].click();
+                _cat.plugins.jquery.utils.$(document).ready(function () {
+                    _cat.plugins.jquery.utils.$('[data-rel="back"]')[0].click();
                 });
             }
         }
