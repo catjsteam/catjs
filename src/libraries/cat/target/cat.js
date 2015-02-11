@@ -3973,7 +3973,7 @@ _cat.plugins.jqm = function () {
         actions: {
 
             selectTab: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('click');
 
@@ -3983,7 +3983,7 @@ _cat.plugins.jqm = function () {
             },
 
             selectMenu : function (selectId, value) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(selectId);
                     if (typeof value === 'number') {
                         elt.find(" option[value=" + value + "]").attr('selected','selected');
@@ -3997,7 +3997,7 @@ _cat.plugins.jqm = function () {
             },
 
             swipeItemLeft : function(idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.swipeleft();
@@ -4006,7 +4006,7 @@ _cat.plugins.jqm = function () {
             },
 
             swipeItemRight : function(idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.swiperight();
 
@@ -4015,22 +4015,22 @@ _cat.plugins.jqm = function () {
             },
 
             swipePageLeft : function() {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
-                    _cat.plugins.jquery.utils.$( ".ui-page-active" ).swipeleft();
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
+                    _cat.plugins.jquery.utils.$()( ".ui-page-active" ).swipeleft();
 
                 });
             },
 
             swipePageRight : function() {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
 
-                    var prev = _cat.plugins.jquery.utils.$( ".ui-page-active" ).jqmData( "prev" );
+                    var prev = _cat.plugins.jquery.utils.$()( ".ui-page-active" ).jqmData( "prev" );
 
                 });
             },
 
             tap: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('tap');
 
@@ -4039,7 +4039,7 @@ _cat.plugins.jqm = function () {
             },
 
             slide : function (idName, value) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.val(value).slider("refresh");
@@ -4048,15 +4048,15 @@ _cat.plugins.jqm = function () {
             },
 
             searchInListView : function (listViewId, newValue) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(listViewId),
                         listView = elt[0],
                         parentElements = listView.parentElement.children,
-                        form = parentElements[_cat.plugins.jquery.utils.$.inArray( listView, parentElements ) - 1];
+                        form = parentElements[_cat.plugins.jquery.utils.$().inArray( listView, parentElements ) - 1];
 
-                    _cat.plugins.jquery.utils.$( form ).find( "input" ).focus();
-                    _cat.plugins.jquery.utils.$( form ).find( "input" ).val(newValue);
-                    _cat.plugins.jquery.utils.$( form ).find( "input" ).trigger( 'change' );
+                    _cat.plugins.jquery.utils.$()( form ).find( "input" ).focus();
+                    _cat.plugins.jquery.utils.$()( form ).find( "input" ).val(newValue);
+                    _cat.plugins.jquery.utils.$()( form ).find( "input" ).trigger( 'change' );
                 });
             }
         }
@@ -4079,13 +4079,15 @@ _cat.plugins.jquery = function () {
 
             return {                              
                 
-                $: (function() {
+                $: function() {
                     if (typeof $ !== "undefined") {
                         return $;
                     } else  if (typeof angular !== "undefined") {
                         return angular.element;
                     }
-                })(),
+                    
+                    return function(){};
+                },
                 
                 setBoarder: function (element) {
                     if (oldElement) {
@@ -4106,7 +4108,7 @@ _cat.plugins.jquery = function () {
                         val = val.trim();
                         sign = val.charAt(0);
 
-                        return (_cat.plugins.jquery.utils.$ ? _cat.plugins.jquery.utils.$(val) : undefined);
+                        return (_cat.plugins.jquery.utils.$() ? _cat.plugins.jquery.utils.$()(val) : undefined);
 
                     } else if (_cat.utils.Utils.getType(val) === "object") {
                         return val;
@@ -4154,7 +4156,7 @@ _cat.plugins.jquery = function () {
 
                         } else if (typeOfEventArgument === "object") {
                             newEventOpt = getOpt(eventType.opt);
-                            newEvent = _cat.plugins.jquery.utils.$.Event(eventType.type, newEventOpt);
+                            newEvent = _cat.plugins.jquery.utils.$().Event(eventType.type, newEventOpt);
                             elt.trigger(newEvent);
 
                         } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
@@ -4167,7 +4169,7 @@ _cat.plugins.jquery = function () {
                                      elt.trigger(e);
                                     } else {
                                         newEventOpt = getOpt(eventType.opt);
-                                        newEvent = _cat.plugins.jquery.utils.$.Event(eventType.type, newEventOpt);
+                                        newEvent = _cat.plugins.jquery.utils.$().Event(eventType.type, newEventOpt);
                                         elt.trigger(newEvent);
                                     }
                                     
@@ -4185,12 +4187,12 @@ _cat.plugins.jquery = function () {
 
             scrollTo: function (idName) {
 
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName),
                         stop = elt.offset().top,
                         delay = 1000;
 
-                    _cat.plugins.jquery.utils.$('body,html').animate({scrollTop: stop}, delay);
+                    _cat.plugins.jquery.utils.$()('body,html').animate({scrollTop: stop}, delay);
 
                     _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
                 });
@@ -4200,15 +4202,15 @@ _cat.plugins.jquery = function () {
 
             scrollTop: function () {
 
-                _cat.plugins.jquery.utils.$(document).ready(function () {
-                    _cat.plugins.jquery.utils.$('html, body').animate({scrollTop: 0}, 1000);
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
+                    _cat.plugins.jquery.utils.$()('html, body').animate({scrollTop: 0}, 1000);
                 });
 
             },
 
             scrollToWithRapper: function (idName, rapperId) {
 
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName),
                         stop = elt.offset().top,
                         delay = 1000;
@@ -4220,7 +4222,7 @@ _cat.plugins.jquery = function () {
             },
 
             clickRef: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.trigger('click');
@@ -4233,10 +4235,10 @@ _cat.plugins.jquery = function () {
 
 
             clickButton: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
-                    _cat.plugins.jquery.utils.$('.ui-btn').removeClass('ui-focus');
+                    _cat.plugins.jquery.utils.$()('.ui-btn').removeClass('ui-focus');
                     elt.trigger('click');
                     elt.closest('.ui-btn').addClass('ui-focus');
 
@@ -4247,7 +4249,7 @@ _cat.plugins.jquery = function () {
 
 
             click: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('click');
 
@@ -4257,7 +4259,7 @@ _cat.plugins.jquery = function () {
 
 
             setCheck: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.prop("checked", true).checkboxradio("refresh");
@@ -4268,7 +4270,7 @@ _cat.plugins.jquery = function () {
 
 
             setText: function (idName, value) {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     _cat.plugins.jquery.utils.trigger(elt, "mouseenter");
@@ -4294,26 +4296,26 @@ _cat.plugins.jquery = function () {
             },
             
             getValue: function(idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
                     elt.val();
                 });                
             },
 
             checkRadio: function (className, idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
-                    _cat.plugins.jquery.utils.$("." + className).prop("checked", false).checkboxradio("refresh");
-                    _cat.plugins.jquery.utils.$("#" + idName).prop("checked", true).checkboxradio("refresh");
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
+                    _cat.plugins.jquery.utils.$()("." + className).prop("checked", false).checkboxradio("refresh");
+                    _cat.plugins.jquery.utils.$()("#" + idName).prop("checked", true).checkboxradio("refresh");
 
 
-                    _cat.plugins.jquery.utils.setBoarder(_cat.plugins.jquery.utils.$("label[for='" + idName + "']").eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder(_cat.plugins.jquery.utils.$()("label[for='" + idName + "']").eq(0)[0]);
 
                 });
 
             },
 
             collapsible: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.children(".ui-collapsible-heading").children(".ui-collapsible-heading-toggle").click();
@@ -4323,8 +4325,8 @@ _cat.plugins.jquery = function () {
             },
 
             backClick: function () {
-                _cat.plugins.jquery.utils.$(document).ready(function () {
-                    _cat.plugins.jquery.utils.$('[data-rel="back"]')[0].click();
+                _cat.plugins.jquery.utils.$()(document).ready(function () {
+                    _cat.plugins.jquery.utils.$()('[data-rel="back"]')[0].click();
                 });
             }
         }

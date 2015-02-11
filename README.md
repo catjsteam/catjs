@@ -1,4 +1,4 @@
-CatJS 0.4.67
+CatJS 0.4.68
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,6 +52,7 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **jquery fix* Error fix, occurred at version 0.4.67
 * **angularjs support* AngularJS support
 * **Test Manager* Core test execution engine behavior fixes
 * **Ready State** catjs internal tests execution ready state process added 

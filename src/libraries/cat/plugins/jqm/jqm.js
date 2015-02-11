@@ -8,7 +8,7 @@ _cat.plugins.jqm = function () {
         actions: {
 
             selectTab: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('click');
 
@@ -18,7 +18,7 @@ _cat.plugins.jqm = function () {
             },
 
             selectMenu : function (selectId, value) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(selectId);
                     if (typeof value === 'number') {
                         elt.find(" option[value=" + value + "]").attr('selected','selected');
@@ -32,7 +32,7 @@ _cat.plugins.jqm = function () {
             },
 
             swipeItemLeft : function(idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.swipeleft();
@@ -41,7 +41,7 @@ _cat.plugins.jqm = function () {
             },
 
             swipeItemRight : function(idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.swiperight();
 
@@ -50,22 +50,22 @@ _cat.plugins.jqm = function () {
             },
 
             swipePageLeft : function() {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
-                    _cat.plugins.jquery.utils.$( ".ui-page-active" ).swipeleft();
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
+                    _cat.plugins.jquery.utils.$()( ".ui-page-active" ).swipeleft();
 
                 });
             },
 
             swipePageRight : function() {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
 
-                    var prev = _cat.plugins.jquery.utils.$( ".ui-page-active" ).jqmData( "prev" );
+                    var prev = _cat.plugins.jquery.utils.$()( ".ui-page-active" ).jqmData( "prev" );
 
                 });
             },
 
             tap: function (idName) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('tap');
 
@@ -74,7 +74,7 @@ _cat.plugins.jqm = function () {
             },
 
             slide : function (idName, value) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.val(value).slider("refresh");
@@ -83,15 +83,15 @@ _cat.plugins.jqm = function () {
             },
 
             searchInListView : function (listViewId, newValue) {
-                _cat.plugins.jquery.utils.$(document).ready(function(){
+                _cat.plugins.jquery.utils.$()(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(listViewId),
                         listView = elt[0],
                         parentElements = listView.parentElement.children,
-                        form = parentElements[_cat.plugins.jquery.utils.$.inArray( listView, parentElements ) - 1];
+                        form = parentElements[_cat.plugins.jquery.utils.$().inArray( listView, parentElements ) - 1];
 
-                    _cat.plugins.jquery.utils.$( form ).find( "input" ).focus();
-                    _cat.plugins.jquery.utils.$( form ).find( "input" ).val(newValue);
-                    _cat.plugins.jquery.utils.$( form ).find( "input" ).trigger( 'change' );
+                    _cat.plugins.jquery.utils.$()( form ).find( "input" ).focus();
+                    _cat.plugins.jquery.utils.$()( form ).find( "input" ).val(newValue);
+                    _cat.plugins.jquery.utils.$()( form ).find( "input" ).trigger( 'change' );
                 });
             }
         }
