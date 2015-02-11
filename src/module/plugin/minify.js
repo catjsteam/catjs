@@ -88,6 +88,7 @@ module.exports = _basePlugin.ext(function () {
                 }
                 
                 jshint.globals["_cat"] = true;
+                jshint.globals["angular"] = true;
                 jshint.globals["chai"] = true;
                 jshint.globals["$"] = true;
                 jshint.globals["window"] = true;

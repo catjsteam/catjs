@@ -175,8 +175,8 @@ var path = require("path"),
                     testsConfig.next();
 
                     _getReadyScraps();
-                    
-                } 
+
+                }
             }
 
             _getReadyScraps();
@@ -190,19 +190,22 @@ var path = require("path"),
             var indexTests,
                 tests = devicesTests[testId].tests,
                 tempScrap,
-                indexTests = 0, size;
+                indexTests = 0, size,
+                scrap;
 
             if (tests) {
                 size = tests.length;
                 for (indexTests = 0; indexTests < size; indexTests++) {
                     tempScrap = tests[indexTests];
-                    if (tempScrap.name == scrapName && !(tempScrap.run)) {
-                        return tempScrap;
+                    if (tempScrap.name == scrapName) {
+                        scrap = tempScrap;
                     }
+
+
                 }
             }
 
-            return null;
+            return {scrap: scrap, run: (scrap ? scrap.run : false) };
         };
 
         return {
@@ -225,17 +228,31 @@ var path = require("path"),
                     testsConfig,
                     cloneGlobalTests,
                     isReady = false,
-                    readyScrapList = [];
+                    readyScrapList = [],
+                    scrapReady = true;
+
+                function _response(isready) {
+                    // send back response
+                    result = {
+                        "ready": isReady,
+                        "readyScraps": readyScrapList,
+                        "scrapInfo": (scrap && currTest && isready ? currTest[scrap.index] : undefined),
+                        status: 200,
+                        currentIndex: currReadyIndex
+                    };
+
+                    res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+                    res.send(result);
+                }
 
                 testId = req.query.testId;
                 if (testId) {
-                    
                     testsConfig = devicesTests[testId];
-                    
-                   
+
+
                     if (!testsConfig ||
                         (testsConfig && globalTests.length === testsConfig.getIndex())) {
-                        
+
                         cloneGlobalTests = JSON.parse(JSON.stringify(globalTests));
                         devicesTests[testId] = new TestConfig({
                             "tests": cloneGlobalTests
@@ -243,37 +260,51 @@ var path = require("path"),
                     }
 
                     testsConfig = devicesTests[testId];
-                    
+
                     // test data for the test id
                     currReadyIndex = testsConfig.getIndex();
-                    
+
                     if (req.query && req.query.scrap && scrapsObj[req.query.scrap]) {
 
                         scrapName = req.query.scrap;
                         scrap = getScrap(scrapName, testId);
 
-                        if (!scrap) {
-                            console.warn("[CAT] No valid scrap was found");
-                            return undefined;
-                        } else {
-                            if (scrap.index === undefined || scrap.index === null) {
-                                console.warn("[CAT] No valid scrap index was found");
-                                return undefined;
+                        if (scrap.run) {
+                            if (scrap.scrap) {
+                                console.warn("[catjs monitoring server] scrap:", scrap.scrap.name, " already processed ");
+                            } else {
+                                console.warn("[catjs monitoring server] No valid scrap was found, scrap:", scrapName);
                             }
-                        }                       
+                            scrapReady = false;
+                        }
+//                        else {
+//                            if (scrap.scrap && (scrap.scrap.index === undefined || scrap.scrap.index === null)) {
+//                                console.warn("[catjs monitoring server] No valid scrap index was found");
+//                                scrapReady = false;
+//                            }
+//                        }
+
+                        if (!scrapReady) {
+                            _response(false);
+                            return undefined;
+                        }
+
+                        if (scrap && scrap.scrap && !scrap.run) {
+                            scrap = scrap.scrap;
+                        }
 
                         currTest = testsConfig.tests;
                         currTest[scrap.index].signed = true;
 
                         // if this is the next scrap
                         if (scrap.index <= currReadyIndex) {
-                            
+
                             currTest[scrap.index].run = true;
                             isReady = true;
 
                             readyScrapList.push(scrap);
                             testsConfig.next();
-                            
+
                             readyScrapList = readyScrapList.concat(emptyQueue(testId));
 
                         } else {
@@ -283,18 +314,8 @@ var path = require("path"),
 
                         }
 
-                        // send back response
-                        result = {
-                            "ready": isReady,
-                            "readyScraps": readyScrapList,
-                            "scrapInfo": currTest[scrap.index],
-                            status: 200,
-                            currentIndex: currReadyIndex
-                        };
-                        
-                        res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
-                        res.send(result);
 
+                        _response(true);
 
                     }
                 }

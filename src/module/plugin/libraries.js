@@ -334,7 +334,8 @@ module.exports = _basePlugin.ext(function () {
                                                     chai: true,
                                                     phantom: true,
                                                     JSPath: true,
-                                                    flyer : true
+                                                    flyer : true,
+                                                    angular : true
                                                 }
                                             }
                                         });
@@ -488,6 +489,7 @@ module.exports = _basePlugin.ext(function () {
                                 if (concatItem.key === _path.normalize("cat/cat.json")) {
                                     // parse content..
                                     if (parse) {
+                                        _jsutils.Template.setMustache(true);
                                         contentValue = _jsutils.Template.template({
                                             content: contentValue,
                                             data: {
