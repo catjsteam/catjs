@@ -9,12 +9,12 @@ _cat.plugins.enyo = function () {
     function _genericAPI(element, name) {
         if (name) {
             if (!element) {
-                _cat.core.log.info(_noValidMessgae("next"));
+                _cat.core.log.info("[catjs enyo plugin]", _noValidMessgae("next"));
             }
             if (element[name]) {
                 element[name]();
             } else {
-                _cat.core.log.info("[cat enyo plugin] No valid method was found, '" + name + "'");
+                _cat.core.log.info("[catjs enyo plugin] No valid method was found, '" + name + "'");
             }
         }
     }
@@ -26,7 +26,7 @@ _cat.plugins.enyo = function () {
 
             waterfall: function (element, eventName) {
                 if (!element || !eventName) {
-                    _cat.core.log.info(_noValidMessgae("waterfall"));
+                    _cat.core.log.info("[catjs enyo plugin]", _noValidMessgae("waterfall"));
                 }
 
                 try {

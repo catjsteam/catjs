@@ -220,7 +220,69 @@ _cat.core = function () {
         init: function (config) {
 
             var parentWindow,
-                me = this;            
+                me = this;
+
+
+            /* AngularJS Initialization */
+            function ngscript(ng) {
+                'use strict';
+
+                var app = ng.module('ng');
+
+                if (app) {
+                    // debug _log.log("[catjs script directive] ng module directive initialization");
+                    app.directive('script', function() {
+                        return {
+                            restrict: 'E',
+                            scope: false,
+                            link: function(scope, elem, attr) {
+                                if (attr.id && attr.id === '__catjs_script_element') {
+                                   // debug  _log.log("[catjs script directive] angularjs script directive, found an element");
+                                    var code = (elem ? elem.text() : undefined),
+                                        _f;
+
+                                    if (code) {
+                                        _f = new Function(code);
+                                        // debug _log.log("[catjs script directive] angularjs script directive, executing: ", elem.text());
+
+                                        _f.call(this);
+                                    }
+                                }
+                            }
+                        };
+                    });
+
+                    app.directive('link', function() {
+                        return {
+                            restrict: 'E',
+                            scope: false,
+                            link: function(scope, elem, attr) {
+                                if (attr.href.indexOf("cat.css" !== -1)) {
+                                    var head = document.querySelector("head"),
+                                        link;
+                                    if (head) {
+                                        link = document.createElement("link");
+                                        link.rel = "stylesheet";
+                                        link.href = attr.href;
+                                        head.appendChild(link);
+                                    }
+                                }
+                            }
+                        };
+                    });
+                }
+            }
+
+            if (!this.aon && typeof angular !== "undefined") {
+
+                this.aon = true;
+
+                ngscript(angular);
+
+                _log.log("[catjs core] angularjs handle found, initializined");
+
+            }
+
             
             if (_cat.utils.iframe.isIframe()) {
                 parentWindow = _rootWindow();
@@ -301,60 +363,6 @@ _cat.core = function () {
                         send: reportFormats
                     });
                 });
-            }
-
-            /*global angular */
-            function ngscript(ng) {
-                'use strict';
-
-                var app = ng.module('ng');
-
-                if (app) {
-                    app.directive('script', function() {
-                        return {
-                            restrict: 'E',
-                            scope: false,
-                            link: function(scope, elem, attr) {
-                                if (attr.id && attr.id === '__catjs_script_element') {
-                                    var code = (elem ? elem.text() : undefined),
-                                        _f;
-                                    
-                                    if (code) {
-                                        _f = new Function(code);
-                                        _f.call(this);
-                                    }
-                                }
-                            }
-                        };
-                    });
-    
-                    app.directive('link', function() {
-                        return {
-                            restrict: 'E',
-                            scope: false,
-                            link: function(scope, elem, attr) {
-                                if (attr.href.indexOf("cat.css" !== -1)) {
-                                    var head = document.querySelector("head"),
-                                        link;
-                                    if (head) {
-                                        link = document.createElement("link");
-                                        link.rel = "stylesheet";
-                                        link.href = attr.href;
-                                        head.appendChild(link);
-                                    }
-                                }
-                            }
-                        };
-                    });
-                }
-            }                      
-
-            if (!this.aon && typeof angular !== "undefined") {
-
-                this.aon = true;
-
-                ngscript(angular);
-
             }
             
             _isStateReady = true;
@@ -847,7 +855,7 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                _log.log("[catjs] Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
+                _log.log("[catjs core] scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
         },

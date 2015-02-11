@@ -220,7 +220,69 @@ _cat.core = function () {
         init: function (config) {
 
             var parentWindow,
-                me = this;            
+                me = this;
+
+
+            /* AngularJS Initialization */
+            function ngscript(ng) {
+                'use strict';
+
+                var app = ng.module('ng');
+
+                if (app) {
+                    // debug _log.log("[catjs script directive] ng module directive initialization");
+                    app.directive('script', function() {
+                        return {
+                            restrict: 'E',
+                            scope: false,
+                            link: function(scope, elem, attr) {
+                                if (attr.id && attr.id === '__catjs_script_element') {
+                                   // debug  _log.log("[catjs script directive] angularjs script directive, found an element");
+                                    var code = (elem ? elem.text() : undefined),
+                                        _f;
+
+                                    if (code) {
+                                        _f = new Function(code);
+                                        // debug _log.log("[catjs script directive] angularjs script directive, executing: ", elem.text());
+
+                                        _f.call(this);
+                                    }
+                                }
+                            }
+                        };
+                    });
+
+                    app.directive('link', function() {
+                        return {
+                            restrict: 'E',
+                            scope: false,
+                            link: function(scope, elem, attr) {
+                                if (attr.href.indexOf("cat.css" !== -1)) {
+                                    var head = document.querySelector("head"),
+                                        link;
+                                    if (head) {
+                                        link = document.createElement("link");
+                                        link.rel = "stylesheet";
+                                        link.href = attr.href;
+                                        head.appendChild(link);
+                                    }
+                                }
+                            }
+                        };
+                    });
+                }
+            }
+
+            if (!this.aon && typeof angular !== "undefined") {
+
+                this.aon = true;
+
+                ngscript(angular);
+
+                _log.log("[catjs core] angularjs handle found, initializined");
+
+            }
+
             
             if (_cat.utils.iframe.isIframe()) {
                 parentWindow = _rootWindow();
@@ -301,60 +363,6 @@ _cat.core = function () {
                         send: reportFormats
                     });
                 });
-            }
-
-            /*global angular */
-            function ngscript(ng) {
-                'use strict';
-
-                var app = ng.module('ng');
-
-                if (app) {
-                    app.directive('script', function() {
-                        return {
-                            restrict: 'E',
-                            scope: false,
-                            link: function(scope, elem, attr) {
-                                if (attr.id && attr.id === '__catjs_script_element') {
-                                    var code = (elem ? elem.text() : undefined),
-                                        _f;
-                                    
-                                    if (code) {
-                                        _f = new Function(code);
-                                        _f.call(this);
-                                    }
-                                }
-                            }
-                        };
-                    });
-    
-                    app.directive('link', function() {
-                        return {
-                            restrict: 'E',
-                            scope: false,
-                            link: function(scope, elem, attr) {
-                                if (attr.href.indexOf("cat.css" !== -1)) {
-                                    var head = document.querySelector("head"),
-                                        link;
-                                    if (head) {
-                                        link = document.createElement("link");
-                                        link.rel = "stylesheet";
-                                        link.href = attr.href;
-                                        head.appendChild(link);
-                                    }
-                                }
-                            }
-                        };
-                    });
-                }
-            }                      
-
-            if (!this.aon && typeof angular !== "undefined") {
-
-                this.aon = true;
-
-                ngscript(angular);
-
             }
             
             _isStateReady = true;
@@ -847,7 +855,7 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                _log.log("[catjs] Scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
+                _log.log("[catjs core] scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
         },
@@ -1314,7 +1322,7 @@ _cat.utils.chai = function () {
             assert = _chai.assert;
 
         } else {
-            _cat.core.log.info("Chai library is not supported, skipping annotation 'assert', consider adding it to the .catproject dependencies");
+            _cat.core.log.info("[catjs chai utils] Chai library is not supported, skipping annotation 'assert', consider adding it to the .catproject dependencies");
         }
     }
 
@@ -1492,7 +1500,8 @@ _cat.core.clientmanager = function () {
         endTest,
         testQueue,
         currentState = { index: 0, testend: false },
-        clientmanagerId;
+        clientmanagerId,
+        _log = _cat.core.log;
 
 
     endTest = function (opt, interval) {
@@ -1502,7 +1511,7 @@ _cat.core.clientmanager = function () {
         
         _cat.core.TestManager.send({signal: 'TESTEND', error: opt.error});
         if (interval === -1) {
-            console.log("Test End");
+            _log.log("[catjs client manager] Test End");
         } else {
             clearInterval(interval);
         }
@@ -1571,12 +1580,12 @@ _cat.core.clientmanager = function () {
                         currentState: currentState
                     });
     
-                    console.log("[CatJS manager] ", msg.join(""));
+                    _log.log("[CatJS client manager] ", msg.join(""));
     
                 } else {
                     var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
     
-                    console.log("[CatJS Error] ", err);
+                    _log.log("[catjs client manager] error: ", err);
                     endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
                     clearInterval(intervalObj.interval);
                 }
@@ -2023,13 +2032,26 @@ _cat.core.clientmanager = function () {
                     callback: function () {
 
                         var response = JSON.parse(this.responseText),
-                            scraplist, responseCurrentIndex = 0;
+                            scraplist, reportFormats, errmsg;
 
                         function _add2Queue(config) {
                             _preScrapProcess(config, args);
                             testQueue.add(config.scrapInfo.index, config);
                         }
 
+                        if (!response.scrapInfo) {
+                            errmsg = ["[catjs client manager] Something went wrong processing the scrap request, check your cat.json test project. current scrap index:", currentState.index, "; url:", urlAddress].join("");
+                            _log.error(errmsg);
+
+                            if (catConfig.isReport()) {
+                                reportFormats = catConfig.getReportFormats();
+                            }
+
+                            endTest({error: errmsg}, (runStatus ? runStatus.intervalObj : undefined));
+
+                            return undefined;
+                        }
+                        
                         if (response.ready) {
                             
                             if (!initCurrentState && !_cat.utils.iframe.isIframe()) {
@@ -3113,7 +3135,7 @@ _cat.utils.AJAX = function () {
             var xmlhttp = new XMLHttpRequest();
             // TODO
             // config.url = encodeURI(config.url);
-            _cat.core.log.info("Sending REST request: " + config.url);
+            _cat.core.log.info("[catjs ajax] sending REST request: " + config.url);
 
             try {
                 xmlhttp.open(("GET" || config.method), config.url, false);
@@ -3889,12 +3911,12 @@ _cat.plugins.enyo = function () {
     function _genericAPI(element, name) {
         if (name) {
             if (!element) {
-                _cat.core.log.info(_noValidMessgae("next"));
+                _cat.core.log.info("[catjs enyo plugin]", _noValidMessgae("next"));
             }
             if (element[name]) {
                 element[name]();
             } else {
-                _cat.core.log.info("[cat enyo plugin] No valid method was found, '" + name + "'");
+                _cat.core.log.info("[catjs enyo plugin] No valid method was found, '" + name + "'");
             }
         }
     }
@@ -3906,7 +3928,7 @@ _cat.plugins.enyo = function () {
 
             waterfall: function (element, eventName) {
                 if (!element || !eventName) {
-                    _cat.core.log.info(_noValidMessgae("waterfall"));
+                    _cat.core.log.info("[catjs enyo plugin]", _noValidMessgae("waterfall"));
                 }
 
                 try {
@@ -3951,7 +3973,7 @@ _cat.plugins.jqm = function () {
         actions: {
 
             selectTab: function (idName) {
-                $(document).ready(function(){
+                _cat.plugins.jquery.utils.$(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('click');
 
@@ -3961,7 +3983,7 @@ _cat.plugins.jqm = function () {
             },
 
             selectMenu : function (selectId, value) {
-                $(document).ready(function(){
+                _cat.plugins.jquery.utils.$(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(selectId);
                     if (typeof value === 'number') {
                         elt.find(" option[value=" + value + "]").attr('selected','selected');
@@ -3975,7 +3997,7 @@ _cat.plugins.jqm = function () {
             },
 
             swipeItemLeft : function(idName) {
-                $(document).ready(function(){
+                _cat.plugins.jquery.utils.$(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.swipeleft();
@@ -3984,7 +4006,7 @@ _cat.plugins.jqm = function () {
             },
 
             swipeItemRight : function(idName) {
-                $(document).ready(function(){
+                _cat.plugins.jquery.utils.$(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.swiperight();
 
@@ -3993,22 +4015,22 @@ _cat.plugins.jqm = function () {
             },
 
             swipePageLeft : function() {
-                $(document).ready(function(){
-                    $( ".ui-page-active" ).swipeleft();
+                _cat.plugins.jquery.utils.$(document).ready(function(){
+                    _cat.plugins.jquery.utils.$( ".ui-page-active" ).swipeleft();
 
                 });
             },
 
             swipePageRight : function() {
-                $(document).ready(function(){
+                _cat.plugins.jquery.utils.$(document).ready(function(){
 
-                    var prev = $( ".ui-page-active" ).jqmData( "prev" );
+                    var prev = _cat.plugins.jquery.utils.$( ".ui-page-active" ).jqmData( "prev" );
 
                 });
             },
 
             tap: function (idName) {
-                $(document).ready(function(){
+                _cat.plugins.jquery.utils.$(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('tap');
 
@@ -4017,7 +4039,7 @@ _cat.plugins.jqm = function () {
             },
 
             slide : function (idName, value) {
-                $(document).ready(function(){
+                _cat.plugins.jquery.utils.$(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.val(value).slider("refresh");
@@ -4026,15 +4048,15 @@ _cat.plugins.jqm = function () {
             },
 
             searchInListView : function (listViewId, newValue) {
-                $(document).ready(function(){
+                _cat.plugins.jquery.utils.$(document).ready(function(){
                     var elt =  _cat.plugins.jquery.utils.getElt(listViewId),
                         listView = elt[0],
                         parentElements = listView.parentElement.children,
-                        form = parentElements[$.inArray( listView, parentElements ) - 1];
+                        form = parentElements[_cat.plugins.jquery.utils.$.inArray( listView, parentElements ) - 1];
 
-                    $( form ).find( "input" ).focus();
-                    $( form ).find( "input" ).val(newValue);
-                    $( form ).find( "input" ).trigger( 'change' );
+                    _cat.plugins.jquery.utils.$( form ).find( "input" ).focus();
+                    _cat.plugins.jquery.utils.$( form ).find( "input" ).val(newValue);
+                    _cat.plugins.jquery.utils.$( form ).find( "input" ).trigger( 'change' );
                 });
             }
         }
@@ -4055,7 +4077,15 @@ _cat.plugins.jquery = function () {
 
             var oldElement = "";
 
-            return {
+            return {                              
+                
+                $: (function() {
+                    if (typeof $ !== "undefined") {
+                        return $;
+                    } else  if (typeof angular !== "undefined") {
+                        return angular.element;
+                    }
+                })(),
                 
                 setBoarder: function (element) {
                     if (oldElement) {
@@ -4076,7 +4106,7 @@ _cat.plugins.jquery = function () {
                         val = val.trim();
                         sign = val.charAt(0);
 
-                        return ($ ? $(val) : undefined);
+                        return (_cat.plugins.jquery.utils.$ ? _cat.plugins.jquery.utils.$(val) : undefined);
 
                     } else if (_cat.utils.Utils.getType(val) === "object") {
                         return val;
@@ -4124,7 +4154,7 @@ _cat.plugins.jquery = function () {
 
                         } else if (typeOfEventArgument === "object") {
                             newEventOpt = getOpt(eventType.opt);
-                            newEvent = $.Event(eventType.type, newEventOpt);
+                            newEvent = _cat.plugins.jquery.utils.$.Event(eventType.type, newEventOpt);
                             elt.trigger(newEvent);
 
                         } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
@@ -4137,7 +4167,7 @@ _cat.plugins.jquery = function () {
                                      elt.trigger(e);
                                     } else {
                                         newEventOpt = getOpt(eventType.opt);
-                                        newEvent = $.Event(eventType.type, newEventOpt);
+                                        newEvent = _cat.plugins.jquery.utils.$.Event(eventType.type, newEventOpt);
                                         elt.trigger(newEvent);
                                     }
                                     
@@ -4155,12 +4185,12 @@ _cat.plugins.jquery = function () {
 
             scrollTo: function (idName) {
 
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName),
                         stop = elt.offset().top,
                         delay = 1000;
 
-                    $('body,html').animate({scrollTop: stop}, delay);
+                    _cat.plugins.jquery.utils.$('body,html').animate({scrollTop: stop}, delay);
 
                     _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
                 });
@@ -4170,15 +4200,15 @@ _cat.plugins.jquery = function () {
 
             scrollTop: function () {
 
-                $(document).ready(function () {
-                    $('html, body').animate({scrollTop: 0}, 1000);
+                _cat.plugins.jquery.utils.$(document).ready(function () {
+                    _cat.plugins.jquery.utils.$('html, body').animate({scrollTop: 0}, 1000);
                 });
 
             },
 
             scrollToWithRapper: function (idName, rapperId) {
 
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName),
                         stop = elt.offset().top,
                         delay = 1000;
@@ -4190,7 +4220,7 @@ _cat.plugins.jquery = function () {
             },
 
             clickRef: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.trigger('click');
@@ -4203,10 +4233,10 @@ _cat.plugins.jquery = function () {
 
 
             clickButton: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
-                    $('.ui-btn').removeClass('ui-focus');
+                    _cat.plugins.jquery.utils.$('.ui-btn').removeClass('ui-focus');
                     elt.trigger('click');
                     elt.closest('.ui-btn').addClass('ui-focus');
 
@@ -4217,7 +4247,7 @@ _cat.plugins.jquery = function () {
 
 
             click: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
                     elt.trigger('click');
 
@@ -4227,7 +4257,7 @@ _cat.plugins.jquery = function () {
 
 
             setCheck: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.prop("checked", true).checkboxradio("refresh");
@@ -4238,7 +4268,7 @@ _cat.plugins.jquery = function () {
 
 
             setText: function (idName, value) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     _cat.plugins.jquery.utils.trigger(elt, "mouseenter");
@@ -4264,26 +4294,26 @@ _cat.plugins.jquery = function () {
             },
             
             getValue: function(idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
                     elt.val();
                 });                
             },
 
             checkRadio: function (className, idName) {
-                $(document).ready(function () {
-                    $("." + className).prop("checked", false).checkboxradio("refresh");
-                    $("#" + idName).prop("checked", true).checkboxradio("refresh");
+                _cat.plugins.jquery.utils.$(document).ready(function () {
+                    _cat.plugins.jquery.utils.$("." + className).prop("checked", false).checkboxradio("refresh");
+                    _cat.plugins.jquery.utils.$("#" + idName).prop("checked", true).checkboxradio("refresh");
 
 
-                    _cat.plugins.jquery.utils.setBoarder($("label[for='" + idName + "']").eq(0)[0]);
+                    _cat.plugins.jquery.utils.setBoarder(_cat.plugins.jquery.utils.$("label[for='" + idName + "']").eq(0)[0]);
 
                 });
 
             },
 
             collapsible: function (idName) {
-                $(document).ready(function () {
+                _cat.plugins.jquery.utils.$(document).ready(function () {
                     var elt = _cat.plugins.jquery.utils.getElt(idName);
 
                     elt.children(".ui-collapsible-heading").children(".ui-collapsible-heading-toggle").click();
@@ -4293,8 +4323,8 @@ _cat.plugins.jquery = function () {
             },
 
             backClick: function () {
-                $(document).ready(function () {
-                    $('[data-rel="back"]')[0].click();
+                _cat.plugins.jquery.utils.$(document).ready(function () {
+                    _cat.plugins.jquery.utils.$('[data-rel="back"]')[0].click();
                 });
             }
         }

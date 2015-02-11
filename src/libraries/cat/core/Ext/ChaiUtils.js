@@ -11,7 +11,7 @@ _cat.utils.chai = function () {
             assert = _chai.assert;
 
         } else {
-            _cat.core.log.info("Chai library is not supported, skipping annotation 'assert', consider adding it to the .catproject dependencies");
+            _cat.core.log.info("[catjs chai utils] Chai library is not supported, skipping annotation 'assert', consider adding it to the .catproject dependencies");
         }
     }
 

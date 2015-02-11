@@ -16,7 +16,8 @@ _cat.core.clientmanager = function () {
         endTest,
         testQueue,
         currentState = { index: 0, testend: false },
-        clientmanagerId;
+        clientmanagerId,
+        _log = _cat.core.log;
 
 
     endTest = function (opt, interval) {
@@ -26,7 +27,7 @@ _cat.core.clientmanager = function () {
         
         _cat.core.TestManager.send({signal: 'TESTEND', error: opt.error});
         if (interval === -1) {
-            console.log("Test End");
+            _log.log("[catjs client manager] Test End");
         } else {
             clearInterval(interval);
         }
@@ -95,12 +96,12 @@ _cat.core.clientmanager = function () {
                         currentState: currentState
                     });
     
-                    console.log("[CatJS manager] ", msg.join(""));
+                    _log.log("[CatJS client manager] ", msg.join(""));
     
                 } else {
                     var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
     
-                    console.log("[CatJS Error] ", err);
+                    _log.log("[catjs client manager] error: ", err);
                     endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
                     clearInterval(intervalObj.interval);
                 }
@@ -547,13 +548,26 @@ _cat.core.clientmanager = function () {
                     callback: function () {
 
                         var response = JSON.parse(this.responseText),
-                            scraplist, responseCurrentIndex = 0;
+                            scraplist, reportFormats, errmsg;
 
                         function _add2Queue(config) {
                             _preScrapProcess(config, args);
                             testQueue.add(config.scrapInfo.index, config);
                         }
 
+                        if (!response.scrapInfo) {
+                            errmsg = ["[catjs client manager] Something went wrong processing the scrap request, check your cat.json test project. current scrap index:", currentState.index, "; url:", urlAddress].join("");
+                            _log.error(errmsg);
+
+                            if (catConfig.isReport()) {
+                                reportFormats = catConfig.getReportFormats();
+                            }
+
+                            endTest({error: errmsg}, (runStatus ? runStatus.intervalObj : undefined));
+
+                            return undefined;
+                        }
+                        
                         if (response.ready) {
                             
                             if (!initCurrentState && !_cat.utils.iframe.isIframe()) {
