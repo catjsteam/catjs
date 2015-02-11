@@ -1,4 +1,4 @@
-CatJS 0.4.66
+CatJS 0.4.67
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,6 +52,8 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **angularjs support* AngularJS support
+* **Test Manager* Core test execution engine behavior fixes
 * **Ready State** catjs internal tests execution ready state process added 
 * **iframe support** Stabilized
 * **iframe support** Initial IFrame feature added. It means that in case IFrame exists in the application, catjs library should be relatively imported at each IFrame. (see demo app: https://github.com/catjsteam/catjstests/tree/master/app/iframe)
