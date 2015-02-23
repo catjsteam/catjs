@@ -1,1 +1,1 @@
-if (typeof _cat !== "undefined) {_cat.core.action(this, {{param1}});}
+if (typeof _cat !== "undefined") {_cat.core.action(this, {{param1}});}
