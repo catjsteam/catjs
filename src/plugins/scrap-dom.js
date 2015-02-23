@@ -24,7 +24,8 @@ module.exports = function () {
                     var domRows,
                         dom,
                         me = this,
-                        validcode = false;
+                        validcode = false,
+                        api, match;
 
                     domRows = this.get("dom");
                     var scrapConf = me.config;
@@ -37,18 +38,18 @@ module.exports = function () {
 
                         if (dom) {
 
-                            var match = _scraputils.generate({
-                                api: "listen",
-                                apiname: "listen",
-                                exp: dom
-                            });
+                            api = [ 
+                                {
+                                    api: "listen",
+                                    apiname: "listen"
+                                },
+                                {
+                                    api: "listen",
+                                    apiname: "listen"
+                                }
+                            ];
 
-                            match = _scraputils.generate({
-                                api: "listen",
-                                apiname: "listen",
-                                exp: dom
-                            });
-
+                            match = _scraputils.match(dom, api);
                             if (match) {
                                 me.print("_cat.core.plugin('dom').actions."+ match);
                             }

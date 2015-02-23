@@ -30,98 +30,67 @@ module.exports = function () {
 
                         generate = function (jqueryRow) {
 
-                            var jquery;
+                            var jquery, api, match;
 
                             jqueryRow = _codeutils.prepareCode(jqueryRow);
 
                             if (jqueryRow && jqueryRow.join) {
                                 jquery = jqueryRow.join("\n");
+                                
                             } else {
                                 jquery = jqueryRow;
                             }
 
                             if (jquery) {
-                                var match = _scraputils.generate({
-                                    api: "scrollTo",
-                                    apiname: "scrollTo",
-                                    exp: jquery
-                                });
-
-
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "scrollToWithRapper",
-                                        apiname: "scrollToWithRapper",
-                                        exp: jquery
-                                    });
-                                }
-                             
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "clickRef",
-                                        apiname: "clickRef",
-                                        exp: jquery
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "click",
-                                        apiname: "click",
-                                        exp: jquery
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "clickButton",
-                                        apiname: "clickButton",
-                                        exp: jquery
-                                    });
-                                }
-
-
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "setCheck",
-                                        apiname: "setCheck",
-                                        exp: jquery
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "setText",
-                                        apiname: "setText",
-                                        exp: jquery
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "checkRadio",
-                                        apiname: "checkRadio",
-                                        exp: jquery
-                                    });
-                                }
-
-
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "scrollTop",
-                                        apiname: "scrollTop",
-                                        exp: jquery
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
-                                        api: "collapsible",
-                                        apiname: "collapsible",
-                                        exp: jquery
-                                    });
-                                }                               
-
+                                
+                                api = [
+                                    {
+                                        api: "trigger",
+                                        apiname: "trigger"
+                                    }, 
+                                    {
+                                        api: "scrollTo",
+                                        apiname: "scrollTo"
+                                    },
+                                    {
+                                            api: "scrollToWithRapper",
+                                            apiname: "scrollToWithRapper"
+                                    },
+                                    {
+                                            api: "clickRef",
+                                            apiname: "clickRef"
+                                    },
+                                    {
+                                            api: "click",
+                                            apiname: "click"
+                                    },
+                                    {
+                                            api: "clickButton",
+                                            apiname: "clickButton"
+                                    },
+                                    {
+                                            api: "setCheck",
+                                            apiname: "setCheck"
+                                    },
+                                    {
+                                            api: "setText",
+                                            apiname: "setText"
+                                    },
+                                    {
+                                            api: "checkRadio",
+                                            apiname: "checkRadio"
+                                    },
+                                    {
+                                            api: "scrollTop",
+                                            apiname: "scrollTop"
+                                    },
+                                    {
+                                            api: "collapsible",
+                                            apiname: "collapsible"
+                                    }
+                                ];
+                                
+                                match = _scraputils.match(jquery, api);
                                 if (match) {
 
                                     tempCommand = [
@@ -131,6 +100,7 @@ module.exports = function () {
 
                                     return tempCommand.join("");
                                 }
+                                
                             }
 
                             return undefined;

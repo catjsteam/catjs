@@ -2,7 +2,7 @@ var _Scrap = catrequire("cat.common.scrap"),
     _codeutils = catrequire("cat.code.utils"),
     _tplutils = catrequire("cat.tpl.utils"),
     _scraputils = require("./utils/Utils"),
-    _delayManagerUtils =  require("./utils/DelayManagerUtils");
+    _delayManagerUtils = require("./utils/DelayManagerUtils");
 
 module.exports = function () {
 
@@ -29,12 +29,12 @@ module.exports = function () {
                         enyo,
                         me = this,
                         tempCommand,
-                        
+
                         generate = function (enyoRow) {
 
 
                             if (enyoRows) {
-                                var enyo;
+                                var enyo, api, match;
 
                                 enyoRow = _codeutils.prepareCode(enyoRow);
 
@@ -46,20 +46,17 @@ module.exports = function () {
 
                                 if (enyo) {
 
-                                    var match;
+                                    api = [
+                                        {
+                                            api: "waterfall"
+                                        },
 
-                                    match = _scraputils.generate({
-                                        api: "waterfall",
-                                        exp: enyo
-                                    });
+                                        {
+                                            api: "next"
+                                        }
+                                    ];
 
-                                    if (!match) {
-                                        match = _scraputils.generate({
-                                            api: "next",
-                                            exp: enyo
-                                        });
-                                    }
-
+                                    match = _scraputils.match(enyo, api);
                                     if (!match) {
                                         match = _scraputils.generate({
                                             api: "setSelected",
@@ -67,7 +64,7 @@ module.exports = function () {
                                         });
                                     }
 
-
+                                    match = _scraputils.match(enyo, api);
                                     if (match) {
 
                                         tempCommand = [
@@ -85,9 +82,8 @@ module.exports = function () {
                         dm;
 
 
-
                     enyoRows = this.get("enyo");
-                    
+
                     dm = new _delayManagerUtils({
                         scrap: me
                     });
@@ -95,19 +91,19 @@ module.exports = function () {
                     if (enyoRows) {
 
                         dm.add({
-                            rows:enyoRows,
+                            rows: enyoRows,
                             args: [
                                 "scrapName: 'enyo'"
                             ],
-                            type:"enyo"
+                            type: "enyo"
 
-                        }, function(row) {
+                        }, function (row) {
                             return generate(row);
                         });
                     }
 
                     dm.dispose();
-                    
+
                 }
             });
 

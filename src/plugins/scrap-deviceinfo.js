@@ -1,7 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _codeutils = catrequire("cat.code.utils"),
     _scraputils = require("./utils/Utils"),
-    _delayManagerUtils =  require("./utils/DelayManagerUtils");
+    _delayManagerUtils = require("./utils/DelayManagerUtils");
 
 var tipNum = 1;
 module.exports = function () {
@@ -30,7 +30,9 @@ module.exports = function () {
 
                         generate = function (deviceinfoRow) {
 
-                            var deviceinfo;
+                            var deviceinfo,
+                                tempCommand,
+                                api, match;
 
                             deviceinfoRow = _codeutils.prepareCode(deviceinfoRow);
 
@@ -41,12 +43,15 @@ module.exports = function () {
                             }
 
                             if (deviceinfo) {
-                                var match = _scraputils.generate({
-                                    api: "deviceinfo",
-                                    apiname: "deviceinfo",
-                                    exp: deviceinfo
-                                });
 
+                                api = [
+                                    {
+                                        api: "deviceinfo",
+                                        apiname: "deviceinfo"
+                                    }
+                                ];
+
+                                match = _scraputils.match(deviceinfo, api);
                                 if (match) {
 
                                     tempCommand = [
@@ -60,8 +65,8 @@ module.exports = function () {
 
                             return undefined;
                         },
-                        
-                        
+
+
                         scrapConf = me.config,
                         scrap = scrapConf,
                         dm;
@@ -74,13 +79,13 @@ module.exports = function () {
                     if (deviceinfoRows) {
 
                         dm.add({
-                            rows:deviceinfoRows,
+                            rows: deviceinfoRows,
                             args: [
                                 "scrapName: 'deviceinfo'"
                             ],
-                            type:"deviceinfo"
+                            type: "deviceinfo"
 
-                        }, function(row) {
+                        }, function (row) {
                             return generate(row);
                         });
                     }

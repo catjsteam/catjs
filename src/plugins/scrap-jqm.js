@@ -1,7 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _codeutils = catrequire("cat.code.utils"),
     _scraputils = require("./utils/Utils"),
-    _delayManagerUtils =  require("./utils/DelayManagerUtils");
+    _delayManagerUtils = require("./utils/DelayManagerUtils");
 
 var tipNum = 1;
 module.exports = function () {
@@ -30,7 +30,7 @@ module.exports = function () {
 
                         generate = function (jqmRow) {
 
-                            var jqm;
+                            var jqm, api, match;
 
                             jqmRow = _codeutils.prepareCode(jqmRow);
 
@@ -41,168 +41,96 @@ module.exports = function () {
                             }
 
                             if (jqm) {
-                                var match = _scraputils.generate({
-                                    api: "scrollTo",
-                                    apiname: "scrollTo",
-                                    exp: jqm
-                                });
 
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                api = [
+                                    {
+                                        api: "trigger",
+                                        apiname: "trigger"
+                                    },
+                                    {
+                                        api: "scrollTo",
+                                        apiname: "scrollTo"
+                                    },
+                                    {
                                         api: "scrollToWithRapper",
-                                        apiname: "scrollToWithRapper",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "scrollToWithRapper"
+                                    },
+                                    {
                                         api: "tap",
-                                        apiname: "tap",
-                                        exp: jqm
-                                    });
-                                }
-
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "tap"
+                                    },
+                                    {
                                         api: "clickRef",
-                                        apiname: "clickRef",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "clickRef"
+                                    },
+                                    {
                                         api: "click",
-                                        apiname: "click",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "click"
+                                    },
+                                    {
                                         api: "clickButton",
-                                        apiname: "clickButton",
-                                        exp: jqm
-                                    });
-                                }
-
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "clickButton"
+                                    },
+                                    {
                                         api: "setCheck",
-                                        apiname: "setCheck",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setCheck"
+                                    },
+                                    {
                                         api: "slide",
-                                        apiname: "slide",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "slide"
+                                    },
+                                    {
                                         api: "setText",
-                                        apiname: "setText",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setText"
+                                    },
+                                    {
                                         api: "checkRadio",
-                                        apiname: "checkRadio",
-                                        exp: jqm
-                                    });
-                                }
-
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "checkRadio"
+                                    },
+                                    {
                                         api: "scrollTop",
-                                        apiname: "scrollTop",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "scrollTop"
+                                    },
+                                    {
                                         api: "collapsible",
-                                        apiname: "collapsible",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "collapsible"
+                                    },
+                                    {
                                         api: "selectMenu",
-                                        apiname: "selectMenu",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "selectMenu"
+                                    },
+                                    {
                                         api: "selectTab",
-                                        apiname: "selectTab",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "selectTab"
+                                    },
+                                    {
                                         api: "swipeItemRight",
-                                        apiname: "swipeItemRight",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "swipeItemRight"
+                                    },
+                                    {
                                         api: "swipeItemLeft",
-                                        apiname: "swipeItemLeft",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "swipeItemLeft"
+                                    },
+                                    {
                                         api: "swipePageRight",
-                                        apiname: "swipePageRight",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "swipePageRight"
+                                    },
+                                    {
                                         api: "swipePageLeft",
-                                        apiname: "swipePageLeft",
-                                        exp: jqm
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "swipePageLeft"
+                                    },
+                                    {
                                         api: "backClick",
-                                        apiname: "backClick",
-                                        exp: jqm
-                                    });
-                                }
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "backClick"
+                                    },
+                                    {
                                         api: "searchInListView",
-                                        apiname: "searchInListView",
-                                        exp: jqm
-                                    });
-                                }
+                                        apiname: "searchInListView"
+                                    }
+                                ];
 
-
+                                match = _scraputils.match(jqm, api);
+                                
                                 if (match) {
 
                                     tempCommand = [
@@ -221,7 +149,7 @@ module.exports = function () {
                         dm;
 
                     jqmRows = this.get("jqm");
-                    
+
                     dm = new _delayManagerUtils({
                         scrap: me
                     });
@@ -229,13 +157,13 @@ module.exports = function () {
                     if (jqmRows) {
 
                         dm.add({
-                            rows:jqmRows,
+                            rows: jqmRows,
                             args: [
                                 "scrapName: 'jqm'"
                             ],
                             type: "jqm"
 
-                        }, function(row) {
+                        }, function (row) {
                             return generate(row);
                         });
                     }

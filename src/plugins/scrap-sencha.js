@@ -32,7 +32,8 @@ module.exports = function () {
                         generate = function (senchaRow) {
 
                             var sencha,
-                                tempCommand;
+                                tempCommand,
+                                api, match;
                             
                             
                             senchaRow = _codeutils.prepareCode(senchaRow);
@@ -43,176 +44,96 @@ module.exports = function () {
                                 sencha = senchaRow;
                             }
 
-
                             if (sencha) {
 
-                                var match = _scraputils.generate({
-                                    api: "tap",
-                                    apiname: "fireTap",
-                                    exp: sencha
-                                });
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                api = [
+                                    {
+                                        api: "tap",
+                                        apiname: "fireTap"
+                                    },
+                                    {
                                         api: "setText",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setText"
+                                    },
+                                    {
                                         api: "tapButton",
-                                        apiname: "tapButton",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "tapButton"
+                                    },
+                                    {
                                         api: "setTextValue",
-                                        apiname: "setTextValue",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setTextValue"
+                                    },
+                                    {
                                         api: "setChecked",
-                                        apiname: "setChecked",
-                                        exp: sencha
-                                    });
-                                }
-
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setChecked"
+                                    },
+                                    {
                                         api: "setUnchecked",
-                                        apiname: "setUnchecked",
-                                        exp: sencha
-                                    });
-                                }
-
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setUnchecked"
+                                    },
+                                    {
                                         api: "setDate",
-                                        apiname: "setDate",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setDate"
+                                    },
+                                    {
                                         api: "setSliderValue",
-                                        apiname: "setSliderValue",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setSliderValue"
+                                    },
+                                    {
                                         api: "setSliderValues",
-                                        apiname: "setSliderValues",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setSliderValues"
+                                    },
+                                    {
                                         api: "setToggle",
-                                        apiname: "setToggle",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "setToggle"
+                                    },
+                                    {
                                         api: "scrollBy",
-                                        apiname: "scrollBy",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "scrollBy"
+                                    },
+                                    {
                                         api: "scrollToTop",
-                                        apiname: "scrollToTop",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "scrollToTop"
+                                    },
+                                    {
                                         api: "carouselNext",
-                                        apiname: "carouselNext",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "carouselNext"
+                                    },
+                                    {
                                         api: "carouselPrevious",
-                                        apiname: "carouselPrevious",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "carouselPrevious"
+                                    },
+                                    {
                                         api: "scrollToEnd",
-                                        apiname: "scrollToEnd",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "scrollToEnd"
+                                    },
+                                    {
                                         api: "scrollToListIndex",
-                                        apiname: "scrollToListIndex",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "scrollToListIndex"
+                                    },
+                                    {
                                         api: "listSelectIndex",
-                                        apiname: "listSelectIndex",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "listSelectIndex"
+                                    },
+                                    {
                                         api: "changeTab",
-                                        apiname: "changeTab",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "changeTab"
+                                    },
+                                    {
                                         api: "nestedlistSelect",
-                                        apiname: "nestedlistSelect",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "nestedlistSelect"
+                                    },
+                                    {
                                         api: "removePanel",
-                                        apiname: "removePanel",
-                                        exp: sencha
-                                    });
-                                }
-
-                                if (!match) {
-                                    match = _scraputils.generate({
+                                        apiname: "removePanel"
+                                    },
+                                    {
                                         api: "nestedlistBack",
-                                        apiname: "nestedlistBack",
-                                        exp: sencha
-                                    });
-                                }
+                                        apiname: "nestedlistBack"
+                                    }
+                                ];
 
+                                match = _scraputils.match(sencha, api);
                                 if (match) {
 
                                     tempCommand = [
