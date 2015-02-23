@@ -62,7 +62,7 @@ var path = require("path"),
         }());
 
 
-        (function () {
+        function _init() {
 
             var getScenarioTests = function (testsList, globalDelay, scenarioName) {
 
@@ -153,8 +153,11 @@ var path = require("path"),
 
                 scrapsObj[globalTests[indexGlobalTests].name] = globalTests[indexGlobalTests];
             }
-        })();
+        };
 
+        // initial call
+        _init();
+        
         emptyQueue = function (testId) {
 
             var testsConfig = devicesTests[testId],
@@ -285,6 +288,8 @@ var path = require("path"),
 //                        }
 
                         if (!scrapReady) {
+
+                            _init();
                             _response(false);
                             return undefined;
                         }
