@@ -381,9 +381,11 @@ module.exports = function () {
             if (size) {
                 for (; idx < size; idx++) {
                     row = codeRows[idx];
+                    row = (row.trim ? row.trim() : row);
                     codeRows = _row(row, codeRows, idx);
                 }
             } else {
+                codeRows = (codeRows.trim ? codeRows.trim() : codeRows);
                 codeRows = _row(codeRows, codeRows);
             }
             return codeRows;

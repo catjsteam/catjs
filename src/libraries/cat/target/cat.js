@@ -1,5 +1,5 @@
 var _cat = {
-    utils: {},
+    utils: { plugins: {}},
     plugins: {},
     ui: {},
     errors: {}
@@ -217,73 +217,109 @@ _cat.core = function () {
 
         },
 
+        angular: function(config) {
+            
+            var ng = ((config && ("ng" in config) && config.ng ? config.ng : undefined) || (typeof angular !== "undefined" ? angular : undefined)),
+               nghandle = ((config && ("app" in config) && config.app ? config.app : undefined));
+            
+            /* AngularJS Initialization */
+            function ngscript(ng) {
+                'use strict';
+
+                var versionMajor,
+                    versionMinor,
+                    app,
+                    moduleName;
+                                  
+                versionMajor = ng.version.major;
+                versionMinor = ng.version.minor;
+                moduleName = (config && "moduleName" in config ? config.moduleName : "ng");
+                               
+                
+                if (versionMajor === 1 ) {
+            
+                    if (nghandle) {          
+                        app = nghandle;
+                        
+                    } else if (moduleName) {
+                                        
+                        try {
+                            app = ng.module(moduleName);
+                            
+                        } catch(e) {
+                            _log.warn("[catjs core angular] module name: ", moduleName, " has not being created, you might want to move the registration annotation after it's being initiated.");
+                        }
+                    }
+
+                    
+                    if (app) {
+
+                        _log.log("[catjs core angular] adding directives to module:" + moduleName + " module");
+                        
+                        // debug _log.log("[catjs script directive] ng module directive initialization");
+                        ng.module("catjsmodule", []). 
+                        directive('script', function() {
+                            return {
+                                restrict: 'E',
+                                scope: false,
+                                link: function(scope, elem, attr) {
+                                    if (attr.id && attr.id === '__catjs_script_element') {
+                                        _log.log("[catjs script directive] angularjs script directive found, processing the script element");
+                                        var code = (elem ? elem.text() : undefined),
+                                            _f;
+    
+                                        if (code) {
+                                            _f = new Function(code);
+                                            // debug _log.log("[catjs script directive] angularjs script directive, executing: ", elem.text());
+    
+                                            _f.call(this);
+                                        }
+                                    }
+                                }
+                            };
+                        }).directive('link', function() {
+                            return {
+                                restrict: 'E',
+                                scope: false,
+                                link: function(scope, elem, attr) {
+                                    if (attr.href.indexOf("cat.css" !== -1)) {
+                                        var head = document.querySelector("head"),
+                                            link;
+                                        if (head) {
+                                            link = document.createElement("link");
+                                            link.rel = "stylesheet";
+                                            link.href = attr.href;
+                                            head.appendChild(link);
+                                        }
+                                    }
+                                }
+                            };
+                        });
+    
+                        app.requires.push("catjsmodule");
+
+                    } else {
+                        _log.warn("[catjs core angular] failed to initial angular module, test might not properly executed");
+                    }               
+                }
+            }
+
+            if (!this.aon && ng ) {
+
+                this.aon = true;
+
+                _log.log("[catjs core] angular handle found, initializing");
+                ngscript(ng);
+
+            }
+
+        },
+        
         init: function (config) {
 
             var parentWindow,
                 me = this;
 
-
-            /* AngularJS Initialization */
-            function ngscript(ng) {
-                'use strict';
-
-                var app = ng.module('ng');
-
-                if (app) {
-                    // debug _log.log("[catjs script directive] ng module directive initialization");
-                    app.directive('script', function() {
-                        return {
-                            restrict: 'E',
-                            scope: false,
-                            link: function(scope, elem, attr) {
-                                if (attr.id && attr.id === '__catjs_script_element') {
-                                   // debug  _log.log("[catjs script directive] angularjs script directive, found an element");
-                                    var code = (elem ? elem.text() : undefined),
-                                        _f;
-
-                                    if (code) {
-                                        _f = new Function(code);
-                                        // debug _log.log("[catjs script directive] angularjs script directive, executing: ", elem.text());
-
-                                        _f.call(this);
-                                    }
-                                }
-                            }
-                        };
-                    });
-
-                    app.directive('link', function() {
-                        return {
-                            restrict: 'E',
-                            scope: false,
-                            link: function(scope, elem, attr) {
-                                if (attr.href.indexOf("cat.css" !== -1)) {
-                                    var head = document.querySelector("head"),
-                                        link;
-                                    if (head) {
-                                        link = document.createElement("link");
-                                        link.rel = "stylesheet";
-                                        link.href = attr.href;
-                                        head.appendChild(link);
-                                    }
-                                }
-                            }
-                        };
-                    });
-                }
-            }
-
-            if (!this.aon && typeof angular !== "undefined") {
-
-                this.aon = true;
-
-                ngscript(angular);
-
-                _log.log("[catjs core] angularjs handle found, initializined");
-
-            }
-
-            
             if (_cat.utils.iframe.isIframe()) {
                 parentWindow = _rootWindow();
                 try {
@@ -2147,6 +2183,243 @@ _cat.core.clientmanager = function () {
 
     };
 }();
+/**
+ * JQuery / JQlite (Angular) helper 
+ * 
+ * Common layer to make a smooth bridge between the functionality
+ * 
+ * @type {_cat.utils.plugins}
+ */
+_cat.utils.plugins = function() {
+    
+    var _module = {
+
+        /**
+         * Get the jquery or jqlite handle
+         * 
+         * @param autodetect {String} if "*" auto detect the returned handle or else specify [jqlite | jquery]
+         * @returns {*}
+         */
+        $: function(autodetect) {
+            
+            var _methods = {},
+                    _map = {};
+            
+            autodetect = (autodetect || "*");
+
+            _methods._empty = function() {
+                return function(){};
+            };
+
+            _methods._jqlite = function() {
+                if (typeof angular !== "undefined") {
+                    return angular.element;
+                }
+                return undefined;
+            };
+            
+            _methods._jquery = function() {
+                if (typeof $ !== "undefined") {
+                    return $;
+                }
+                return undefined;
+            };
+            
+            _map["angular"] = function() {
+                return (_methods._jqlite() || _methods._empty());
+            };
+            
+            _map["jquery"] = function() {
+                return (_methods._jquery() || _methods._empty());
+            };
+            
+            _map["*"] = function() {
+                var _$ =  (_methods._jquery() || _methods._jquery());
+                return (_$ || _methods._empty());
+            };
+            
+            if (!(autodetect in _map)) {
+                _cat.core.log.warn("[catjs jqhelper plugin] no valid functionality for :", autodetect);
+            }
+            return _map[autodetect].call(this);
+        },
+
+        /**
+         * Get a generic element depends on the autodetect argument 
+         * 
+         * @param val {*} an element reference or a string DOM query
+         * @param autodetect {String} if "*" auto detect the returned handle or else specify [jqlite | jquery]
+         * @returns {*}
+         */
+        getElt: function (val, autodetect) {
+            var sign,
+                _$ = _module.$(autodetect);
+            
+            if ( typeof val === "string") {
+                val = val.trim();
+                sign = val.charAt(0);
+
+                return (_$ ? _$(val) : undefined);
+
+            } else if (typeof val === "object") {
+                return _$(val);
+            }
+        },
+
+        /**
+         * Trigger an event with a given object
+         *
+         * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
+         * @param eventType {String} The event type name
+         * @param autodetect {String} if "*" auto detect the returned handle or else specify [jqlite | jquery]
+         *
+         * @private
+         */
+        trigger: function () {
+            
+            // args[0] element | args[1] eventType | args[2] autodetect
+            var e, newEvent, newEventOpt, idx = 0, size,
+                args = arguments,
+                autodetect = args[2],
+                elt = (args ? _module.getElt( args[0], autodetect) : undefined),
+                eventType = (args ? args[1] : undefined),
+                typeOfEventArgument = _cat.utils.Utils.getType(eventType),
+                typeOfEventArrayItem,
+                _$ = _module.$(autodetect),
+                isAngular = ( autodetect && autodetect === "angular" ),
+                triggerFn = (isAngular ? "triggerHandler" : "trigger"),
+                eventFn;
+
+            function getOpt(opt) {
+                var key, newOpt = {};
+                if (opt) {
+                    for (key in opt) {
+                        if (opt.hasOwnProperty(key)) {
+                            newOpt[key] = opt[key];
+                        }
+                    }
+                    if ("keyCode" in newOpt) {
+                        newOpt.which = newOpt.keyCode;
+
+                    } else if ("which" in newOpt) {
+                        newOpt.keyCode = newOpt.which;
+                    }
+                }
+
+                return newOpt;
+            }
+
+            function createNewEvent(eventType) {
+                var newEventOpt = getOpt(eventType.opt),
+                newEvent = _$.Event(eventType.type, newEventOpt);
+                
+                return newEvent; 
+            }
+            
+            eventFn = function(elt, triggerFn, event, eventType) {
+                var opt;
+                
+                if (!isAngular) {
+                    elt[triggerFn](event);
+                    
+                } else {
+                    if (eventType) {
+                        if ("opt" in eventType) {
+                            opt = getOpt(eventType.opt);
+                        }
+                        elt[triggerFn](eventType.type, opt);
+                        
+                    } else {
+                        elt[triggerFn](event);
+                    }
+                }
+            };
+            
+            if (elt && eventType) {
+                if (typeOfEventArgument === "string") {
+                    eventFn(elt, triggerFn, eventType);
+
+                } else if (typeOfEventArgument === "object") {            
+                    newEvent = createNewEvent(eventType);
+                    eventFn(elt, triggerFn, newEvent, eventType);
+
+                } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
+                    size = typeOfEventArgument.length;
+                   
+                    for (idx = 0; idx < size; idx++) {
+                        e = eventType[idx];
+                        if (e) {
+                            typeOfEventArrayItem = _cat.utils.Utils.getType(eventType);
+                            if (typeOfEventArrayItem === "string") {
+                                eventFn(elt, triggerFn, e);
+                            } else {
+                                newEvent = createNewEvent(eventType);
+                                eventFn(elt, triggerFn, newEvent, eventType);
+                            }
+
+                        }
+                    }
+                }
+            }
+        },
+
+        setText: function (idName, value, usevents, callback, autodetect) {
+            var _$ = _module.$(autodetect);
+            
+            if (usevents === undefined) {
+                usevents = true;
+            }
+            
+            _$(document).ready(function () {
+                var elt = _module.getElt(idName, autodetect);
+
+                if (usevents) {
+                    _module.trigger(elt, "mouseenter", autodetect);
+                    _module.trigger(elt, "mouseover", autodetect);
+                    _module.trigger(elt, "mousemove", autodetect);
+                    _module.trigger(elt, "focus", autodetect);
+                    _module.trigger(elt, "mousedown", autodetect);
+                    _module.trigger(elt, "mouseup", autodetect);
+                    _module.trigger(elt, "click", autodetect);
+                }
+
+                elt.val(value);
+
+                if (usevents) {
+                    _module.trigger(elt, "keydown", autodetect);
+                    _module.trigger(elt, "keypress", autodetect);
+                    _module.trigger(elt, "keyup", autodetect);
+                    _module.trigger(elt, "mousemove", autodetect);
+                    _module.trigger(elt, "mouseleave", autodetect);
+                    _module.trigger(elt, "mouseout", autodetect);
+                    _module.trigger(elt, "blur", autodetect);
+                }
+
+                _module.trigger(elt, "input", autodetect);
+
+
+                if (callback) {
+                    return callback.call(this, elt);
+                }
+            });
+        },
+
+        getValue: function(idName, callback, autodetect) {
+            _module.$(autodetect)(document).ready(function () {
+                var elt = _module.getElt(idName, autodetect);
+                elt.val();
+
+                if (callback) {
+                    return callback.call(this, elt);
+                }
+            });
+        }
+        
+    };
+    
+    return _module;
+    
+}();
 _cat.core.TestAction = function () {
 
     return {
@@ -3519,7 +3792,8 @@ _cat.utils.Storage = function () {
 _cat.utils.TestsDB = function() {
 
     var _data,
-        _testnextcache = {};
+        _testnextcache = {},
+        _variableNameMap = {};
 
     function _TestsDB() {
 
@@ -3569,6 +3843,15 @@ _cat.utils.TestsDB = function() {
 
     return {
 
+        counter: function(variableName) {
+            if (!(variableName in _variableNameMap)) {
+                _variableNameMap[variableName] = {counter: -1};
+            }
+            _variableNameMap[variableName].counter++;
+            
+            return _variableNameMap[variableName].counter;
+        },
+        
         getData : function() {
             return _data;
         },
@@ -3596,6 +3879,7 @@ _cat.utils.TestsDB = function() {
         set : function(field, value) {
             return TestDB.set(field, value);
         },
+        
         find : function(field) {
             var code = "JSPath.apply('" + field + "', _data);";
 
@@ -3778,6 +4062,121 @@ if (typeof exports !== 'undefined') {
     }
 }
 
+
+_cat.plugins.angular = function () {
+
+    var   _log = _cat.core.log,
+        
+        _module = {
+
+        utils: function () {
+
+            var oldElement = "",
+                _getargs = function(parentargs, autodetect) {
+                    var args = [].slice.call(parentargs);
+                    args.push(autodetect);
+                    
+                    return args;
+                };
+
+            return {
+
+                $: function() {
+                    return _cat.utils.plugins.$("angular");
+                },
+
+                setBoarder: function (element) {
+                    if (oldElement) {
+                        oldElement.classList.remove("markedElement");
+                    }
+
+                    if (element) {
+                        element.className = element.className + " markedElement";
+                    }
+                    oldElement = element;
+
+                },
+
+                /**
+                 * Get a an angular element 
+                 *
+                 * @param val {*} an element reference or a string DOM query
+                 * @param autodetect {String} if "*" auto detect the returned handle or else specify [angular | jquery]
+                 * @returns {*}
+                 */
+                getElt: function (val) {
+                    var args = _getargs(arguments, "angular");
+                    return _cat.utils.plugins.getElt.apply(this, args);
+                },
+
+                /**
+                 * Trigger an event with a given object
+                 *
+                 * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
+                 * @param eventType {String} The event type name
+                 * @param autodetect {String} if "*" auto detect the returned handle or else specify [angular | jquery]
+                 *
+                 * @private
+                 */
+                trigger: function() {
+                    var args, result;
+                    
+                    args = _getargs(arguments, "angular");
+                    
+                    try {
+                        result = _cat.utils.plugins.trigger.apply(this, args);
+                    } catch (e) {
+                        _log.warn("[catjs angular plugin] The trigger action failed with errors: ", e, " arguments:", JSON.stringify(args));   
+                    }
+                    
+                    return result;
+                },
+
+                setText: function() {
+                    var args = _getargs(arguments, "angular");
+                    return _cat.utils.plugins.setText.apply(this, args);
+                }
+            };
+
+        }(),
+
+        actions: {
+
+            /**
+             * Trigger an event with a given object
+             *
+             * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
+             * @param eventType {String} The event type name
+             * @param autodetect {String} if "*" auto detect the returned handle or else specify [angular | jquery]
+             *
+             * @private
+             */
+            trigger: function(element, eventType) {
+                
+                var elt;
+                
+                if (element) {
+                    elt = _module.utils.getElt(element);
+                    if (elt) {
+                        _module.utils.trigger(element, eventType);   
+                    }                                        
+                }
+                
+            },
+            
+            setText: function(idName, value, usevents) {
+                _module.utils.setText(idName, value, usevents, function(elt) {
+                    _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
+                });
+            }
+         
+            
+        }
+    };
+    
+    return _module;
+
+}();
 
 _cat.plugins.deviceinfo = function () {
 
@@ -4068,30 +4467,29 @@ _cat.plugins.jqm = function () {
 
 var animation = false;
 
-
 _cat.plugins.jquery = function () {
 
     var _module = {
 
         utils: function () {
 
-            var oldElement = "";
+            var oldElement = "",
+                _getargs = function(parentargs, autodetect) {
+                    var args = [].slice.call(parentargs);
+                    args.push(autodetect);
+
+                    return args;
+                };
+
 
             return {                              
                 
                 $: function() {
-                    if (typeof $ !== "undefined") {
-                        return $;
-                    } else  if (typeof angular !== "undefined") {
-                        return angular.element;
-                    }
-                    
-                    return function(){};
+                    return _cat.utils.plugins.$();
                 },
                 
                 setBoarder: function (element) {
                     if (oldElement) {
-
                         oldElement.classList.remove("markedElement");
                     }
 
@@ -4103,81 +4501,19 @@ _cat.plugins.jquery = function () {
                 },
 
                 getElt: function (val) {
-                    var sign;
-                    if (_cat.utils.Utils.getType(val) === "string") {
-                        val = val.trim();
-                        sign = val.charAt(0);
-
-                        return (_cat.plugins.jquery.utils.$() ? _cat.plugins.jquery.utils.$()(val) : undefined);
-
-                    } else if (_cat.utils.Utils.getType(val) === "object") {
-                        return val;
-                    }
+                    var args = _getargs(arguments, "jquery");
+                    return _cat.utils.plugins.getElt.apply(this, args);
                 },
-
-                /**
-                 * Trigger an event with a given object
-                 *
-                 * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
-                 * @param eventType {String} The event type name
-                 *
-                 * @private
-                 */
-                trigger: function () {
-                    var e, newEvent, newEventOpt, idx = 0, size,
-                        args = arguments,
-                        elt = (args ? _cat.plugins.jquery.utils.getElt(args[0]) : undefined),
-                        eventType = (args ? args[1] : undefined),
-                        typeOfEventArgument = _cat.utils.Utils.getType(eventType),
-                        typeOfEventArrayItem;
-
-                    function getOpt(opt) {
-                        var key, newOpt = {};
-                        if (opt) {
-                            for (key in opt) {
-                                if (opt.hasOwnProperty(key)) {
-                                    newOpt[key] = opt[key];
-                                }
-                            }
-                            if ("keyCode" in newOpt) {
-                               newOpt.which = newOpt.keyCode;
-                                
-                            } else if ("which" in newOpt) {
-                                newOpt.keyCode = newOpt.which;
-                            }                             
-                        }
-                        
-                        return newOpt;
-                    }
-                    
-                    if (elt && eventType) {
-                        if (typeOfEventArgument === "string") {
-                            elt.trigger(eventType);
-
-                        } else if (typeOfEventArgument === "object") {
-                            newEventOpt = getOpt(eventType.opt);
-                            newEvent = _cat.plugins.jquery.utils.$().Event(eventType.type, newEventOpt);
-                            elt.trigger(newEvent);
-
-                        } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
-                            size = typeOfEventArgument.length;
-                            for (idx = 0; idx < size; idx++) {
-                                e = eventType[idx];
-                                if (e) {
-                                    typeOfEventArrayItem = _cat.utils.Utils.getType(eventType);
-                                    if (typeOfEventArrayItem === "string") {
-                                     elt.trigger(e);
-                                    } else {
-                                        newEventOpt = getOpt(eventType.opt);
-                                        newEvent = _cat.plugins.jquery.utils.$().Event(eventType.type, newEventOpt);
-                                        elt.trigger(newEvent);
-                                    }
-                                    
-                                }
-                            }
-                        }
-                    }
-                }
+                
+                trigger: function() {
+                    var args = _getargs(arguments, "jquery");
+                    return _cat.utils.plugins.trigger.apply(this, args);
+                },
+                
+                setText: function() {
+                    var args = _getargs(arguments, "jquery");
+                    return _cat.utils.plugins.setText.apply(this, args);
+                }          
             };
 
         }(),
@@ -4269,28 +4605,8 @@ _cat.plugins.jquery = function () {
             },
 
 
-            setText: function (idName, value) {
-                _cat.plugins.jquery.utils.$()(document).ready(function () {
-                    var elt = _cat.plugins.jquery.utils.getElt(idName);
-
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseenter");
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseover");
-                    _cat.plugins.jquery.utils.trigger(elt, "mousemove");
-                    _cat.plugins.jquery.utils.trigger(elt, "focus");
-                    _cat.plugins.jquery.utils.trigger(elt, "mousedown");
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseup");
-                    _cat.plugins.jquery.utils.trigger(elt, "click");
-                    elt.val(value);
-                    _cat.plugins.jquery.utils.trigger(elt, "keydown");
-                    _cat.plugins.jquery.utils.trigger(elt, "keypress");
-                    _cat.plugins.jquery.utils.trigger(elt, "input");
-                    _cat.plugins.jquery.utils.trigger(elt, "keyup");
-                    _cat.plugins.jquery.utils.trigger(elt, "mousemove");
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseleave");
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseout");
-                    _cat.plugins.jquery.utils.trigger(elt, "blur");
-
-
+            setText: function (idName, value, usevents) {
+                _module.utils.setText(idName, value, usevents, function(elt) {
                     _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
                 });
             },
@@ -4614,55 +4930,28 @@ _cat.plugins.sencha = function () {
 
 }();
 
-var animation = false;
-
-
-_cat.plugins.vnc = function () {
-
-
-
-    return {
+_cat.plugins.testdata = function () {
+   
+    var _module = {
 
         actions: {
-
-
-            mouseClick: function (x, y) {
-                window.rfb.mouseClick(x, y);
-            },
-
-            mouseScrollVer: function (x, y1, y2) {
-                window.rfb.mouseScrollVer(x, y1, y2);
-            },
-
-            mouseSlide: function (x1, y1, x2, y2) {
-                window.rfb.mouseSlide(x1, y1, x2, y2);
-            },
-
-            mouseLongClick: function (x1, y1) {
-                window.rfb.mouseLongClick(x1, y1);
-            },
-
-            swipeRight: function () {
-                window.rfb.swipeRight();
-            },
-
-            swipeLeft: function () {
-                window.rfb.swipeLeft();
-            },
-            back: function () {
-                window.rfb.back();
-            },
-
-            setText: function (text) {
-                window.rfb.setText(text);
-            },
-
-            home: function () {
-                window.rfb.home();
-            }
-
+        
         }
     };
+
+    (function() {
+        var testdb = _cat.utils.TestsDB,
+            key;
+        
+        for (key in testdb) {
+            if (testdb.hasOwnProperty(key)) {
+                _module.actions[key] = _cat.utils.TestsDB[key];
+            }
+        }
+        
+    })();
+
+    return _module;
 
 }();
 

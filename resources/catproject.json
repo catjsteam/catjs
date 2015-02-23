@@ -104,6 +104,10 @@
             "type": "scrap-jquery"
         },
         {
+            "name": "p@scrap.angular",
+            "type": "scrap-angular"
+        },
+        {
             "name": "p@scrap.jasmine",
             "type": "scrap-jasmine"
         },
@@ -114,10 +118,6 @@
         {
             "name": "p@scrap.deviceinfo",
             "type": "scrap-deviceinfo"
-        },
-        {
-            "name": "p@scrap.vnc",
-            "type": "scrap-vnc"
         },
         {
             "name": "p@scrap.mock",
@@ -201,7 +201,7 @@
         },
         {
             "name": "t@scrap",
-            "plugins": ["p@scrap.common", "p@scrap.jasmine", "p@scrap.sencha", "p@scrap.jquery", "p@scrap.jqm", "p@scrap.vnc", "p@scrap.enyo", "p@scrap.screenshot", "p@scrap.deviceinfo", "p@custom.plugin"]
+            "plugins": ["p@scrap.common", "p@scrap.jasmine", "p@scrap.sencha", "p@scrap.jquery", "p@scrap.angular", "p@scrap.jqm", "p@scrap.enyo", "p@scrap.screenshot", "p@scrap.deviceinfo", "p@custom.plugin"]
         },
         {
             "name": "t@inject",

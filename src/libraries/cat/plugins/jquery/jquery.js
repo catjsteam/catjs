@@ -1,29 +1,28 @@
 var animation = false;
 
-
 _cat.plugins.jquery = function () {
 
     var _module = {
 
         utils: function () {
 
-            var oldElement = "";
+            var oldElement = "",
+                _getargs = function(parentargs, autodetect) {
+                    var args = [].slice.call(parentargs);
+                    args.push(autodetect);
+
+                    return args;
+                };
+
 
             return {                              
                 
                 $: function() {
-                    if (typeof $ !== "undefined") {
-                        return $;
-                    } else  if (typeof angular !== "undefined") {
-                        return angular.element;
-                    }
-                    
-                    return function(){};
+                    return _cat.utils.plugins.$();
                 },
                 
                 setBoarder: function (element) {
                     if (oldElement) {
-
                         oldElement.classList.remove("markedElement");
                     }
 
@@ -35,81 +34,19 @@ _cat.plugins.jquery = function () {
                 },
 
                 getElt: function (val) {
-                    var sign;
-                    if (_cat.utils.Utils.getType(val) === "string") {
-                        val = val.trim();
-                        sign = val.charAt(0);
-
-                        return (_cat.plugins.jquery.utils.$() ? _cat.plugins.jquery.utils.$()(val) : undefined);
-
-                    } else if (_cat.utils.Utils.getType(val) === "object") {
-                        return val;
-                    }
+                    var args = _getargs(arguments, "jquery");
+                    return _cat.utils.plugins.getElt.apply(this, args);
                 },
-
-                /**
-                 * Trigger an event with a given object
-                 *
-                 * @param element {Object} The element to trigger from (The element JQuery representation id/class or the object itself)
-                 * @param eventType {String} The event type name
-                 *
-                 * @private
-                 */
-                trigger: function () {
-                    var e, newEvent, newEventOpt, idx = 0, size,
-                        args = arguments,
-                        elt = (args ? _cat.plugins.jquery.utils.getElt(args[0]) : undefined),
-                        eventType = (args ? args[1] : undefined),
-                        typeOfEventArgument = _cat.utils.Utils.getType(eventType),
-                        typeOfEventArrayItem;
-
-                    function getOpt(opt) {
-                        var key, newOpt = {};
-                        if (opt) {
-                            for (key in opt) {
-                                if (opt.hasOwnProperty(key)) {
-                                    newOpt[key] = opt[key];
-                                }
-                            }
-                            if ("keyCode" in newOpt) {
-                               newOpt.which = newOpt.keyCode;
-                                
-                            } else if ("which" in newOpt) {
-                                newOpt.keyCode = newOpt.which;
-                            }                             
-                        }
-                        
-                        return newOpt;
-                    }
-                    
-                    if (elt && eventType) {
-                        if (typeOfEventArgument === "string") {
-                            elt.trigger(eventType);
-
-                        } else if (typeOfEventArgument === "object") {
-                            newEventOpt = getOpt(eventType.opt);
-                            newEvent = _cat.plugins.jquery.utils.$().Event(eventType.type, newEventOpt);
-                            elt.trigger(newEvent);
-
-                        } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
-                            size = typeOfEventArgument.length;
-                            for (idx = 0; idx < size; idx++) {
-                                e = eventType[idx];
-                                if (e) {
-                                    typeOfEventArrayItem = _cat.utils.Utils.getType(eventType);
-                                    if (typeOfEventArrayItem === "string") {
-                                     elt.trigger(e);
-                                    } else {
-                                        newEventOpt = getOpt(eventType.opt);
-                                        newEvent = _cat.plugins.jquery.utils.$().Event(eventType.type, newEventOpt);
-                                        elt.trigger(newEvent);
-                                    }
-                                    
-                                }
-                            }
-                        }
-                    }
-                }
+                
+                trigger: function() {
+                    var args = _getargs(arguments, "jquery");
+                    return _cat.utils.plugins.trigger.apply(this, args);
+                },
+                
+                setText: function() {
+                    var args = _getargs(arguments, "jquery");
+                    return _cat.utils.plugins.setText.apply(this, args);
+                }          
             };
 
         }(),
@@ -201,28 +138,8 @@ _cat.plugins.jquery = function () {
             },
 
 
-            setText: function (idName, value) {
-                _cat.plugins.jquery.utils.$()(document).ready(function () {
-                    var elt = _cat.plugins.jquery.utils.getElt(idName);
-
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseenter");
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseover");
-                    _cat.plugins.jquery.utils.trigger(elt, "mousemove");
-                    _cat.plugins.jquery.utils.trigger(elt, "focus");
-                    _cat.plugins.jquery.utils.trigger(elt, "mousedown");
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseup");
-                    _cat.plugins.jquery.utils.trigger(elt, "click");
-                    elt.val(value);
-                    _cat.plugins.jquery.utils.trigger(elt, "keydown");
-                    _cat.plugins.jquery.utils.trigger(elt, "keypress");
-                    _cat.plugins.jquery.utils.trigger(elt, "input");
-                    _cat.plugins.jquery.utils.trigger(elt, "keyup");
-                    _cat.plugins.jquery.utils.trigger(elt, "mousemove");
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseleave");
-                    _cat.plugins.jquery.utils.trigger(elt, "mouseout");
-                    _cat.plugins.jquery.utils.trigger(elt, "blur");
-
-
+            setText: function (idName, value, usevents) {
+                _module.utils.setText(idName, value, usevents, function(elt) {
                     _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
                 });
             },

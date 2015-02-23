@@ -2,7 +2,8 @@
 _cat.utils.TestsDB = function() {
 
     var _data,
-        _testnextcache = {};
+        _testnextcache = {},
+        _variableNameMap = {};
 
     function _TestsDB() {
 
@@ -52,6 +53,15 @@ _cat.utils.TestsDB = function() {
 
     return {
 
+        counter: function(variableName) {
+            if (!(variableName in _variableNameMap)) {
+                _variableNameMap[variableName] = {counter: -1};
+            }
+            _variableNameMap[variableName].counter++;
+            
+            return _variableNameMap[variableName].counter;
+        },
+        
         getData : function() {
             return _data;
         },
@@ -79,6 +89,7 @@ _cat.utils.TestsDB = function() {
         set : function(field, value) {
             return TestDB.set(field, value);
         },
+        
         find : function(field) {
             var code = "JSPath.apply('" + field + "', _data);";
 

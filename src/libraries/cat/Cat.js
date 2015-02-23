@@ -1,5 +1,5 @@
 var _cat = {
-    utils: {},
+    utils: { plugins: {}},
     plugins: {},
     ui: {},
     errors: {}
@@ -217,73 +217,109 @@ _cat.core = function () {
 
         },
 
+        angular: function(config) {
+            
+            var ng = ((config && ("ng" in config) && config.ng ? config.ng : undefined) || (typeof angular !== "undefined" ? angular : undefined)),
+               nghandle = ((config && ("app" in config) && config.app ? config.app : undefined));
+            
+            /* AngularJS Initialization */
+            function ngscript(ng) {
+                'use strict';
+
+                var versionMajor,
+                    versionMinor,
+                    app,
+                    moduleName;
+                                  
+                versionMajor = ng.version.major;
+                versionMinor = ng.version.minor;
+                moduleName = (config && "moduleName" in config ? config.moduleName : "ng");
+                               
+                
+                if (versionMajor === 1 ) {
+            
+                    if (nghandle) {          
+                        app = nghandle;
+                        
+                    } else if (moduleName) {
+                                        
+                        try {
+                            app = ng.module(moduleName);
+                            
+                        } catch(e) {
+                            _log.warn("[catjs core angular] module name: ", moduleName, " has not being created, you might want to move the registration annotation after it's being initiated.");
+                        }
+                    }
+
+                    
+                    if (app) {
+
+                        _log.log("[catjs core angular] adding directives to module:" + moduleName + " module");
+                        
+                        // debug _log.log("[catjs script directive] ng module directive initialization");
+                        ng.module("catjsmodule", []). 
+                        directive('script', function() {
+                            return {
+                                restrict: 'E',
+                                scope: false,
+                                link: function(scope, elem, attr) {
+                                    if (attr.id && attr.id === '__catjs_script_element') {
+                                        _log.log("[catjs script directive] angularjs script directive found, processing the script element");
+                                        var code = (elem ? elem.text() : undefined),
+                                            _f;
+    
+                                        if (code) {
+                                            _f = new Function(code);
+                                            // debug _log.log("[catjs script directive] angularjs script directive, executing: ", elem.text());
+    
+                                            _f.call(this);
+                                        }
+                                    }
+                                }
+                            };
+                        }).directive('link', function() {
+                            return {
+                                restrict: 'E',
+                                scope: false,
+                                link: function(scope, elem, attr) {
+                                    if (attr.href.indexOf("cat.css" !== -1)) {
+                                        var head = document.querySelector("head"),
+                                            link;
+                                        if (head) {
+                                            link = document.createElement("link");
+                                            link.rel = "stylesheet";
+                                            link.href = attr.href;
+                                            head.appendChild(link);
+                                        }
+                                    }
+                                }
+                            };
+                        });
+    
+                        app.requires.push("catjsmodule");
+
+                    } else {
+                        _log.warn("[catjs core angular] failed to initial angular module, test might not properly executed");
+                    }               
+                }
+            }
+
+            if (!this.aon && ng ) {
+
+                this.aon = true;
+
+                _log.log("[catjs core] angular handle found, initializing");
+                ngscript(ng);
+
+            }
+
+        },
+        
         init: function (config) {
 
             var parentWindow,
                 me = this;
 
-
-            /* AngularJS Initialization */
-            function ngscript(ng) {
-                'use strict';
-
-                var app = ng.module('ng');
-
-                if (app) {
-                    // debug _log.log("[catjs script directive] ng module directive initialization");
-                    app.directive('script', function() {
-                        return {
-                            restrict: 'E',
-                            scope: false,
-                            link: function(scope, elem, attr) {
-                                if (attr.id && attr.id === '__catjs_script_element') {
-                                   // debug  _log.log("[catjs script directive] angularjs script directive, found an element");
-                                    var code = (elem ? elem.text() : undefined),
-                                        _f;
-
-                                    if (code) {
-                                        _f = new Function(code);
-                                        // debug _log.log("[catjs script directive] angularjs script directive, executing: ", elem.text());
-
-                                        _f.call(this);
-                                    }
-                                }
-                            }
-                        };
-                    });
-
-                    app.directive('link', function() {
-                        return {
-                            restrict: 'E',
-                            scope: false,
-                            link: function(scope, elem, attr) {
-                                if (attr.href.indexOf("cat.css" !== -1)) {
-                                    var head = document.querySelector("head"),
-                                        link;
-                                    if (head) {
-                                        link = document.createElement("link");
-                                        link.rel = "stylesheet";
-                                        link.href = attr.href;
-                                        head.appendChild(link);
-                                    }
-                                }
-                            }
-                        };
-                    });
-                }
-            }
-
-            if (!this.aon && typeof angular !== "undefined") {
-
-                this.aon = true;
-
-                ngscript(angular);
-
-                _log.log("[catjs core] angularjs handle found, initializined");
-
-            }
-
-            
             if (_cat.utils.iframe.isIframe()) {
                 parentWindow = _rootWindow();
                 try {

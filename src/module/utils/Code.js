@@ -41,11 +41,13 @@ module.exports = function() {
             }
 
             function convertTestDataRegExp(codeRows) {
-                
-                var patt = new RegExp("(.*)@d\\.([a-z]*\\()\\.(.*)(\\).*\\).*)", "g");
+                ;
+                var patt = new RegExp("(.*)@d\\.(.*)(.*\\))", "g");
 
+                
                 while (codeRows.match(patt)) {
-                    codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2\".$3\"$4");
+                    codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2$3");
+                    console.log(codeRows);
                 }
                 return codeRows;
             }
@@ -53,9 +55,11 @@ module.exports = function() {
             if (size) {
                 for (; idx < size; idx++) {
                     row = codeRows[idx];
+                    row = (row.trim ? row.trim() : row);
                     codeRows = _row(row, codeRows, idx);
                 }
             } else {
+                codeRows = (codeRows.trim ? codeRows.trim() : codeRows);
                 codeRows = _row(codeRows, codeRows);
             }
             return codeRows;
