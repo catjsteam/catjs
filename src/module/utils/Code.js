@@ -41,13 +41,11 @@ module.exports = function() {
             }
 
             function convertTestDataRegExp(codeRows) {
-                ;
                 var patt = new RegExp("(.*)@d\\.(.*)(.*\\))", "g");
 
                 
                 while (codeRows.match(patt)) {
                     codeRows = codeRows.replace(patt, "$1_cat.utils.TestsDB.$2$3");
-                    console.log(codeRows);
                 }
                 return codeRows;
             }

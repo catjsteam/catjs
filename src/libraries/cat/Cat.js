@@ -220,44 +220,32 @@ _cat.core = function () {
         angular: function(config) {
             
             var ng = ((config && ("ng" in config) && config.ng ? config.ng : undefined) || (typeof angular !== "undefined" ? angular : undefined)),
-               nghandle = ((config && ("app" in config) && config.app ? config.app : undefined));
-            
-            /* AngularJS Initialization */
-            function ngscript(ng) {
-                'use strict';
+               nghandle = ((config && ("app" in config) && config.app ? config.app : undefined)),
+                versionMajor, versionMinor;
 
-                var versionMajor,
-                    versionMinor,
-                    app,
-                    moduleName;
-                                  
-                versionMajor = ng.version.major;
-                versionMinor = ng.version.minor;
-                moduleName = (config && "moduleName" in config ? config.moduleName : "ng");
-                               
+
+            versionMajor = ng.version.major;
+            versionMinor = ng.version.minor;
+
+            _log.log("[catjs core] angular (" + ng.version.full + ") handle found, initializing");
+            
+            function createCatjsModule() {
+
+                var catjsmodule;
                 
-                if (versionMajor === 1 ) {
-            
-                    if (nghandle) {          
-                        app = nghandle;
-                        
-                    } else if (moduleName) {
-                                        
-                        try {
-                            app = ng.module(moduleName);
-                            
-                        } catch(e) {
-                            _log.warn("[catjs core angular] module name: ", moduleName, " has not being created, you might want to move the registration annotation after it's being initiated.");
-                        }
-                    }
-
+                try {
+                
+                    catjsmodule = ng.module("catjsmodule");
                     
-                    if (app) {
-
-                        _log.log("[catjs core angular] adding directives to module:" + moduleName + " module");
-                        
-                        // debug _log.log("[catjs script directive] ng module directive initialization");
-                        ng.module("catjsmodule", []). 
+                } catch(e) {
+                   
+                    // not exists ... 
+                    
+                }
+                
+                if (!catjsmodule) {
+                    // debug _log.log("[catjs script directive] ng module directive initialization");
+                    ng.module("catjsmodule", []).
                         directive('script', function() {
                             return {
                                 restrict: 'E',
@@ -295,20 +283,78 @@ _cat.core = function () {
                                 }
                             };
                         });
-    
+                }
+            }
+                    
+            /* AngularJS Initialization */
+            function ngscript(ng) {
+                'use strict';
+
+                var moduleName,
+                    moduleNames,
+                    nodeModuleObjectType;
+                          
+                function _require(app, moduleName) {
+                    
+                    if (app) {
+
+                        _log.log("[catjs core angular] adding directives to module:" + (moduleName || " Not Spcified "));
+
+
                         app.requires.push("catjsmodule");
 
                     } else {
                         _log.warn("[catjs core angular] failed to initial angular module, test might not properly executed");
-                    }               
+                    }
+                }
+                
+                function _requireall(moduleNames) {
+
+                    moduleNames.forEach(function(moduleName) {
+
+                        var app;
+                        
+                        if (moduleName) {
+                            
+                            try {
+                                app = ng.module(moduleName);
+        
+                            } catch(e) {
+                                _log.warn("[catjs core angular] module name: ", moduleName, " has not being created, you might want to move the registration annotation after it's being initiated.");
+                            }
+        
+                            _require(app, moduleName);
+                        }                        
+                    });
+                }
+            
+                moduleName = (config && "moduleName" in config ? config.moduleName : "ng");
+                               
+                
+                if (versionMajor === 1 ) {
+            
+                    if (nghandle) {          
+                        _require(nghandle, moduleName);
+                        
+                    } else if (moduleName) {
+
+                        nodeModuleObjectType = _cat.utils.Utils.getType(moduleName);
+                        if (nodeModuleObjectType === "string") {
+                            moduleNames = [moduleName]; 
+                            
+                        } else if (nodeModuleObjectType === "array" && moduleName.length > 0) {
+                            moduleNames = moduleName;
+                        }
+                       
+                        _requireall(moduleNames);
+                    }
+                             
                 }
             }
 
-            if (!this.aon && ng ) {
-
-                this.aon = true;
-
-                _log.log("[catjs core] angular handle found, initializing");
+            if (ng) {                                
+                
+                createCatjsModule();
                 ngscript(ng);
 
             }

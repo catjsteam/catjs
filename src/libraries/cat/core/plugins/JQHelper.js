@@ -158,7 +158,7 @@ _cat.utils.plugins = function() {
                     newEvent = createNewEvent(eventType);
                     eventFn(elt, triggerFn, newEvent, eventType);
 
-                } else if (typeOfEventArgument === "array" && typeOfEventArgument.length > 0) {
+                } else if (typeOfEventArgument === "array" && eventType.length > 0) {
                     size = typeOfEventArgument.length;
                    
                     for (idx = 0; idx < size; idx++) {

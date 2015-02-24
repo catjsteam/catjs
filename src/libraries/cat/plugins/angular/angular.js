@@ -86,8 +86,7 @@ _cat.plugins.angular = function () {
              *
              * @private
              */
-            trigger: function(element, eventType) {
-                
+            trigger: function(element, eventType) {   
                 var elt;
                 
                 if (element) {
@@ -95,14 +94,18 @@ _cat.plugins.angular = function () {
                     if (elt) {
                         _module.utils.trigger(element, eventType);   
                     }                                        
-                }
-                
+                }                
             },
             
             setText: function(idName, value, usevents) {
                 _module.utils.setText(idName, value, usevents, function(elt) {
                     _cat.plugins.jquery.utils.setBoarder(elt.eq(0)[0]);
                 });
+            },
+            
+            require: function(modules) {                
+                var args = (modules ? {moduleName: modules} : undefined);
+                _cat.core.angular(args);
             }
          
             

@@ -49,6 +49,9 @@ module.exports = function () {
                                     },
                                     {
                                         api: "setText"
+                                    },
+                                    {
+                                        api: "require"
                                     }
                                 ];
 

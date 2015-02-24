@@ -71,7 +71,24 @@ _cat.utils.TestsDB = function() {
                 url :  _cat.core.getBaseUrl("cat/config/testdata.json"),
                 callback : {
                     call : function(check) {
-                        _data = JSON.parse(check.response);
+                        var incomingdata = check.response,
+                            type, validata = false;
+                        
+                        if (!incomingdata) {
+                            type = _cat.utils.Utils.getType();
+                            if (type === "object" || type === "array") {
+                                try {
+                                    _data = JSON.parse(incomingdata);
+                                    validata = true;
+                                } catch(e) {
+                                }
+                            }
+                        }
+
+                        if (!validata) {
+                            _cat.core.log.warn("[catjs testdb] No valid test data was found, any '@d' API usage related will be skipped (see src/config/testdata.json)");
+                        }
+
                     }
                 }
             });
