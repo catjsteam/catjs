@@ -4,6 +4,27 @@ if (typeof(_cat) !== "undefined") {
 
         var _module = {
 
+            getCatjsServerURL: function(url) {
+
+                var catConfig = _cat.core.getConfig(),
+                    port = catConfig.getPort(),
+                    host = catConfig.getIp(),
+                    method = catConfig.getMethod(),
+                    slashPos = -1;
+
+                if (url) {
+                    slashPos = url.indexOf("/");
+                    if (slashPos !== 0) {
+                        url = "/" + url;
+                    }
+                } else {
+                    url = "/";
+                }
+                
+                return [method, "://", host, ":", port, url].join("");
+                
+            },
+            
             querystring: function(name, query){
                 var re, r=[], m;
 
@@ -15,6 +36,9 @@ if (typeof(_cat) !== "undefined") {
             },
 
             getType: function (obj) {
+                if (!obj) {
+                    return undefined;
+                }
                 return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 
             },

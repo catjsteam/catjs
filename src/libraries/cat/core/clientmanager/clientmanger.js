@@ -541,10 +541,12 @@ _cat.core.clientmanager = function () {
             
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
                 startInterval(catConfig, scrap);
-                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid();
+                urlAddress = _cat.utils.Utils.getCatjsServerURL("/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid());
 
                 config = {
+                    
                     url: urlAddress,
+                    
                     callback: function () {
 
                         var response = JSON.parse(this.responseText),
