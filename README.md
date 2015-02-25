@@ -1,4 +1,4 @@
-CatJS 0.4.70
+CatJS 0.4.71
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,17 +52,18 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **screenshot for the browser** DOM snapshot annotation added that saves an image of a given DOM and/or Canvas element. The images will be available in the reports folder.
+
+        @[scrap
+            @@name snapshots
+            @@dom snapshot("#canvas")
+            @@dom snapshot("#body")
+        ]@
+
 * **angularjs support** AngularJS with ng- actions supported 
-* **Test Manager** Core test execution engine behavior fixes
-* **Ready State** catjs internal tests execution ready state process added 
 * **iframe support** Stabilized
-* **iframe support** Initial IFrame feature added. It means that in case IFrame exists in the application, catjs library should be relatively imported at each IFrame. (see demo app: https://github.com/catjsteam/catjstests/tree/master/app/iframe)
 * **auto-override** In the cat.json test project file this property enable/disable cat.json file override when using -a command-line flag
 * **dependencies property** at the catproject.json format changed e.g. instead of ["jsutils", "jspath"] use [{"name": "jspath", "exclude": true}...]
-* **external example** We have created another project for testing catjs core and put the best practices in the same place. The application that we are using is the TodoMVC implementations, currently we have started with [JQuery](https://github.com/catjsteam/catjstests/tree/master/app/todomvc/jquery) 
-* **jquery plugin added** docs will be added in the next releases
-* **third-party libraries** aggregation using the library name. catjs import should be modified using the new path cat/lib/cat/cat.js although the old path is supported  
-* **Jasmin support** WIP 
 
 ## Documentation
 
