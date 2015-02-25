@@ -23,7 +23,25 @@ _cat.utils.plugins = function() {
             autodetect = (autodetect || "*");
 
             _methods._empty = function() {
-                return function(){};
+                return function(element){
+                    var elt;
+                    
+                    if (element) {
+                        
+                        if (typeof element === "object") {
+                            return element;
+                            
+                        } else if (typeof element === "string") {
+                            elt = document.getElementById(element);
+                            
+                            if (!elt) {
+                                elt = document.querySelector(element);
+                            }                                                        
+                        }
+                    }
+                    
+                    return elt;                                        
+                };
             };
 
             _methods._jqlite = function() {

@@ -40,12 +40,13 @@ module.exports = function () {
 
                             api = [ 
                                 {
-                                    api: "listen",
-                                    apiname: "listen"
+                                    api: "listen"
                                 },
                                 {
-                                    api: "listen",
-                                    apiname: "listen"
+                                    api: "fire"
+                                },
+                                {
+                                    api: "snapshot"
                                 }
                             ];
 

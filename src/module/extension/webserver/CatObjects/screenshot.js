@@ -26,17 +26,15 @@ exports.post = function (req, res) {
      var    pic,
             imageBuffer,
             scrapName,
-            deviceName,
             _userAgent,
             deviceName, deviceId,
-            saveScreenshot,
+            save,
             ua,
             ismobile;
 
 
-    saveScreenshot = function (data) {
+    save = function (data) {
         var filename = [scrapName, deviceName ,deviceId].join("_");
-        console.log("save screenshot : " + filename);
         _catinfo.set({
                 id: deviceId,
                 device: (ismobile ? "device" : "browser"),
@@ -53,7 +51,7 @@ exports.post = function (req, res) {
             '"deviceName" : "' + deviceName + '",' +
             '"deviceId" : "' + deviceId + '",' +
         '}');
-    }
+    };
 
 
     _userAgent = function (req) {
@@ -68,10 +66,11 @@ exports.post = function (req, res) {
             us.isAndroid = (req.body.deviceType === "android");
             us.isiOS = (req.body.deviceType === "iOS");
             us.Version = req.body.deviceType;
-        }
-
+            
+        } 
+        
         return us;
-    }
+    };
 
     ua = _userAgent(req);
     ismobile = ("isMobile" in ua && ua.isMobile);
@@ -84,7 +83,7 @@ exports.post = function (req, res) {
     pic = pic.replace(new RegExp('\n| ', 'g'), '');
 
     imageBuffer = new Buffer(pic, 'base64');
-    saveScreenshot(imageBuffer);
+    save(imageBuffer);
 
 };
 

@@ -2107,10 +2107,12 @@ _cat.core.clientmanager = function () {
             
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
                 startInterval(catConfig, scrap);
-                urlAddress = "http://" + catConfig.getIp() + ":" + catConfig.getPort() + "/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid();
+                urlAddress = _cat.utils.Utils.getCatjsServerURL("/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid());
 
                 config = {
+                    
                     url: urlAddress,
+                    
                     callback: function () {
 
                         var response = JSON.parse(this.responseText),
@@ -2254,7 +2256,25 @@ _cat.utils.plugins = function() {
             autodetect = (autodetect || "*");
 
             _methods._empty = function() {
-                return function(){};
+                return function(element){
+                    var elt;
+                    
+                    if (element) {
+                        
+                        if (typeof element === "object") {
+                            return element;
+                            
+                        } else if (typeof element === "string") {
+                            elt = document.getElementById(element);
+                            
+                            if (!elt) {
+                                elt = document.querySelector(element);
+                            }                                                        
+                        }
+                    }
+                    
+                    return elt;                                        
+                };
             };
 
             _methods._jqlite = function() {
@@ -3419,7 +3439,7 @@ _cat.utils.AJAX = function () {
     }
 
     if (!_validate()) {
-        console.log("[CAT AJAX] Not valid AJAX handle was found");
+        _cat.utils.log.info("[catjs ajax] Not valid AJAX handle was found");
         return {};
     }
 
@@ -3428,13 +3448,40 @@ _cat.utils.AJAX = function () {
     
     
     function _execAsync() {
-        var currentxmlhttp;
+        var currentxmlhttp,
+            requestHeaderList,
+            data, type,
+            config,
+            xmlhttp;
         
         if (_running === 0 && _queue.length > 0) {
             currentxmlhttp = _queue.shift();
+            config = currentxmlhttp.config;
+            xmlhttp = currentxmlhttp.xmlhttp;
+            
+            xmlhttp.open(config.method, config.url, config.async);
 
-            currentxmlhttp.xmlhttp.open(currentxmlhttp.config.method, currentxmlhttp.config.url, currentxmlhttp.config.async);
-            currentxmlhttp.xmlhttp.send();
+            requestHeaderList = config.headers;
+            if (requestHeaderList) {
+                requestHeaderList.forEach(function(header) {
+                    
+                    if (header) {
+                        xmlhttp.setRequestHeader(header.name, header.value);
+                    }
+                });
+            }
+            
+            data = config.data;
+            type = _cat.utils.Utils.getType(data);
+            if (type !== "string") {
+                try {
+                    data = JSON.stringify(data);
+                } catch (e) {
+                    _cat.utils.log.warn("[catjs ajax] failed to serialize the post request data ");
+                }
+            }
+
+            xmlhttp.send(data);
             _running++;
         }
     }
@@ -3457,7 +3504,7 @@ _cat.utils.AJAX = function () {
             _cat.core.log.info("[catjs ajax] sending REST request: " + config.url);
 
             try {
-                xmlhttp.open(("GET" || config.method), config.url, false);
+                xmlhttp.open((config.method || "GET"), config.url, false);
                 xmlhttp.send();
                 
             } catch (err) {
@@ -3474,16 +3521,21 @@ _cat.utils.AJAX = function () {
          * TODO pass arguments on post
          *
          * @param config
-         *      url - The url to send
-         *      method - The request method
-         *      args - TODO
-         *      onerror - [optional] error listener
-         *      onreadystatechange - [optional] ready listener
-         *      callback - [optional] instead of using onreadystatechange this callback will occur when the call is ready
+         *      url {String} The url to send
+         *      header {Array} The request header objects
+         *          object: header {String} The header name 
+         *                  value {String} The header value
+         *      method {String} The request method
+         *      data {*} The data to be passed in case of post method is being used
+         *      onerror {Function} [optional] error listener
+         *      onreadystatechange {Function} [optional] ready listener
+         *      callback {Function} [optional] instead of using onreadystatechange this callback will occur when the call is ready
          */
         sendRequestAsync: function(config) {
             
             var xmlhttp = new XMLHttpRequest(),
+                data = ("data" in config ? config.data : undefined),
+                requestHeader, requestHeaderType, requestHeaderList,
                 onerror = function (e) {
                     _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
@@ -3501,10 +3553,24 @@ _cat.utils.AJAX = function () {
                 };
 
 
+            requestHeader = ("header" in config ? config.header : undefined);
+            if (requestHeader) {
+                requestHeaderType = _cat.utils.Utils.getType(requestHeader);
+                
+                if (requestHeaderType === "object") {
+                    requestHeaderList = [requestHeader];
+                    
+                } else if (requestHeaderType === "array") {
+                    requestHeaderList = requestHeader;
+                }
+                
+               
+            }
+            
             xmlhttp.onreadystatechange = (("onreadystatechange" in config) ? config.onreadystatechange : onreadystatechange);
             xmlhttp.onerror = (("onerror" in config) ? config.onerror : onerror);
 
-            _queue.push({xmlhttp: xmlhttp, config:{method: ("GET" || config.method), url: config.url, async: true}});
+            _queue.push({xmlhttp: xmlhttp, config:{data: data, headers: requestHeaderList, method: (config.method || "GET"), url: config.url, async: true}});
 
             _execAsync();
            
@@ -3988,6 +4054,27 @@ if (typeof(_cat) !== "undefined") {
 
         var _module = {
 
+            getCatjsServerURL: function(url) {
+
+                var catConfig = _cat.core.getConfig(),
+                    port = catConfig.getPort(),
+                    host = catConfig.getIp(),
+                    method = catConfig.getMethod(),
+                    slashPos = -1;
+
+                if (url) {
+                    slashPos = url.indexOf("/");
+                    if (slashPos !== 0) {
+                        url = "/" + url;
+                    }
+                } else {
+                    url = "/";
+                }
+                
+                return [method, "://", host, ":", port, url].join("");
+                
+            },
+            
             querystring: function(name, query){
                 var re, r=[], m;
 
@@ -3999,6 +4086,9 @@ if (typeof(_cat) !== "undefined") {
             },
 
             getType: function (obj) {
+                if (!obj) {
+                    return undefined;
+                }
                 return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 
             },
@@ -4286,7 +4376,7 @@ _cat.plugins.dom = function () {
             return undefined;
         }
 
-        if(document.createEvent){
+        if (document.createEvent) {
 
             clickEvent = document.createEvent("MouseEvents");
             clickEvent.initMouseEvent(name, true, true, window,
@@ -4312,44 +4402,150 @@ _cat.plugins.dom = function () {
         }
     }
 
-    function _getElement(idName) {
+    var _module = {
 
-        var elt;
 
-        if (!idName) {
-            return undefined;
-        }
-        if (_cat.utils.Utils.getType(idName) === "String") {
-            // try resolving by id
-            elt = document.getElementById(idName);
+        utils: function () {
 
-        } else if (_cat.utils.Utils.getType(idName).indexOf("Element") !== -1) {
-            // try getting the element
-            elt = idName;
-        }
+            var oldElement = "",
+                _getargs = function (parentargs, autodetect) {
+                    var args = [].slice.call(parentargs);
+                    args.push(autodetect);
 
-        return (elt || idName);
-    }
+                    return args;
+                };
 
-    return {
+
+            return {
+
+                $: function () {
+                    return _cat.utils.plugins.$();
+                },
+
+                setBoarder: function (element) {
+                    if (oldElement) {
+                        oldElement.classList.remove("markedElement");
+                    }
+
+                    if (element) {
+                        element.className = element.className + " markedElement";
+                    }
+                    oldElement = element;
+
+                },
+
+                getElt: function (val) {
+                    var args = _getargs(arguments, "*");
+                    return _cat.utils.plugins.getElt.apply(this, args);
+                },
+
+                trigger: function () {
+                    var args = _getargs(arguments, "*");
+                    return _cat.utils.plugins.trigger.apply(this, args);
+                },
+
+                setText: function () {
+                    var args = _getargs(arguments, "*");
+                    return _cat.utils.plugins.setText.apply(this, args);
+                }
+            };
+
+        }(),
 
         actions: {
 
 
-            listen: function (name, idName, callback) {
+            snapshot: function (idName) {
 
-                var elt = _getElement(idName);
+                function _isCanvasSupported() {
+                    var elem = document.createElement('canvas');
+                    return !!(elem.getContext && elem.getContext('2d'));
+                }
+
+                /**
+                 * capture canvas data
+                 *
+                 * @param elt
+                 * @returns {undefined}
+                 * @private
+                 */
+                function _captureCanvas(elt) {
+
+                    var data,
+                        serverURL = _cat.utils.Utils.getCatjsServerURL("/screenshot");
+
+                    function _prepareImage(data) {
+                        return data.replace(/^data:image\/png;base64,/, "");
+                    }
+                    
+                    if (elt) {
+
+                        // we found canvas DOM element
+                        if (elt.nodeType && elt.nodeType === 1 && elt.nodeName.toLowerCase() === "canvas") {
+                            if (elt.toDataURL) {
+                                data = elt.toDataURL("image/png");                                
+                            }
+
+                            if (data) {
+                          
+                                _cat.utils.AJAX.sendRequestAsync({
+                                    url: serverURL,
+                                    method: "POST",
+                                    data: {
+                                        pic: _prepareImage(data), 
+                                        scrapName: "tmp",
+                                        deviceId: _cat.core.guid()
+                                    },
+                                    header: [
+                                        {name: "Content-Type", value: "application/json;charset=UTF-8"}
+                                    ],
+                                    callback: function() {
+                                        if (this.responseText) {
+                                            _cat.core.log.info("[catjs dom snapshot] request processed successfully response: ", this.responseText);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+
+                var _$, elt;
+
+                // test if canvas supported
+                if (!_isCanvasSupported()) {
+                    _cat.core.log.warn("[catjs dom plugin] Your browser doesn't support canvas element ");
+
+                    return undefined;
+                }
+
+                _$ = _module.utils.$();
+                elt = _$(idName);
 
                 if (elt) {
-                    _addEventListener(elt, name, callback);
+                    if (_cat.utils.Utils.getType(elt) === "array") {
+
+
+                    } else {
+                        _captureCanvas(elt);
+                    }
                 }
 
 
             },
 
+            listen: function (name, idName, callback) {
+
+                var elt = _module.utils.getElt(idName);
+
+                if (elt) {
+                    _addEventListener(elt, name, callback);
+                }
+            },
+
             fire: function (name, idName) {
 
-                var elt = _getElement(idName);
+                var elt = _module.utils.getElt(idName);
 
                 if (elt) {
                     _fireEvent(elt, name);
@@ -4362,6 +4558,8 @@ _cat.plugins.dom = function () {
 
 
     };
+
+    return _module;
 
 }();
 
