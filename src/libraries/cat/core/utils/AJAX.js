@@ -8,7 +8,7 @@ _cat.utils.AJAX = function () {
     }
 
     if (!_validate()) {
-        console.log("[CAT AJAX] Not valid AJAX handle was found");
+        _cat.utils.log.info("[catjs ajax] Not valid AJAX handle was found");
         return {};
     }
 
@@ -17,13 +17,40 @@ _cat.utils.AJAX = function () {
     
     
     function _execAsync() {
-        var currentxmlhttp;
+        var currentxmlhttp,
+            requestHeaderList,
+            data, type,
+            config,
+            xmlhttp;
         
         if (_running === 0 && _queue.length > 0) {
             currentxmlhttp = _queue.shift();
+            config = currentxmlhttp.config;
+            xmlhttp = currentxmlhttp.xmlhttp;
+            
+            xmlhttp.open(config.method, config.url, config.async);
 
-            currentxmlhttp.xmlhttp.open(currentxmlhttp.config.method, currentxmlhttp.config.url, currentxmlhttp.config.async);
-            currentxmlhttp.xmlhttp.send();
+            requestHeaderList = config.headers;
+            if (requestHeaderList) {
+                requestHeaderList.forEach(function(header) {
+                    
+                    if (header) {
+                        xmlhttp.setRequestHeader(header.name, header.value);
+                    }
+                });
+            }
+            
+            data = config.data;
+            type = _cat.utils.Utils.getType(data);
+            if (type !== "string") {
+                try {
+                    data = JSON.stringify(data);
+                } catch (e) {
+                    _cat.utils.log.warn("[catjs ajax] failed to serialize the post request data ");
+                }
+            }
+
+            xmlhttp.send(data);
             _running++;
         }
     }
@@ -46,7 +73,7 @@ _cat.utils.AJAX = function () {
             _cat.core.log.info("[catjs ajax] sending REST request: " + config.url);
 
             try {
-                xmlhttp.open(("GET" || config.method), config.url, false);
+                xmlhttp.open((config.method || "GET"), config.url, false);
                 xmlhttp.send();
                 
             } catch (err) {
@@ -63,16 +90,21 @@ _cat.utils.AJAX = function () {
          * TODO pass arguments on post
          *
          * @param config
-         *      url - The url to send
-         *      method - The request method
-         *      args - TODO
-         *      onerror - [optional] error listener
-         *      onreadystatechange - [optional] ready listener
-         *      callback - [optional] instead of using onreadystatechange this callback will occur when the call is ready
+         *      url {String} The url to send
+         *      header {Array} The request header objects
+         *          object: header {String} The header name 
+         *                  value {String} The header value
+         *      method {String} The request method
+         *      data {*} The data to be passed in case of post method is being used
+         *      onerror {Function} [optional] error listener
+         *      onreadystatechange {Function} [optional] ready listener
+         *      callback {Function} [optional] instead of using onreadystatechange this callback will occur when the call is ready
          */
         sendRequestAsync: function(config) {
             
             var xmlhttp = new XMLHttpRequest(),
+                data = ("data" in config ? config.data : undefined),
+                requestHeader, requestHeaderType, requestHeaderList,
                 onerror = function (e) {
                     _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
                 },
@@ -90,10 +122,24 @@ _cat.utils.AJAX = function () {
                 };
 
 
+            requestHeader = ("header" in config ? config.header : undefined);
+            if (requestHeader) {
+                requestHeaderType = _cat.utils.Utils.getType(requestHeader);
+                
+                if (requestHeaderType === "object") {
+                    requestHeaderList = [requestHeader];
+                    
+                } else if (requestHeaderType === "array") {
+                    requestHeaderList = requestHeader;
+                }
+                
+               
+            }
+            
             xmlhttp.onreadystatechange = (("onreadystatechange" in config) ? config.onreadystatechange : onreadystatechange);
             xmlhttp.onerror = (("onerror" in config) ? config.onerror : onerror);
 
-            _queue.push({xmlhttp: xmlhttp, config:{method: ("GET" || config.method), url: config.url, async: true}});
+            _queue.push({xmlhttp: xmlhttp, config:{data: data, headers: requestHeaderList, method: (config.method || "GET"), url: config.url, async: true}});
 
             _execAsync();
            
