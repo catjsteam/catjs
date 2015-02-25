@@ -113,6 +113,14 @@
             "exports": "jasmine",
             "globals": true,
             "install": "static"
+        },
+        {
+            "name": "html2canvas",
+            "prod" :["html2canvas.min.js", "html2canvas.svg.min.js"],
+            "dev" :["html2canvas.min.js", "html2canvas.svg.min.js"],        
+            "exports": "html2canvas",
+            "globals": true,
+            "install": "static"
         }
     ]
 }
