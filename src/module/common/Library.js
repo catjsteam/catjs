@@ -92,7 +92,8 @@ module.exports = function() {
          */
         merge: function(source, target) {
             
-            var idx= 0, size= 0, item, targetItem;            
+            var idx= 0, size= 0, item, targetItem,
+                additional = [];            
             
             if (source && underscore.isArray(source) && target && underscore.isArray(target)) {
                 
@@ -102,18 +103,38 @@ module.exports = function() {
                     if (item) {
                         targetItem = _module.exists(target, item.name);
                         if (targetItem) {
-                            _jsutils.Object.copy(item, target[targetItem.idx], true);
+                            if (!item.exclude) {
+                                _jsutils.Object.copy(item, target[targetItem.idx], true);
+                            } else {
+                                target[targetItem.idx] = null;
+                            }
                         } else {
-                            targetItem.lib.push(item);
+                            if (!item.exclude) {
+                                additional.push(item);
+                            }
                         }
                     }  
                 }
+
+                additional.forEach(function(lib) {
+                    if (lib) {
+                        target.push(lib);
+                    }
+                });
+                
+                
+                // clean all null || undefined cells
+                size = target.length;
+                for(idx = 0; idx < size; idx++ ) {
+                    target[idx] && target.push(target[idx]);  
+                }
+                target.splice(0 , size);
             }
            
         },
         
         /**
-         * Check if an object exists within Array of Library objects
+         * Check if an object exists within Array of the Library objects
          * 
          * @param obj {Array} Array of Library objects
          * @param value {Object} Library object
