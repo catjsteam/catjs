@@ -29,7 +29,7 @@ module.exports = function () {
                 }
 
                 functionArg = functionArg.substring(0, functionArg.length - 1);
-                return [(config.apiname || config.api), "(" + functionArg + ");"].join("");
+                return [(config.apiname || config.api), ".call((context || this), " + functionArg + ");"].join("");
 
             }
         },

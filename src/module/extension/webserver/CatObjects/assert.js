@@ -115,7 +115,6 @@ exports.get = function (req, res) {
         }, checkIfAliveTimeout);
     }
 
-    _log.info("requesting " + testName + message + status);
     res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
     res.send({"testName": testName, "message": message, "status": status});
 

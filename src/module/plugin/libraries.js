@@ -335,7 +335,8 @@ module.exports = _basePlugin.ext(function () {
                                                     phantom: true,
                                                     JSPath: true,
                                                     flyer : true,
-                                                    angular : true
+                                                    angular : true,
+                                                    html2canvas: true
                                                 }
                                             }
                                         });

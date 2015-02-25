@@ -92,6 +92,10 @@ _cat.plugins.dom = function () {
 
             snapshot: function (idName) {
 
+                var _$, elt,
+                    me = this;
+
+                
                 function _isCanvasSupported() {
                     var elem = document.createElement('canvas');
                     return !!(elem.getContext && elem.getContext('2d'));
@@ -108,44 +112,70 @@ _cat.plugins.dom = function () {
 
                     var data,
                         serverURL = _cat.utils.Utils.getCatjsServerURL("/screenshot");
+                    
+                    function _getData(canvas) {
+                        var data;
+                        
+                        if (canvas.toDataURL) {
+                            data = canvas.toDataURL("image/png");
+                        }
+                        
+                        return data;
+                    }
+                    
+                    function _save(data) {
 
-                    function _prepareImage(data) {
-                        return data.replace(/^data:image\/png;base64,/, "");
+                        function _prepareImage(data) {
+                            return data.replace(/^data:image\/png;base64,/, "");
+                        }
+
+                        if (data) {
+
+                            _cat.utils.AJAX.sendRequestAsync({
+                                url: serverURL,
+                                method: "POST",
+                                data: {
+                                    pic: _prepareImage(data),
+                                    scrapName: ( "scrap" in me ? me.scrap.name : "temp" ),
+                                    deviceId: _cat.core.guid()
+                                },
+                                header: [
+                                    {name: "Content-Type", value: "application/json;charset=UTF-8"}
+                                ],
+                                callback: function() {
+                                    if (this.responseText) {
+                                        _cat.core.log.info("[catjs dom snapshot] request processed successfully response: ", this.responseText);
+                                    }
+                                }
+                            });
+                        }    
                     }
                     
                     if (elt) {
 
-                        // we found canvas DOM element
-                        if (elt.nodeType && elt.nodeType === 1 && elt.nodeName.toLowerCase() === "canvas") {
-                            if (elt.toDataURL) {
-                                data = elt.toDataURL("image/png");                                
-                            }
-
-                            if (data) {
-                          
-                                _cat.utils.AJAX.sendRequestAsync({
-                                    url: serverURL,
-                                    method: "POST",
-                                    data: {
-                                        pic: _prepareImage(data), 
-                                        scrapName: "tmp",
-                                        deviceId: _cat.core.guid()
-                                    },
-                                    header: [
-                                        {name: "Content-Type", value: "application/json;charset=UTF-8"}
-                                    ],
-                                    callback: function() {
-                                        if (this.responseText) {
-                                            _cat.core.log.info("[catjs dom snapshot] request processed successfully response: ", this.responseText);
-                                        }
-                                    }
-                                });
+                        // DOM element case
+                        if (elt.nodeType && elt.nodeType === 1) {
+                            
+                            
+                            // canvas element case
+                            if (elt.nodeName.toLowerCase() === "canvas") {
+                                
+                                _save(_getData(elt));
+                                
+                            // try using html2canvas    
+                            } else {
+                                if (typeof html2canvas !== "undefined") {
+                                    
+                                    html2canvas(elt).then(function(canvas) {
+                                        _save(_getData(canvas));
+                                    });
+                                } else {
+                                    _cat.core.log.warn("[catjs dom plugin] no valid 'html2canvas' handle was found, consider adding it as a dependency in your catproject.json ");
+                                }
                             }
                         }
                     }
                 }
-
-                var _$, elt;
 
                 // test if canvas supported
                 if (!_isCanvasSupported()) {

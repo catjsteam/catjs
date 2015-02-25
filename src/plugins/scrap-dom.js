@@ -1,6 +1,7 @@
 var _Scrap = catrequire("cat.common.scrap"),
     _codeutils = catrequire("cat.code.utils"),
-    _scraputils = require("./utils/Utils");
+    _scraputils = require("./utils/Utils"),
+    _delayManagerUtils =  require("./utils/DelayManagerUtils");
 
 module.exports = function () {
 
@@ -24,39 +25,72 @@ module.exports = function () {
                     var domRows,
                         dom,
                         me = this,
-                        validcode = false,
-                        api, match;
+                        dm,
+                        tempCommand,
+                        generate = function (domRow) {
 
-                    domRows = this.get("dom");
-                    var scrapConf = me.config;
+                            var dom, api, match;
 
-                    if (domRows) {
-                        domRows = _codeutils.prepareCode(domRows);
-                        dom = domRows.join("\n");
-                        var scrap = scrapConf,
-                            scrapName = (scrap.name ? scrap.name[0] : undefined);
+                            domRow = _codeutils.prepareCode(domRow);
 
-                        if (dom) {
+                            if (domRow && domRow.join) {
+                                dom = domRow.join("\n");
 
-                            api = [ 
-                                {
-                                    api: "listen"
-                                },
-                                {
-                                    api: "fire"
-                                },
-                                {
-                                    api: "snapshot"
-                                }
-                            ];
-
-                            match = _scraputils.match(dom, api);
-                            if (match) {
-                                me.print("_cat.core.plugin('dom').actions."+ match);
+                            } else {
+                                dom = domRow;
                             }
 
-                        }
+                            if (dom) {
+
+                                api = [
+                                    {
+                                        api: "listen"
+                                    },
+                                    {
+                                        api: "fire"
+                                    },
+                                    {
+                                        api: "snapshot"
+                                    }
+                                ];
+
+                                match = _scraputils.match(dom, api);
+                                if (match) {
+
+                                    tempCommand = [
+                                        '_cat.core.plugin("dom").actions.',
+                                        match
+                                    ];
+
+                                    return tempCommand.join("");
+                                }
+
+                            }
+
+                            return undefined;
+                        };
+
+                    domRows = this.get("dom");
+
+                    dm = new _delayManagerUtils({
+                        scrap: me
+                    });
+
+                    if (domRows) {
+
+                        dm.add({
+                            rows:domRows,
+                            args: [
+                                "scrapName: 'dom'"
+                            ],
+                            type: "dom"
+
+                        }, function(row) {
+                            return generate(row);
+                        });
                     }
+
+                    dm.dispose();                    
                 }
             });
 

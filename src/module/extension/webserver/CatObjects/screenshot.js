@@ -2,23 +2,8 @@ var _global = catrequire("cat.global"),
     _log = _global.log(),
     _catinfo = catrequire("cat.info"),
     _useragent = require('express-useragent'),
-    _fs = require("fs");
-
-
-
-/**
- * Initial settings
- * - Loading colors module
- * - Loading cat configuration
- */
-function init() {
-
-
-}
-
-
-// Initialization
-init();
+    _fs = require("fs"),
+    _date = require("date-format-lite");
 
 
 exports.post = function (req, res) {
@@ -34,7 +19,7 @@ exports.post = function (req, res) {
 
 
     save = function (data) {
-        var filename = [scrapName, deviceName ,deviceId].join("_");
+        var filename = [scrapName, deviceName ,deviceId ].join("_");
         _catinfo.set({
                 id: deviceId,
                 device: (ismobile ? "device" : "browser"),
@@ -74,7 +59,7 @@ exports.post = function (req, res) {
 
     ua = _userAgent(req);
     ismobile = ("isMobile" in ua && ua.isMobile);
-    scrapName = req.body.scrapName;
+    scrapName = [req.body.scrapName, "_", (new Date()).format("hh_mm_ss")].join("");
     deviceName = req.body.deviceName;
     deviceId = req.body.deviceId;
 

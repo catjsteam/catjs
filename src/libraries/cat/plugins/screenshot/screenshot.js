@@ -9,7 +9,6 @@ _cat.plugins.screenshot = function () {
 
             screenshot: function (scrapName) {
 
-                console.log("screenshot");
                 var url = "catjsgetscreenshot://scrapName=" + scrapName + "&deviceId=" + _cat.core.guid(),
                 iframe = document.createElement("IFRAME");
 
