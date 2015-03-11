@@ -168,6 +168,39 @@ module.exports = function () {
             }
         },
 
+        /**
+         * check if the path argument exists in the current location
+         *
+         * @param request {Object} standard request object
+         * @param path {*} a given path list of type Array or String
+         * @returns {boolean} whether one of the path exists
+         */
+        pathMatch: function (request, path) {
+            
+            var location = request.originalUrl,
+                referer = request.headers['referer'],
+                type, n = 0;
+
+            if (path) {
+                if (_.isString(path)) {
+                    path = [path];
+                }
+
+                path.forEach(function (item) {
+                    if (item) {
+                        if (referer && referer.indexOf(path) !== -1) {
+                            n++;
+                        }
+                    }
+                });
+                
+            } else {
+                return true;
+            }
+
+            return (n > 0 ? true : false);
+        },
+
         isWindows: function () {
             var type = _os.platform();
             if (type.toLocaleLowerCase() === "win32") {
@@ -505,7 +538,7 @@ module.exports = function () {
                             } else {
                                 _log.warning(_props.get("cat.utils.copy.object.array.warn").format("[utils copy object]", name, typeof(obj)));
                             }
-                            
+
                         } else if (_.isObject(srcObj[name])) {
                             if (!destObj[name]) {
                                 destObj[name] = {};

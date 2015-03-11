@@ -15,7 +15,8 @@ var path = require("path"),
             mainProject,
             emptyQueue,
             getScrap,
-            devicesTests;
+            devicesTests,
+            _module;
 
         devicesTests = {};
         globalTests = [];
@@ -61,10 +62,9 @@ var path = require("path"),
             return result;
         }());
 
-
         function _init() {
 
-            var getScenarioTests = function (testsList, globalDelay, scenarioName) {
+            var getScenarioTests = function (testsList, globalDelay, scenarioName, path) {
 
                     var innerConfigMap = [],
                         j = 0, i = 0, tempArr,
@@ -90,6 +90,7 @@ var path = require("path"),
                                         testsobj[i].delay = globalDelay;
                                     }
                                     testsobj[i].wasRun = false;
+                                    testsobj[i].path = path;
                                     testsobj[i].scenario = {name: (scenarioName || null)};
 
 
@@ -136,7 +137,7 @@ var path = require("path"),
                 if (scenario) {
                     repeatScenario = (scenario.repeat ? scenario.repeat : 1);
                     for (j = 0; j < repeatScenario; j++) {
-                        temp = (getScenarioTests(scenario, scenario.delay, currentTestName));
+                        temp = (getScenarioTests(scenario, scenario.delay, currentTestName, currTest.path));
                         globalTests = globalTests.concat(temp);
                     }
                 } else {
@@ -157,7 +158,7 @@ var path = require("path"),
 
         // initial call
         _init();
-        
+
         emptyQueue = function (testId) {
 
             var testsConfig = devicesTests[testId],
@@ -188,7 +189,6 @@ var path = require("path"),
 
         };
 
-
         getScrap = function (scrapName, testId) {
             var indexTests,
                 tests = devicesTests[testId].tests,
@@ -211,7 +211,7 @@ var path = require("path"),
             return {scrap: scrap, run: (scrap ? scrap.run : false) };
         };
 
-        return {
+        _module = {
 
             getProject: function () {
                 return mainProject;
@@ -221,7 +221,12 @@ var path = require("path"),
                 return globalTests;
             },
 
+            destroy: function (testId) {
+                delete devicesTests[testId];
+            },
+
             checkScrap: function (req, res) {
+
                 var scrapName,
                     scrap,
                     result,
@@ -258,11 +263,15 @@ var path = require("path"),
 
                         cloneGlobalTests = JSON.parse(JSON.stringify(globalTests));
                         devicesTests[testId] = new TestConfig({
-                            "tests": cloneGlobalTests
+                            "tests": cloneGlobalTests,
+                            "request": req
                         });
                     }
 
                     testsConfig = devicesTests[testId];
+                    while (testsConfig.skip()) {
+                        testsConfig.next();
+                    }
 
                     // test data for the test id
                     currReadyIndex = testsConfig.getIndex();
@@ -289,7 +298,7 @@ var path = require("path"),
 
                         if (!scrapReady) {
 
-                            _init();
+                           _module.destroy(testId);
                             _response(false);
                             return undefined;
                         }
@@ -326,9 +335,9 @@ var path = require("path"),
                 }
 
             }
-
-
         };
+        
+        return _module;
 
     }();
 

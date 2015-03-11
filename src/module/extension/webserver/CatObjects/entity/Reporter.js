@@ -3,7 +3,8 @@ var _jmr = require("test-model-reporter"),
     _global = catrequire("cat.global"),
     _catinfo = catrequire("cat.info"),
     _log = _global.log(),
-    _fs = require("fs");
+    _fs = require("fs"),
+    _projectmanager = require('./../../../projectmanager/action');
 
 /**
  * Report Entity
@@ -226,6 +227,8 @@ Reporter.prototype.addTestCase = function (config) {
 
         // delete the color on test end
         me._colors.deleteColor(id);
+
+        _projectmanager.destroy(id);
         
         // test callback
         if (me._callback) {

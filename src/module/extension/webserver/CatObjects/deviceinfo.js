@@ -71,7 +71,5 @@ exports.post = function (req, res) {
         '"deviceId" : "' + deviceId + '",' +
         '}');
 
-    console.log("send response");
-
 };
 
