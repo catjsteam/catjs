@@ -181,11 +181,12 @@ _cat.core.clientmanager = function () {
     checkIfExists = function (scrapName, tests) {
 
         var indexScrap = 0, size = (tests && tests.length ? tests.length : 0),
-            testitem;
-
+            testitem, path;      
+        
         for (; indexScrap < size; indexScrap++) {
             testitem = tests[indexScrap];
-            if (testitem && testitem.name === scrapName) {
+            path = testitem.scenario.path;
+            if (testitem && testitem.name === scrapName && _cat.utils.Utils.pathMatch(path)) {
                 return {scrap: testitem, idx: indexScrap};
             }
         }
@@ -216,7 +217,9 @@ _cat.core.clientmanager = function () {
             delay = catConfig.getTestDelay(),
             scrap = ("scrap" in dmcontext  ? dmcontext.scrap : undefined),
             standalone = _isStandalone(scrap),
-            testobj, currentTestIdx;
+            testobj, currentTestIdx,
+            manager = false,
+            me = this;
 
         currentTestIdx = currentState.index;
         testobj = catConfig.getTest(currentTestIdx);
@@ -315,6 +318,25 @@ _cat.core.clientmanager = function () {
         } else {
             executeCode(dmcommands, dmcontext);
         }
+        
+       /* if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
+            manager = true;             
+                        
+        } else {
+            manager = false;
+        }
+
+        _cat.core.controller.add(
+            {
+                fn: function() {
+                    executeCode(dmcommands, dmcontext);
+                },
+                manager: manager,
+                totalDelay: totalDelay,
+                delay : totalDelay,
+                me: me
+            });
+            */
     };
 
     function _preScrapProcess(config, args) {
@@ -468,8 +490,26 @@ _cat.core.clientmanager = function () {
 
     function _processReadyScraps(cameFromBroadcast) {
         var idx = currentState.index,
-            testitem = testQueue.get(idx);
+            catConfig, test,
+            testitem = testQueue.get(idx),
+            testname,
+            emptyQueue = testQueue.isEmpty(),
+            queuedesc = (emptyQueue ? "no " : ""),
+            firstfound = false,
+            broadcast = false;
 
+
+        // TODO add as a debug info
+        catConfig = _cat.core.getConfig();
+        test = catConfig.getTest(idx);
+        testname = (test ? _cat.core.getScrapName(test.name) : undefined );
+        if (testname) {
+            _log.log("[catjs client manager status] scraps execution status: ready; There are " + queuedesc + "scraps in the queue. current index: ", idx, " test: ", testname);
+            _log.log("[catjs client manager status] ", _cat.core.validateUniqueScrapInfo(testname));
+        } else {
+            _log.log("[catjs client manager status] scraps execution status: ready; current index: ", idx);
+        }
+        
         if (testitem.first()) {
             var configs = testitem.all();
             configs.forEach(function(config) {
@@ -486,12 +526,13 @@ _cat.core.clientmanager = function () {
             });
             testitem.deleteAll();
             broadcastProcess(false, true);
-            
+            firstfound = true;
         } else {
             if (!cameFromBroadcast) {
                 broadcastProcess(true, true);
+                broadcast = true;                
             }
-        }
+        }        
     }
 
     function scrapTestIndex(scrap) {
@@ -530,13 +571,7 @@ _cat.core.clientmanager = function () {
 
                 //currentState.testend = true;
                 
-                return;
-                
-//                if (catConfig.isReport()) {
-//                    reportFormats = catConfig.getReportFormats();
-//                }
-//
-//                endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
+                return undefined; 
             }
             
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
@@ -605,7 +640,10 @@ _cat.core.clientmanager = function () {
                 };
 
                 _cat.utils.AJAX.sendRequestAsync(config);
-            }
+                
+            } else {
+                _log.log("[catjs client manager] scrap was not signed. probably not part of the scenario [scrap: ", _cat.core.getScrapName(scrap.name), ", tests: [", catConfig.getTestNames() , "]]");
+            } 
 
         },
 

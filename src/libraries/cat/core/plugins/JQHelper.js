@@ -3,12 +3,26 @@
  * 
  * Common layer to make a smooth bridge between the functionality
  * 
- * @type {_cat.utils.plugins}
+ * @type {_cat.utils.plugins.jqhelper}
  */
-_cat.utils.plugins = function() {
+_cat.utils.plugins.jqhelper = function() {
     
     var _module = {
 
+        isjquery: function() {
+            if (typeof $ !== "undefined") {
+                return true;
+            }
+            return false;
+        },
+        
+        isangular: function() {
+            if (typeof angular !== "undefined") {
+                return true;
+            }
+            return false;
+        },
+        
         /**
          * Get the jquery or jqlite handle
          * 
@@ -45,14 +59,14 @@ _cat.utils.plugins = function() {
             };
 
             _methods._jqlite = function() {
-                if (typeof angular !== "undefined") {
+                if (_module.isangular()) {
                     return angular.element;
                 }
                 return undefined;
             };
             
             _methods._jquery = function() {
-                if (typeof $ !== "undefined") {
+                if (_module.isjquery()) {
                     return $;
                 }
                 return undefined;
@@ -67,7 +81,7 @@ _cat.utils.plugins = function() {
             };
             
             _map["*"] = function() {
-                var _$ =  (_methods._jquery() || _methods._jquery());
+                var _$ =  (_methods._jquery() || _methods._jqlite());
                 return (_$ || _methods._empty());
             };
             

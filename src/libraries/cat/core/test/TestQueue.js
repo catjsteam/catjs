@@ -48,6 +48,10 @@ _cat.core.TestQueue = function() {
 
     _module = {
         
+        isEmpty: function() {
+            return _cat.utils.Utils.isEmpty(_queue);    
+        },
+                
         get: function(key) {
             var queue = _queue[key];
             return (queue ? queue : new _Queue());

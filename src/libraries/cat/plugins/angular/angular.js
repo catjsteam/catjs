@@ -17,7 +17,7 @@ _cat.plugins.angular = function () {
             return {
 
                 $: function() {
-                    return _cat.utils.plugins.$("angular");
+                    return _cat.utils.plugins.jqhelper.$("angular");
                 },
 
                 setBoarder: function (element) {
@@ -41,7 +41,7 @@ _cat.plugins.angular = function () {
                  */
                 getElt: function (val) {
                     var args = _getargs(arguments, "angular");
-                    return _cat.utils.plugins.getElt.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.getElt.apply(this, args);
                 },
 
                 /**
@@ -59,7 +59,7 @@ _cat.plugins.angular = function () {
                     args = _getargs(arguments, "angular");
                     
                     try {
-                        result = _cat.utils.plugins.trigger.apply(this, args);
+                        result = _cat.utils.plugins.jqhelper.trigger.apply(this, args);
                     } catch (e) {
                         _log.warn("[catjs angular plugin] The trigger action failed with errors: ", e, " arguments:", JSON.stringify(args));   
                     }
@@ -69,7 +69,7 @@ _cat.plugins.angular = function () {
 
                 setText: function() {
                     var args = _getargs(arguments, "angular");
-                    return _cat.utils.plugins.setText.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.setText.apply(this, args);
                 }
             };
 

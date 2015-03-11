@@ -171,6 +171,7 @@ _cat.core.ui = function () {
     var __cache = [],
         __catElement,
         _disabled = false,
+        _islogolistener = false,
 
         _loaderListener = false,
         _me = {
@@ -219,10 +220,19 @@ _cat.core.ui = function () {
                                     if (catmask) {
                                         catmask.classList.toggle("fadeMe");
                                     }
+                                },
+                                bubblefalse = function(e) {
+                                    if (e) {
+                                        e.stopPropagation();
+                                    }
                                 };
 
-                            if (logoelt && catmask && catmask.classList) {
+                            if (!_islogolistener && logoelt && catmask && catmask.classList) {
+                                // toggle mask
                                 _addEventListener(logoelt, "click", listener);
+                                
+                                // stop propagation
+                                _islogolistener = true;
                             }
 
                         }

@@ -106,6 +106,18 @@ _cat.core.Config = function(args) {
             return undefined;
         };
         
+        this.getTestNames = function() {
+            var list = this.getTests(),
+                names = [];
+            list.forEach(function(test){
+               if (test) {
+                   names.push(test.scenario.name + ":" + test.name);
+               } 
+            });
+            
+            return names.join(",");
+        };
+        
         this.getTests = function () {
 
             function _GetTestsClass(config) {
@@ -116,15 +128,17 @@ _cat.core.Config = function(args) {
                 this.setTests = function (config) {
 
                     var getScenarioTests = function (testsList, globalDelay, scenarioName) {
-                            var innerConfigMap = [];
+                            var innerConfigMap = [],
+                                repeatFlow, i, j, tempArr;
+                            
                             if (testsList.tests) {
-                                for (var i = 0; i < testsList.tests.length; i++) {
+                                for (i = 0; i < testsList.tests.length; i++) {
                                     if (!(testsList.tests[i].disable)) {
                                         if (testsList.tests[i].tests) {
-                                            var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
+                                            repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
 
-                                            for (var j = 0; j < repeatFlow; j++) {
-                                                var tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay);
+                                            for (j = 0; j < repeatFlow; j++) {
+                                                tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay);
                                                 innerConfigMap = innerConfigMap.concat(tempArr);
                                             }
 
@@ -135,7 +149,7 @@ _cat.core.Config = function(args) {
                                                 testsList.tests[i].delay = globalDelay;
                                             }
                                             testsList.tests[i].wasRun = false;
-                                            testsList.tests[i].scenario = {name: (scenarioName || null)};
+                                            testsList.tests[i].scenario = {name: (scenarioName || null), path: (testsList.path || null)};
                                             innerConfigMap.push(testsList.tests[i]);
 
                                         }
@@ -145,17 +159,21 @@ _cat.core.Config = function(args) {
 
                             return innerConfigMap;
 
-                        }, i, j, temp,
+                        },                       
+                        i, j, temp, testcounter = 0,
                         testsFlow, scenarios, scenario,
-                        repeatScenario, currTest, currentTestName;
+                        repeatScenario, currTest, currentTestName, currentTestPathTest;
 
                     testsFlow = config.tests;
                     scenarios = config.scenarios;
                     for (i = 0; i < testsFlow.length; i++) {
                         currTest = testsFlow[i];
-
-                        if (!currTest || !("name" in currTest)) {
-                            _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                        currentTestPathTest = _cat.utils.Utils.pathMatch(currTest.path);
+                        
+                        if (!currTest || !("name" in currTest) ||!currentTestPathTest) {
+                            if (!("name" in currTest)) {
+                                _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                            }                                
                             continue;
                         }
                         currentTestName = currTest.name;

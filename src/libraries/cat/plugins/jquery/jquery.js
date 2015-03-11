@@ -18,7 +18,7 @@ _cat.plugins.jquery = function () {
             return {                              
                 
                 $: function() {
-                    return _cat.utils.plugins.$();
+                    return _cat.utils.plugins.jqhelper.$();
                 },
                 
                 setBoarder: function (element) {
@@ -35,17 +35,17 @@ _cat.plugins.jquery = function () {
 
                 getElt: function (val) {
                     var args = _getargs(arguments, "jquery");
-                    return _cat.utils.plugins.getElt.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.getElt.apply(this, args);
                 },
                 
                 trigger: function() {
                     var args = _getargs(arguments, "jquery");
-                    return _cat.utils.plugins.trigger.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.trigger.apply(this, args);
                 },
                 
                 setText: function() {
                     var args = _getargs(arguments, "jquery");
-                    return _cat.utils.plugins.setText.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.setText.apply(this, args);
                 }          
             };
 

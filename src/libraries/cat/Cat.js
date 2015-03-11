@@ -1,5 +1,5 @@
 var _cat = {
-    utils: { plugins: {}},
+    utils: { plugins: { jqhelper: {}}},
     plugins: {},
     ui: {},
     errors: {}
@@ -659,21 +659,59 @@ _cat.core = function () {
             return arr;  
         },
 
-        getScrapByName : function(searchName) {
+        validateUniqueScrapInfo: function(searchName) {
+            var list = _module.getScrapsByName(searchName),
+                size = (list ? list.length : 0),
+                message;
+
+            if (size === 0) {
+                message = ["The scrap named '", searchName ,"' was not found. results:["];
+            } else if (size > 0) {
+                message = ["The scrap named '", searchName ,"' is ",(size > 1 ? "not ": ""), "unique. results: ["];
+            }
+            
+            list.forEach(function(scrap) {
+               message.push(_module.getScrapName(scrap.name), " (", scrap.pkgName , "); "); 
+            });
+
+            message.push("]");
+            
+            return message.join("");
+        },
+        
+        /**
+         * Get all match scraps by name
+         * 
+         * @param searchName {String} The scrap name
+         * @returns {Array} Scrap object
+         */
+        getScrapsByName: function(searchName) {
             var scraps = this.getScraps(),
                 scrap,
                 scrapName,
-                i;
+                i, list = [];
 
             for (i = 0; i < scraps.length; i++) {
                 scrap = scraps[i];
                 scrapName = scrap.name;
                 scrapName = (Array.isArray(scrapName) ? scrapName[0] : scrapName);
                 if (scrapName === searchName) {
-                    return scrap;
+                    list.push(scrap);
                 }
-            }
+            }            
+            
+            return list;
+        },
 
+        /**
+         * I feel lucky, Get the first scrap match by a name
+         * 
+         * @param searchName {String} The scrap name
+         * @returns {*} Scrap object
+         */
+        getScrapByName : function(searchName) {
+            var list = _module.getScrapsByName(searchName);
+            return (list && list.length > 0 ? list[0] : undefined);
         },
 
         getScrapById : function(searchId) {
@@ -874,9 +912,10 @@ _cat.core = function () {
 
         },
         
-        action: function() {           
+        action: function(thiz, config) {
 
-
+            _log.log("[catjs core evaluation] scrap [package name: ", config.pkgName, "  args: ", arguments, "]");
+            
             if (!_isReady()) {
                 _actionQueue.push({args: arguments});
             } else {
@@ -903,7 +942,7 @@ _cat.core = function () {
 
             if (scrap) {
                 if (scrap.pkgName) {
-
+                    _log.log("[catjs core execution] scrap [name: " + _module.getScrapName(scrap.name) + ", pkgName:", config.pkgName, "configuration: ", config, "]");
 
                     // collect arguments
                     if (arguments.length > 2) {
@@ -937,7 +976,6 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                _log.log("[catjs core] scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
         },

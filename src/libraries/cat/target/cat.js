@@ -1,5 +1,5 @@
 var _cat = {
-    utils: { plugins: {}},
+    utils: { plugins: { jqhelper: {}}},
     plugins: {},
     ui: {},
     errors: {}
@@ -659,21 +659,59 @@ _cat.core = function () {
             return arr;  
         },
 
-        getScrapByName : function(searchName) {
+        validateUniqueScrapInfo: function(searchName) {
+            var list = _module.getScrapsByName(searchName),
+                size = (list ? list.length : 0),
+                message;
+
+            if (size === 0) {
+                message = ["The scrap named '", searchName ,"' was not found. results:["];
+            } else if (size > 0) {
+                message = ["The scrap named '", searchName ,"' is ",(size > 1 ? "not ": ""), "unique. results: ["];
+            }
+            
+            list.forEach(function(scrap) {
+               message.push(_module.getScrapName(scrap.name), " (", scrap.pkgName , "); "); 
+            });
+
+            message.push("]");
+            
+            return message.join("");
+        },
+        
+        /**
+         * Get all match scraps by name
+         * 
+         * @param searchName {String} The scrap name
+         * @returns {Array} Scrap object
+         */
+        getScrapsByName: function(searchName) {
             var scraps = this.getScraps(),
                 scrap,
                 scrapName,
-                i;
+                i, list = [];
 
             for (i = 0; i < scraps.length; i++) {
                 scrap = scraps[i];
                 scrapName = scrap.name;
                 scrapName = (Array.isArray(scrapName) ? scrapName[0] : scrapName);
                 if (scrapName === searchName) {
-                    return scrap;
+                    list.push(scrap);
                 }
-            }
+            }            
+            
+            return list;
+        },
 
+        /**
+         * I feel lucky, Get the first scrap match by a name
+         * 
+         * @param searchName {String} The scrap name
+         * @returns {*} Scrap object
+         */
+        getScrapByName : function(searchName) {
+            var list = _module.getScrapsByName(searchName);
+            return (list && list.length > 0 ? list[0] : undefined);
         },
 
         getScrapById : function(searchId) {
@@ -874,9 +912,10 @@ _cat.core = function () {
 
         },
         
-        action: function() {           
+        action: function(thiz, config) {
 
-
+            _log.log("[catjs core evaluation] scrap [package name: ", config.pkgName, "  args: ", arguments, "]");
+            
             if (!_isReady()) {
                 _actionQueue.push({args: arguments});
             } else {
@@ -903,7 +942,7 @@ _cat.core = function () {
 
             if (scrap) {
                 if (scrap.pkgName) {
-
+                    _log.log("[catjs core execution] scrap [name: " + _module.getScrapName(scrap.name) + ", pkgName:", config.pkgName, "configuration: ", config, "]");
 
                     // collect arguments
                     if (arguments.length > 2) {
@@ -937,7 +976,6 @@ _cat.core = function () {
                         catObj.apply(_context, passedArguments);
                     }
                 }
-                _log.log("[catjs core] scrap call: ", config, " scrap: " + scrap.name + " this:" + thiz);
             }
 
         },
@@ -1091,6 +1129,18 @@ _cat.core.Config = function(args) {
             return undefined;
         };
         
+        this.getTestNames = function() {
+            var list = this.getTests(),
+                names = [];
+            list.forEach(function(test){
+               if (test) {
+                   names.push(test.scenario.name + ":" + test.name);
+               } 
+            });
+            
+            return names.join(",");
+        };
+        
         this.getTests = function () {
 
             function _GetTestsClass(config) {
@@ -1101,15 +1151,17 @@ _cat.core.Config = function(args) {
                 this.setTests = function (config) {
 
                     var getScenarioTests = function (testsList, globalDelay, scenarioName) {
-                            var innerConfigMap = [];
+                            var innerConfigMap = [],
+                                repeatFlow, i, j, tempArr;
+                            
                             if (testsList.tests) {
-                                for (var i = 0; i < testsList.tests.length; i++) {
+                                for (i = 0; i < testsList.tests.length; i++) {
                                     if (!(testsList.tests[i].disable)) {
                                         if (testsList.tests[i].tests) {
-                                            var repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
+                                            repeatFlow = testsList.tests[i].repeat ? testsList.tests[i].repeat : 1;
 
-                                            for (var j = 0; j < repeatFlow; j++) {
-                                                var tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay);
+                                            for (j = 0; j < repeatFlow; j++) {
+                                                tempArr = getScenarioTests(testsList.tests[i], testsList.tests[i].delay);
                                                 innerConfigMap = innerConfigMap.concat(tempArr);
                                             }
 
@@ -1120,7 +1172,7 @@ _cat.core.Config = function(args) {
                                                 testsList.tests[i].delay = globalDelay;
                                             }
                                             testsList.tests[i].wasRun = false;
-                                            testsList.tests[i].scenario = {name: (scenarioName || null)};
+                                            testsList.tests[i].scenario = {name: (scenarioName || null), path: (testsList.path || null)};
                                             innerConfigMap.push(testsList.tests[i]);
 
                                         }
@@ -1130,17 +1182,21 @@ _cat.core.Config = function(args) {
 
                             return innerConfigMap;
 
-                        }, i, j, temp,
+                        },                       
+                        i, j, temp, testcounter = 0,
                         testsFlow, scenarios, scenario,
-                        repeatScenario, currTest, currentTestName;
+                        repeatScenario, currTest, currentTestName, currentTestPathTest;
 
                     testsFlow = config.tests;
                     scenarios = config.scenarios;
                     for (i = 0; i < testsFlow.length; i++) {
                         currTest = testsFlow[i];
-
-                        if (!currTest || !("name" in currTest)) {
-                            _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                        currentTestPathTest = _cat.utils.Utils.pathMatch(currTest.path);
+                        
+                        if (!currTest || !("name" in currTest) ||!currentTestPathTest) {
+                            if (!("name" in currTest)) {
+                                _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
+                            }                                
                             continue;
                         }
                         currentTestName = currTest.name;
@@ -1747,11 +1803,12 @@ _cat.core.clientmanager = function () {
     checkIfExists = function (scrapName, tests) {
 
         var indexScrap = 0, size = (tests && tests.length ? tests.length : 0),
-            testitem;
-
+            testitem, path;      
+        
         for (; indexScrap < size; indexScrap++) {
             testitem = tests[indexScrap];
-            if (testitem && testitem.name === scrapName) {
+            path = testitem.scenario.path;
+            if (testitem && testitem.name === scrapName && _cat.utils.Utils.pathMatch(path)) {
                 return {scrap: testitem, idx: indexScrap};
             }
         }
@@ -1782,7 +1839,9 @@ _cat.core.clientmanager = function () {
             delay = catConfig.getTestDelay(),
             scrap = ("scrap" in dmcontext  ? dmcontext.scrap : undefined),
             standalone = _isStandalone(scrap),
-            testobj, currentTestIdx;
+            testobj, currentTestIdx,
+            manager = false,
+            me = this;
 
         currentTestIdx = currentState.index;
         testobj = catConfig.getTest(currentTestIdx);
@@ -1881,6 +1940,25 @@ _cat.core.clientmanager = function () {
         } else {
             executeCode(dmcommands, dmcontext);
         }
+        
+       /* if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
+            manager = true;             
+                        
+        } else {
+            manager = false;
+        }
+
+        _cat.core.controller.add(
+            {
+                fn: function() {
+                    executeCode(dmcommands, dmcontext);
+                },
+                manager: manager,
+                totalDelay: totalDelay,
+                delay : totalDelay,
+                me: me
+            });
+            */
     };
 
     function _preScrapProcess(config, args) {
@@ -2034,8 +2112,26 @@ _cat.core.clientmanager = function () {
 
     function _processReadyScraps(cameFromBroadcast) {
         var idx = currentState.index,
-            testitem = testQueue.get(idx);
+            catConfig, test,
+            testitem = testQueue.get(idx),
+            testname,
+            emptyQueue = testQueue.isEmpty(),
+            queuedesc = (emptyQueue ? "no " : ""),
+            firstfound = false,
+            broadcast = false;
 
+
+        // TODO add as a debug info
+        catConfig = _cat.core.getConfig();
+        test = catConfig.getTest(idx);
+        testname = (test ? _cat.core.getScrapName(test.name) : undefined );
+        if (testname) {
+            _log.log("[catjs client manager status] scraps execution status: ready; There are " + queuedesc + "scraps in the queue. current index: ", idx, " test: ", testname);
+            _log.log("[catjs client manager status] ", _cat.core.validateUniqueScrapInfo(testname));
+        } else {
+            _log.log("[catjs client manager status] scraps execution status: ready; current index: ", idx);
+        }
+        
         if (testitem.first()) {
             var configs = testitem.all();
             configs.forEach(function(config) {
@@ -2052,12 +2148,13 @@ _cat.core.clientmanager = function () {
             });
             testitem.deleteAll();
             broadcastProcess(false, true);
-            
+            firstfound = true;
         } else {
             if (!cameFromBroadcast) {
                 broadcastProcess(true, true);
+                broadcast = true;                
             }
-        }
+        }        
     }
 
     function scrapTestIndex(scrap) {
@@ -2096,13 +2193,7 @@ _cat.core.clientmanager = function () {
 
                 //currentState.testend = true;
                 
-                return;
-                
-//                if (catConfig.isReport()) {
-//                    reportFormats = catConfig.getReportFormats();
-//                }
-//
-//                endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
+                return undefined; 
             }
             
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
@@ -2171,7 +2262,10 @@ _cat.core.clientmanager = function () {
                 };
 
                 _cat.utils.AJAX.sendRequestAsync(config);
-            }
+                
+            } else {
+                _log.log("[catjs client manager] scrap was not signed. probably not part of the scenario [scrap: ", _cat.core.getScrapName(scrap.name), ", tests: [", catConfig.getTestNames() , "]]");
+            } 
 
         },
 
@@ -2231,17 +2325,110 @@ _cat.core.clientmanager = function () {
 
     };
 }();
+_cat.core.controller = function () {
+
+    var _queue = [],
+        _Action = function (config) {
+            var me = this;
+
+            this.config = config;
+            this.get = function (key) {
+                return me.config[key];
+            };
+
+        },
+
+        _module = {
+
+            add: function (config) {
+
+                _cat.utils.Utils.prepareProps(
+                    {
+                        global: {
+                            obj: config
+                        },
+                        props: [
+                            {
+                                key: "me",
+                                default: this
+                            },
+                            {
+                                key: "fn"
+                            },
+                            {
+                                key: "delay",
+                                default: 0
+                            },
+                            {
+                                key: "totalDelay",
+                                default: 0
+                            },
+                            {
+                                key: "manager",
+                                require: true
+                            }
+                        ]
+                    });
+
+                if (config.manager) {
+
+                   // _queue.push(new _Action(config));
+                    config.fn.call(config.me);
+//                if (config.fn) {
+//                    setTimeout(function () {
+//                        fn.call(config.me);
+//                    }, totalDelay);
+//                    totalDelay += delay;
+//                }
+
+                }                
+            },
+
+            run: function() {
+
+                
+            }
+
+        };
+
+
+    return _module;
+
+}();
+_cat.core.wait = function () {
+
+    var _module = {
+        
+        
+        
+    };
+
+}();
 /**
  * JQuery / JQlite (Angular) helper 
  * 
  * Common layer to make a smooth bridge between the functionality
  * 
- * @type {_cat.utils.plugins}
+ * @type {_cat.utils.plugins.jqhelper}
  */
-_cat.utils.plugins = function() {
+_cat.utils.plugins.jqhelper = function() {
     
     var _module = {
 
+        isjquery: function() {
+            if (typeof $ !== "undefined") {
+                return true;
+            }
+            return false;
+        },
+        
+        isangular: function() {
+            if (typeof angular !== "undefined") {
+                return true;
+            }
+            return false;
+        },
+        
         /**
          * Get the jquery or jqlite handle
          * 
@@ -2278,14 +2465,14 @@ _cat.utils.plugins = function() {
             };
 
             _methods._jqlite = function() {
-                if (typeof angular !== "undefined") {
+                if (_module.isangular()) {
                     return angular.element;
                 }
                 return undefined;
             };
             
             _methods._jquery = function() {
-                if (typeof $ !== "undefined") {
+                if (_module.isjquery()) {
                     return $;
                 }
                 return undefined;
@@ -2300,7 +2487,7 @@ _cat.utils.plugins = function() {
             };
             
             _map["*"] = function() {
-                var _$ =  (_methods._jquery() || _methods._jquery());
+                var _$ =  (_methods._jquery() || _methods._jqlite());
                 return (_$ || _methods._empty());
             };
             
@@ -2485,6 +2672,50 @@ _cat.utils.plugins = function() {
     
     return _module;
     
+}();
+_cat.utils.plugins.simulate = function() {
+    
+    var _module = {
+        
+        drag: function(opt) {
+
+            _cat.utils.Utils.prepareProps(
+                {
+                    global: {
+                        obj: opt
+                    },
+                    props: [
+                        {
+                            key: "element",
+                            require: true
+                        },
+                        {
+                            key: "target"
+                        },
+                        {
+                            key: "offset",
+                            default: {x:0, y:0}
+                        },
+                        {
+                            key: "cords",
+                            default: false
+                        },
+                        {
+                            key: "steps",
+                            default: {delay: 0, count: 1}
+                        }
+                    ]
+                });
+
+            _cat.plugins.dom.fire("mouseenter", {"element": opt.element});
+            _cat.plugins.dom.fire("mousedown", {"element": opt.element});
+            _cat.plugins.dom.fire("mousemove", opt);
+            _cat.plugins.dom.fire("mouseup", {"element": opt.element});            
+        } 
+    };
+    
+    return _module;
+
 }();
 _cat.core.TestAction = function () {
 
@@ -2920,6 +3151,10 @@ _cat.core.TestQueue = function() {
 
     _module = {
         
+        isEmpty: function() {
+            return _cat.utils.Utils.isEmpty(_queue);    
+        },
+                
         get: function(key) {
             var queue = _queue[key];
             return (queue ? queue : new _Queue());
@@ -3109,6 +3344,7 @@ _cat.core.ui = function () {
     var __cache = [],
         __catElement,
         _disabled = false,
+        _islogolistener = false,
 
         _loaderListener = false,
         _me = {
@@ -3157,10 +3393,19 @@ _cat.core.ui = function () {
                                     if (catmask) {
                                         catmask.classList.toggle("fadeMe");
                                     }
+                                },
+                                bubblefalse = function(e) {
+                                    if (e) {
+                                        e.stopPropagation();
+                                    }
                                 };
 
-                            if (logoelt && catmask && catmask.classList) {
+                            if (!_islogolistener && logoelt && catmask && catmask.classList) {
+                                // toggle mask
                                 _addEventListener(logoelt, "click", listener);
+                                
+                                // stop propagation
+                                _islogolistener = true;
                             }
 
                         }
@@ -4054,7 +4299,114 @@ if (typeof(_cat) !== "undefined") {
 
         var _module = {
 
-            getCatjsServerURL: function(url) {
+            /**
+             * check if the path argument exists in the current location  
+             *
+             * @param path {*} a given path list of type Array or String
+             * @returns {boolean} whether one of the path exists
+             */
+            pathMatch: function (path) {
+                var location = window.location.href,
+                    type, n=0;
+
+                if (path) {
+                    type = _cat.utils.Utils.getType(path);
+                    if (type === "string") {
+                        path = [path];
+                    }
+
+                    path.forEach(function (item) {
+                        if (item) {
+                            if (location.indexOf(path) !== -1) {
+                                n++;
+                            }
+                        }
+                    });
+                } else {
+                    return true;
+                }
+
+                return (n > 0 ? true : false);
+            },
+
+            isEmpty: function (srcobj) {
+                var key,
+                    n = 0,
+                    result = false;
+
+                if (!srcobj) {
+                    return true;
+                }
+
+                if (Object.keys) {
+                    result = (Object.keys(srcobj).length === 0);
+
+                } else {
+                    for (key in srcobj) {
+                        if (srcobj.hasOwnProperty(key)) {
+                            n++;
+                            break;
+                        }
+                    }
+
+                    result = (n === 0);
+                }
+
+                return result;
+            },
+
+            /**
+             * Setting the reference object with default values or undefined for unassigned properties
+             * e.g. { global: {obj: obj}, props: [{key: "test", default: 1}] }
+             *
+             *
+             * @param value {Object} props values
+             *          global {Object} global references
+             *               obj {Object} [optional] The object to be copied the property from
+             *
+             *          props {Array} prop value
+             *              key {String} The property key
+             *              obj {Object} [optional] The object to be copied the property from
+             *              default {Object} [optional] A default value
+             *              require {Boolean} Warning about undefined value, default set to false
+             *
+             */
+            prepareProps: function (value) {
+
+                var globalreference, refobj;
+
+                if (value) {
+                    if ("global" in value && value.global) {
+                        globalreference = value.global.obj;
+                    }
+                    if ("props" in value && value.props && _module.getType(value.props) === "array") {
+                        value.props.forEach(function (prop) {
+
+                            var defaultval;
+
+                            if (!("require" in prop)) {
+                                prop.require = false;
+                            }
+                            if (!("key" in prop)) {
+                                throw new Error("[catjs utils] 'key' is a required property for method 'getProps' ");
+                            }
+
+                            defaultval = ("default" in prop ? prop.default : undefined);
+                            refobj = ("obj" in prop ? prop.obj : globalreference);
+
+                            refobj[prop.key] = (prop.key in refobj ? refobj[prop.key] : defaultval);
+
+                            if (prop.require && (refobj[prop.key] === undefined || refobj[prop.key] === null)) {
+                                throw new Error("[catjs utils prepareProps] property '" + prop.key + "' is required ");
+                            }
+
+
+                        });
+                    }
+                }
+            },
+
+            getCatjsServerURL: function (url) {
 
                 var catConfig = _cat.core.getConfig(),
                     port = catConfig.getPort(),
@@ -4070,17 +4422,17 @@ if (typeof(_cat) !== "undefined") {
                 } else {
                     url = "/";
                 }
-                
-                return [method, "://", host, ":", port, url].join("");
-                
-            },
-            
-            querystring: function(name, query){
-                var re, r=[], m;
 
-                re = new RegExp('(?:\\?|&)' + name + '=(.*?)(?=&|$)','gi');
-                while ((m=re.exec(query  || document.location.search)) != null) {
-                    r[r.length]=m[1];
+                return [method, "://", host, ":", port, url].join("");
+
+            },
+
+            querystring: function (name, query) {
+                var re, r = [], m;
+
+                re = new RegExp('(?:\\?|&)' + name + '=(.*?)(?=&|$)', 'gi');
+                while ((m = re.exec(query || document.location.search)) != null) {
+                    r[r.length] = m[1];
                 }
                 return (r && r[0] ? r[0] : undefined);
             },
@@ -4149,22 +4501,22 @@ if (typeof(_cat) !== "undefined") {
             }
         };
 
-        (function(){
-            var types = ['Array','Function','Object','String','Number'],
+        (function () {
+            var types = ['Array', 'Function', 'Object', 'String', 'Number'],
                 typesLength = types.length;
 
-            function _getType(type){
-                return function(o) {
+            function _getType(type) {
+                return function (o) {
                     return !!o && ( Object.prototype.toString.call(o) === '[object ' + type + ']' );
                 };
             }
-            
+
             while (typesLength--) {
-                                
+
                 _module['is' + types[typesLength]] = _getType(types[typesLength]);
             }
         })();
-        
+
         return _module;
 
     }();
@@ -4173,8 +4525,8 @@ if (typeof(_cat) !== "undefined") {
 } else {
 
     var _cat = {
-        utils:{
-            Utils:{}
+        utils: {
+            Utils: {}
         }
     };
 
@@ -4183,16 +4535,17 @@ _cat.utils.Utils.generateGUID = function () {
 
     //GUID generator
     function S4() {
-        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
     }
+
     function guid() {
-        return [S4(),S4(),"-",S4(),"-",S4(),"-",S4(),"-",S4(),S4(),S4()].join("");
+        return [S4(), S4(), "-", S4(), "-", S4(), "-", S4(), "-", S4(), S4(), S4()].join("");
     }
 
     return guid();
 };
 
-_cat.utils.Utils.extExists = function(value) {
+_cat.utils.Utils.extExists = function (value) {
     var pos;
     if (value) {
         pos = value.lastIndexOf(".");
@@ -4235,7 +4588,7 @@ _cat.plugins.angular = function () {
             return {
 
                 $: function() {
-                    return _cat.utils.plugins.$("angular");
+                    return _cat.utils.plugins.jqhelper.$("angular");
                 },
 
                 setBoarder: function (element) {
@@ -4259,7 +4612,7 @@ _cat.plugins.angular = function () {
                  */
                 getElt: function (val) {
                     var args = _getargs(arguments, "angular");
-                    return _cat.utils.plugins.getElt.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.getElt.apply(this, args);
                 },
 
                 /**
@@ -4277,7 +4630,7 @@ _cat.plugins.angular = function () {
                     args = _getargs(arguments, "angular");
                     
                     try {
-                        result = _cat.utils.plugins.trigger.apply(this, args);
+                        result = _cat.utils.plugins.jqhelper.trigger.apply(this, args);
                     } catch (e) {
                         _log.warn("[catjs angular plugin] The trigger action failed with errors: ", e, " arguments:", JSON.stringify(args));   
                     }
@@ -4287,7 +4640,7 @@ _cat.plugins.angular = function () {
 
                 setText: function() {
                     var args = _getargs(arguments, "angular");
-                    return _cat.utils.plugins.setText.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.setText.apply(this, args);
                 }
             };
 
@@ -4368,28 +4721,233 @@ var animation = false;
 
 _cat.plugins.dom = function () {
 
-    function _fireEvent(name, elt) {
+    var _module,
+        _eventdata = { dataTransfer: null };
 
-        var clickEvent;
+    function _findPosition(obj) {
 
-        if (!elt || !name) {
+        function _native(obj) {
+            var left, top;
+            left = top = 0;
+            if (obj.offsetParent) {
+                do {
+                    left += obj.offsetLeft;
+                    top += obj.offsetTop;
+                } while (obj = obj.offsetParent);
+            }
+            return {
+                left: left,
+                top: top,
+                right: 0,
+                bottom: 0
+            };
+        }
+
+        if (obj) {
+            if (typeof jQuery !== "undefined" && obj instanceof jQuery) {
+                obj = obj[0];
+            }
+            if (obj) {
+                if (obj.getBoundingClientRect) {
+                    return obj.getBoundingClientRect();
+                } else {
+                    return _native(obj);
+                }
+            }
+        }
+
+        return undefined;
+    }
+
+    /**
+     * Fire one or more DOM events according to a given element or coordinates {x, y}
+     *
+     * @param event {String} DOM event type name
+     * @param opt {Object} event options
+     * @returns {*}
+     * @private
+     */
+    function _fireEvent(event, opt, callback) {
+
+        var eventObj,
+            position = false,
+            pos,
+            x = 0,
+            y = 0,
+            targetx,
+            targety,
+            steps,
+            stepx, stepy,
+            counter, index, delay,
+            offsetx = opt.offset.x,
+            offsety = opt.offset.y,
+            elt;
+
+        function _getSteps() {
+            var steps = opt.steps;
+            if (!("delay" in steps)) {
+                steps.delay = 0;
+            }
+            if (!("count" in steps)) {
+                steps.count = 1;
+            }
+            return steps;
+        }
+
+        function _createEvent(type, opt) {
+
+            var event,
+                x = opt.x, y = opt.y;
+
+
+            if (type in {"dragstart": 1, "drop": 1, "dragover": 1}) {
+
+                event = document.createEvent("CustomEvent");
+                event.initCustomEvent(type, true, true, null);
+                if (type === "dragstart" || !_eventdata.dataTransfer) {
+                    _eventdata.dataTransfer = {
+                        data: {
+                        },
+                        setData: function (type, val) {
+                            _eventdata.dataTransfer.data[type] = val;
+                        },
+                        getData: function (type) {
+                            return _eventdata.dataTransfer.data[type];
+                        }
+                    };
+                }
+                event.dataTransfer = _eventdata.dataTransfer;
+
+            } else {
+
+                _cat.core.log.info("[catjs dom fire] Event type:", type, " client cords [x, y]:  ", x, y);
+                event = document.createEvent("MouseEvents");
+                event.initMouseEvent(type, true, true, window,
+                    0, 0, 0, x, y, false, false, false, 0, null);
+            }
+            return event;
+        }
+
+        function _dispatch() {
+
+            function isDocument(ele) {
+                var documenttest = /\[object (?:HTML)?Document\]/;
+                return documenttest.test(Object.prototype.toString.call(ele));
+            }
+
+            if (event) {
+
+                index++;
+
+                if (document.createEvent) {
+
+                    if (isNaN(stepx)) {
+                        stepx = 0;
+                    }
+                    if (isNaN(stepy)) {
+                        stepy = 0;
+                    }
+
+                    x += stepx + (offsetx / counter);
+                    y += stepy + (offsety / counter);
+
+                    x = Math.round(x);
+                    y = Math.round(y);
+
+                    eventObj = _createEvent(event, {x: x, y: y});
+                    elt.dispatchEvent(eventObj);
+
+                } else {
+
+                    elt.fireEvent("on" + event);
+                }
+
+                if (index < counter) {
+                    setTimeout(_dispatch, delay);
+
+                } else {
+                    callback.call(this);
+                }
+
+            } else {
+                _cat.core.log.warn("[catjs dom fire event] No valid event was found");
+            }
+
+        }
+
+        if (!event) {
             return undefined;
         }
 
-        if (document.createEvent) {
+        steps = _getSteps();
 
-            clickEvent = document.createEvent("MouseEvents");
-            clickEvent.initMouseEvent(name, true, true, window,
-                0, 0, 0, 0, 0, false, false, false, 0, null);
-            elt.dispatchEvent(clickEvent);
+        // resolve target element data
+        if (opt.target) {
+            if (_cat.utils.Utils.getType(opt.target) === "object") {
+                if ("x" in opt.target && "y" in opt.target) {
+                    targetx = opt.target.x;
+                    targety = opt.target.y;
+                }
+
+            } else {
+                pos = _findPosition(opt.target);
+                if (pos) {
+                    targetx = pos.left;
+                    targety = pos.top;
+                }
+            }
+        }
+
+        // resolve element data
+        if (_cat.utils.Utils.getType(opt.element) === "object") {
+            if ("x" in opt.element && "y" in opt.element) {
+                x = opt.element.x;
+                y = opt.element.y;
+                position = true;
+            }
+        } else if (opt.cords || targetx) {
+            pos = _findPosition(opt.element);
+            if (pos) {
+                x = pos.left;
+                y = pos.top;
+                position = true;
+            }
+        }
+
+        if (position) {
+            if (document.elementFromPoint) {
+                elt = document.elementFromPoint(x, y);
+            }
+            if (!elt) {
+                elt = opt.element;
+            }
 
         } else {
-
-            elt.fireEvent("on" + name);
+            elt = opt.element;
         }
+
+        if (!elt) {
+            _cat.core.log.warn("[catjs dom fire event] No valid element was found");
+            return undefined;
+        }
+
+        index = 0;
+        delay = steps.delay;
+        counter = steps.count;
+
+        if (targetx !== undefined) {
+            stepx = (targetx - x) / counter;
+            stepy = (targety - y) / counter;
+
+        } else {
+            // TBD        
+        }
+
+
+        _dispatch();
     }
 
-    function _addEventListener(elem, event, fn) {
+    function _addEventListener(event, elem, fn) {
         if (!elem) {
             return undefined;
         }
@@ -4402,24 +4960,30 @@ _cat.plugins.dom = function () {
         }
     }
 
-    var _module = {
+    function _getargs(parentargs, autodetect) {
+        var args = [].slice.call(parentargs);
+        args.push(autodetect);
+
+        return args;
+    }
+
+    function _getElt(val) {
+        var args = _getargs(arguments, "*");
+        return _cat.utils.plugins.jqhelper.getElt.apply(this, args);
+    }
+
+    _module = {
 
 
         utils: function () {
 
-            var oldElement = "",
-                _getargs = function (parentargs, autodetect) {
-                    var args = [].slice.call(parentargs);
-                    args.push(autodetect);
-
-                    return args;
-                };
+            var oldElement = "";
 
 
             return {
 
                 $: function () {
-                    return _cat.utils.plugins.$();
+                    return _cat.utils.plugins.jqhelper.$();
                 },
 
                 setBoarder: function (element) {
@@ -4434,19 +4998,22 @@ _cat.plugins.dom = function () {
 
                 },
 
+                findPosition: function (obj) {
+                    return _findPosition(obj);
+                },
+
                 getElt: function (val) {
-                    var args = _getargs(arguments, "*");
-                    return _cat.utils.plugins.getElt.apply(this, args);
+                    return _getElt(val);
                 },
 
                 trigger: function () {
                     var args = _getargs(arguments, "*");
-                    return _cat.utils.plugins.trigger.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.trigger.apply(this, args);
                 },
 
                 setText: function () {
                     var args = _getargs(arguments, "*");
-                    return _cat.utils.plugins.setText.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.setText.apply(this, args);
                 }
             };
 
@@ -4457,10 +5024,10 @@ _cat.plugins.dom = function () {
 
             snapshot: function (idName) {
 
-                var _$, elt,
+                var elt,
                     me = this;
 
-                
+
                 function _isCanvasSupported() {
                     var elem = document.createElement('canvas');
                     return !!(elem.getContext && elem.getContext('2d'));
@@ -4477,17 +5044,17 @@ _cat.plugins.dom = function () {
 
                     var data,
                         serverURL = _cat.utils.Utils.getCatjsServerURL("/screenshot");
-                    
+
                     function _getData(canvas) {
                         var data;
-                        
+
                         if (canvas.toDataURL) {
                             data = canvas.toDataURL("image/png");
                         }
-                        
+
                         return data;
                     }
-                    
+
                     function _save(data) {
 
                         function _prepareImage(data) {
@@ -4507,31 +5074,31 @@ _cat.plugins.dom = function () {
                                 header: [
                                     {name: "Content-Type", value: "application/json;charset=UTF-8"}
                                 ],
-                                callback: function() {
+                                callback: function () {
                                     if (this.responseText) {
                                         _cat.core.log.info("[catjs dom snapshot] request processed successfully response: ", this.responseText);
                                     }
                                 }
                             });
-                        }    
+                        }
                     }
-                    
+
                     if (elt) {
 
                         // DOM element case
                         if (elt.nodeType && elt.nodeType === 1) {
-                            
-                            
+
+
                             // canvas element case
                             if (elt.nodeName.toLowerCase() === "canvas") {
-                                
+
                                 _save(_getData(elt));
-                                
-                            // try using html2canvas    
+
+                                // try using html2canvas    
                             } else {
                                 if (typeof html2canvas !== "undefined") {
-                                    
-                                    html2canvas(elt).then(function(canvas) {
+
+                                    html2canvas(elt).then(function (canvas) {
                                         _save(_getData(canvas));
                                     });
                                 } else {
@@ -4549,9 +5116,11 @@ _cat.plugins.dom = function () {
                     return undefined;
                 }
 
-                _$ = _module.utils.$();
-                elt = _$(idName);
-
+                elt = _module.utils.getElt(idName);
+                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                    elt = elt[0];
+                }
+                
                 if (elt) {
                     if (_cat.utils.Utils.getType(elt) === "array") {
 
@@ -4564,25 +5133,127 @@ _cat.plugins.dom = function () {
 
             },
 
-            listen: function (name, idName, callback) {
+            /**
+             * Listen to a DOM event
+             *
+             * @param event {*} a given event name or an array of names
+             * @param opt {Object} event's listener options
+             *      element {*} The DOM element to be listen to or coordinates {x, y}
+             *      listener {Function} Listener functionality
+             */
+            listen: function (event, opt) {
 
-                var elt = _module.utils.getElt(idName);
+                _cat.utils.Utils.prepareProps(
+                    {
+                        global: {
+                            obj: opt
+                        },
+                        props: [
+                            {
+                                key: "element",
+                                require: true
+                            },
+                            {
+                                key: "listener",
+                                require: true
+                            }
+                        ]
+                    });
 
+                var elt = _module.utils.getElt(opt.element);
+                // todo a generic code please..
+                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                    elt = elt[0];
+                }
                 if (elt) {
-                    _addEventListener(elt, name, callback);
+                    _addEventListener(event, elt, opt.listener);
                 }
             },
 
-            fire: function (name, idName) {
+            /**
+             * Fire a DOM event
+             *
+             * @param event {*} a given event name or an array of names
+             * @param opt {Object} event's fire options
+             *      element {*} The DOM element to be fired or coordinates {x, y}
+             *      cords {Boolean} combined with the given element or target element, get its coordinates or else use the element
+             *      repeat {Number} Number of calls
+             *      delay {Number} delay in milliseconds between calls
+             */
+            fire: function (event, opt, callback) {
 
-                var elt = _module.utils.getElt(idName);
+                var items, index = 0, size;
 
-                if (elt) {
-                    _fireEvent(elt, name);
+                if (!event || !opt) {
+                    _cat.core.log.warn("[catjs plugin dom fire] no valid event and/or element were found");
+                    return undefined;
                 }
 
-            }
+                if (_cat.utils.Utils.getType(opt) === "string") {
+                    opt = {element: opt};
+                }
 
+                _cat.utils.Utils.prepareProps(
+                    {
+                        global: {
+                            obj: opt
+                        },
+                        props: [
+                            {
+                                key: "element",
+                                require: true
+                            },
+                            {
+                                key: "target"
+                            },
+                            {
+                                key: "offset",
+                                default: {x: 0, y: 0}
+                            },
+                            {
+                                key: "cords",
+                                default: false
+                            },
+                            {
+                                key: "steps",
+                                default: {delay: 0, count: 1}
+                            }
+                        ]
+                    });                
+                
+                if (_cat.utils.Utils.getType(event) === "array") {
+                    items = event;
+
+                } else if (_cat.utils.Utils.getType(event) === "string") {
+                    items = [event];
+
+                } else {
+                    items = [];
+                }
+
+                opt.element = _module.utils.getElt(opt.element);                
+                opt.target = (opt.target ? _module.utils.getElt(opt.target) : opt.target);
+                
+                // todo a generic code please..
+                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                    opt.element = opt.element[0];
+                    if (opt.target && opt.target[0]) {
+                        opt.target = opt.target[0];
+                    }
+                }
+
+
+                function firecallback() {
+                    index++;
+                    if (index < size) {
+                        _fireEvent(items[index], opt, firecallback);
+                    }
+                }
+
+                size = items.length;
+                _fireEvent(items[index], opt, firecallback);
+
+            }
 
         }
 
@@ -4779,7 +5450,7 @@ _cat.plugins.jquery = function () {
             return {                              
                 
                 $: function() {
-                    return _cat.utils.plugins.$();
+                    return _cat.utils.plugins.jqhelper.$();
                 },
                 
                 setBoarder: function (element) {
@@ -4796,17 +5467,17 @@ _cat.plugins.jquery = function () {
 
                 getElt: function (val) {
                     var args = _getargs(arguments, "jquery");
-                    return _cat.utils.plugins.getElt.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.getElt.apply(this, args);
                 },
                 
                 trigger: function() {
                     var args = _getargs(arguments, "jquery");
-                    return _cat.utils.plugins.trigger.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.trigger.apply(this, args);
                 },
                 
                 setText: function() {
                     var args = _getargs(arguments, "jquery");
-                    return _cat.utils.plugins.setText.apply(this, args);
+                    return _cat.utils.plugins.jqhelper.setText.apply(this, args);
                 }          
             };
 
