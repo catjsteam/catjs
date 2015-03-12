@@ -30,11 +30,11 @@ _cat.plugins.dom = function () {
                 obj = obj[0];
             }
             if (obj) {
-                if (obj.getBoundingClientRect) {
-                    return obj.getBoundingClientRect();
-                } else {
+                //if (obj.getBoundingClientRect) {
+                //    return obj.getBoundingClientRect();
+                //} else {
                     return _native(obj);
-                }
+                //}
             }
         }
 
@@ -112,6 +112,8 @@ _cat.plugins.dom = function () {
 
         function _dispatch() {
 
+            var eletOffset, eltoffsetx, eltoffsety;
+            
             function isDocument(ele) {
                 var documenttest = /\[object (?:HTML)?Document\]/;
                 return documenttest.test(Object.prototype.toString.call(ele));
@@ -129,12 +131,29 @@ _cat.plugins.dom = function () {
                     if (isNaN(stepy)) {
                         stepy = 0;
                     }
+                    
+                    eletOffset = _findPosition(opt.element);
 
-                    x += stepx + (offsetx / counter);
-                    y += stepy + (offsety / counter);
+                    if (event === "mousemove") {
 
-                    x = Math.round(x);
-                    y = Math.round(y);
+                        if (index === 1 && _cat.utils.plugins.jqhelper.isjquery()) {
+                            eletOffset = _findPosition(opt.element);
+
+                            x -= eltoffsetx = (eletOffset.left || 0);
+                            y -= eltoffsety = (eletOffset.top || 0);
+
+                        }
+
+                        x += stepx + (offsetx / counter);
+                        y += stepy + (offsety / counter);
+
+                        x = Math.round(x);
+                        y = Math.round(y);
+
+                    } else {
+                        x = 0;
+                        y = 0;
+                    }                   
 
                     eventObj = _createEvent(event, {x: x, y: y});
                     elt.dispatchEvent(eventObj);
