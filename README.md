@@ -52,6 +52,8 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **DOM Plugin** Drag and Drop support (see https://github.com/catjsteam/catjstests) 
+* **snapshot** Create an image out of a given canvas or/and use html2canvas library for creating an image out of a given DOM object
 * **screenshot for the browser** DOM snapshot annotation added that saves an image of a given DOM and/or Canvas element. The images will be available in the reports folder.
 
         @[scrap
