@@ -228,7 +228,8 @@ Reporter.prototype.addTestCase = function (config) {
         // delete the color on test end
         me._colors.deleteColor(id);
 
-        _projectmanager.destroy(id);
+        // TODO Test need to be defined, it cannot be destroyed because of the current behavior that each test starts on a new page.
+        //_projectmanager.destroy(id);
         
         // test callback
         if (me._callback) {
