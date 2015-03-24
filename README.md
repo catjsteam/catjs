@@ -1,4 +1,4 @@
-CatJS 0.4.81
+CatJS 0.4.82
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,6 +52,7 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **Scrap's name** can be used more than once in the catjs project (cat.json)  
 * **DOM Plugin** Drag and Drop support (see https://github.com/catjsteam/catjstests) 
 * **snapshot for the browser** DOM snapshot annotation added that saves an image of a given DOM and/or Canvas element. The images will be available in the reports folder.
 

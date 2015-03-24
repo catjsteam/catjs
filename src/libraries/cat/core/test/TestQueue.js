@@ -1,70 +1,78 @@
-_cat.core.TestQueue = function() {
+_cat.core.TestQueue = function () {
 
-    var _Queue = function(key) {
-        
-        this.key = key;
-        this.items = [];
-    }, 
+    var _Queue = function (key) {
+
+            this.key = key;
+            this.items = [];
+        },
         _queue = {},
-        _module;
-
-    _Queue.prototype.empty = function() {
+        _module;    
+        
+    _Queue.prototype.empty = function () {
         return (this.key ? false : true);
     };
-    
-    _Queue.prototype.add = function(config) {
+
+    _Queue.prototype.add = function (config) {
         this.items.push(config);
     };
 
-    _Queue.prototype.all = function() {
+    _Queue.prototype.all = function () {
         return this.items;
     };
-    
-    _Queue.prototype.first = function() {
+
+    _Queue.prototype.first = function () {
         return (this.size() > 0 ? this.items[0] : undefined);
     };
-    
-   _Queue.prototype.deleteFirst = function() {
+
+    _Queue.prototype.deleteFirst = function () {
         if (this.size() > 0) {
-            this.items.shift();   
-        }
-    };   
-        
-   _Queue.prototype.delete = function(idx) {
-        if (this.size() > 0) {
-            this.items.splice(idx, 1);   
-        }
-    };   
-    
-    _Queue.prototype.deleteAll = function() {
-        if (this.size() > 0) {
-            this.items = []; 
+            this.items.shift();         
         }
     };
-    
-    _Queue.prototype.size = function() {
+
+    _Queue.prototype.delete = function (idx) {
+        if (this.size() > 0) {
+            this.items.splice(idx, 1);
+        }
+    };
+
+    _Queue.prototype.deleteAll = function () {
+        if (this.size() > 0) {
+            this.items = [];
+        }
+    };
+
+    _Queue.prototype.size = function () {
         return this.items.length;
     };
 
     _module = {
-        
-        isEmpty: function() {
-            return _cat.utils.Utils.isEmpty(_queue);    
+
+        isEmpty: function () {
+            return _cat.utils.Utils.isEmpty(_queue);
         },
-                
-        get: function(key) {
-            var queue = _queue[key];
+
+        get: function (scrap) {
+            var index, 
+                queue,
+                found;
+
+            index = (scrap ? scrap.index : -1);
+            if (index > -1) {
+                queue = _queue[index];                    
+            }
             return (queue ? queue : new _Queue());
         },
-        
-        add: function(key, config) {
-            var queue = _module.get(key);
+
+        add: function (key, config) {
+            var queue = _module.get(config);
+            
             if (queue.empty()) {
                 queue = _queue[key] = new _Queue();
             }
             queue.add(config);
         }
     };
-    
+
     return _module;
 };

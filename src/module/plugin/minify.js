@@ -103,6 +103,8 @@ module.exports = _basePlugin.ext(function () {
                 jshint.globals["after"] = true;
                 jshint.globals["afterEach"] = true;
                 jshint.globals["html2canvas"] = true;
+                jshint.globals["jsutilsObject"] = true;
+                jshint.globals["jsutilsArray"] = true;
 
 
                 task({

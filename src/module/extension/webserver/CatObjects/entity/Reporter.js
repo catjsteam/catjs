@@ -230,6 +230,7 @@ Reporter.prototype.addTestCase = function (config) {
 
         // TODO Test need to be defined, it cannot be destroyed because of the current behavior that each test starts on a new page.
         //_projectmanager.destroy(id);
+        _projectmanager.resetDevice(id);
         
         // test callback
         if (me._callback) {

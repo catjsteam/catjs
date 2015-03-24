@@ -149,7 +149,10 @@ _cat.core.Config = function(args) {
                                                 testsList.tests[i].delay = globalDelay;
                                             }
                                             testsList.tests[i].wasRun = false;
-                                            testsList.tests[i].scenario = {name: (scenarioName || null), path: (testsList.path || null)};
+                                            testsList.tests[i].scenario = {
+                                                name: (scenarioName || null), 
+                                                path: (testsList.path || null)
+                                            };
                                             innerConfigMap.push(testsList.tests[i]);
 
                                         }

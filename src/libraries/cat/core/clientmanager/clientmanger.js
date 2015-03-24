@@ -137,8 +137,9 @@ _cat.core.clientmanager = function () {
             i, size,
             validate = 0,
             tempInfo,
-            reportFormats,
             scrapName = scrap.name,
+            idx = (!isNaN(scrap.index) ? scrap.index : -1),
+            testItem,
             isStandalone = _isStandalone(scrap);
 
         function setScrapTests(test) {
@@ -160,12 +161,18 @@ _cat.core.clientmanager = function () {
             });
 
         } else if (tests && scrapName) {
+            /* 
             size = tests.length;
             for (i = 0; i < size; i++) {
 
                 if (tests[i].name === scrapName) {
                     setScrapTests(tests[i]);
                 }
+            } 
+            */
+            testItem = (idx !== -1 ? tests[idx] : undefined);
+            if (testItem && testItem.name === scrapName) {
+                setScrapTests(testItem);
             }
         }
 
@@ -491,7 +498,7 @@ _cat.core.clientmanager = function () {
     function _processReadyScraps(cameFromBroadcast) {
         var idx = currentState.index,
             catConfig, test,
-            testitem = testQueue.get(idx),
+            testitem = testQueue.get({index: idx}),
             testname,
             emptyQueue = testQueue.isEmpty(),
             queuedesc = (emptyQueue ? "no " : ""),
@@ -588,8 +595,53 @@ _cat.core.clientmanager = function () {
                             scraplist, reportFormats, errmsg;
 
                         function _add2Queue(config) {
+                            var scrapInfo,
+                                counter = 0,
+                                configclone = {};
+                            
                             _preScrapProcess(config, args);
-                            testQueue.add(config.scrapInfo.index, config);
+                            scrapInfo = config.scrapInfo;
+                            testQueue.add(scrapInfo.index, config);
+                            
+                            if (tests) {
+                                tests.forEach(function(test) {
+                                    var name, testname;
+                                    
+                                    function _setScrapInfoProperty(name, dest, src, srcScrapPropName, destScrapPropName, value) {
+                                        if (name in test) {
+                                            dest[destScrapPropName][name] = (value !== undefined ? value : src[name]);
+                                        } else {
+                                            delete dest[destScrapPropName][name];
+                                        }
+                                    }
+                                    
+                                    function _scrapInfoSerialization(dest, src, srcScrapPropName, destScrapPropName) {
+
+                                        dest[destScrapPropName] = JSON.parse(JSON.stringify(config[srcScrapPropName]));
+                                        dest[destScrapPropName].index = counter;
+                                        _setScrapInfoProperty("delay", dest, src, srcScrapPropName, destScrapPropName);
+                                        _setScrapInfoProperty("repeat", dest, src, srcScrapPropName, destScrapPropName);
+                                        _setScrapInfoProperty("run", dest, src, srcScrapPropName, destScrapPropName, true);
+                                    }
+                                    
+                                    if (test && "name" in test && counter !== scrapInfo.index) {
+                                        name = _cat.core.getScrapName(scrapInfo.name);
+                                        testname = _cat.core.getScrapName(test.name);
+                                        
+                                        if (name === testname) {
+                                            // config.index = counter;
+                                            configclone[counter] = {};
+
+                                            _scrapInfoSerialization(configclone[counter], test, "scrapInfo", "scrapInfo");
+                                            configclone[counter].args = config.args;
+                                            _scrapInfoSerialization(configclone[counter].args[1], test, "scrapInfo", "scrapinfo");
+                                            
+                                            testQueue.add(counter, configclone[counter]);
+                                        }
+                                    }
+                                    counter++;
+                                });
+                            }
                         }
 
                         if (!response.scrapInfo) {
@@ -616,7 +668,7 @@ _cat.core.clientmanager = function () {
                             scraplist = response.readyScraps;
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
-                                    var config = testQueue.get(scrap.index).first();
+                                    var config = testQueue.get(scrap).first();
                                     if (config) {
                                         // already in queue;
 

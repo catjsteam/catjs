@@ -59,6 +59,10 @@ TestConfig.prototype.getIndex = function() {
     return this.scrapReadyIndex;
 };
 
+TestConfig.prototype.setIndex = function(idx) {
+    this.scrapReadyIndex = idx;
+};
+
 TestConfig.prototype.isInQueue = function(idx) {
     if (this.resQueue[idx]) {
         return true;

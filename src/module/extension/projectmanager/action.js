@@ -202,6 +202,7 @@ var path = require("path"),
                     tempScrap = tests[indexTests];
                     if (tempScrap.name == scrapName) {
                         scrap = tempScrap;
+                        break;
                     }
 
 
@@ -223,6 +224,12 @@ var path = require("path"),
 
             destroy: function (testId) {
                 delete devicesTests[testId];
+            },
+            
+            resetDevice: function(testId) {
+                if (devicesTests[testId]) {
+                    devicesTests[testId].setIndex(testId);
+                }
             },
 
             checkScrap: function (req, res) {

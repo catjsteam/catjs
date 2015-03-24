@@ -1172,7 +1172,10 @@ _cat.core.Config = function(args) {
                                                 testsList.tests[i].delay = globalDelay;
                                             }
                                             testsList.tests[i].wasRun = false;
-                                            testsList.tests[i].scenario = {name: (scenarioName || null), path: (testsList.path || null)};
+                                            testsList.tests[i].scenario = {
+                                                name: (scenarioName || null), 
+                                                path: (testsList.path || null)
+                                            };
                                             innerConfigMap.push(testsList.tests[i]);
 
                                         }
@@ -1759,8 +1762,9 @@ _cat.core.clientmanager = function () {
             i, size,
             validate = 0,
             tempInfo,
-            reportFormats,
             scrapName = scrap.name,
+            idx = (!isNaN(scrap.index) ? scrap.index : -1),
+            testItem,
             isStandalone = _isStandalone(scrap);
 
         function setScrapTests(test) {
@@ -1782,12 +1786,18 @@ _cat.core.clientmanager = function () {
             });
 
         } else if (tests && scrapName) {
+            /* 
             size = tests.length;
             for (i = 0; i < size; i++) {
 
                 if (tests[i].name === scrapName) {
                     setScrapTests(tests[i]);
                 }
+            } 
+            */
+            testItem = (idx !== -1 ? tests[idx] : undefined);
+            if (testItem && testItem.name === scrapName) {
+                setScrapTests(testItem);
             }
         }
 
@@ -2113,7 +2123,7 @@ _cat.core.clientmanager = function () {
     function _processReadyScraps(cameFromBroadcast) {
         var idx = currentState.index,
             catConfig, test,
-            testitem = testQueue.get(idx),
+            testitem = testQueue.get({index: idx}),
             testname,
             emptyQueue = testQueue.isEmpty(),
             queuedesc = (emptyQueue ? "no " : ""),
@@ -2210,8 +2220,53 @@ _cat.core.clientmanager = function () {
                             scraplist, reportFormats, errmsg;
 
                         function _add2Queue(config) {
+                            var scrapInfo,
+                                counter = 0,
+                                configclone = {};
+                            
                             _preScrapProcess(config, args);
-                            testQueue.add(config.scrapInfo.index, config);
+                            scrapInfo = config.scrapInfo;
+                            testQueue.add(scrapInfo.index, config);
+                            
+                            if (tests) {
+                                tests.forEach(function(test) {
+                                    var name, testname;
+                                    
+                                    function _setScrapInfoProperty(name, dest, src, srcScrapPropName, destScrapPropName, value) {
+                                        if (name in test) {
+                                            dest[destScrapPropName][name] = (value !== undefined ? value : src[name]);
+                                        } else {
+                                            delete dest[destScrapPropName][name];
+                                        }
+                                    }
+                                    
+                                    function _scrapInfoSerialization(dest, src, srcScrapPropName, destScrapPropName) {
+
+                                        dest[destScrapPropName] = JSON.parse(JSON.stringify(config[srcScrapPropName]));
+                                        dest[destScrapPropName].index = counter;
+                                        _setScrapInfoProperty("delay", dest, src, srcScrapPropName, destScrapPropName);
+                                        _setScrapInfoProperty("repeat", dest, src, srcScrapPropName, destScrapPropName);
+                                        _setScrapInfoProperty("run", dest, src, srcScrapPropName, destScrapPropName, true);
+                                    }
+                                    
+                                    if (test && "name" in test && counter !== scrapInfo.index) {
+                                        name = _cat.core.getScrapName(scrapInfo.name);
+                                        testname = _cat.core.getScrapName(test.name);
+                                        
+                                        if (name === testname) {
+                                            // config.index = counter;
+                                            configclone[counter] = {};
+
+                                            _scrapInfoSerialization(configclone[counter], test, "scrapInfo", "scrapInfo");
+                                            configclone[counter].args = config.args;
+                                            _scrapInfoSerialization(configclone[counter].args[1], test, "scrapInfo", "scrapinfo");
+                                            
+                                            testQueue.add(counter, configclone[counter]);
+                                        }
+                                    }
+                                    counter++;
+                                });
+                            }
                         }
 
                         if (!response.scrapInfo) {
@@ -2238,7 +2293,7 @@ _cat.core.clientmanager = function () {
                             scraplist = response.readyScraps;
                             if (scraplist) {
                                 scraplist.forEach(function (scrap) {
-                                    var config = testQueue.get(scrap.index).first();
+                                    var config = testQueue.get(scrap).first();
                                     if (config) {
                                         // already in queue;
 
@@ -3101,74 +3156,132 @@ _cat.core.TestManager = function() {
 
 }();
 
-_cat.core.TestQueue = function() {
+_cat.core.TestQueue = function () {
 
-    var _Queue = function(key) {
-        
-        this.key = key;
-        this.items = [];
-    }, 
+    var _Queue = function (key) {
+
+            this.key = key;
+            this.items = [];
+        },
         _queue = {},
-        _module;
-
-    _Queue.prototype.empty = function() {
+        _registered = {},
+        _module,
+        _addRegisteredItem = function (config) {
+            if (!config) {
+                return undefined;
+            }
+            if ("scrapInfo" in config && config) {
+                _registered[config.scrapInfo.name] = config;
+            }
+        },
+        _getRegisteredItem = function (key) {
+            
+            var item, keySearch, found = [], keyTest;
+            
+            function getKey(key) {
+                var arr, size, keyFound;
+    
+                arr = ((typeof key === "string") ? [key]  : (key.split ? key.split(".") : [key]));
+                size = (arr ? arr.length : 0);
+    
+                if (size > 0) {
+                    keyFound = arr[size-1];
+                }
+                
+                return keyFound;                
+            }
+            
+            for (keyTest in _registered) {
+                if (_registered.hasOwnProperty(keyTest)) {
+                    keySearch = getKey(keyTest);
+                    if (keySearch) {
+                        item = _registered[keySearch];
+                        if (item && keySearch === key) {
+                            found.push(item);                        
+                        }
+                    }
+                }
+            }
+            return (found.length === 0 ? undefined : found);
+        };    
+        
+    _Queue.prototype.empty = function () {
         return (this.key ? false : true);
     };
-    
-    _Queue.prototype.add = function(config) {
+
+    _Queue.prototype.add = function (config) {
         this.items.push(config);
+        _addRegisteredItem(config);
     };
 
-    _Queue.prototype.all = function() {
+    _Queue.prototype.all = function () {
         return this.items;
     };
-    
-    _Queue.prototype.first = function() {
+
+    _Queue.prototype.first = function () {
         return (this.size() > 0 ? this.items[0] : undefined);
     };
-    
-   _Queue.prototype.deleteFirst = function() {
+
+    _Queue.prototype.deleteFirst = function () {
         if (this.size() > 0) {
-            this.items.shift();   
-        }
-    };   
-        
-   _Queue.prototype.delete = function(idx) {
-        if (this.size() > 0) {
-            this.items.splice(idx, 1);   
-        }
-    };   
-    
-    _Queue.prototype.deleteAll = function() {
-        if (this.size() > 0) {
-            this.items = []; 
+            this.items.shift();         
         }
     };
-    
-    _Queue.prototype.size = function() {
+
+    _Queue.prototype.delete = function (idx) {
+        if (this.size() > 0) {
+            this.items.splice(idx, 1);
+        }
+    };
+
+    _Queue.prototype.deleteAll = function () {
+        if (this.size() > 0) {
+            this.items = [];
+        }
+    };
+
+    _Queue.prototype.size = function () {
         return this.items.length;
     };
 
     _module = {
-        
-        isEmpty: function() {
-            return _cat.utils.Utils.isEmpty(_queue);    
+
+        isEmpty: function () {
+            return _cat.utils.Utils.isEmpty(_queue);
         },
-                
-        get: function(key) {
-            var queue = _queue[key];
+
+        get: function (scrap) {
+            var index, 
+                queue,
+                found;
+
+            index = (scrap ? scrap.index : -1);
+            if (index > -1) {
+                queue = _queue[index];
+                    
+                if (!queue) {
+                    // look in the registered
+                    if ("name" in scrap && scrap.name) {
+                        found = _getRegisteredItem(scrap.name);
+                        if (found) {
+                            // found registered
+                        }
+                    }
+                }
+            }
             return (queue ? queue : new _Queue());
         },
-        
-        add: function(key, config) {
-            var queue = _module.get(key);
+
+        add: function (key, config) {
+            var queue = _module.get(config);
+            
             if (queue.empty()) {
                 queue = _queue[key] = new _Queue();
             }
             queue.add(config);
         }
     };
-    
+
     return _module;
 };
 _cat.core.ui = function () {
