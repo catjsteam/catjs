@@ -89,8 +89,9 @@ _cat.core.ui = function () {
                         '<ul id="testList"></ul>' +
                     '</div>' +
                 '</div>'+
-                '<div id="catmask" class="fadeMe"></div>';
+                '<div id="catmask"></div>';
 
+            // add  id="catmask" class="fadeMe" to enable the mask
             _appendUI();
            
         }
@@ -232,11 +233,12 @@ _cat.core.ui = function () {
                                 _addEventListener(logoelt, "click", listener);
                                 
                                 // stop propagation
-                                _addEventListener(catmask, "mouseover", bubblefalse);
+                                /* _addEventListener(catmask, "mouseover", bubblefalse);
                                 _addEventListener(catmask, "mousemove", bubblefalse);
                                 _addEventListener(catmask, "mouseup", bubblefalse);
                                 _addEventListener(catmask, "mousedown", bubblefalse);
                                 _addEventListener(catmask, "click", bubblefalse);
+                                */
                                 _islogolistener = true;
                             }
 
