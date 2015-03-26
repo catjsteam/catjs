@@ -137,7 +137,7 @@ _cat.plugins.dom = function () {
                     
                     eletOffset = _findPosition(opt.element);
 
-                    if (event === "mousemove" || opt.cords === true) {
+                    if (event === "mousemove" || opt.cords) {
 
                         if (index === 1 && (_cat.utils.plugins.jqhelper.isjquery())) {
                             eletOffset = _findPosition(opt.element);
@@ -210,7 +210,11 @@ _cat.plugins.dom = function () {
                 position = true;
             }
         } else if (opt.cords || targetx) {
-            pos = _findPosition(opt.element);
+            if (typeof opt.cords === "object") {
+                pos = _findPosition(opt.cords);
+            } else if (typeof opt.cords === "boolean") {
+                pos = _findPosition(opt.element);
+            }
             if (pos) {
                 x = pos.left;
                 y = pos.top;

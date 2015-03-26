@@ -3325,8 +3325,9 @@ _cat.core.ui = function () {
                         '<ul id="testList"></ul>' +
                     '</div>' +
                 '</div>'+
-                '<div id="catmask" class="fadeMe"></div>';
+                '<div id="catmask"></div>';
 
+            // add  id="catmask" class="fadeMe" to enable the mask
             _appendUI();
            
         }
@@ -3468,11 +3469,12 @@ _cat.core.ui = function () {
                                 _addEventListener(logoelt, "click", listener);
                                 
                                 // stop propagation
-                                _addEventListener(catmask, "mouseover", bubblefalse);
+                                /* _addEventListener(catmask, "mouseover", bubblefalse);
                                 _addEventListener(catmask, "mousemove", bubblefalse);
                                 _addEventListener(catmask, "mouseup", bubblefalse);
                                 _addEventListener(catmask, "mousedown", bubblefalse);
                                 _addEventListener(catmask, "click", bubblefalse);
+                                */
                                 _islogolistener = true;
                             }
 
@@ -4287,21 +4289,22 @@ _cat.utils.TestsDB = function() {
                 callback : {
                     call : function(check) {
                         var incomingdata = check.response,
-                            type, validata = false;
+                            type, validata = false, errors;
                         
-                        if (incomingdata && incomingdata.length && incomingdata.length > 0) {
+                        if (incomingdata) {
                             type = _cat.utils.Utils.getType(incomingdata);
                             if (type === "string") {
                                 try {
                                     _data = JSON.parse(incomingdata);
                                     validata = true;
                                 } catch(e) {
+                                    errors = e;
                                 }
                             }
                         }
 
                         if (!validata) {
-                            _cat.core.log.warn("[catjs testdb] No valid test data was found, any '@d' API usage related will be skipped (see src/config/testdata.json)");
+                            _cat.core.log.warn("[catjs testdb] No valid test data was found, any '@d' API usage related will be skipped (see src/config/testdata.json), errors:", (errors ? errors : " NA"));
                         }
 
                     }
@@ -4923,7 +4926,7 @@ _cat.plugins.dom = function () {
                     
                     eletOffset = _findPosition(opt.element);
 
-                    if (event === "mousemove" || opt.cords === true) {
+                    if (event === "mousemove" || opt.cords) {
 
                         if (index === 1 && (_cat.utils.plugins.jqhelper.isjquery())) {
                             eletOffset = _findPosition(opt.element);
@@ -4996,7 +4999,11 @@ _cat.plugins.dom = function () {
                 position = true;
             }
         } else if (opt.cords || targetx) {
-            pos = _findPosition(opt.element);
+            if (typeof opt.cords === "object") {
+                pos = _findPosition(opt.cords);
+            } else if (typeof opt.cords === "boolean") {
+                pos = _findPosition(opt.element);
+            }
             if (pos) {
                 x = pos.left;
                 y = pos.top;
