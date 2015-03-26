@@ -3164,46 +3164,7 @@ _cat.core.TestQueue = function () {
             this.items = [];
         },
         _queue = {},
-        _registered = {},
-        _module,
-        _addRegisteredItem = function (config) {
-            if (!config) {
-                return undefined;
-            }
-            if ("scrapInfo" in config && config) {
-                _registered[config.scrapInfo.name] = config;
-            }
-        },
-        _getRegisteredItem = function (key) {
-            
-            var item, keySearch, found = [], keyTest;
-            
-            function getKey(key) {
-                var arr, size, keyFound;
-    
-                arr = ((typeof key === "string") ? [key]  : (key.split ? key.split(".") : [key]));
-                size = (arr ? arr.length : 0);
-    
-                if (size > 0) {
-                    keyFound = arr[size-1];
-                }
-                
-                return keyFound;                
-            }
-            
-            for (keyTest in _registered) {
-                if (_registered.hasOwnProperty(keyTest)) {
-                    keySearch = getKey(keyTest);
-                    if (keySearch) {
-                        item = _registered[keySearch];
-                        if (item && keySearch === key) {
-                            found.push(item);                        
-                        }
-                    }
-                }
-            }
-            return (found.length === 0 ? undefined : found);
-        };    
+        _module;    
         
     _Queue.prototype.empty = function () {
         return (this.key ? false : true);
@@ -3211,7 +3172,6 @@ _cat.core.TestQueue = function () {
 
     _Queue.prototype.add = function (config) {
         this.items.push(config);
-        _addRegisteredItem(config);
     };
 
     _Queue.prototype.all = function () {
@@ -3257,17 +3217,7 @@ _cat.core.TestQueue = function () {
 
             index = (scrap ? scrap.index : -1);
             if (index > -1) {
-                queue = _queue[index];
-                    
-                if (!queue) {
-                    // look in the registered
-                    if ("name" in scrap && scrap.name) {
-                        found = _getRegisteredItem(scrap.name);
-                        if (found) {
-                            // found registered
-                        }
-                    }
-                }
+                queue = _queue[index];                    
             }
             return (queue ? queue : new _Queue());
         },
@@ -3518,6 +3468,11 @@ _cat.core.ui = function () {
                                 _addEventListener(logoelt, "click", listener);
                                 
                                 // stop propagation
+                                _addEventListener(catmask, "mouseover", bubblefalse);
+                                _addEventListener(catmask, "mousemove", bubblefalse);
+                                _addEventListener(catmask, "mouseup", bubblefalse);
+                                _addEventListener(catmask, "mousedown", bubblefalse);
+                                _addEventListener(catmask, "click", bubblefalse);
                                 _islogolistener = true;
                             }
 
@@ -4334,9 +4289,9 @@ _cat.utils.TestsDB = function() {
                         var incomingdata = check.response,
                             type, validata = false;
                         
-                        if (!incomingdata) {
-                            type = _cat.utils.Utils.getType();
-                            if (type === "object" || type === "array") {
+                        if (incomingdata && incomingdata.length && incomingdata.length > 0) {
+                            type = _cat.utils.Utils.getType(incomingdata);
+                            if (type === "string") {
                                 try {
                                     _data = JSON.parse(incomingdata);
                                     validata = true;
@@ -4847,6 +4802,9 @@ _cat.plugins.dom = function () {
                     left += obj.offsetLeft;
                     top += obj.offsetTop;
                 } while (obj = obj.offsetParent);
+            } else {
+                left += (obj.offsetLeft || 0);
+                top += (obj.offsetTop || 0);
             }
             return {
                 left: left,
@@ -4965,9 +4923,9 @@ _cat.plugins.dom = function () {
                     
                     eletOffset = _findPosition(opt.element);
 
-                    if (event === "mousemove") {
+                    if (event === "mousemove" || opt.cords === true) {
 
-                        if (index === 1 && _cat.utils.plugins.jqhelper.isjquery()) {
+                        if (index === 1 && (_cat.utils.plugins.jqhelper.isjquery())) {
                             eletOffset = _findPosition(opt.element);
 
                             x -= eltoffsetx = (eletOffset.left || 0);
@@ -5249,7 +5207,7 @@ _cat.plugins.dom = function () {
                 }
 
                 elt = _module.utils.getElt(idName);
-                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
                     elt = elt[0];
                 }
                 
@@ -5294,7 +5252,7 @@ _cat.plugins.dom = function () {
 
                 var elt = _module.utils.getElt(opt.element);
                 // todo a generic code please..
-                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular() ) {
                     elt = elt[0];
                 }
                 if (elt) {
@@ -5367,7 +5325,7 @@ _cat.plugins.dom = function () {
                 opt.target = (opt.target ? _module.utils.getElt(opt.target) : opt.target);
                 
                 // todo a generic code please..
-                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
                     opt.element = opt.element[0];
                     if (opt.target && opt.target[0]) {
                         opt.target = opt.target[0];
