@@ -72,21 +72,22 @@ _cat.utils.TestsDB = function() {
                 callback : {
                     call : function(check) {
                         var incomingdata = check.response,
-                            type, validata = false;
+                            type, validata = false, errors;
                         
-                        if (!incomingdata) {
-                            type = _cat.utils.Utils.getType();
-                            if (type === "object" || type === "array") {
+                        if (incomingdata) {
+                            type = _cat.utils.Utils.getType(incomingdata);
+                            if (type === "string") {
                                 try {
                                     _data = JSON.parse(incomingdata);
                                     validata = true;
                                 } catch(e) {
+                                    errors = e;
                                 }
                             }
                         }
 
                         if (!validata) {
-                            _cat.core.log.warn("[catjs testdb] No valid test data was found, any '@d' API usage related will be skipped (see src/config/testdata.json)");
+                            _cat.core.log.warn("[catjs testdb] No valid test data was found, any '@d' API usage related will be skipped (see src/config/testdata.json), errors:", (errors ? errors : " NA"));
                         }
 
                     }
