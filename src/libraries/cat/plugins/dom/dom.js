@@ -16,6 +16,9 @@ _cat.plugins.dom = function () {
                     left += obj.offsetLeft;
                     top += obj.offsetTop;
                 } while (obj = obj.offsetParent);
+            } else {
+                left += (obj.offsetLeft || 0);
+                top += (obj.offsetTop || 0);
             }
             return {
                 left: left,
@@ -134,9 +137,9 @@ _cat.plugins.dom = function () {
                     
                     eletOffset = _findPosition(opt.element);
 
-                    if (event === "mousemove") {
+                    if (event === "mousemove" || opt.cords === true) {
 
-                        if (index === 1 && _cat.utils.plugins.jqhelper.isjquery()) {
+                        if (index === 1 && (_cat.utils.plugins.jqhelper.isjquery())) {
                             eletOffset = _findPosition(opt.element);
 
                             x -= eltoffsetx = (eletOffset.left || 0);
@@ -418,7 +421,7 @@ _cat.plugins.dom = function () {
                 }
 
                 elt = _module.utils.getElt(idName);
-                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
                     elt = elt[0];
                 }
                 
@@ -463,7 +466,7 @@ _cat.plugins.dom = function () {
 
                 var elt = _module.utils.getElt(opt.element);
                 // todo a generic code please..
-                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular() ) {
                     elt = elt[0];
                 }
                 if (elt) {
@@ -536,7 +539,7 @@ _cat.plugins.dom = function () {
                 opt.target = (opt.target ? _module.utils.getElt(opt.target) : opt.target);
                 
                 // todo a generic code please..
-                if (_cat.utils.plugins.jqhelper.isjquery()) {
+                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
                     opt.element = opt.element[0];
                     if (opt.target && opt.target[0]) {
                         opt.target = opt.target[0];
