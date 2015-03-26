@@ -66,13 +66,17 @@ _cat.core.clientmanager = function () {
 
         var tests,
             testManager, 
-            validateExists;
+            validateExists,
+            item;
 
         intervalObj = getScrapInterval(scrap);
 
         tests = config.getTests();
         if (tests) {
-            testManager = (tests[tests.length - 1].name || "NA");
+            item = tests[tests.length - 1];
+            if (item) {
+                testManager = ( item.name || "NA");
+            }
         }
 
 
@@ -192,9 +196,11 @@ _cat.core.clientmanager = function () {
         
         for (; indexScrap < size; indexScrap++) {
             testitem = tests[indexScrap];
-            path = testitem.scenario.path;
-            if (testitem && testitem.name === scrapName && _cat.utils.Utils.pathMatch(path)) {
-                return {scrap: testitem, idx: indexScrap};
+            if (testitem) {
+                path = testitem.scenario.path;
+                if (testitem && testitem.name === scrapName && _cat.utils.Utils.pathMatch(path)) {
+                    return {scrap: testitem, idx: indexScrap};
+                }
             }
         }
         return undefined;
@@ -545,7 +551,7 @@ _cat.core.clientmanager = function () {
     function scrapTestIndex(scrap) {
         var index;
         for (index = 0; index < tests.length; index++) {
-            if (scrap.name[0] === tests[index].name) {
+            if (tests && tests[index] && scrap.name[0] === tests[index].name) {
                 return index;
             }
         }
@@ -596,16 +602,18 @@ _cat.core.clientmanager = function () {
 
                         function _add2Queue(config) {
                             var scrapInfo,
-                                counter = 0,
+                                counter,
                                 configclone = {};
                             
                             _preScrapProcess(config, args);
-                            scrapInfo = config.scrapInfo;
+                            scrapInfo = config.scrapInfo;                            
                             testQueue.add(scrapInfo.index, config);
+                            //counter = scrapInfo.index;
+                            counter = 0;
                             
                             if (tests) {
                                 tests.forEach(function(test) {
-                                    var name, testname;
+                                    var name, testname, size;
                                     
                                     function _setScrapInfoProperty(name, dest, src, srcScrapPropName, destScrapPropName, value) {
                                         if (name in test) {
@@ -624,7 +632,8 @@ _cat.core.clientmanager = function () {
                                         _setScrapInfoProperty("run", dest, src, srcScrapPropName, destScrapPropName, true);
                                     }
                                     
-                                    if (test && "name" in test && counter !== scrapInfo.index) {
+                                    size = tests.length;
+                                    if (test && "name" in test &&  scrapInfo.index < size && counter < size && counter > scrapInfo.index) {
                                         name = _cat.core.getScrapName(scrapInfo.name);
                                         testname = _cat.core.getScrapName(test.name);
                                         

@@ -1188,7 +1188,13 @@ _cat.core.Config = function(args) {
                         },                       
                         i, j, temp, testcounter = 0,
                         testsFlow, scenarios, scenario,
-                        repeatScenario, currTest, currentTestName, currentTestPathTest;
+                        repeatScenario, currTest, currentTestName, currentTestPathTest,
+                        me = this,
+                        _addToGlobal = function(temp) {
+                            temp.tests.forEach(function() {
+                                me.globalTests.push(null);
+                            });
+                        };
 
                     testsFlow = config.tests;
                     scenarios = config.scenarios;
@@ -1199,7 +1205,13 @@ _cat.core.Config = function(args) {
                         if (!currTest || !("name" in currTest) ||!currentTestPathTest) {
                             if (!("name" in currTest)) {
                                 _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
-                            }                                
+                            }
+
+                            temp = scenarios[currTest.name];
+                            if (temp.tests) {
+                                _addToGlobal(temp);
+                            }
+                            
                             continue;
                         }
                         currentTestName = currTest.name;
@@ -1691,13 +1703,17 @@ _cat.core.clientmanager = function () {
 
         var tests,
             testManager, 
-            validateExists;
+            validateExists,
+            item;
 
         intervalObj = getScrapInterval(scrap);
 
         tests = config.getTests();
         if (tests) {
-            testManager = (tests[tests.length - 1].name || "NA");
+            item = tests[tests.length - 1];
+            if (item) {
+                testManager = ( item.name || "NA");
+            }
         }
 
 
@@ -1817,9 +1833,11 @@ _cat.core.clientmanager = function () {
         
         for (; indexScrap < size; indexScrap++) {
             testitem = tests[indexScrap];
-            path = testitem.scenario.path;
-            if (testitem && testitem.name === scrapName && _cat.utils.Utils.pathMatch(path)) {
-                return {scrap: testitem, idx: indexScrap};
+            if (testitem) {
+                path = testitem.scenario.path;
+                if (testitem && testitem.name === scrapName && _cat.utils.Utils.pathMatch(path)) {
+                    return {scrap: testitem, idx: indexScrap};
+                }
             }
         }
         return undefined;
@@ -2170,7 +2188,7 @@ _cat.core.clientmanager = function () {
     function scrapTestIndex(scrap) {
         var index;
         for (index = 0; index < tests.length; index++) {
-            if (scrap.name[0] === tests[index].name) {
+            if (tests && tests[index] && scrap.name[0] === tests[index].name) {
                 return index;
             }
         }
@@ -2221,16 +2239,18 @@ _cat.core.clientmanager = function () {
 
                         function _add2Queue(config) {
                             var scrapInfo,
-                                counter = 0,
+                                counter,
                                 configclone = {};
                             
                             _preScrapProcess(config, args);
-                            scrapInfo = config.scrapInfo;
+                            scrapInfo = config.scrapInfo;                            
                             testQueue.add(scrapInfo.index, config);
+                            //counter = scrapInfo.index;
+                            counter = 0;
                             
                             if (tests) {
                                 tests.forEach(function(test) {
-                                    var name, testname;
+                                    var name, testname, size;
                                     
                                     function _setScrapInfoProperty(name, dest, src, srcScrapPropName, destScrapPropName, value) {
                                         if (name in test) {
@@ -2249,7 +2269,8 @@ _cat.core.clientmanager = function () {
                                         _setScrapInfoProperty("run", dest, src, srcScrapPropName, destScrapPropName, true);
                                     }
                                     
-                                    if (test && "name" in test && counter !== scrapInfo.index) {
+                                    size = tests.length;
+                                    if (test && "name" in test &&  scrapInfo.index < size && counter < size && counter > scrapInfo.index) {
                                         name = _cat.core.getScrapName(scrapInfo.name);
                                         testname = _cat.core.getScrapName(test.name);
                                         
@@ -3225,7 +3246,7 @@ _cat.core.TestQueue = function () {
         add: function (key, config) {
             var queue = _module.get(config);
             
-            if (queue.empty()) {
+            if (!_queue[key]) {
                 queue = _queue[key] = new _Queue();
             }
             queue.add(config);

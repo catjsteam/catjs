@@ -67,7 +67,7 @@ _cat.core.TestQueue = function () {
         add: function (key, config) {
             var queue = _module.get(config);
             
-            if (queue.empty()) {
+            if (!_queue[key]) {
                 queue = _queue[key] = new _Queue();
             }
             queue.add(config);

@@ -165,7 +165,13 @@ _cat.core.Config = function(args) {
                         },                       
                         i, j, temp, testcounter = 0,
                         testsFlow, scenarios, scenario,
-                        repeatScenario, currTest, currentTestName, currentTestPathTest;
+                        repeatScenario, currTest, currentTestName, currentTestPathTest,
+                        me = this,
+                        _addToGlobal = function(temp) {
+                            temp.tests.forEach(function() {
+                                me.globalTests.push(null);
+                            });
+                        };
 
                     testsFlow = config.tests;
                     scenarios = config.scenarios;
@@ -176,7 +182,13 @@ _cat.core.Config = function(args) {
                         if (!currTest || !("name" in currTest) ||!currentTestPathTest) {
                             if (!("name" in currTest)) {
                                 _log.warn("[CAT] 'name' property is missing for the test configuration, see cat.json ");
-                            }                                
+                            }
+
+                            temp = scenarios[currTest.name];
+                            if (temp.tests) {
+                                _addToGlobal(temp);
+                            }
+                            
                             continue;
                         }
                         currentTestName = currTest.name;
