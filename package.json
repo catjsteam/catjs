@@ -1,7 +1,7 @@
 {
   "name": "catjs",
   "description": "(Mobile) Web Automation Framework",
-  "version": "0.4.83",
+  "version": "0.4.84",
   "homepage": "http://catjsteam.github.io",
   "author": {
     "name": "arik",
@@ -39,7 +39,7 @@
   },
   "scripts": {
     "test": "node ./test/test.js",
-    "postinstall": "node install.js"
+    "postinstall": "node postinstall.js"
   },
   "dependencies": {
     "mobilerunner": "latest",
