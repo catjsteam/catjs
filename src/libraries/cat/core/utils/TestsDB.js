@@ -108,18 +108,19 @@ _cat.utils.TestsDB = function() {
             return TestDB.set(field, value);
         },
         
-        find : function(field) {
-            var code = "JSPath.apply('" + field + "', _data);";
+        find : function(query) {
+            var code = "JSPath.apply('" + query + "', _data);";
 
             return (new Function("JSPath", "_data", "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, [(typeof JSPath !== "undefined" ? JSPath : undefined), _data]) || "");
         },
-        random: function(field) {
+        
+        random: function(query) {
 
             function _random(min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
             }
 
-            var result = this.find(field),
+            var result = this.find(query),
                 cell=0;
 
             if (result && result.length) {
@@ -129,21 +130,66 @@ _cat.utils.TestsDB = function() {
 
             return result;
         },
-        next: function(field) {
+                  
+        next: function(query, opt) {
+            
+            var result = this.find(query),
+                value, idx, bounds,
+                pause, repeat;
 
-            var result = this.find(field),
-                cell=0;
-
-            if (result && result.length) {
-                if (_testnextcache[field] !== undefined && _testnextcache[field] != null) {
-                    _testnextcache[field]++;
-                } else {
-                    _testnextcache[field] = 0;
+            function _getOpt(key) {
+                if (key && opt) {
+                    if (typeof(opt) !== "object") {
+                        _cat.core.log.warn("[catjs testdb next] expects an object {repeat:[boolean], pause:[boolean]} but found an opt argument of type: ", typeof(opt));
+                        return undefined;
+                    }        
+                    if (key in opt) {
+                        return opt[key];
+                    }
                 }
-                return result[_testnextcache[field]];
+                return undefined;
+            }
+            
+            function _updateIndex() {
+                if (idx !== undefined && idx != null) {
+                    if (!pause) {
+                        _testnextcache[query]++;
+                    }
+                    if (_testnextcache[query] >= result.length && repeat) {
+                        _testnextcache[query] = 0;
+                    }
+                    
+                } else {
+                    _testnextcache[query] = 0;
+                }                
+            } 
+            
+            pause = _getOpt("pause");
+            repeat =  _getOpt("repeat");
+            
+            if (result && result.length) {
+
+                bounds = result.length-1;
+                idx = _testnextcache[query];
+
+                _updateIndex();
+
+                idx = _testnextcache[query];
+                if (idx < result.length) {
+                    value = result[idx];
+                    if (!value) {
+                        throw new Error("[catjs testdb next] Failed to resolve array index:  (" + idx + ") out of bounds (" + bounds + ")"); 
+                    }
+                } else {
+                    throw new Error("[catjs testdb next] Array index (" + idx + ") out of bounds (0 - " + bounds + ")");
+                }
+            } 
+            
+            if (!value) {
+                throw new Error("[catjs testdb next] Failed to resolve the data according the following query :  (" + query + ")");
             }
 
-            return result;
+            return value;
         }
     };
 }();
