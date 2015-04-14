@@ -329,6 +329,8 @@ module.exports = _basePlugin.ext(function () {
                                                     document: true,
                                                     _cat: true,
                                                     $ : true,
+                                                    Q : true,
+                                                    q : true,
                                                     jQuery : true,
                                                     Ext : true,
                                                     window : true,

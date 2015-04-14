@@ -121,6 +121,14 @@
             "exports": "html2canvas",
             "globals": true,
             "install": "static"
+        },
+        {
+            "name": "q",
+            "prod" :["q.min.js"],
+            "dev" :["q.min.js"],        
+            "exports": "q",
+            "globals": true,
+            "install": "static"
         }
     ]
 }
