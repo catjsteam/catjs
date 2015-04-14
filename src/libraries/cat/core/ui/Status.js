@@ -157,7 +157,7 @@ _cat.core.ui = function () {
             channel: "default",
             topic: "setContent.*",
             callback: function(data, topic, channel) {
-                var clientTopic = "setContent." + _cat.core.clientmanager.getClientmanagerId();
+                var clientTopic = "setContent." + _cat.core.manager.client.getClientmanagerId();
                 // check if it's the same frame
                 if (topic !== clientTopic && !_cat.utils.iframe.isIframe()) {
                     _cat.core.ui.setContent(data);
@@ -492,7 +492,7 @@ _cat.core.ui = function () {
                 if (isIframe) { // && (config.header || config.desc)) {
 //                    catParent = window.parent._cat;
 //                    catParent.core.ui.setContent(config);
-                    topic = "setContent." + _cat.core.clientmanager.getClientmanagerId();
+                    topic = "setContent." + _cat.core.manager.client.getClientmanagerId();
                     flyer.broadcast({
                         channel: "default",
                         topic: topic,

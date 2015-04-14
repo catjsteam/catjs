@@ -1,15 +1,13 @@
-_cat.core.clientmanager = function () {
+_cat.core.manager.client = function () {
 
     var tests,
         commitScrap,
         getScrapTestInfo,
         totalDelay,
         runStatus,
-        checkIfExists,
-        updateTimeouts,
+        checkIfExists,        
         initCurrentState = false,
         startInterval,
-        delayManagerCommands,
         getScrapInterval,
         setupInterval,
         intervalObj,
@@ -144,7 +142,7 @@ _cat.core.clientmanager = function () {
             scrapName = scrap.name,
             idx = (!isNaN(scrap.index) ? scrap.index : -1),
             testItem,
-            isStandalone = _isStandalone(scrap);
+            isStandalone = _cat.utils.scrap.isStandalone(scrap);
 
         function setScrapTests(test) {
             tempInfo = {
@@ -208,149 +206,10 @@ _cat.core.clientmanager = function () {
 
     totalDelay = 0;
 
-    updateTimeouts = function (scrap) {
-        var scrapId = scrap.id;
-
-        if (runStatus.intervalObj && (scrapId !== runStatus.intervalObj.signScrapId)) {
-            runStatus.intervalObj.signScrapId = scrapId;
-            runStatus.intervalObj.counter = 0;
-        }
-    };
-
     startInterval = function (catConfig, scrap) {
         setupInterval(catConfig, scrap);
     };
 
-    delayManagerCommands = function (dmcommands, dmcontext) {
-
-        var indexCommand = 0,
-            catConfig = _cat.core.getConfig(),
-            _enum = catConfig.getTestsTypes(),
-            executeCode,
-            delay = catConfig.getTestDelay(),
-            scrap = ("scrap" in dmcontext  ? dmcontext.scrap : undefined),
-            standalone = _isStandalone(scrap),
-            testobj, currentTestIdx,
-            manager = false,
-            me = this;
-
-        currentTestIdx = currentState.index;
-        testobj = catConfig.getTest(currentTestIdx);
-        if (testobj) {
-            if ("delay" in testobj) {
-                delay = testobj.delay; 
-            }
-        }
-        
-        executeCode = function (codeCommandsArg, contextArg) {
-            var commandObj,
-                scrap = contextArg.scrap,
-                size = (codeCommandsArg ? codeCommandsArg.length : undefined),
-                functionargskeys = [],
-                functionargs = [],
-                contextkey,
-                scrapName = ("scrapName" in contextArg ? contextArg.scrapName : undefined),
-                scrapRowIdx = ("scrapRowIdx" in contextArg ? contextArg.scrapRowIdx : undefined),
-                description = [],
-                rows, idx = 0, rowssize = 0, row;
-
-
-            updateTimeouts(scrap);
-
-            for (indexCommand = 0; indexCommand < size; indexCommand++) {
-                commandObj = codeCommandsArg[indexCommand];
-
-                if (commandObj) {
-                    functionargskeys.push("context");
-                    functionargs.push(contextArg);
-
-                    if (contextArg && contextArg.args) {
-                        for (contextkey in contextArg.args) {
-                            if (contextArg.args.hasOwnProperty(contextkey)) {
-                                functionargskeys.push(contextkey);
-                                functionargs.push(contextArg.args[contextkey]);
-                            }
-                        }
-                    }
-
-                    rows = ( (scrap && scrapName && scrapName in scrap) ? scrap[scrapName] : [commandObj]);
-                    if (rows) {
-                        description.push(rows[scrapRowIdx] || rows[0]);
-                    }
-
-//                    rowssize = rows.length;
-//                    for (; idx<rowssize; idx++) {
-//                        row = rows[idx];
-//                        if (row) {
-//                            description.push(row);
-//                        }
-//                    }
-
-                    _cat.core.ui.setContent({
-                        style: 'color:#0080FF, font-size: 10px',
-                        header: ((scrap && "name" in scrap && scrap.name) || "'NA'"),
-                        desc: (description.length > 0 ? description.join("_$$_") : description.join("")),
-                        tips: {},
-                        currentState: currentState
-                    });
-
-                    if (_cat.utils.Utils.getType(commandObj) === "string") {
-                        commandObj = (commandObj ? commandObj.trim() : undefined);
-                        new Function(functionargskeys.join(","), "return " + commandObj).apply(this, functionargs);
-
-                    } else if (_cat.utils.Utils.getType(commandObj) === "function") {
-                        commandObj.apply(this, functionargs);
-                    }
-
-                } else {
-                    console.warn("[CatJS] Ignore, Not a valid command: ", commandObj);
-                }
-            }
-
-            runStatus.numRanSubscrap = runStatus.numRanSubscrap + size;
-
-            if ((runStatus.numRanSubscrap === runStatus.subscrapReady) && runStatus.scrapReady === runStatus.scrapsNumber) {
-                var reportFormats;
-                if (catConfig.isReport()) {
-                    reportFormats = catConfig.getReportFormats();
-                }
-
-                // TODO change clear interval
-                endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
-            }
-
-        };
-
-        runStatus.subscrapReady = runStatus.subscrapReady + dmcommands.length;
-
-        if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
-            setTimeout(function () {
-                executeCode(dmcommands, dmcontext);
-            }, totalDelay);
-            totalDelay += delay;
-        } else {
-            executeCode(dmcommands, dmcontext);
-        }
-        
-       /* if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
-            manager = true;             
-                        
-        } else {
-            manager = false;
-        }
-
-        _cat.core.controller.add(
-            {
-                fn: function() {
-                    executeCode(dmcommands, dmcontext);
-                },
-                manager: manager,
-                totalDelay: totalDelay,
-                delay : totalDelay,
-                me: me
-            });
-            */
-    };
 
     function _preScrapProcess(config, args) {
         config.args = args;
@@ -376,11 +235,6 @@ _cat.core.clientmanager = function () {
 
     }
 
-    function _isStandalone(scrap) {
-        var standalone = ("$standalone" in scrap ? scrap.$standalone : undefined);
-        return standalone;
-    }
-
     function _nextScrap(config) {
 
         var scrap = config.scrap,
@@ -392,7 +246,7 @@ _cat.core.clientmanager = function () {
             exists = checkIfExists(scrapName, tests),
             preScrapConfig;
 
-        if ((exists && (!testQueue.get(currentStateIdx - 1).first()) && (exists.idx === (currentStateIdx - 1)) || _isStandalone(scrap))) {
+        if ((exists && (!testQueue.get(currentStateIdx - 1).first()) && (exists.idx === (currentStateIdx - 1)) || _cat.utils.scrap.isStandalone(scrap))) {
             preScrapConfig = {scrapInfo: scrap, args: args};
             _preScrapProcess(preScrapConfig, args);
             commitScrap({$standalone: scrap.$standalone, name: scrapName}, args);
@@ -414,7 +268,7 @@ _cat.core.clientmanager = function () {
      */
     function broadcastProcess(doprocess, dostate) {
 
-        var topic = "process." + _cat.core.clientmanager.getClientmanagerId();
+        var topic = "process." + _cat.core.manager.client.getClientmanagerId();
 
         doprocess = (doprocess === undefined ? true : doprocess);
         dostate = (dostate === undefined ? true : dostate);
@@ -441,7 +295,7 @@ _cat.core.clientmanager = function () {
             channel: "default",
             topic: "process.*",
             callback: function(data, topic, channel) {
-                var clientTopic = "process." + _cat.core.clientmanager.getClientmanagerId();
+                var clientTopic = "process." + _cat.core.manager.client.getClientmanagerId();
                 
                 // update the current state
                 if ("currentState" in data && data.currentState) {
@@ -469,7 +323,7 @@ _cat.core.clientmanager = function () {
 
 
     function broadcastAfterProcess(fullScrap) {
-        var topic = "afterprocess." + _cat.core.clientmanager.getClientmanagerId();
+        var topic = "afterprocess." + _cat.core.manager.client.getClientmanagerId();
 
         flyer.broadcast({
             channel: "default",
@@ -486,10 +340,10 @@ _cat.core.clientmanager = function () {
             channel: "default",
             topic: "afterprocess.*",
             callback: function(data, topic, channel) {
-                var clientTopic = "afterprocess." + _cat.core.clientmanager.getClientmanagerId();
+                var clientTopic = "afterprocess." + _cat.core.manager.client.getClientmanagerId();
                 // check if it's the same frame
                 //if (topic !== clientTopic) {
-                    _cat.core.clientmanager.removeIntervalFromBroadcast(data);
+                    _cat.core.manager.client.removeIntervalFromBroadcast(data);
                 //}
 
             }
@@ -497,8 +351,6 @@ _cat.core.clientmanager = function () {
     }
 
     _subscribeAfterProcess();
-
-
 
 
     function _processReadyScraps(cameFromBroadcast) {
@@ -708,34 +560,7 @@ _cat.core.clientmanager = function () {
 
         },
 
-        /**
-         * Delay a set of UI actions commands
-         *
-         * Config:
-         *       methods {Array} string javascript functions reference
-         *       commands {Array} string javascript statements
-         *       context {Object} catjs context object
-         *
-         *
-         * @param config
-         */
-        delayManager: function (config) {
-            var codeCommands, context, methods, commands = [];
-
-            (function init() {
-                if (config) {
-                    codeCommands = ("commands" in config ? config.commands : undefined);
-                    methods = ("methods" in config ? config.methods : undefined);
-                    context = ("context" in config ? config.context : undefined);
-                }
-            })();
-
-            commands = commands.concat((codeCommands || []));
-            commands = commands.concat((methods || []));
-
-            delayManagerCommands(commands, context);
-        },
-
+     
         removeIntervalFromBroadcast : function(scrap) {
             var intervalScrap,
                 runIndex,
@@ -760,7 +585,26 @@ _cat.core.clientmanager = function () {
                 clientmanagerId = _cat.utils.Utils.generateGUID();
             }
             return clientmanagerId;
-        }
+        },
+        
+        getCurrentState: function() {
+            return currentState;
+        },
+        
+        getRunStatus: function() {
+            return runStatus;
+        },
 
+        updateTimeouts: function (scrap) {
+            var scrapId = scrap.id;
+    
+            if (runStatus.intervalObj && (scrapId !== runStatus.intervalObj.signScrapId)) {
+                runStatus.intervalObj.signScrapId = scrapId;
+                runStatus.intervalObj.counter = 0;
+            }
+        },
+
+        endTest: endTest
     };
+    
 }();

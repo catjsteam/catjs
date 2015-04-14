@@ -14,8 +14,17 @@ module.exports = function() {
         this.generate = function () {
             var output = (this.enum.GENERAL in this.output ? this.output[this.enum.GENERAL] : undefined),
                 order =  (this.enum.ORDER in this.output ? this.output[this.enum.ORDER] : undefined),
+                counter = 0,
                 me =  this;
 
+            function addQ(out, first) {
+                if (!out) {
+                    return out;
+                }
+                
+                return [(first ? "Q.fcall" : ".then"), "(function(){ return ", out, "})"].join("");
+            }
+            
             if (order) {
                 order.forEach(function(item) {
                     var cell, key, out;
@@ -27,12 +36,16 @@ module.exports = function() {
                         if (out) {
                             out = out[cell];
                             if (out) {
+                                out = addQ(out, (counter === 0 ? true : false));
                                 output.push(out);
                             }
+                            counter++;
                         }
                     }
-
+                   
                 });
+                
+                output.push(";");
             }
 
             return ( output ? output.join(" \n ") : "" );

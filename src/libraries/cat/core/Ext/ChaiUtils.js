@@ -53,7 +53,7 @@ _cat.utils.chai = function () {
          * Examples:
          *   
          *   // Code String case: 
-         *   _cat.core.clientmanager.delayManager({
+         *   _cat.core.manager.controller.invoke({
          *       commands: [
          *           function(context, thi$, testButton) {
          *               _cat.utils.chai.assert(context);

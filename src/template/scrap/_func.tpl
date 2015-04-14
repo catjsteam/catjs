@@ -6,7 +6,9 @@ _cat.core.define("{{name}}", function({{arguments}}) {
         _args = {},
         _ipkg = _cat.core.getVar(pkgName),
         context,
-        _counter=0;
+        _counter=0,
+        _catConfig = _cat.core.getConfig(),
+        _delay = _catConfig.getTestDelay();
 
     if (_args) {    
         _argsnames = _argsnames.split(",");

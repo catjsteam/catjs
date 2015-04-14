@@ -55,7 +55,7 @@ module.exports = function (config) {
                                 
                                 _scrap.print({
                                     scrap: {type: scrapType, scrap: _scrap},
-                                    line: ["_cat.core.clientmanager.delayManager({" +
+                                    line: ["_cat.core.manager.controller.invoke({" +
                                     "commands:[function(", scrapargsstr, ") { try {", command, "} catch(e){ _cat.core.log.warn('[catjs delay manager command]', e); }}]," +
                                     "context:{", args.concat("scrapRowIdx:" + rowcounter), "}" +
                                     "});"].join("")

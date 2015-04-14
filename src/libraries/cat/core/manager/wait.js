@@ -1,4 +1,4 @@
-_cat.core.wait = function () {
+_cat.core.manager.wait = function () {
 
     var _module = {
         

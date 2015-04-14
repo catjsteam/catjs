@@ -2,7 +2,7 @@ var _cat = {
     utils: { plugins: { jqhelper: {}}},
     plugins: {},
     ui: {},
-    errors: {}
+    errors: {}    
 };
 
 var hasPhantomjs = false;
@@ -809,7 +809,7 @@ _cat.core = function () {
                         
             if ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) {
                 if (tests.length > 0) {
-                    _cat.core.clientmanager.signScrap(scrap, catConfig, arguments, tests);
+                    _cat.core.manager.client.signScrap(scrap, catConfig, arguments, tests);
                 } else {
                     
                     _cat.core.TestManager.send({signal: 'NOTEST'});
@@ -1011,7 +1011,9 @@ _cat.core = function () {
             }            
             
             return  ([head, (url || "")].join("") || "/");
-        }
+        },
+        
+        manager: {}
     };
     
     return _module;
