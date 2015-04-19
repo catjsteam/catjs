@@ -1274,7 +1274,7 @@ _cat.core.Config = function(args) {
         };
 
         this.getTestDelay = function () {
-            return (innerConfig["run-test-delay"] || 2000);
+            return (innerConfig["run-test-delay"] || 500);
         };
 
         this.getRunMode = function () {
@@ -1308,6 +1308,15 @@ _cat.core.Config = function(args) {
             }
 
             return false;
+        };
+        
+        this.isAnnotationDelaySupported = function(annotationType) {
+            var supportedAnnotationKeys = {"js":1, "code":1, "assert":1, "jqm":1, "jquery":1, "enyo":1, "sencha":1, "dom":1, "angular":1};
+            if (annotationType && supportedAnnotationKeys[annotationType]) {
+                return (this.getTestDelay() || 0);
+            }
+
+            return 0;
         };
 
         this.isJUnitSupport = function () {
@@ -2024,7 +2033,8 @@ _cat.core.manager.client = function () {
             emptyQueue = testQueue.isEmpty(),
             queuedesc = (emptyQueue ? "no " : ""),
             firstfound = false,
-            broadcast = false;
+            broadcast = false,
+            testobj;
 
 
         // TODO add as a debug info
@@ -2063,7 +2073,8 @@ _cat.core.manager.client = function () {
             
             _cat.core.manager.controller.state().next({
                 defer: Q,
-                methods: testconfigs
+                methods: testconfigs,
+                delay: ((test && "delay" in test) ? test.delay : 0) 
             });
             
             testitem.deleteAll();
@@ -2085,9 +2096,6 @@ _cat.core.manager.client = function () {
             }
         }
     }
-
-
-
 
     return {
 
@@ -2425,12 +2433,7 @@ _cat.core.manager.controller = function () {
 
                 if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
                     
-//                    deffer = deffer.delay(delay).then(function() {
-//                        return executeCode(dmcommands, dmcontext);
-//                    });
-                  // _cat.core.manager.controller.state().wait({delay: delay, steps: 0}).promise.then(function() {
-                        return executeCode(dmcommands, dmcontext);
-                  // });
+                    return executeCode(dmcommands, dmcontext);
                    
                 } else {
                     deffer.fcall(function(){return executeCode(dmcommands, dmcontext);});
@@ -2619,7 +2622,9 @@ _cat.core.manager.statecontroller = function () {
 
         next: function (config) {
 
-            var defer, methods, currentconfig;
+            var defer, methods, delay, 
+                currentconfig;
+            
             if (config) {
                 _scrapspool.add(config);
             }
@@ -2629,9 +2634,10 @@ _cat.core.manager.statecontroller = function () {
                 currentconfig = _scrapspool.next();
                 defer = currentconfig.defer;
                 methods = currentconfig.methods;
+                delay = ("delay" in currentconfig ? currentconfig.delay : 0); 
                 
                 _scrapspool.busy(true);
-                defer.delay(0).then(function () {
+                defer.delay(delay).then(function () {
     
                     defer.fcall(function () {
                         var cell = methods.shift(),
@@ -6285,6 +6291,27 @@ _cat.plugins.testdata = function () {
 
 }();
 
+_cat.plugins.wait = function () {
+
+    var _module = {
+
+        utils: function () {
+
+           
+
+        }(),
+
+        actions: {
+
+           
+          
+        }
+    };
+
+    return _module;
+
+}();
+
 function _catjs_settings() {
     var _topWindow,
         _isIframe = function() {
@@ -6321,6 +6348,9 @@ function _catjs_settings() {
     // aliases
     _cat.core.alias("manager");
     _cat.core.alias("manager.wait", _cat.core.manager.statecontroller.wait);
+    _cat.core.alias("manager.resolve", _cat.core.manager.statecontroller.resolve);
+    _cat.core.alias("manager.defer", _cat.core.manager.statecontroller.defer);
+    _cat.core.alias("plugin.get", _cat.core.plugin);
     
     if (_isIframe() ){
         _topWindow = _rootWindow();

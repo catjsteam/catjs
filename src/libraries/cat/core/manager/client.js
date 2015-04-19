@@ -362,7 +362,8 @@ _cat.core.manager.client = function () {
             emptyQueue = testQueue.isEmpty(),
             queuedesc = (emptyQueue ? "no " : ""),
             firstfound = false,
-            broadcast = false;
+            broadcast = false,
+            testobj;
 
 
         // TODO add as a debug info
@@ -401,7 +402,8 @@ _cat.core.manager.client = function () {
             
             _cat.core.manager.controller.state().next({
                 defer: Q,
-                methods: testconfigs
+                methods: testconfigs,
+                delay: ((test && "delay" in test) ? test.delay : 0) 
             });
             
             testitem.deleteAll();

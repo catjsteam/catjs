@@ -1,4 +1,4 @@
-CatJS 0.4.86
+catjs 0.4.84 catjs.canary 0.4.87
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,6 +52,8 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **Test Execution** [Canary] catjs has a new tests execution engine with backward compatibility support and with additional new skills such as, waiting for other processes to complete before it continue to the next tasks. no more timing is required.   
+* **NPM catjs.canary** <code>npm install -g catjs.canary</code> new NPM module for getting the latest repository changes [not fully tested] 
 * **DOM plugin** Drag and Drop fixes 
 * **testdb issue** test data json failed on parsing  
 * **Scrap's name** can be used more than once in the catjs project (cat.json)  

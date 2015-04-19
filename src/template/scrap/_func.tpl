@@ -10,7 +10,10 @@ _cat.core.define("{{name}}", function({{arguments}}) {
         context,
         _counter=0,
         _catConfig = _cat.core.getConfig(),
-        _delay = _catConfig.getTestDelay();
+        _delay = _catConfig.getTestDelay(),
+        _supportedDelay = function(type) {
+           return _catConfig.isAnnotationDelaySupported(type);
+        };
 
     if (_args) {    
         _argsnames = _argsnames.split(",");

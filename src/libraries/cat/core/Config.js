@@ -226,7 +226,7 @@ _cat.core.Config = function(args) {
         };
 
         this.getTestDelay = function () {
-            return (innerConfig["run-test-delay"] || 2000);
+            return (innerConfig["run-test-delay"] || 500);
         };
 
         this.getRunMode = function () {
@@ -260,6 +260,15 @@ _cat.core.Config = function(args) {
             }
 
             return false;
+        };
+        
+        this.isAnnotationDelaySupported = function(annotationType) {
+            var supportedAnnotationKeys = {"js":1, "code":1, "assert":1, "jqm":1, "jquery":1, "enyo":1, "sencha":1, "dom":1, "angular":1};
+            if (annotationType && supportedAnnotationKeys[annotationType]) {
+                return (this.getTestDelay() || 0);
+            }
+
+            return 0;
         };
 
         this.isJUnitSupport = function () {

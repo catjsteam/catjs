@@ -159,7 +159,9 @@ _cat.core.manager.statecontroller = function () {
 
         next: function (config) {
 
-            var defer, methods, currentconfig;
+            var defer, methods, delay, 
+                currentconfig;
+            
             if (config) {
                 _scrapspool.add(config);
             }
@@ -169,9 +171,10 @@ _cat.core.manager.statecontroller = function () {
                 currentconfig = _scrapspool.next();
                 defer = currentconfig.defer;
                 methods = currentconfig.methods;
+                delay = ("delay" in currentconfig ? currentconfig.delay : 0); 
                 
                 _scrapspool.busy(true);
-                defer.delay(0).then(function () {
+                defer.delay(delay).then(function () {
     
                     defer.fcall(function () {
                         var cell = methods.shift(),
