@@ -34,6 +34,8 @@ function _catjs_settings() {
     // aliases
     _cat.core.alias("manager");
     _cat.core.alias("manager.wait", _cat.core.manager.statecontroller.wait);
+    _cat.core.alias("manager.resolve", _cat.core.manager.statecontroller.resolve);
+    _cat.core.alias("manager.defer", _cat.core.manager.statecontroller.defer);
     
     if (_isIframe() ){
         _topWindow = _rootWindow();
