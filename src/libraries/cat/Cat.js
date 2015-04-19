@@ -3,7 +3,7 @@ var _cat = {
     plugins: {},
     ui: {},
     errors: {}    
-};
+}, _catjs = {};
 
 var hasPhantomjs = false;
 
@@ -970,7 +970,8 @@ _cat.core = function () {
                         _context["$$put"]({
                             scrap: scrap,
                             arguments: passedArguments,
-                            scrapinfo: ("scrapinfo" in config ? config.scrapinfo : undefined)
+                            scrapinfo: ("scrapinfo" in config ? config.scrapinfo : undefined),
+                            def:  ("def" in config ? config.def : undefined)
 
                         }, pkgName);
                         catObj.apply(_context, passedArguments);
@@ -1013,7 +1014,29 @@ _cat.core = function () {
             return  ([head, (url || "")].join("") || "/");
         },
         
-        manager: {}
+        manager: {},
+        
+        alias: function(name, obj) {
+            var names, idx, size, key, aliasobj = _catjs;
+            
+            names = name.split(".");
+            size = names.length;
+            for (idx=0; idx<size; idx++) {
+                key = names[idx];
+                if (key) {
+                    if (idx === size-1) {
+                        if (aliasobj) {
+                            aliasobj[key] = (obj || {});
+                        }
+                    } else {
+                        if (!_catjs[key]) {
+                            _catjs[key] = {};
+                        }
+                        aliasobj = _catjs[key];
+                    }
+                }
+            }
+        }
     };
     
     return _module;

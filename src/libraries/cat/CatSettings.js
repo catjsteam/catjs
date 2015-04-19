@@ -8,7 +8,6 @@ function _catjs_settings() {
                 return true;
             }
         },
-
         _rootWindow = function() {
 
             function _getTopWindow(parentarg) {
@@ -32,6 +31,10 @@ function _catjs_settings() {
             }
         };
 
+    // aliases
+    _cat.core.alias("manager");
+    _cat.core.alias("manager.wait", _cat.core.manager.statecontroller.wait);
+    
     if (_isIframe() ){
         _topWindow = _rootWindow();
         if (_topWindow && _topWindow._cat) {
