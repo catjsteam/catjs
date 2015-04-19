@@ -225,6 +225,7 @@ _cat.core.manager.client = function () {
 
         if (scrap) {
             runStatus.scrapReady = parseInt(scrap ? scrap.index : 0) + 1;
+            args[1].def = config.def;
             commitScrap(scrap, args);
         }
 
@@ -376,19 +377,33 @@ _cat.core.manager.client = function () {
         }
         
         if (testitem.first()) {
-            var configs = testitem.all();
+            var configs = testitem.all(),
+                testconfigs = [];
+            
             configs.forEach(function(config) {
-                if (config) {
-                    _process(config);
-                  
-                    currentState.index++;
 
-                    if (intervalObj && intervalObj.interval) {
-                        clearInterval(intervalObj.interval);
-                    }                   
-                    _processReadyScraps(false);
-                } 
+                testconfigs.push(function(def) {
+                    if (config) {
+                        
+                        config.def = def;
+                        _process(config);
+                      
+                        currentState.index++;
+    
+                        if (intervalObj && intervalObj.interval) {
+                            clearInterval(intervalObj.interval);
+                        }                   
+                        _processReadyScraps(false);
+                    } 
+                });
+            
             });
+            
+            _cat.core.manager.controller.state().next({
+                defer: Q,
+                methods: testconfigs
+            });
+            
             testitem.deleteAll();
             broadcastProcess(false, true);
             firstfound = true;
@@ -408,9 +423,6 @@ _cat.core.manager.client = function () {
             }
         }
     }
-
-
-
 
     return {
 

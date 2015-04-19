@@ -5,7 +5,12 @@ _cat.core.manager.controller = function () {
 
     _module = {
 
-        /**
+        state: function() {
+            return _cat.core.manager.statecontroller;
+        },
+
+
+    /**
          * Invoke a given client command
          *
          * Config:
@@ -132,12 +137,9 @@ _cat.core.manager.controller = function () {
                 runStatus.subscrapReady = runStatus.subscrapReady + dmcommands.length;
 
                 if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
-                    //setTimeout(function () {
-                    deffer = deffer.delay(delay).then(function() {
-                        return executeCode(dmcommands, dmcontext);
-                    });
-                    //}, totalDelay);
-                    //totalDelay += delay;
+                    
+                    return executeCode(dmcommands, dmcontext);
+                   
                 } else {
                     deffer.fcall(function(){return executeCode(dmcommands, dmcontext);});
                 }

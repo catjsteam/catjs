@@ -12,6 +12,7 @@ module.exports = function() {
         };
 
         this.generate = function () {
+            
             var output = (this.enum.GENERAL in this.output ? this.output[this.enum.GENERAL] : undefined),
                 order =  (this.enum.ORDER in this.output ? this.output[this.enum.ORDER] : undefined),
                 counter = 0,
@@ -22,7 +23,7 @@ module.exports = function() {
                     return out;
                 }
                 
-                return [(first ? "Q.fcall" : ".then"), "(function(){ return ", out, "})"].join("");
+                return [(first ? "_cat.core.manager.controller.state().wait({delay: _delay, steps: 0, callback:" : ".wait({delay: 0, steps: 0, callback:"), " function(){ return ", out, "}  })"].join("");
             }
             
             if (order) {

@@ -5,6 +5,8 @@ _cat.core.define("{{name}}", function({{arguments}}) {
         _argsnames = "{{arguments}}",
         _args = {},
         _ipkg = _cat.core.getVar(pkgName),
+        _thisargs = this.get(pkgName),
+        _def = (_thisargs && "def" in _thisargs ? _thisargs.def : undefined),
         context,
         _counter=0,
         _catConfig = _cat.core.getConfig(),
