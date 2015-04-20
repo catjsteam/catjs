@@ -262,8 +262,14 @@ _cat.core.Config = function(args) {
             return false;
         };
         
-        this.isAnnotationDelaySupported = function(annotationType) {
-            var supportedAnnotationKeys = {"js":1, "code":1, "assert":1, "jqm":1, "jquery":1, "enyo":1, "sencha":1, "dom":1, "angular":1};
+        this.isAnnotationDelaySupported = function(annotationType, override) {
+            var supportedAnnotationKeys;
+            
+            if (override !== undefined) {
+                return override;
+            }
+
+            supportedAnnotationKeys = {"js":1, "code":1, "assert":1, "jqm":1, "jquery":1, "enyo":1, "sencha":1, "dom":1, "angular":1};
             if (annotationType && supportedAnnotationKeys[annotationType]) {
                 return (this.getTestDelay() || 0);
             }

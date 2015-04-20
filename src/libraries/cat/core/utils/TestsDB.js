@@ -3,7 +3,9 @@ _cat.utils.TestsDB = function() {
 
     var _data,
         _testnextcache = {},
-        _variableNameMap = {};
+        _variableNameMap = {},
+        TestDB,
+        _module;
 
     function _TestsDB() {
 
@@ -49,9 +51,8 @@ _cat.utils.TestsDB = function() {
 
     }
 
-    var TestDB;
 
-    return {
+    _module = {
 
         counter: function(variableName) {
             if (!(variableName in _variableNameMap)) {
@@ -130,12 +131,33 @@ _cat.utils.TestsDB = function() {
 
             return result;
         },
-                  
-        next: function(query, opt) {
+               
+        currentIndex: function(query, name) {
+            var key = (query + (name || ""));
+            return  _testnextcache[key];
+        },
+        
+        current: function(query, name) {            
+            _module.next(query, name, {"pause": true});
+        },
+        
+        hasnext: function(query, name) {
+            var idx = _module.currentIndex(query, name),            
+                result = this.find(query);
+            
+            idx++;
+            if (result && result.length && idx < result.length) {
+                return true; 
+            }
+            
+            return false;
+        },
+        
+        next: function(query, name, opt) {
             
             var result = this.find(query),
                 value, idx, bounds,
-                pause, repeat;
+                pause, repeat, key = query + (name || "");
 
             function _getOpt(key) {
                 if (key && opt) {
@@ -153,14 +175,14 @@ _cat.utils.TestsDB = function() {
             function _updateIndex() {
                 if (idx !== undefined && idx != null) {
                     if (!pause) {
-                        _testnextcache[query]++;
+                        _testnextcache[key]++;
                     }
-                    if (_testnextcache[query] >= result.length && repeat) {
-                        _testnextcache[query] = 0;
+                    if (_testnextcache[key] >= result.length && repeat) {
+                        _testnextcache[key] = 0;
                     }
                     
                 } else {
-                    _testnextcache[query] = 0;
+                    _testnextcache[key] = 0;
                 }                
             } 
             
@@ -170,11 +192,11 @@ _cat.utils.TestsDB = function() {
             if (result && result.length) {
 
                 bounds = result.length-1;
-                idx = _testnextcache[query];
+                idx = _testnextcache[key];
 
                 _updateIndex();
 
-                idx = _testnextcache[query];
+                idx = _testnextcache[key];
                 if (idx < result.length) {
                     value = result[idx];
                     if (!value) {
@@ -186,10 +208,12 @@ _cat.utils.TestsDB = function() {
             } 
             
             if (!value) {
-                throw new Error("[catjs testdb next] Failed to resolve the data according the following query :  (" + query + ")");
+                throw new Error("[catjs testdb next] Failed to resolve the data according the following query :  (" + key + ")");
             }
 
             return value;
         }
     };
+    
+    return _module;
 }();

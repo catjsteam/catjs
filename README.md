@@ -1,4 +1,4 @@
-catjs 0.4.84 catjs.canary 0.4.87
+catjs 0.4.84 catjs.canary 0.4.88
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,6 +52,7 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **Wait to Object** Wait functionality is now supported, adding a standard wait, and\or wait to a DOM object and\or a functionality (TBD Documentation) see https://github.com/catjsteam/catjstests/tree/master/app/basic example application
 * **Test Execution** [Canary] catjs has a new tests execution engine with backward compatibility support and with additional new skills such as, waiting for other processes to complete before it continue to the next tasks. no more timing is required.   
 * **NPM catjs.canary** <code>npm install -g catjs.canary</code> new NPM module for getting the latest repository changes [not fully tested] 
 * **DOM plugin** Drag and Drop fixes 

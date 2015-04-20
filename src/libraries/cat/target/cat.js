@@ -1310,8 +1310,14 @@ _cat.core.Config = function(args) {
             return false;
         };
         
-        this.isAnnotationDelaySupported = function(annotationType) {
-            var supportedAnnotationKeys = {"js":1, "code":1, "assert":1, "jqm":1, "jquery":1, "enyo":1, "sencha":1, "dom":1, "angular":1};
+        this.isAnnotationDelaySupported = function(annotationType, override) {
+            var supportedAnnotationKeys;
+            
+            if (override !== undefined) {
+                return override;
+            }
+
+            supportedAnnotationKeys = {"js":1, "code":1, "assert":1, "jqm":1, "jquery":1, "enyo":1, "sencha":1, "dom":1, "angular":1};
             if (annotationType && supportedAnnotationKeys[annotationType]) {
                 return (this.getTestDelay() || 0);
             }
@@ -2523,22 +2529,24 @@ _cat.core.manager.statecontroller = function () {
             function _test(item) {
 
                 var valid = 0,
-                    test;
-
-                console.log("test validation...");
+                    test, testobj;
 
                 if ("match" in item) {
                     match = item.match;
-                    if (match) {
+                    if (match && match !== "undefined") {
                         if (typeof match === "function") {
 
                             test = match.apply(me, ("context" in config ? config.context : []));
 
-                        } else if (typeof match === "object") {
+                        } else if (typeof match === "object" || typeof match === "string") {
 
-                            // TBD
-                            test = true;
-
+                            testobj = _cat.utils.plugins.jqhelper.getElt(match);
+                            if (testobj) {                              
+                                testobj = _cat.utils.plugins.jqhelper.dom(testobj);
+                                if (testobj) {
+                                    test = true;       
+                                }
+                            }                            
                         }
 
                         if (!test) {
@@ -2698,6 +2706,13 @@ _cat.utils.plugins.jqhelper = function() {
                 return true;
             }
             return false;
+        },
+        
+        dom: function(elt) {
+            if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
+                elt = (elt.length ? elt[0] : undefined);
+            }
+            return elt;
         },
         
         /**
@@ -4449,7 +4464,9 @@ _cat.utils.TestsDB = function() {
 
     var _data,
         _testnextcache = {},
-        _variableNameMap = {};
+        _variableNameMap = {},
+        TestDB,
+        _module;
 
     function _TestsDB() {
 
@@ -4495,9 +4512,8 @@ _cat.utils.TestsDB = function() {
 
     }
 
-    var TestDB;
 
-    return {
+    _module = {
 
         counter: function(variableName) {
             if (!(variableName in _variableNameMap)) {
@@ -4576,12 +4592,33 @@ _cat.utils.TestsDB = function() {
 
             return result;
         },
-                  
-        next: function(query, opt) {
+               
+        currentIndex: function(query, name) {
+            var key = (query + (name || ""));
+            return  _testnextcache[key];
+        },
+        
+        current: function(query, name) {            
+            _module.next(query, name, {"pause": true});
+        },
+        
+        hasnext: function(query, name) {
+            var idx = _module.currentIndex(query, name),            
+                result = this.find(query);
+            
+            idx++;
+            if (result && result.length && idx < result.length) {
+                return true; 
+            }
+            
+            return false;
+        },
+        
+        next: function(query, name, opt) {
             
             var result = this.find(query),
                 value, idx, bounds,
-                pause, repeat;
+                pause, repeat, key = query + (name || "");
 
             function _getOpt(key) {
                 if (key && opt) {
@@ -4599,14 +4636,14 @@ _cat.utils.TestsDB = function() {
             function _updateIndex() {
                 if (idx !== undefined && idx != null) {
                     if (!pause) {
-                        _testnextcache[query]++;
+                        _testnextcache[key]++;
                     }
-                    if (_testnextcache[query] >= result.length && repeat) {
-                        _testnextcache[query] = 0;
+                    if (_testnextcache[key] >= result.length && repeat) {
+                        _testnextcache[key] = 0;
                     }
                     
                 } else {
-                    _testnextcache[query] = 0;
+                    _testnextcache[key] = 0;
                 }                
             } 
             
@@ -4616,11 +4653,11 @@ _cat.utils.TestsDB = function() {
             if (result && result.length) {
 
                 bounds = result.length-1;
-                idx = _testnextcache[query];
+                idx = _testnextcache[key];
 
                 _updateIndex();
 
-                idx = _testnextcache[query];
+                idx = _testnextcache[key];
                 if (idx < result.length) {
                     value = result[idx];
                     if (!value) {
@@ -4632,12 +4669,14 @@ _cat.utils.TestsDB = function() {
             } 
             
             if (!value) {
-                throw new Error("[catjs testdb next] Failed to resolve the data according the following query :  (" + query + ")");
+                throw new Error("[catjs testdb next] Failed to resolve the data according the following query :  (" + key + ")");
             }
 
             return value;
         }
     };
+    
+    return _module;
 }();
 if (typeof(_cat) !== "undefined") {
 
@@ -6351,6 +6390,7 @@ function _catjs_settings() {
     _cat.core.alias("manager.resolve", _cat.core.manager.statecontroller.resolve);
     _cat.core.alias("manager.defer", _cat.core.manager.statecontroller.defer);
     _cat.core.alias("plugin.get", _cat.core.plugin);
+    _cat.core.alias("testdata", _cat.utils.TestsDB);
     
     if (_isIframe() ){
         _topWindow = _rootWindow();

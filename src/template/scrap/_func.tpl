@@ -11,8 +11,8 @@ _cat.core.define("{{name}}", function({{arguments}}) {
         _counter=0,
         _catConfig = _cat.core.getConfig(),
         _delay = _catConfig.getTestDelay(),
-        _supportedDelay = function(type) {
-           return _catConfig.isAnnotationDelaySupported(type);
+        _supportedDelay = function(type, delay) {
+           return _catConfig.isAnnotationDelaySupported(type, delay);
         };
 
     if (_args) {    

@@ -60,22 +60,24 @@ _cat.core.manager.statecontroller = function () {
             function _test(item) {
 
                 var valid = 0,
-                    test;
-
-                console.log("test validation...");
+                    test, testobj;
 
                 if ("match" in item) {
                     match = item.match;
-                    if (match) {
+                    if (match && match !== "undefined") {
                         if (typeof match === "function") {
 
                             test = match.apply(me, ("context" in config ? config.context : []));
 
-                        } else if (typeof match === "object") {
+                        } else if (typeof match === "object" || typeof match === "string") {
 
-                            // TBD
-                            test = true;
-
+                            testobj = _cat.utils.plugins.jqhelper.getElt(match);
+                            if (testobj) {                              
+                                testobj = _cat.utils.plugins.jqhelper.dom(testobj);
+                                if (testobj) {
+                                    test = true;       
+                                }
+                            }                            
                         }
 
                         if (!test) {

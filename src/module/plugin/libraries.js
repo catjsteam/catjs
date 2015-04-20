@@ -328,6 +328,7 @@ module.exports = _basePlugin.ext(function () {
                                                     XMLHttpRequest: true,
                                                     document: true,
                                                     _cat: true,
+                                                    _catjs: true,
                                                     $ : true,
                                                     Q : true,
                                                     q : true,

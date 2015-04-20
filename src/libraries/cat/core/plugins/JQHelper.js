@@ -23,6 +23,13 @@ _cat.utils.plugins.jqhelper = function() {
             return false;
         },
         
+        dom: function(elt) {
+            if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
+                elt = (elt.length ? elt[0] : undefined);
+            }
+            return elt;
+        },
+        
         /**
          * Get the jquery or jqlite handle
          * 

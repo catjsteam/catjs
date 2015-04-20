@@ -135,10 +135,12 @@ module.exports = function () {
                         apiname: ("apiname" in apitem ? apitem.apiname : undefined),
                         exp: exp
                     });
-                    
+                    if (match) {
+                        return match;
+                    }
                 }
             }
-            return match;
+            return undefined;
         }
     };
     

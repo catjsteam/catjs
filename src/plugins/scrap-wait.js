@@ -44,10 +44,12 @@ module.exports = function () {
 
                                 api = [
                                     {
-                                        api: "object"
+                                        api: "object",
+                                        apiname: "object"
                                     },
                                     {
-                                        api: "delay"
+                                        api: "delay",
+                                        apiname: "delay"
                                     }
                                 ];
 
@@ -62,18 +64,33 @@ module.exports = function () {
                     if (waitRows) {
 
                         waitRows.forEach(function(row) {
-                            var match, args;
+                            var match, args, wait;
                             
                             if (row) {
                                 match = generate(row);
-                                if (match) {
+                                if (match) {                                   
+
                                     if (match.api === "delay") {
                                         args = match.args;
                                         me.print({
                                             scrap: {type: "wait", scrap: me},
                                             line: [],
-                                            delay: ((args && args[0]) ? args[0] : 0)
+                                            delay: ((args && args[0]) ? args[0] : 0),
+                                            steps: 0
                                         })
+                                    } else if (match.api === "object") {
+                                        args = match.args,
+                                        wait = ((args && args[0]) ? args[0] : undefined);                
+
+                                        if (wait) {
+                                            me.print({
+                                                scrap: {type: "wait", scrap: me},
+                                                line: [],
+                                                wait2object: wait,
+                                                delay: ((args && args[1]) ? args[1] : 5000),
+                                                steps: 10
+                                            });
+                                        }
                                     }
                                 }
                                                                 
