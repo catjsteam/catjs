@@ -7,9 +7,8 @@ _cat.core.manager.client = function () {
         runStatus,
         checkIfExists,        
         initCurrentState = false,
-        startInterval,
         getScrapInterval,
-        setupInterval,
+        setFailureInterval,
         intervalObj,
         endTest,
         testQueue,
@@ -60,7 +59,7 @@ _cat.core.manager.client = function () {
     };
 
 
-    setupInterval = function (config, scrap) {
+    setFailureInterval = function (config, scrap) {
 
         var tests,
             testManager, 
@@ -205,11 +204,6 @@ _cat.core.manager.client = function () {
     };
 
     totalDelay = 0;
-
-    startInterval = function (catConfig, scrap) {
-        setupInterval(catConfig, scrap);
-    };
-
 
     function _preScrapProcess(config, args) {
         config.args = args;
@@ -361,9 +355,7 @@ _cat.core.manager.client = function () {
             testname,
             emptyQueue = testQueue.isEmpty(),
             queuedesc = (emptyQueue ? "no " : ""),
-            firstfound = false,
-            broadcast = false,
-            testobj;
+            firstfound = false;
 
 
         // TODO add as a debug info
@@ -411,8 +403,7 @@ _cat.core.manager.client = function () {
             firstfound = true;
         } else {
             if (!cameFromBroadcast) {
-                broadcastProcess(true, true);
-                broadcast = true;                
+                broadcastProcess(true, true);              
             }
         }        
     }
@@ -454,7 +445,7 @@ _cat.core.manager.client = function () {
             }
             
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
-                startInterval(catConfig, scrap);
+                setFailureInterval(catConfig, scrap);
                 urlAddress = _cat.utils.Utils.getCatjsServerURL("/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid());
 
                 config = {
@@ -474,7 +465,6 @@ _cat.core.manager.client = function () {
                             _preScrapProcess(config, args);
                             scrapInfo = config.scrapInfo;                            
                             testQueue.add(scrapInfo.index, config);
-                            //counter = scrapInfo.index;
                             counter = 0;
                             
                             if (tests) {
@@ -618,6 +608,8 @@ _cat.core.manager.client = function () {
             }
         },
 
+        setFailureInterval: setFailureInterval,
+        
         endTest: endTest
     };
     

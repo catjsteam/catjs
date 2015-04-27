@@ -128,7 +128,6 @@ _cat.core.manager.controller = function () {
                             reportFormats = catConfig.getReportFormats();
                         }
 
-                        // TODO change clear interval
                         _cat.core.manager.client.endTest({reportFormats: reportFormats}, (runStatus.intervalObj ? runStatus.intervalObj.interval : undefined));
                     }
 
@@ -141,6 +140,8 @@ _cat.core.manager.controller = function () {
                     return executeCode(dmcommands, dmcontext);
                    
                 } else {
+                    
+                    // Todo need to be tested
                     deffer.fcall(function(){return executeCode(dmcommands, dmcontext);});
                 }
 
