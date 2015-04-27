@@ -21,7 +21,6 @@ _cat.core = function () {
         _runModeValidation,
         _catjspath,
         _rootcatcore,
-        _rootWindow,
         _actionQueue = [],
         _isStateReady = false,
         _isReady = function() {
@@ -363,17 +362,85 @@ _cat.core = function () {
         
         init: function (config) {
 
-            var parentWindow,
-                me = this;
+            var me = this,
+                _ownerWin = function (elt) {
+                    if (elt) {
+                        return (elt.ownerDocument.defaultView || elt.ownerDocument.parentWindow);
+                    }
 
-            if (_cat.utils.iframe.isIframe()) {
-                parentWindow = _rootWindow();
-                try {
-                    _rootcatcore = parentWindow.window._cat;
-                } catch(e) {
-                    _log.error("[catjs core] failed to resolve the parent window error:",e);
+                    return undefined;
+                }, win = (_ownerWin((config && "win" in config ? config.win : undefined)) || window);
+            
+            
+            function _configCallback(config, rootcatcore) {
+                
+                if (config) {
+
+                    if (rootcatcore) {
+
+                        _cat.utils.TestsDB.init( rootcatcore.utils.TestsDB.getData() );
+                        
+                    } else {
+                        _cat.utils.TestsDB.init();
+                    }
+
+                    _enum = _cat.core.TestManager.enum;
+
+                    if (rootcatcore) {
+                        _guid = rootcatcore.utils.Storage.getGUID();
+                        
+                    } else {
+                        _guid = _cat.utils.Storage.getGUID();
+                    }
+
+                    // display the ui, if you didn't already
+                    if (_config.isUI()) {
+                        _cat.core.ui.enable();
+                        if (!_cat.core.ui.isOpen()) {
+                            _cat.core.ui.on();
+                        }
+                    } else {
+                        _cat.core.ui.disable();
+                        _cat.core.ui.off();
+                        _cat.core.ui.destroy();
+                    }
+
+                    // Test Manager Init
+                    _cat.core.TestManager.init();
+
+                    // set scrap data info
+                    _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());
+
+                    if (_config.isErrors()) {
+
+                        // register DOM's error listener
+                        _cat.core.errors.listen(function (message, filename, lineno, colno, error) {
+
+                            var catconfig = _cat.core.getConfig(),
+                                reportFormats;
+
+                            if (catconfig.isReport()) {
+                                reportFormats = catconfig.getReportFormats();
+                            }
+
+                            // create catjs assertion entry
+                            _cat.utils.assert.create({
+                                name: "generalJSError",
+                                displayName: "General JavaScript Error",
+                                status: "failure",
+                                message: [message, " ;file: ", filename, " ;line: ", lineno, " ;column:", colno, " ;error:", error ].join(" "),
+                                success: false,
+                                ui: catconfig.isUI(),
+                                send: reportFormats
+                            });
+                        });
+                    }
+
+                    _isStateReady = true;
+                    _isReady();
                 }
-             }
+                
+            }
             
             // set catjs path
             if (config) {
@@ -381,8 +448,6 @@ _cat.core = function () {
                     _catjspath = config.catjspath;
                 }
             }
-
-            _cat.utils.TestsDB.init();
 
                 // plugin initialization
             (function() {
@@ -394,61 +459,32 @@ _cat.core = function () {
                         }
                     }
                 }
-            })();            
-
-            _enum = _cat.core.TestManager.enum;
+            })();
             
-            _guid = _cat.utils.Storage.getGUID();
-            
-            _config = new _cat.core.Config({
-                hasPhantomjs: hasPhantomjs
-            });
-        
-            // display the ui, if you didn't already
-            if (_config.isUI()) {
-                _cat.core.ui.enable();
-                if (!_cat.core.ui.isOpen()) {
-                    _cat.core.ui.on();
+            if (_cat.utils.iframe.isIframe(win)) {
+                try {
+                    _rootcatcore = _cat.utils.iframe.catroot(win);
+                    _config = _rootcatcore.core.getConfig();                
+                    _configCallback(config, _rootcatcore);
+                } catch(e) {
+                    _log.error("[catjs core] failed to resolve the parent window error:",e);
                 }
-            } else {
-                _cat.core.ui.disable();
-                _cat.core.ui.off();
-                _cat.core.ui.destroy();
             }
             
-            // Test Manager Init
-            _cat.core.TestManager.init();
+            //_cat.core.manager.client.setFailureInterval();
             
-            // set scrap data info
-            _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());                       
-
-            if (_config.isErrors()) {
-
-                // register DOM's error listener
-                _cat.core.errors.listen(function (message, filename, lineno, colno, error) {
-
-                    var catconfig = _cat.core.getConfig(),
-                        reportFormats;
-
-                    if (catconfig.isReport()) {
-                        reportFormats = catconfig.getReportFormats();
+            if (!_rootcatcore) {
+                _config = new _cat.core.Config({
+                    
+                    hasPhantomjs: hasPhantomjs,
+                    
+                    log: _log,
+                    
+                    callback: function(config) {
+                        _configCallback(config);
                     }
-
-                    // create catjs assertion entry
-                    _cat.utils.assert.create({
-                        name: "generalJSError",
-                        displayName: "General JavaScript Error",
-                        status: "failure",
-                        message: [message, " ;file: ", filename, " ;line: ", lineno, " ;column:", colno, " ;error:", error ].join(" "),
-                        success: false,
-                        ui: catconfig.isUI(),
-                        send: reportFormats
-                    });
-                });
-            }
-            
-            _isStateReady = true;
-            _isReady();
+                });                                               
+            }                     
         },
 
         setManager: function (managerKey, pkgName) {
@@ -854,7 +890,7 @@ _cat.core = function () {
 
                             pkgname = managerScrap.scrap.pkgName;
                             if (!pkgname) {
-                                _cat.core.log.error("[catjs action] Scrap's Package name is not valid");
+                                _log.error("[catjs action] Scrap's Package name is not valid");
                             } else {
 
 
@@ -892,7 +928,7 @@ _cat.core = function () {
                             if (manager) {
                                 pkgname = scrap.pkgName;
                                 if (!pkgname) {
-                                    _cat.core.log.error("[catjs action] Scrap's Package name is not valid");
+                                    _log.error("[catjs action] Scrap's Package name is not valid");
                                 } else {
                                     _cat.core.defineImpl(pkgname, function () {
                                         _cat.core.actionimpl.apply(this, args);
@@ -904,7 +940,7 @@ _cat.core = function () {
                             _cat.core.actionimpl.apply(this, arguments);
                         }
                     } else {
-                        _cat.core.log.info("[catjs action] " + scrap.name[0] + " was not run as it does not appears in testManager");
+                        _log.info("[catjs action] " + scrap.name[0] + " was not run as it does not appears in testManager");
                     }
                 }
 
