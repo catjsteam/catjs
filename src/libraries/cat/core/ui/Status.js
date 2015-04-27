@@ -192,59 +192,66 @@ _cat.core.ui = function () {
             on: function () {
 
                 if (_disabled) {
-                    return;
+                    return undefined;
                 }
 
-                if ((!_loaderListener) || true) {
-                    _loaderListener = true;
-                    _addEventListener(window, "load", function (e) {
+                function _onload() {
 
-                        var catElement = _getCATElt();
-                        if (typeof document !== "undefined") {
+                    var catElement = _getCATElt();
+                    if (typeof document !== "undefined") {
 
+                        if (catElement) {
+                            catElement.style.display = "";
+                        } else {
+                            _create();
+                            catElement = _getCATElt();
                             if (catElement) {
+                                _me.toggle();
                                 catElement.style.display = "";
-                            } else {
-                                _create();
-                                catElement = _getCATElt();
-                                if (catElement) {
-                                    _me.toggle();
-                                    catElement.style.display = "";
-                                }
                             }
-
-
-                            // set logo listener
-                            var logoelt = document.getElementById("catlogo"),
-                                catmask = document.getElementById("catmask"),
-                                listener = function () {
-                                    if (catmask) {
-                                        catmask.classList.toggle("fadeMe");
-                                    }
-                                },
-                                bubblefalse = function(e) {
-                                    if (e) {
-                                        e.stopPropagation();
-                                    }
-                                };
-
-                            if (!_islogolistener && logoelt && catmask && catmask.classList) {
-                                // toggle mask
-                                _addEventListener(logoelt, "click", listener);
-                                
-                                // stop propagation
-                                /* _addEventListener(catmask, "mouseover", bubblefalse);
-                                _addEventListener(catmask, "mousemove", bubblefalse);
-                                _addEventListener(catmask, "mouseup", bubblefalse);
-                                _addEventListener(catmask, "mousedown", bubblefalse);
-                                _addEventListener(catmask, "click", bubblefalse);
-                                */
-                                _islogolistener = true;
-                            }
-
                         }
 
-                    });
+
+                        // set logo listener
+                        var logoelt = document.getElementById("catlogo"),
+                            catmask = document.getElementById("catmask"),
+                            listener = function () {
+                                if (catmask) {
+                                    catmask.classList.toggle("fadeMe");
+                                }
+                            },
+                            bubblefalse = function(e) {
+                                if (e) {
+                                    e.stopPropagation();
+                                }
+                            };
+
+                        if (!_islogolistener && logoelt && catmask && catmask.classList) {
+                            // toggle mask
+                            _addEventListener(logoelt, "click", listener);
+
+                            // stop propagation
+                            /* _addEventListener(catmask, "mouseover", bubblefalse);
+                             _addEventListener(catmask, "mousemove", bubblefalse);
+                             _addEventListener(catmask, "mouseup", bubblefalse);
+                             _addEventListener(catmask, "mousedown", bubblefalse);
+                             _addEventListener(catmask, "click", bubblefalse);
+                             */
+                            _islogolistener = true;
+                        }
+
+                    }
+
+                }
+                
+                if ((!_loaderListener)) {
+                    _loaderListener = true;
+
+                    if (/loaded|complete/.test(document.readyState)) {
+                        _onload();
+                    } else {
+                        _addEventListener(window, "load", _onload);
+                    }
                 }
 
             },
