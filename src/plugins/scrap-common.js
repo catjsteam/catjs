@@ -769,7 +769,7 @@ module.exports = function () {
                             me.print(_tplutils.template({
                                 content: contentByType,
                                 data: {
-                                    events: {onload: ( value.indexOf("cat.src.js") !== -1 ? "onload=\"_cat.core.init()\"" : undefined )},
+                                    events: {onload: ( value.indexOf("cat.src.js") !== -1 ? "onload=\"_cat.core.init({win: this})\"" : undefined )},
                                     src: value,
                                     elementId: elementId
                                 }

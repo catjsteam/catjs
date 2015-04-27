@@ -87,7 +87,7 @@ module.exports = function () {
                                                 scrap: {type: "wait", scrap: me},
                                                 line: [],
                                                 wait2object: wait,
-                                                delay: ((args && args[1]) ? args[1] : 5000),
+                                                delay: ((args && args[1]) ? args[1] : 10000),
                                                 steps: 10
                                             });
                                         }
