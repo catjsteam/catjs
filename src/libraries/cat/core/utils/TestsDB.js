@@ -67,7 +67,13 @@ _cat.utils.TestsDB = function() {
             return _data;
         },
 
-        init : function() {
+        init : function(data) {
+            
+            if (data) {
+                _data = data;
+                return undefined;
+            }
+            
             _cat.utils.AJAX.sendRequestAsync({
                 url :  _cat.core.getBaseUrl("cat/config/testdata.json"),
                 callback : {

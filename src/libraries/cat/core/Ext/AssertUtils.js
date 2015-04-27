@@ -6,7 +6,7 @@ _cat.utils.assert = function () {
         var config = _cat.core.getConfig();
 
         if (config) {
-            _cat.utils.AJAX.sendRequestSync({
+            _cat.utils.AJAX.sendRequestAsync({
                 url: _cat.core.TestManager.generateAssertCall(config, data)
             });
         }

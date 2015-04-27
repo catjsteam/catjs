@@ -31,7 +31,7 @@ _cat.core.TestAction = function () {
             if (config.isReport()) {
                                
                 if (config) {
-                    _cat.utils.AJAX.sendRequestSync({
+                    _cat.utils.AJAX.sendRequestAsync({
                         url: _cat.core.TestManager.generateAssertCall(config, testdata)
                     });
                 }
@@ -58,7 +58,7 @@ _cat.core.TestAction = function () {
                 });
 
                 if (config) {
-                    _cat.utils.AJAX.sendRequestSync({
+                    _cat.utils.AJAX.sendRequestAsync({
                         url: _cat.core.TestManager.generateAssertCall(config, testdata)
                     });
                 }
@@ -104,10 +104,16 @@ _cat.core.TestAction = function () {
                 });
 
                 if (config) {
-                    _cat.utils.AJAX.sendRequestSync({
-                        url: _cat.core.TestManager.generateAssertCall(config, testdata)
+                    _cat.utils.AJAX.sendRequestAsync({
+                        url: _cat.core.TestManager.generateAssertCall(config, testdata),
+                        callback : {
+                            call : function(check) {
+                                _cat.core.TestManager.testEnd();
+                            }
+                        }
                     });
-                    _cat.core.TestManager.testEnd();
+                    
+                    
                 }
             }
 
