@@ -18,7 +18,6 @@ _cat.core = function () {
         _config, _log,
         _guid,
         _enum,
-        _runModeValidation,
         _catjspath,
         _rootcatcore,
         _actionQueue = [],
@@ -883,10 +882,6 @@ _cat.core = function () {
                         if (testNumber === 0) {
                             managerScrap = managerScraps[managerScraps.length - 1];
 
-                            // clear run-mode validation
-                            clearInterval(_runModeValidation);
-
-
                             managerScrap.scrap.catui = ["on"];
                             managerScrap.scrap.manager = ["true"];
 
@@ -905,7 +900,6 @@ _cat.core = function () {
                                         _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.delay);
                                     }
                                 }
-
 
                                 /*  CAT UI call  */
                                 _cat.core.ui.on();
