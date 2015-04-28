@@ -55,6 +55,7 @@ _cat.core.manager.controller = function () {
                 }
 
                 executeCode = function (codeCommandsArg, contextArg) {
+                    
                     var commandObj,
                         scrap = contextArg.scrap,
                         size = (codeCommandsArg ? codeCommandsArg.length : undefined),

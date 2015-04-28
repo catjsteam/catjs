@@ -438,6 +438,9 @@ _cat.core = function () {
 
                     _isStateReady = true;
                     _isReady();
+
+                    // setup the failure interval in case the tests will not be reached...
+                    _cat.core.manager.client.setFailureInterval(_config);
                 }
                 
             }

@@ -438,6 +438,9 @@ _cat.core = function () {
 
                     _isStateReady = true;
                     _isReady();
+
+                    // setup the failure interval in case the tests will not be reached...
+                    _cat.core.manager.client.setFailureInterval(_config);
                 }
                 
             }
@@ -1159,6 +1162,17 @@ _cat.core.Config = function(args) {
                     return false;
                 };
 
+                me.getNextTest = function() {
+                   var state = _cat.core.manager.client.getCurrentState(),
+                       idx;
+                    
+                    if (state) {
+                        idx = state.index;
+                        return me.getTest(idx);
+                    }
+                    return undefined;
+                };
+                
                 me.getTest = function(idx) {
 
                     var tests = this.getTests();
@@ -1762,7 +1776,7 @@ _cat.core.manager.client = function () {
     };
 
     getScrapInterval = function (scrap) {
-        var scrapId = scrap.id;
+        var scrapId = (scrap ? scrap.id : "undefined");
 
         if (!runStatus.intervalObj) {
             runStatus.intervalObj = {
@@ -1789,6 +1803,37 @@ _cat.core.manager.client = function () {
             validateExists,
             item;
 
+        function _setInterval() {
+            
+            intervalObj.interval = setInterval(function () {
+
+                var msg = ["No test activity, retry: "];
+                if (intervalObj.counter < 3) {
+                    intervalObj.counter++;
+
+                    msg.push(intervalObj.counter);
+
+                    _cat.core.ui.setContent({
+                        header: "Test Status",
+                        desc: msg.join(""),
+                        tips: {},
+                        style: "color:gray",
+                        currentState: currentState
+                    });
+
+                    _log.log("[CatJS client manager] ", msg.join(""));
+
+                } else {
+                    var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
+
+                    _log.log("[catjs client manager] error: ", err);
+                    endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
+                    clearInterval(intervalObj.interval);
+                }
+            }, config.getTimeout() / 3);  
+            
+        }
+        
         intervalObj = getScrapInterval(scrap);
 
         tests = config.getTests();
@@ -1799,40 +1844,37 @@ _cat.core.manager.client = function () {
             }
         }
 
+        if (!scrap) {
 
-        validateExists = _cat.core.getScrapById(intervalObj.signScrapId);
-        
-        if ( (_cat.core.getScrapName(scrap.name) === _cat.core.getScrapName(validateExists.name)) && !intervalObj.interval ) {
-        
-            intervalObj.interval = setInterval(function () {
-    
-                var msg = ["No test activity, retry: "];
-                if (intervalObj.counter < 3) {
-                    intervalObj.counter++;
-    
-                    msg.push(intervalObj.counter);
-    
-                    _cat.core.ui.setContent({
-                        header: "Test Status",
-                        desc: msg.join(""),
-                        tips: {},
-                        style: "color:gray",
-                        currentState: currentState
-                    });
-    
-                    _log.log("[CatJS client manager] ", msg.join(""));
-    
-                } else {
-                    var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
-    
-                    _log.log("[catjs client manager] error: ", err);
-                    endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
-                    clearInterval(intervalObj.interval);
+            _setInterval();
+            
+        } else {
+            
+            // try resolving by id
+            validateExists = _cat.core.getScrapById(intervalObj.signScrapId);
+            if (!validateExists) {
+                // try resolving by name
+                validateExists = _cat.core.getScrapByName(intervalObj.signScrapId);
+            }
+
+            if ( intervalObj.interval !== undefined && intervalObj.interval !== null ) {
+                
+                if ( (_cat.core.getScrapName(scrap.name) !== (validateExists ? _cat.core.getScrapName(validateExists.name) : undefined)) ) {
+                    if (config.isUI()) {
+                        _cat.core.ui.setContent({
+                            header: "No Valid Scrap Name",
+                            desc: "Scrap name: '" + intervalObj.signScrapId + "' is not valid, check your cat.json test project",
+                            style: "color:red"
+                        });
+                    }
                 }
-            }, config.getTimeout() / 3);
+                _setInterval();
+
+            } 
+            
         }
         
-        return;
+        return undefined;
     };
 
 
@@ -2108,7 +2150,8 @@ _cat.core.manager.client = function () {
     
                         if (intervalObj && intervalObj.interval) {
                             clearInterval(intervalObj.interval);
-                        }                   
+                        }     
+                        
                         _processReadyScraps(false);
                     } 
                 });
@@ -2168,7 +2211,9 @@ _cat.core.manager.client = function () {
             }
             
             if (_nextScrap({scrap: scrap, tests: tests, args: args})) {
+                
                 setFailureInterval(catConfig, scrap);
+                
                 urlAddress = _cat.utils.Utils.getCatjsServerURL("/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid());
 
                 config = {
@@ -2294,14 +2339,23 @@ _cat.core.manager.client = function () {
                 intervalIndex;
 
             if (intervalObj) {
-                intervalScrap = _cat.core.getScrapById(intervalObj.signScrapId);
+                
+                if (intervalObj.signScrapId !== "undefined") {
+                    
+                    intervalScrap = _cat.core.getScrapById(intervalObj.signScrapId);
 
-                runIndex = scrapTestIndex(scrap);
-                intervalIndex = scrapTestIndex(intervalScrap);
-
-                if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
-
-                    clearInterval(intervalObj.interval);
+                    runIndex = scrapTestIndex(scrap);
+                    intervalIndex = scrapTestIndex(intervalScrap);
+    
+                    if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
+    
+                        clearInterval(intervalObj.interval);
+                    }
+                } else {
+                    
+                    if (intervalObj.interval) {
+                        clearInterval(intervalObj.interval);
+                    }
                 }
             }
         },
@@ -2394,6 +2448,7 @@ _cat.core.manager.controller = function () {
                 }
 
                 executeCode = function (codeCommandsArg, contextArg) {
+                    
                     var commandObj,
                         scrap = contextArg.scrap,
                         size = (codeCommandsArg ? codeCommandsArg.length : undefined),
@@ -2670,7 +2725,7 @@ _cat.core.manager.statecontroller = function () {
         next: function (config) {
 
             var defer, methods, delay, 
-                currentconfig;
+                currentconfig, nextTest, catconfig;
             
             if (config) {
                 _scrapspool.add(config);
@@ -2679,6 +2734,14 @@ _cat.core.manager.statecontroller = function () {
             if (!_scrapspool.busy()) {
 
                 currentconfig = _scrapspool.next();
+                
+                if (!currentconfig) {
+                    catconfig = _cat.core.getConfig();
+                    nextTest = catconfig.getNextTest();
+                    _cat.core.manager.client.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));
+                    return undefined;
+                }
+                
                 defer = currentconfig.defer;
                 methods = currentconfig.methods;
                 delay = ("delay" in currentconfig ? currentconfig.delay : 0); 
