@@ -29,6 +29,8 @@ _cat.core.manager.client = function () {
         } else {
             clearInterval(interval);
         }
+
+        _cat.core.manager.client.clearLastInterval();
     };
 
     runStatus = {
@@ -59,7 +61,6 @@ _cat.core.manager.client = function () {
         return runStatus.intervalObj;
     };
 
-
     setFailureInterval = function (config, scrap) {
 
         var tests,
@@ -88,7 +89,7 @@ _cat.core.manager.client = function () {
                     _log.log("[CatJS client manager] ", msg.join(""));
 
                 } else {
-                    var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
+                    var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code and make sure to resolve your custom tests using the following API: _catjs.manager.resolve() ";
 
                     _log.log("[catjs client manager] error: ", err);
                     endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
@@ -412,9 +413,9 @@ _cat.core.manager.client = function () {
                       
                         currentState.index++;
     
-                        if (intervalObj && intervalObj.interval) {
-                            clearInterval(intervalObj.interval);
-                        }     
+//                        if (intervalObj && intervalObj.interval) {
+//                            clearInterval(intervalObj.interval);
+//                        }     
                         
                         _processReadyScraps(false);
                     } 
@@ -607,13 +608,18 @@ _cat.core.manager.client = function () {
                 if (intervalObj.signScrapId !== "undefined") {
                     
                     intervalScrap = _cat.core.getScrapById(intervalObj.signScrapId);
+                    if (!intervalScrap) {
+                        intervalScrap = _cat.core.getScrapByName(intervalObj.signScrapId);
+                    }
 
-                    runIndex = scrapTestIndex(scrap);
-                    intervalIndex = scrapTestIndex(intervalScrap);
-    
-                    if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
-    
-                        clearInterval(intervalObj.interval);
+                    if (!intervalScrap) {
+                        runIndex = scrapTestIndex(scrap);
+                        intervalIndex = scrapTestIndex(intervalScrap);
+        
+                        if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
+        
+                            clearInterval(intervalObj.interval);
+                        }
                     }
                 } else {
                     
@@ -649,6 +655,13 @@ _cat.core.manager.client = function () {
             }
         },
 
+        clearLastInterval: function() {
+
+            if (intervalObj) {
+                clearInterval(intervalObj.interval);
+            }
+        },
+        
         setFailureInterval: setFailureInterval,
         
         endTest: endTest

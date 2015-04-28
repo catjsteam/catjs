@@ -174,7 +174,7 @@ _cat.core.manager.statecontroller = function () {
 
                 currentconfig = _scrapspool.next();
                 
-                if (!currentconfig) {
+               
                     catconfig = _cat.core.getConfig();
                     nextTest = catconfig.getNextTest();
                     if (nextTest) {
@@ -183,6 +183,7 @@ _cat.core.manager.statecontroller = function () {
                         runStatus = clientManager.getRunStatus();
                         clientManager.endTest({}, runStatus);
                     }
+                if (!currentconfig) {
                     return undefined;
                 }
                 

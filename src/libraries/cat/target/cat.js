@@ -18,7 +18,6 @@ _cat.core = function () {
         _config, _log,
         _guid,
         _enum,
-        _runModeValidation,
         _catjspath,
         _rootcatcore,
         _actionQueue = [],
@@ -883,10 +882,6 @@ _cat.core = function () {
                         if (testNumber === 0) {
                             managerScrap = managerScraps[managerScraps.length - 1];
 
-                            // clear run-mode validation
-                            clearInterval(_runModeValidation);
-
-
                             managerScrap.scrap.catui = ["on"];
                             managerScrap.scrap.manager = ["true"];
 
@@ -905,7 +900,6 @@ _cat.core = function () {
                                         _cat.core.setManagerBehavior(managerScrap.scrap.name[0], tempScrap.scrap.name[0], tempScrap.delay);
                                     }
                                 }
-
 
                                 /*  CAT UI call  */
                                 _cat.core.ui.on();
@@ -1766,6 +1760,8 @@ _cat.core.manager.client = function () {
         } else {
             clearInterval(interval);
         }
+
+        _cat.core.manager.client.clearLastInterval();
     };
 
     runStatus = {
@@ -1796,7 +1792,6 @@ _cat.core.manager.client = function () {
         return runStatus.intervalObj;
     };
 
-
     setFailureInterval = function (config, scrap) {
 
         var tests,
@@ -1825,7 +1820,7 @@ _cat.core.manager.client = function () {
                     _log.log("[CatJS client manager] ", msg.join(""));
 
                 } else {
-                    var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code.";
+                    var err = "run-mode=tests catjs manager '" + testManager + "' is not reachable or not exists, review the test name and/or the tests code and make sure to resolve your custom tests using the following API: _catjs.manager.resolve() ";
 
                     _log.log("[catjs client manager] error: ", err);
                     endTest({error: err}, (runStatus ? runStatus.intervalObj : undefined));
@@ -2149,9 +2144,9 @@ _cat.core.manager.client = function () {
                       
                         currentState.index++;
     
-                        if (intervalObj && intervalObj.interval) {
-                            clearInterval(intervalObj.interval);
-                        }     
+//                        if (intervalObj && intervalObj.interval) {
+//                            clearInterval(intervalObj.interval);
+//                        }     
                         
                         _processReadyScraps(false);
                     } 
@@ -2344,13 +2339,18 @@ _cat.core.manager.client = function () {
                 if (intervalObj.signScrapId !== "undefined") {
                     
                     intervalScrap = _cat.core.getScrapById(intervalObj.signScrapId);
+                    if (!intervalScrap) {
+                        intervalScrap = _cat.core.getScrapByName(intervalObj.signScrapId);
+                    }
 
-                    runIndex = scrapTestIndex(scrap);
-                    intervalIndex = scrapTestIndex(intervalScrap);
-    
-                    if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
-    
-                        clearInterval(intervalObj.interval);
+                    if (!intervalScrap) {
+                        runIndex = scrapTestIndex(scrap);
+                        intervalIndex = scrapTestIndex(intervalScrap);
+        
+                        if (intervalObj && intervalObj.interval && intervalIndex < runIndex) {
+        
+                            clearInterval(intervalObj.interval);
+                        }
                     }
                 } else {
                     
@@ -2386,6 +2386,13 @@ _cat.core.manager.client = function () {
             }
         },
 
+        clearLastInterval: function() {
+
+            if (intervalObj) {
+                clearInterval(intervalObj.interval);
+            }
+        },
+        
         setFailureInterval: setFailureInterval,
         
         endTest: endTest
@@ -2738,7 +2745,7 @@ _cat.core.manager.statecontroller = function () {
 
                 currentconfig = _scrapspool.next();
                 
-                if (!currentconfig) {
+               
                     catconfig = _cat.core.getConfig();
                     nextTest = catconfig.getNextTest();
                     if (nextTest) {
@@ -2747,6 +2754,7 @@ _cat.core.manager.statecontroller = function () {
                         runStatus = clientManager.getRunStatus();
                         clientManager.endTest({}, runStatus);
                     }
+                if (!currentconfig) {
                     return undefined;
                 }
                 
