@@ -75,6 +75,17 @@ _cat.core.Config = function(args) {
                     return false;
                 };
 
+                me.getNextTest = function() {
+                   var state = _cat.core.manager.client.getCurrentState(),
+                       idx;
+                    
+                    if (state) {
+                        idx = state.index;
+                        return me.getTest(idx);
+                    }
+                    return undefined;
+                };
+                
                 me.getTest = function(idx) {
 
                     var tests = this.getTests();
