@@ -1760,6 +1760,7 @@ _cat.core.manager.client = function () {
         currentState.testend = true;
         
         _cat.core.TestManager.send({signal: 'TESTEND', error: opt.error});
+        
         if (interval === -1) {
             _log.log("[catjs client manager] Test End");
         } else {
@@ -2725,7 +2726,9 @@ _cat.core.manager.statecontroller = function () {
         next: function (config) {
 
             var defer, methods, delay, 
-                currentconfig, nextTest, catconfig;
+                currentconfig, nextTest, catconfig,
+                clientManager = _cat.core.manager.client,
+                runStatus;
             
             if (config) {
                 _scrapspool.add(config);
@@ -2738,7 +2741,12 @@ _cat.core.manager.statecontroller = function () {
                 if (!currentconfig) {
                     catconfig = _cat.core.getConfig();
                     nextTest = catconfig.getNextTest();
-                    _cat.core.manager.client.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));
+                    if (nextTest) {
+                        clientManager.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));                        
+                    } else {
+                        runStatus = clientManager.getRunStatus();
+                        clientManager.endTest({}, runStatus);
+                    }
                     return undefined;
                 }
                 
@@ -3174,6 +3182,13 @@ _cat.core.TestAction = function () {
             // ui signal notification
             if (config.isUI()) {
 
+                _cat.core.ui.setContent({
+                    header: "Test End",
+                    desc: "",
+                    tips: {},
+                    style: "color:gray"
+                });
+                
                 timeout = (opt["timeout"] || 2000);
 
                 setTimeout(function () {

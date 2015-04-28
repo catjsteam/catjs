@@ -76,6 +76,13 @@ _cat.core.TestAction = function () {
             // ui signal notification
             if (config.isUI()) {
 
+                _cat.core.ui.setContent({
+                    header: "Test End",
+                    desc: "",
+                    tips: {},
+                    style: "color:gray"
+                });
+                
                 timeout = (opt["timeout"] || 2000);
 
                 setTimeout(function () {

@@ -162,7 +162,9 @@ _cat.core.manager.statecontroller = function () {
         next: function (config) {
 
             var defer, methods, delay, 
-                currentconfig, nextTest, catconfig;
+                currentconfig, nextTest, catconfig,
+                clientManager = _cat.core.manager.client,
+                runStatus;
             
             if (config) {
                 _scrapspool.add(config);
@@ -175,7 +177,12 @@ _cat.core.manager.statecontroller = function () {
                 if (!currentconfig) {
                     catconfig = _cat.core.getConfig();
                     nextTest = catconfig.getNextTest();
-                    _cat.core.manager.client.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));
+                    if (nextTest) {
+                        clientManager.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));                        
+                    } else {
+                        runStatus = clientManager.getRunStatus();
+                        clientManager.endTest({}, runStatus);
+                    }
                     return undefined;
                 }
                 

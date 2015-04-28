@@ -23,6 +23,7 @@ _cat.core.manager.client = function () {
         currentState.testend = true;
         
         _cat.core.TestManager.send({signal: 'TESTEND', error: opt.error});
+        
         if (interval === -1) {
             _log.log("[catjs client manager] Test End");
         } else {
