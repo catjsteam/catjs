@@ -5620,6 +5620,41 @@ _cat.plugins.dom = function () {
                     return !!(elem.getContext && elem.getContext('2d'));
                 }
 
+                function _outerHTML(node){
+                    
+                    return node.outerHTML || (
+                        function(n){
+                            var div = document.createElement('div'), h;
+                            div.appendChild( n.cloneNode(true) );
+                            h = div.innerHTML;
+                            div = null;
+                            return h;
+                        })(node);
+                }
+                
+                function _getSVGTxt(elt) {
+                    
+                    var str;             
+                    
+                    if (elt.parentNode.innerHTML) {                        
+                        str = _outerHTML(elt);
+                        
+                    } 
+                    
+                    return str;
+                }
+                
+                function _createCanvasElement(elt) {
+                    
+                    var canvaselt = document.createElement("canvas"),
+                        bounds = elt.getBoundingClientRect();
+                    
+                    canvaselt.width = bounds.width + "px";
+                    canvaselt.height = bounds.height + "px";
+                    
+                    return canvaselt;
+                }
+
                 /**
                  * capture canvas data
                  *
@@ -5629,8 +5664,49 @@ _cat.plugins.dom = function () {
                  */
                 function _captureCanvas(elt) {
 
-                    var data,
-                        serverURL = _cat.utils.Utils.getCatjsServerURL("/screenshot");
+                    var nodeName, tagMethod,
+                        serverURL = _cat.utils.Utils.getCatjsServerURL("/screenshot"),
+                        methods = {
+                            
+                            "canvas": function(elt) {
+                                _save(_getData(elt));
+
+                            },
+                            
+                            "svg": function(elt) {
+
+                                var canelt = _createCanvasElement(elt),
+                                    svgtxt = _getSVGTxt(elt);
+                                
+                                if (typeof canvg !== "undefined") {
+                                    canvg(canelt, svgtxt);
+                                    _save(_getData(canelt));
+                                    
+                                } else {
+                                    _cat.core.log.warn("[catjs dom plugin] SVG element was found nut no valid 'canvg' handle was found, consider adding it as a dependency in your catproject.json ");                                    
+                                }
+                                
+                            },
+                            
+                            "*": function(elt) {
+                                
+                                if (typeof html2canvas !== "undefined") {
+
+                                    html2canvas(elt).then(function (canvas) {
+                                        _save(_getData(canvas));
+                                    }).catch(function(err) {
+                                            if (err) {
+                                                _cat.core.log.error("[catjs html2canvas] failed to render the given dom element, \nerror: " ,err);
+                                            }
+                                        });
+                                } else {
+                                    _cat.core.log.warn("[catjs dom plugin] DOM element was found but no valid 'html2canvas' handle was found, consider adding it as a dependency in your catproject.json ");
+                                }
+
+                            }
+                            
+                        };
+                    
 
                     function _getData(canvas) {
                         var data;
@@ -5675,22 +5751,12 @@ _cat.plugins.dom = function () {
                         // DOM element case
                         if (elt.nodeType && elt.nodeType === 1) {
 
-
                             // canvas element case
-                            if (elt.nodeName.toLowerCase() === "canvas") {
-
-                                _save(_getData(elt));
-
-                                // try using html2canvas    
-                            } else {
-                                if (typeof html2canvas !== "undefined") {
-
-                                    html2canvas(elt).then(function (canvas) {
-                                        _save(_getData(canvas));
-                                    });
-                                } else {
-                                    _cat.core.log.warn("[catjs dom plugin] no valid 'html2canvas' handle was found, consider adding it as a dependency in your catproject.json ");
-                                }
+                            nodeName = elt.nodeName;
+                            nodeName = (nodeName ? nodeName.toLowerCase() : undefined);
+                            tagMethod = (nodeName &&  methods[nodeName] ? methods[nodeName] :  methods["*"]);
+                            if (tagMethod) {
+                                tagMethod.call(this, elt);                            
                             }
                         }
                     }

@@ -129,6 +129,14 @@
             "exports": "q",
             "globals": true,
             "install": "static"
+        },
+        {
+            "name": "canvg",
+            "prod" :["canvg.min.js"],
+            "dev" :["canvg.min.js"],        
+            "exports": "canvg",
+            "globals": true,
+            "install": "static"
         }
     ]
 }

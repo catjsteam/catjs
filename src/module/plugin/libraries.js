@@ -341,6 +341,7 @@ module.exports = _basePlugin.ext(function () {
                                                     flyer : true,
                                                     angular : true,
                                                     html2canvas: true,
+                                                    canvg: true,
                                                     jsutilsObject: true,
                                                     jsutilsArray: true
                                                 }

@@ -59,7 +59,7 @@ exports.post = function (req, res) {
 
     ua = _userAgent(req);
     ismobile = ("isMobile" in ua && ua.isMobile);
-    scrapName = [req.body.scrapName, "_", (new Date()).format("hh_mm_ss")].join("");
+    scrapName = [req.body.scrapName, "_", (new Date()).format("hh_mm_ss_S")].join("");
     deviceName = req.body.deviceName;
     deviceId = req.body.deviceId;
 

@@ -1,4 +1,4 @@
-catjs 0.4.84 catjs.canary 0.4.91
+catjs 0.4.84 catjs.canary 0.4.92
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,19 +52,13 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
-* **Wait to Object** Wait functionality is now supported, adding a standard wait, and\or wait to a DOM object and\or a functionality (TBD Documentation) see https://github.com/catjsteam/catjstests/tree/master/app/basic example application
-* **Test Execution** [Canary] catjs has a new tests execution engine with backward compatibility support and with additional new skills such as, waiting for other processes to complete before it continue to the next tasks. no more timing is required.   
-* **NPM catjs.canary** <code>npm install -g catjs.canary</code> new NPM module for getting the latest repository changes [not fully tested] 
-* **DOM plugin** Drag and Drop fixes 
-* **testdb issue** test data json failed on parsing  
-* **Scrap's name** can be used more than once in the catjs project (cat.json)  
-* **DOM Plugin** Drag and Drop support (see https://github.com/catjsteam/catjstests) 
-* **snapshot for the browser** DOM snapshot annotation added that saves an image of a given DOM and/or Canvas element. The images will be available in the reports folder.
+* **snapshot for the browser** DOM snapshot annotation added that saves an image of a given **SVG**, **Canvas** or **DOM**(html2canvas) element. The images will be available in the reports folder.
 
         @[scrap
             @@name snapshots
-            @@dom snapshot("#canvas")
+            @@dom snapshot("#paper")
             @@dom snapshot("body")
+            @@dom snapshot("#svgtest")
         ]@
 
         In case of DOM usage, add the html2canvas library
@@ -74,9 +68,20 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
             {
                 "name": "html2canvas",
                 "exclude": false
+            },
+            {
+                "name": "canvg",
+                "exclude": false
             }
-        ],
+        ]
 
+* **Wait to Object** Wait functionality is now supported, adding a standard wait, and\or wait to a DOM object and\or a functionality (TBD Documentation) see https://github.com/catjsteam/catjstests/tree/master/app/basic example application
+* **Test Execution** [Canary] catjs has a new tests execution engine with backward compatibility support and with additional new skills such as, waiting for other processes to complete before it continue to the next tasks. no more timing is required.   
+* **NPM catjs.canary** <code>npm install -g catjs.canary</code> new NPM module for getting the latest repository changes [not fully tested] 
+* **DOM plugin** Drag and Drop fixes 
+* **testdb issue** test data json failed on parsing  
+* **Scrap's name** can be used more than once in the catjs project (cat.json)  
+* **DOM Plugin** Drag and Drop support (see https://github.com/catjsteam/catjstests) 
 * **angularjs support** AngularJS with ng- actions supported 
 * **iframe support** Stabilized
 * **auto-override** In the cat.json test project file this property enable/disable cat.json file override when using -a command-line flag
