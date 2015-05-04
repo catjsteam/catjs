@@ -1,4 +1,4 @@
-catjs 0.4.84 catjs.canary 0.4.92
+catjs 0.4.84 catjs.canary 0.4.93
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">

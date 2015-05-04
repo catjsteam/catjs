@@ -126,7 +126,7 @@
             "name": "q",
             "prod" :["q.min.js"],
             "dev" :["q.min.js"],        
-            "exports": "q",
+            "exports": "Q",
             "globals": true,
             "install": "static"
         },

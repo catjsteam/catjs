@@ -2402,7 +2402,7 @@ _cat.core.manager.client = function () {
 _cat.core.manager.controller = function () {
 
     var _module,
-        deffer = Q;
+        deffer;
 
     _module = {
 
@@ -2411,7 +2411,14 @@ _cat.core.manager.controller = function () {
         },
 
 
-    /**
+        deffer: function() {
+            if (!deffer) {
+                deffer = Q;
+            }
+            return deffer;
+        },
+        
+        /**
          * Invoke a given client command
          *
          * Config:
@@ -2456,7 +2463,6 @@ _cat.core.manager.controller = function () {
                 }
 
                 executeCode = function (codeCommandsArg, contextArg) {
-                    
                     var commandObj,
                         scrap = contextArg.scrap,
                         size = (codeCommandsArg ? codeCommandsArg.length : undefined),
@@ -2544,10 +2550,10 @@ _cat.core.manager.controller = function () {
                 } else {
                     
                     // Todo need to be tested
-                    deffer.fcall(function(){return executeCode(dmcommands, dmcontext);});
+                    deffer().fcall(function(){return executeCode(dmcommands, dmcontext);});
                 }
 
-                return deffer;
+                return deffer();
             };
             
             (function init() {
