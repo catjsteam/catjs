@@ -298,11 +298,12 @@ module.exports = function () {
                 type = "warn";
             }
 
-            if (console[type]) {
-                console[type](msg);
-            } else {
-                console.log("Console has no support for function: '" + type + "'");
+            if (!console[type]) {
+                msg = type;
+                type = "log";
             }
+
+            console[type](msg);
         },
 
         error: function () {
