@@ -323,42 +323,30 @@ var CAT = function () {
                                         required: true,
                                         description: "Enter the project name"
                                     }),
-                                    host: new Schema({
+                                    serverhost: new Schema({
                                         type: "string",
                                         required: false,
                                         default: "localhost",
-                                        description: "Enter CAT server's host name"
+                                        description: "Enter catjs server's host name"
                                     }),
-                                    port: new Schema({
+                                    serverport: new Schema({
                                         type: "string",
                                         required: false,
                                         default: "8089",
-                                        description: "Enter CAT server's port"
+                                        description: "Enter catjs server's port"
                                     }),
-                                    protocol: new Schema({
+                                    serverprotocol: new Schema({
                                         type: "string",
                                         required: false,
                                         default: "http",
-                                        description: "Enter CAT server's protocol"
+                                        description: "Enter catjs server's protocol"
                                     }),
                                     analytics: new Schema({
                                         type: "string",
                                         required: false,
                                         default: "Y",
                                         description: "May catjs anonymously report usage statistics to improve the tool over time?"
-                                    })/*,
-                                    appserverport: new Schema({
-                                        type: "string",
-                                        required: false,
-                                        default: "8089",
-                                        description: "Enter your Application server's port"
-                                    }),
-                                    appserverprotocol: new Schema({
-                                        type: "string",
-                                        required: false,
-                                        default: "http",
-                                        description: "Enter your Application server's protocol"
-                                    })*/
+                                    })
                                 }
                             };
 

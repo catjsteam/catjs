@@ -204,7 +204,7 @@ var _typedas = require('typedas'),
             _mkEnvDir("target");
 
             // set the info properties incoming from the cat's project
-            _setInfoData(["host", "port", "appserver", "apppath", "appfilter", "appcontext", "cattarget", "analytics", "runner", "dependencies", "jshint"]);
+            _setInfoData(["server", "apppath", "appfilter", "appcontext", "cattarget", "analytics", "runner", "dependencies", "jshint"]);
 
         }
 
@@ -420,22 +420,23 @@ Config.prototype.setInfo = function (key, value) {
     return this.info[key] = value;
 };
 
-Config.prototype.getPort = function () {
-    var port = this.getInfo("appserver.port") || this.getInfo("port");
+Config.prototype.getServerPort = function () {
+    var port = this.getInfo("server.port");
     return (port || "8089");
 };
 
-Config.prototype.getRunner = function () {
+Config.prototype.getServerRunner = function () {
     var runner = this.getInfo("runner");
     return (runner ? runner : undefined);
 };
 
-Config.prototype.getHost = function () {
-    return this.getInfo("appserver.host") || this.getInfo("host");
+Config.prototype.getServerHost = function () {
+    var host = this.getInfo("server.host");
+    return (host || "localhost");
 };
 
-Config.prototype.getProtocol = function () {
-    var protocol = this.getInfo("appserver.protocol") || this.getInfo("protocol");
+Config.prototype.getServerProtocol = function () {
+    var protocol = this.getInfo("server.protocol");
     return (protocol || "http://");
 };
 
@@ -453,9 +454,9 @@ Config.prototype.getAddress = function () {
     var host, port, protocol;
 
     // try getting the app server info
-    host =  this.getHost();
-    port =  this.getPort();
-    protocol =  this.getProtocol();
+    host =  this.getServerHost();
+    port =  this.getServerPort();
+    protocol =  this.getServerProtocol();
 
     if (!host || !port) {
         _log.warning("[CAT project config] Missing configuration properties: 'host' and/or 'port' (see catproject.json)");

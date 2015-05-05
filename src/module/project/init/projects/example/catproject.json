@@ -5,16 +5,16 @@
     "target": "target/",
     "cattarget": "{{cattarget}}",
 
-    "host": "{{host}}",
-    "port": "{{port}}",
-    "protocol": "{{protocol}}",
     "analytics": "{{analytics}}",
     "apppath": "{{appath}}",
     
-    "appserver": {
-        "host": "{{appserver.host}}",
-        "port": "{{appserver.port}}",
-        "protocol": "{{appserver.protocol}}"
+    "server": {
+        "host": "{{server.host}}",
+        "port": "{{server.port}}",
+        "protocol": "{{server.protocol}}",
+        "services": {
+            "static-pages": false
+        }
     },
 
     "runner": {

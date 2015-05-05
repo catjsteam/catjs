@@ -38,16 +38,10 @@
             "src": ["target", "_cat_md.json", "lib"]
         },
         {
-            "name": "p@mobile.start",
-            "type": "mobile",
-            "device": "android",
+            "name": "p@mobile.deprecated",
+            "type": "console",
+            "message": "[catjs mobile plugin] @deprecated - use catjs runner instead",
             "action": "start"
-        },
-        {
-            "name": "p@mobile.install",
-            "type": "mobile",
-            "device": "android",
-            "action": "install"
         },
         {
             "name": "p@project.phantomjs",
@@ -173,7 +167,7 @@
         },
         {
             "name": "t@mtest",
-            "plugins": ["p@mobile.install", "p@project.webserver.start", "p@mobile.start"]
+            "plugins": ["p@mobile.deprecated"]
         },
         {
             "name": "t@phantom",

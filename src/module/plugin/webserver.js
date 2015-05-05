@@ -44,7 +44,7 @@ module.exports = _basePlugin.ext(function () {
                             webserver.start.call(thiz, {
                                 set: set,
                                 path: path,
-                                port: (extensionParams.port || _project.getPort())
+                                port: (extensionParams.port || _project.getServerPort())
                             }, function() {
                                 _emitter.emit("job.done", {status: "done"});
                             });

@@ -35,7 +35,7 @@ module.exports = function () {
                     "c": ["--task", "t@clean"],
                     "s": ["--task", "t@server.start"],
                     "r": ["--task", "t@runner.start"],
-                    "m": ["--task", "t@mtest"],
+                    "m": ["--task", "t@mtest"], // @deprecated
                     "p": ["--project" , "."]
                 });
 

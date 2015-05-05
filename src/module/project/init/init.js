@@ -1,7 +1,7 @@
 var _catglobal = catrequire("cat.global"),
     _log = _catglobal.log(),
     _utils = catrequire("cat.utils"),
-
+    _sysutils = catrequire("cat.sys.utils"),
     _path = require("path"),
     _fs = require("fs.extra"),
     _jsutils = require("js.utils");
@@ -19,7 +19,7 @@ module.exports = function () {
                 msg = "[CAT init project] No valid project name was found, generating a base project",
                 projectPath,
                 args;
-
+            
             function _validate() {
                 if (!name) {
                     console.log(msg);
@@ -52,11 +52,12 @@ module.exports = function () {
                     targetpath = _path.join(workpath, "cat-project");
                     if (!_fs.existsSync(targetpath)) {
 
-                        _fs.mkdirpSync(targetpath);
+                        _fs.mkdirpSync(targetpath, {mode: 0777});
+                        _sysutils.chmodSyncOffset(targetpath, 0777, 1);
                     }
 
                         // creating cat project file
-                        _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content);
+                        _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content, {mode: 0777});
 
                         // copy additional resources to the initial target project folder
                         _fs.copyRecursive(_path.resolve(_path.join(currentpath, "base")), targetpath, function (err) {
@@ -70,7 +71,7 @@ module.exports = function () {
                                 // copy additional resources to the initial target project folder
                                 _fs.copyRecursive(_path.resolve(_path.join(path, "app")), _path.resolve(_path.join(workpath, "app")), function (err) {
                                     if (err) {
-                                        _utils.log("[CAT init project] probably the files already exists, skipping... ");
+                                        _utils.log("[CAT init project] cat-project already exists, skipping... ");
 
                                     }
                                     if (config && config.callback) {
@@ -106,20 +107,18 @@ module.exports = function () {
                     projectPath = _path.resolve(_path.join(currentpath, name));
                 }
             }
+           
             args = {
                 "name": config.name,
 
                 "source": config.source,
                 "target": config.target,
                 "cattarget": "./",
-                "host": config.host,
-                "port": config.port,
-                "protocol": config.protocol,
                 "analytics" : config.analytics,
-                "appserver": {
-                    "host": ( config.host),
-                    "port": (config.port),
-                    "protocol": ( config.protocol)
+                "server": {
+                    "host": ( config.serverhost),
+                    "port": (config.serverport),
+                    "protocol": ( config.serverprotocol)
                 },
                 "appath": config.appath
 
