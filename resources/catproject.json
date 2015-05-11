@@ -35,7 +35,7 @@
             "name": "p@project.clean",
             "type": "clean",
             "dependency": "manager",
-            "src": ["target", "_cat_md.json", "lib"]
+            "src": ["target", "_cat_md.json", "lib", "cache"]
         },
         {
             "name": "p@mobile.deprecated",
@@ -47,7 +47,13 @@
             "name": "p@project.phantomjs",
             "type": "phantomjs",
             "file": "phantomjs-script.js"
-        },
+        },        
+        {
+            "name": "p@project.monitoring.server",
+            "type": "webserver",
+            "mode": "standalone",
+            "action": "start"
+        },        
         {
             "name": "p@project.webserver.start",
             "type": "webserver",
