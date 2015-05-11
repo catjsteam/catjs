@@ -13,7 +13,7 @@
         "port": "{{server.port}}",
         "protocol": "{{server.protocol}}",
         "services": {
-            "static-pages": false
+            "static-pages": true
         }
     },
 

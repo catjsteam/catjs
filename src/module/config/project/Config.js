@@ -425,6 +425,13 @@ Config.prototype.getServerPort = function () {
     return (port || "8089");
 };
 
+Config.prototype.isServerStaticPages = function () {
+    var services = this.getInfo("server.services"),
+        staticPages = (services && ("static-pages" in services) ? services["static-pages"] : true);
+    
+    return staticPages;
+};
+
 Config.prototype.getServerRunner = function () {
     var runner = this.getInfo("runner");
     return (runner ? runner : undefined);

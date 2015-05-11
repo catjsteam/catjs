@@ -1004,7 +1004,8 @@ _cat.core = function () {
                             scrap: scrap,
                             arguments: passedArguments,
                             scrapinfo: ("scrapinfo" in config ? config.scrapinfo : undefined),
-                            def:  ("def" in config ? config.def : undefined)
+                            def:  ("def" in config ? config.def : undefined),
+                            done:  ("done" in config ? config.done : undefined)
 
                         }, pkgName);
                         catObj.apply(_context, passedArguments);

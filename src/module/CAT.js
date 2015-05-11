@@ -1,5 +1,4 @@
 var _flow,
-    _prompt = require('prompt'),
     _jsutils = require("js.utils"),
     _sysutils = catrequire("cat.sys.utils"),
     _analytics = require("./analytics/analytics"),
@@ -83,7 +82,7 @@ var CAT = function () {
         });
         _runTask(_targets[_counter], watch);
     }
-    
+   
     (function () {
 
         _stringFormat = require("string-format");
@@ -192,7 +191,7 @@ var CAT = function () {
             var grunt, args, path, watch = false, kill = -1,
                 npmtest = "npm", testmodule,
                 testcmd,
-                initProject,
+                initProjectType,
                 msg = ["[CAT] Project failed to load, No valid argument path was found"];
 
             /**
@@ -218,7 +217,7 @@ var CAT = function () {
                 _debug = ("debug" in config ? config.debug : false);
                 testcmd = (config["test"] || undefined);
                 _proxy = (config.proxy || undefined);
-                initProject = typeof config.init === 'undefined' ? undefined :  config.init || "cat";
+                initProjectType = typeof config.init === 'undefined' ? undefined :  config.init || "cat";
                 _targets = config.task;
                 grunt = config.grunt;
                 args = config;
@@ -258,31 +257,11 @@ var CAT = function () {
 
                 var project,
                     pids,
-                    linit,
+                    commandmodule,
                     checkAnalytics,
                     targets = _targets, counter,
                     wait = false,
-                    home = _global.get("home"),
-                    schema = (config ? config.schema : undefined),
-                    Schema =  function(args) {
-                        this.type = (args.type || "string");
-                        this.pattern = args.pattern;
-                        this.message = args.message;
-                        this.required = args.required;
-                        this.default = args.default;
-                        this.description  = args.description;
-                    },
-                    appPath;
-
-                function _createProject(args) {
-
-                    if (!args.appath) {
-                        args.appath = appPath;
-                    }
-                    args.projectname = initProject;
-                    args.callback = config.callback;
-                    linit.create(args);
-                }
+                    home = _global.get("home");
 
 
                 _log.info("watch: " + watch + " kill: " + kill + " process: " + process.pid);
@@ -304,80 +283,11 @@ var CAT = function () {
                     return undefined;
                 }
 
-                if (initProject) {
-                    linit = catrequire("cat.init");
-                    if (linit) {
-
-                        if (!schema) {
-
-                            // user prompt section
-                            _prompt.start();
-
-
-                            schema = {
-                                properties: {
-                                    name: new Schema({
-                                        type: "string",
-                                        pattern: /^[a-zA-Z0-9\-]+$/,
-                                        message: 'Name must be only letters, numbers or dashes',
-                                        required: true,
-                                        description: "Enter the project name"
-                                    }),
-                                    serverhost: new Schema({
-                                        type: "string",
-                                        required: false,
-                                        default: "localhost",
-                                        description: "Enter catjs server's host name"
-                                    }),
-                                    serverport: new Schema({
-                                        type: "string",
-                                        required: false,
-                                        default: "8089",
-                                        description: "Enter catjs server's port"
-                                    }),
-                                    serverprotocol: new Schema({
-                                        type: "string",
-                                        required: false,
-                                        default: "http",
-                                        description: "Enter catjs server's protocol"
-                                    }),
-                                    analytics: new Schema({
-                                        type: "string",
-                                        required: false,
-                                        default: "Y",
-                                        description: "May catjs anonymously report usage statistics to improve the tool over time?"
-                                    })
-                                }
-                            };
-
-                        } else {
-                            _prompt = null;
-                        }
-
-                        if (initProject === "example") {
-                            // apppath will be set automatically
-                            appPath = "./../app";
-
-                        } else {
-                            if (!schema.properties.appath) {
-                                schema.properties.appath = new Schema({
-                                    type: "string",
-                                    required: true,
-                                    default: "./..",
-                                    description: "Enter application's directory [./..] "
-                                });
-                            }
-                        }
-
-                        if (_prompt) {
-                            _prompt.get(schema, function (err, args) {
-                                _createProject(args);
-                            });
-
-                        } else {
-                            _createProject(schema.properties);
-                        }
-                    }
+                if (initProjectType) {
+                    commandmodule = catrequire("cat.init.command");
+                    config.initProjectType = initProjectType;
+                    
+                    commandmodule.command(config);
                 }
 
                 

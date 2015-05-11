@@ -35,6 +35,7 @@ module.exports = function () {
                     "c": ["--task", "t@clean"],
                     "s": ["--task", "t@server.start"],
                     "r": ["--task", "t@runner.start"],
+                    "server": ["--task", "t@monitoring.server"],
                     "m": ["--task", "t@mtest"], // @deprecated
                     "p": ["--project" , "."]
                 });
@@ -54,6 +55,7 @@ module.exports = function () {
 
                         "cat": "src/module/CAT.js",
                         "cat.init": "src/module/project/init/init.js",
+                        "cat.init.command": "src/module/project/init/commandInit.js",
 
                         "cat.flow": "src/module/Flow.js",
                         "cat.global": "src/module/CATGlob.js",

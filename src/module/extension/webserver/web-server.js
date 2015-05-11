@@ -38,16 +38,26 @@ var webserver  = function() {
          */
         start: function(config, callback) {
 
-            var path = config.path,
+            var me = this, 
+                path = config.path,
                 port = (config.port || "80"),
-                set = config.set;
-
-            var allowCrossDomain = function(req, res, next) {
-                res.header('Access-Control-Allow-Origin', "*");
-                res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-                next();
-
-            };
+                setp = config.set,
+                isStaticPages = config.isStaticPages,
+                
+                allowCrossDomain = function(req, res, next) {
+                    res.header('Access-Control-Allow-Origin', "*");
+                    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+                    next();    
+                },
+                
+                basicConfig = function() {
+                    _server.set('port', process.env.PORT || port);
+                    _server.use(_express.logger({stream: winstonStream, format: 'dev'}));
+                    _server.use(_express.json());
+                    _server.use(_express.urlencoded());
+                    _server.use(allowCrossDomain);
+                    _server.use(_server.router);
+                };
 
             if (!path || (path && !_fs.existsSync(path))) {
                 _utils.log("warning", "[catjs server] not valid location: " + path);
@@ -68,16 +78,22 @@ var webserver  = function() {
                 }
             };
 
-            _server.configure(function () {
-                _server.set('port', process.env.PORT || port);
-                _server.use(_express.logger({stream: winstonStream, format: 'dev'}));
-                _server.use(_express.json());
-                _server.use(_express.urlencoded());
-                _server.use(allowCrossDomain);
-                _server.use(_server.router);
-                _server.use(_express.static(path));                                                   
-            });
+            console.log(isStaticPages);
+            if (isStaticPages) {
+                _server.configure(function () {
+                    basicConfig.call(me);
+                    _server.use(_express.static(path));                                                   
+                });
+            } else {
+                _server.configure(function () {
+                    basicConfig.call(me);
+                    _server.get('/', function(req, res){
+                        res.send('<h1>CatJS Monitoring Server</h1> <div>For enabling the static pages, go to catproject.json and add a property: server: { static-pages: true } </div>');
+                    });
 
+                });
+
+            }   
            
             _server.get('/assert', _assert.get);
             _server.get('/runner', _runner.get);

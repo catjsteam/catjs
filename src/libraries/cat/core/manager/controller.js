@@ -46,7 +46,7 @@ _cat.core.manager.controller = function () {
                     executeCode,
                     delay = catConfig.getTestDelay(),
                     scrap = ("scrap" in dmcontext  ? dmcontext.scrap : undefined),
-                    standalone = _cat.utils.scrap.isStandalone(scrap),
+                    //standalone = _cat.utils.scrap.isStandalone(scrap),
                     testobj, currentTestIdx,
                     ideffer = Q;
 
@@ -142,17 +142,17 @@ _cat.core.manager.controller = function () {
 
                 runStatus.subscrapReady = runStatus.subscrapReady + dmcommands.length;
 
-                if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
+                //if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
                     
                     return executeCode(dmcommands, dmcontext);
                    
-                } else {
-                    
-                    // Todo need to be tested
-                    deffer().fcall(function(){return executeCode(dmcommands, dmcontext);});
-                }
+//                } else {
+//                    
+//                    // Todo need to be tested
+//                    deffer().fcall(function(){return executeCode(dmcommands, dmcontext);});
+//                }
 
-                return deffer();
+                //return deffer();
             };
             
             (function init() {

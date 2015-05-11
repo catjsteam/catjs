@@ -8,113 +8,105 @@ var _catglobal = catrequire("cat.global"),
 
 module.exports = function () {
 
+    // supported types = ["cat", "example", "server"]
+    
     var workpath = _catglobal.get("home").working.path,
         currentpath = _path.resolve(_path.join(cathome, "src/module/project/init/projects"));
 
-    return {
+    
+    function isCatProjectFolder() {
+        var targetpath = _path.join(workpath, "cat-project");
+        if (!_fs.existsSync(targetpath)) {
+            return targetpath;
+        }
+        
+        return undefined;
+    }
+    
+    function _createCatProject(projectSkeletonarg, targetpath, data) {
+        
+        var catprojeccontent,
+            content;
+        
+        // create cat-project
+        _fs.mkdirpSync(targetpath, {mode: 0777});
+        _sysutils.chmodSyncOffset(targetpath, 0777, 1);
 
-        create: function(config) {
+        // prepare catproject.json content
+        catprojeccontent = _path.resolve(_path.join(projectSkeletonarg, "catproject.json"));
+        content = _fs.readFileSync(catprojeccontent, "utf8");
+        _jsutils.Template.setMustache(true);
+        content = _jsutils.Template.template({
+            content: content,
+            data: (data || {})
+        });
 
-           var name = (("name" in config && config.projectname)? config.projectname : undefined),
-                msg = "[CAT init project] No valid project name was found, generating a base project",
-                projectPath,
-                args;
-            
-            function _validate() {
-                if (!name) {
-                    console.log(msg);
-                    name = "cat";
-                    return false;
-                }
-                return true;
-            }
+        // creating cat project file
+        _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content, {mode: 0777});
 
-            function _generate(name, path, data) {
+    }
+    
+    function _createProject(config) {
 
-                var content,
-                    targetpath,
-                    catprojeccontent,
-                    appfolder;
+        var name = (("name" in config && config.projectname) ? config.projectname : undefined),
+            projectSkeleton,
+            args;
 
-                if (name && path) {
+        function _generate(projectSkeletonarg, data) {
 
-                    data = (data || {});
+            var targetpath,
+                appfolder;
 
-                    catprojeccontent = _path.resolve(_path.join(path, "catproject.json"));
-                    content = _fs.readFileSync(catprojeccontent, "utf8");
+            if (projectSkeletonarg) {
 
-                    _jsutils.Template.setMustache(true);
-                    content = _jsutils.Template.template({
-                        content: content,
-                        data: data
-                    });
+                targetpath = isCatProjectFolder();
+                if (targetpath) {
 
-                    targetpath = _path.join(workpath, "cat-project");
-                    if (!_fs.existsSync(targetpath)) {
+                    // create cat-project
+                    _createCatProject(projectSkeletonarg, targetpath, data);
+    
+                    // copy additional resources to the initial target project folder
+                    _fs.copyRecursive(_path.resolve(_path.join(currentpath, "base")), targetpath, function (err) {
+                        if (err) {
+                            _utils.log("[catjs init project] cat project creation aborted - cat-project already exists ");    
+                        }
 
-                        _fs.mkdirpSync(targetpath, {mode: 0777});
-                        _sysutils.chmodSyncOffset(targetpath, 0777, 1);
-                    }
-
-                        // creating cat project file
-                        _fs.writeFileSync(_path.join(targetpath, "catproject.json"), content, {mode: 0777});
-
-                        // copy additional resources to the initial target project folder
-                        _fs.copyRecursive(_path.resolve(_path.join(currentpath, "base")), targetpath, function (err) {
-                            if (err) {
-                                _utils.log("[CAT init project] probably the files already exists, skipping... ");
-
-                            }
-
-                            appfolder = _fs.existsSync(_path.join(path, "app"));
-                            if (appfolder) {
-                                // copy additional resources to the initial target project folder
-                                _fs.copyRecursive(_path.resolve(_path.join(path, "app")), _path.resolve(_path.join(workpath, "app")), function (err) {
-                                    if (err) {
-                                        _utils.log("[CAT init project] cat-project already exists, skipping... ");
-
-                                    }
-                                    if (config && config.callback) {
-                                        config.callback.call();
-                                    }
-                                });
-                            } else {
+                        appfolder = _fs.existsSync(_path.join(projectSkeletonarg, "app"));
+                        if (appfolder) {
+                            // copy additional resources to the initial target project folder
+                            _fs.copyRecursive(_path.resolve(_path.join(projectSkeletonarg, "app")), _path.resolve(_path.join(workpath, "app")), function (err) {
+                                if (err) {
+                                    _utils.log("[catjs init project] cat project creation aborted - cat-project already exists ");
+    
+                                }
                                 if (config && config.callback) {
                                     config.callback.call();
                                 }
-
+                            });
+                        } else {
+                            if (config && config.callback) {
+                                config.callback.call();
                             }
-
-                        });
-//                    } else {
-//
-//                        console.warn("[CAT init project] Project already exists (consider, delete the project first)");
-//
-//                        if (config && config.callback) {
-//                            config.callback.call();
-//                        }
-//
-//                        return undefined;
-//                    }
+    
+                        }    
+                    });
+                } else {
+                    _utils.log("[catjs init project] cat project creation aborted - cat-project already exists, run init from other location or modify your project ");
                 }
             }
+        }
 
-            _validate();
-
-            projectPath = _path.resolve(_path.join(currentpath, name));
-            if (!_fs.existsSync(projectPath)) {
-                if (!_validate()) {
-                    projectPath = _path.resolve(_path.join(currentpath, name));
-                }
-            }
-           
+        projectSkeleton = _path.resolve(_path.join(currentpath, (name || "undefined")));
+        if (_fs.existsSync(projectSkeleton)) {
+            
+            projectSkeleton = _path.resolve(_path.join(currentpath, name));                
             args = {
                 "name": config.name,
 
                 "source": config.source,
                 "target": config.target,
                 "cattarget": "./",
-                "analytics" : config.analytics,
+                "analytics": config.analytics,
                 "server": {
                     "host": ( config.serverhost),
                     "port": (config.serverport),
@@ -124,8 +116,18 @@ module.exports = function () {
 
             };
 
-            _generate(name, projectPath, args);
+            _generate(projectSkeleton, args);
+            
+        } else {
+            _utils.log("[catjs init project] cat project creation aborted, no valid project type (e.g. cat | example | server) was found");
+        }
+    } 
+    
+    return {
 
+        create: function (config) {
+           
+            _createProject(config);
 
         }
 

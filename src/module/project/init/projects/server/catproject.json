@@ -1,0 +1,19 @@
+{
+    "name": "monitoring-server",   
+        
+    "server": {
+        "host": "{{server.host}}",
+        "port": "{{server.port}}",
+        "protocol": "{{server.protocol}}"     
+    },
+    
+    "plugins": [
+
+    ],
+
+    "tasks": [
+
+    ]
+
+
+}

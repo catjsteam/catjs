@@ -508,6 +508,76 @@ _cat.core.ui = function () {
 
                 }
 
+            },
+
+            /**
+             * print to the ui console
+             * 
+             * @param config
+             *      level {String} the log level [log | error]
+             *      title {String} The console log title
+             *      desc {String} The console log description
+             *      tips {Object} The console log tips - update the console test information
+             *      
+             *  tips details:  
+             *      passed: Number of passed tests 
+             *      failed: Number of failed tests 
+             *      total: Total tests counter
+             *      status: Test status ["succeeded" | "failed"]
+             */
+            console: function(config) {
+
+                var leveltmp, currentstatus, 
+                    level = {
+                    "log": {
+                        name: "log",
+                        style: "color:#0080FF, font-size: 10px"
+                    },
+                    "error": {
+                        name: "error",
+                        style: "color:#FF0000, font-size: 10px"
+                    }
+                };
+                
+                _cat.utils.Utils.prepareProps(
+                    {
+                        global: {
+                            obj: config
+                        },
+                        props: [
+                            {
+                                key: "level",
+                                default: "log"
+                            },
+                            {
+                                key: "title",
+                                default: ""
+                            },
+                            {
+                                key: "desc",
+                                default: ""
+                            },
+                            {
+                                key: "tips",
+                                default: {}
+                            }
+                        ]
+                    });
+
+                leveltmp = (level[config.level] ? level[config.level] : level["log"]);
+                currentstatus = _cat.core.manager.client.getCurrentState();
+                
+                if (config.title || config.desc) {
+                    
+                    _cat.core.ui.setContent({
+                        style: leveltmp.style,
+                        header: config.title,
+                        desc: config.desc,
+                        tips: config.tips,
+                        currentState: currentstatus
+                    });  
+                    
+                }                
             }
 
         };

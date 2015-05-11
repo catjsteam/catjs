@@ -7,6 +7,7 @@ function _catjs_settings() {
     _cat.core.alias("manager.defer", _cat.core.manager.statecontroller.defer);
     _cat.core.alias("plugin.get", _cat.core.plugin);
     _cat.core.alias("testdata", _cat.utils.TestsDB);
+    _cat.core.alias("ui.console", _cat.core.ui.console);
 
 }
 

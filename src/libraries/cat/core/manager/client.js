@@ -250,6 +250,7 @@ _cat.core.manager.client = function () {
         if (scrap) {
             runStatus.scrapReady = parseInt(scrap ? scrap.index : 0) + 1;
             args[1].def = config.def;
+            args[1].done = config.done;
             commitScrap(scrap, args);
         }
 
@@ -405,17 +406,14 @@ _cat.core.manager.client = function () {
             
             configs.forEach(function(config) {
 
-                testconfigs.push(function(def) {
+                testconfigs.push(function(def, done) {
                     if (config) {
                         
                         config.def = def;
+                        config.done = done;
                         _process(config);
                       
                         currentState.index++;
-    
-//                        if (intervalObj && intervalObj.interval) {
-//                            clearInterval(intervalObj.interval);
-//                        }     
                         
                         _processReadyScraps(false);
                     } 
@@ -457,7 +455,8 @@ _cat.core.manager.client = function () {
                 config,
                 scrapName,
                 currentStateIdx,
-                reportFormats;
+                reportFormats,
+                isStandalone = _cat.utils.scrap.isStandalone(scrap);
             
             if (!testQueue) {
                 testQueue = new _cat.core.TestQueue();
@@ -468,10 +467,7 @@ _cat.core.manager.client = function () {
             scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name);
 
             currentStateIdx = currentState.index;
-            if (catConfig.isTestEnd(currentStateIdx)) {
-
-                //currentState.testend = true;
-                
+            if (catConfig.isTestEnd(currentStateIdx) && !isStandalone) {
                 return undefined; 
             }
             

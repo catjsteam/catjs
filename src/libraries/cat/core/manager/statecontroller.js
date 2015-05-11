@@ -1,36 +1,38 @@
 _cat.core.manager.statecontroller = function () {
 
     // jshint supernew: true
-    
-    var _queue = 
-        /**
-         *  General queue class 
-         */
-        function () {
 
-            this._queue = [];
-            this._busy = false;
-    
-            this.add = function (obj) {
-                this._queue.push(obj);
-            };
-            this.next = function () {
-                return this._queue.shift();
-            };
-            this.empty = function () {
-                return (this._queue.length === 0 ? true : false);
-            };
-            this.clean = function () {
+    var _queue =
+            /**
+             *  General queue class
+             */
+                function () {
+
                 this._queue = [];
-            };
-            this.busy = function (status) {
-                if (status !== undefined) {
-                    this._busy = status;
-                }
-                return this._busy;
-            };
-    
-        },        
+                this._busy = false;
+
+                this.add = function (obj) {
+                    this._queue.push(obj);
+                };
+                this.next = function () {
+                    return this._queue.shift();
+                };
+                this.hasnext = function () {
+                    return (this._queue.length > 0 ? true : false);
+                };
+                this.empty = function () {
+                    return (this._queue.length === 0 ? true : false);
+                };
+                this.clean = function () {
+                    this._queue = [];
+                };
+                this.busy = function (status) {
+                    if (status !== undefined) {
+                        this._busy = status;
+                    }
+                    return this._busy;
+                };
+            },
         _q = new _queue(),
         _steps = 10,
         _defer,
@@ -72,12 +74,12 @@ _cat.core.manager.statecontroller = function () {
                         } else if (typeof match === "object" || typeof match === "string") {
 
                             testobj = _cat.utils.plugins.jqhelper.getElt(match);
-                            if (testobj) {                              
+                            if (testobj) {
                                 testobj = _cat.utils.plugins.jqhelper.dom(testobj);
                                 if (testobj) {
-                                    test = true;       
+                                    test = true;
                                 }
-                            }                            
+                            }
                         }
 
                         if (!test) {
@@ -161,59 +163,72 @@ _cat.core.manager.statecontroller = function () {
 
         next: function (config) {
 
-            var defer, methods, delay, 
+            var defer, methods, delay,
                 currentconfig, nextTest, catconfig,
                 clientManager = _cat.core.manager.client,
-                runStatus;
-            
+                runStatus, done;
+
             if (config) {
                 _scrapspool.add(config);
             }
-                        
+
             if (!_scrapspool.busy()) {
 
                 currentconfig = _scrapspool.next();
-                
-               
-                    catconfig = _cat.core.getConfig();
-                    nextTest = catconfig.getNextTest();
-                    if (nextTest) {
-                        clientManager.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));                        
-                    } else {
-                        runStatus = clientManager.getRunStatus();
-                        clientManager.endTest({}, runStatus);
+                catconfig = _cat.core.getConfig();
+                nextTest = catconfig.getNextTest();
+                if (nextTest) {
+                    // we have more tests to run
+                    clientManager.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));
+
+                    if (!catconfig.hasNextTest() ) {
+                        done = function () {
+                            // last scrap done callback
+                                                 
+                        };
                     }
+                    
+                } else {
+                    // this is the last test 
+                    runStatus = clientManager.getRunStatus();
+                    clientManager.endTest({}, runStatus);
+                }
                 if (!currentconfig) {
                     return undefined;
                 }
-                
+
                 defer = currentconfig.defer;
                 methods = currentconfig.methods;
-                delay = ("delay" in currentconfig ? currentconfig.delay : 0); 
-                
+                delay = ("delay" in currentconfig ? currentconfig.delay : 0);
+
                 _scrapspool.busy(true);
                 defer.delay(delay).then(function () {
-    
+
                     defer.fcall(function () {
                         var cell = methods.shift(),
                             def = Q.defer();
-    
+
                         _module.defer(def);
-                        
+
                         (function () {
-                            cell.call(this, def);
-                            return def;
+                            cell.call(this, def, done);
                             
+                            return def;
+
                         })(def).promise.then(function () {
                                 _scrapspool.busy(false);
-                                _module.next();
+                                _module.next();                               
                             });
+
+                        
                     });
-    
+
+                    
+
                 }).catch(function (err) {
-                    console.error(err);
-                });
-            } 
+                        console.error(err);
+                    });                              
+            }
         }
 
     };

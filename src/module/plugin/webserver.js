@@ -13,7 +13,7 @@ var _log = catrequire("cat.global").log(),
 module.exports = _basePlugin.ext(function () {
 
 
-        var _me = this,
+    var _me = this,
 
         _module = {
 
@@ -24,38 +24,54 @@ module.exports = _basePlugin.ext(function () {
              * @returns {*}
              * @private
              */
-            _webserver: function(config) {
+            _webserver: function (config) {
 
                 if (!config) {
                     return undefined;
                 }
 
-                var  extensionParams = _data.data,
+                var extensionParams = _data.data,
                     webserver = config.webserver,
                     thiz = config.thiz,
                     basePath = _project.getTargetFolder(),
                     path = (extensionParams.path ? _path.join(_global.get("home").working.path, extensionParams.path) : basePath),
                     action = extensionParams.action,
-                    set = extensionParams.set;
+                    mode = extensionParams.mode,
+                    setp = extensionParams.set;
 
                 try {
                     if (webserver) {
+
+                        if (mode === "standalone") {
+
+                            // first call init if there's no project
+
+                            // launch the browse and go to app address
+
+                            // search for the local projects
+
+                        }
+
                         if (action === "start") {
                             webserver.start.call(thiz, {
-                                set: set,
+                                set: setp,
                                 path: path,
-                                port: (extensionParams.port || _project.getServerPort())
-                            }, function() {
+                                port: (extensionParams.port || _project.getServerPort()),
+                                isStaticPages: _project.isServerStaticPages()
+                            }, function () {
                                 _emitter.emit("job.done", {status: "done"});
                             });
+
                         } else if (action === "stop") {
-                            webserver.stop.call(thiz, function() {
+                            webserver.stop.call(thiz, function () {
                                 _emitter.emit("job.done", {status: "done"});
                             });
                         }
                     }
 
-                } catch (e) {
+                }
+                catch
+                    (e) {
                     _utils.error(_props.get("cat.error").format("[spawn]", e));
                 }
 
@@ -102,6 +118,7 @@ module.exports = _basePlugin.ext(function () {
                 _internalConfig = config.internalConfig;
                 _project = _internalConfig.externalConfig.project;
 
+
                 // initial data binding to 'this'
                 _me.dataInit(_data);
 
@@ -121,7 +138,7 @@ module.exports = _basePlugin.ext(function () {
              *
              * @returns {{dependencies: Array}}
              */
-            validate: function() {
+            validate: function () {
                 return { dependencies: ["webserver"]};
             }
         };

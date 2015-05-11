@@ -1004,7 +1004,8 @@ _cat.core = function () {
                             scrap: scrap,
                             arguments: passedArguments,
                             scrapinfo: ("scrapinfo" in config ? config.scrapinfo : undefined),
-                            def:  ("def" in config ? config.def : undefined)
+                            def:  ("def" in config ? config.def : undefined),
+                            done:  ("done" in config ? config.done : undefined)
 
                         }, pkgName);
                         catObj.apply(_context, passedArguments);
@@ -1123,9 +1124,14 @@ _cat.core.Config = function(args) {
                     }
                 };
 
-                me.isTests = function() {
+                me.size = function() {
                     var tests = this.getTests();
-                    if (tests && tests.length && tests.length > 0) {
+                    return  ((tests && tests.length && tests.length > 0) ? tests.length : 0);                    
+                };
+                
+                me.isTests = function() {
+                    var size = this.size();
+                    if (size) {
                         return true;
                     }
 
@@ -1165,6 +1171,19 @@ _cat.core.Config = function(args) {
                         return me.getTest(idx);
                     }
                     return undefined;
+                };
+
+                me.hasNextTest = function() {
+                    var size = me.size(),
+                        state = _cat.core.manager.client.getCurrentState(),
+                        idx;
+                 
+                    if (state) {
+                        idx = state.index;
+                        return (idx < size-1); 
+                    }
+                   
+                    return false;
                 };
                 
                 me.getTest = function(idx) {
@@ -1981,6 +2000,7 @@ _cat.core.manager.client = function () {
         if (scrap) {
             runStatus.scrapReady = parseInt(scrap ? scrap.index : 0) + 1;
             args[1].def = config.def;
+            args[1].done = config.done;
             commitScrap(scrap, args);
         }
 
@@ -2136,17 +2156,14 @@ _cat.core.manager.client = function () {
             
             configs.forEach(function(config) {
 
-                testconfigs.push(function(def) {
+                testconfigs.push(function(def, done) {
                     if (config) {
                         
                         config.def = def;
+                        config.done = done;
                         _process(config);
                       
                         currentState.index++;
-    
-//                        if (intervalObj && intervalObj.interval) {
-//                            clearInterval(intervalObj.interval);
-//                        }     
                         
                         _processReadyScraps(false);
                     } 
@@ -2188,7 +2205,8 @@ _cat.core.manager.client = function () {
                 config,
                 scrapName,
                 currentStateIdx,
-                reportFormats;
+                reportFormats,
+                isStandalone = _cat.utils.scrap.isStandalone(scrap);
             
             if (!testQueue) {
                 testQueue = new _cat.core.TestQueue();
@@ -2199,10 +2217,7 @@ _cat.core.manager.client = function () {
             scrapName = (_cat.utils.Utils.isArray(scrap.name) ?  scrap.name[0] : scrap.name);
 
             currentStateIdx = currentState.index;
-            if (catConfig.isTestEnd(currentStateIdx)) {
-
-                //currentState.testend = true;
-                
+            if (catConfig.isTestEnd(currentStateIdx) && !isStandalone) {
                 return undefined; 
             }
             
@@ -2447,7 +2462,7 @@ _cat.core.manager.controller = function () {
                     executeCode,
                     delay = catConfig.getTestDelay(),
                     scrap = ("scrap" in dmcontext  ? dmcontext.scrap : undefined),
-                    standalone = _cat.utils.scrap.isStandalone(scrap),
+                    //standalone = _cat.utils.scrap.isStandalone(scrap),
                     testobj, currentTestIdx,
                     ideffer = Q;
 
@@ -2543,17 +2558,17 @@ _cat.core.manager.controller = function () {
 
                 runStatus.subscrapReady = runStatus.subscrapReady + dmcommands.length;
 
-                if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
+                //if ( ((catConfig) && (catConfig.getRunMode() === _enum.TEST_MANAGER)) && !standalone) {
                     
                     return executeCode(dmcommands, dmcontext);
                    
-                } else {
-                    
-                    // Todo need to be tested
-                    deffer().fcall(function(){return executeCode(dmcommands, dmcontext);});
-                }
+//                } else {
+//                    
+//                    // Todo need to be tested
+//                    deffer().fcall(function(){return executeCode(dmcommands, dmcontext);});
+//                }
 
-                return deffer();
+                //return deffer();
             };
             
             (function init() {
@@ -2578,36 +2593,38 @@ _cat.core.manager.controller = function () {
 _cat.core.manager.statecontroller = function () {
 
     // jshint supernew: true
-    
-    var _queue = 
-        /**
-         *  General queue class 
-         */
-        function () {
 
-            this._queue = [];
-            this._busy = false;
-    
-            this.add = function (obj) {
-                this._queue.push(obj);
-            };
-            this.next = function () {
-                return this._queue.shift();
-            };
-            this.empty = function () {
-                return (this._queue.length === 0 ? true : false);
-            };
-            this.clean = function () {
+    var _queue =
+            /**
+             *  General queue class
+             */
+                function () {
+
                 this._queue = [];
-            };
-            this.busy = function (status) {
-                if (status !== undefined) {
-                    this._busy = status;
-                }
-                return this._busy;
-            };
-    
-        },        
+                this._busy = false;
+
+                this.add = function (obj) {
+                    this._queue.push(obj);
+                };
+                this.next = function () {
+                    return this._queue.shift();
+                };
+                this.hasnext = function () {
+                    return (this._queue.length > 0 ? true : false);
+                };
+                this.empty = function () {
+                    return (this._queue.length === 0 ? true : false);
+                };
+                this.clean = function () {
+                    this._queue = [];
+                };
+                this.busy = function (status) {
+                    if (status !== undefined) {
+                        this._busy = status;
+                    }
+                    return this._busy;
+                };
+            },
         _q = new _queue(),
         _steps = 10,
         _defer,
@@ -2649,12 +2666,12 @@ _cat.core.manager.statecontroller = function () {
                         } else if (typeof match === "object" || typeof match === "string") {
 
                             testobj = _cat.utils.plugins.jqhelper.getElt(match);
-                            if (testobj) {                              
+                            if (testobj) {
                                 testobj = _cat.utils.plugins.jqhelper.dom(testobj);
                                 if (testobj) {
-                                    test = true;       
+                                    test = true;
                                 }
-                            }                            
+                            }
                         }
 
                         if (!test) {
@@ -2738,59 +2755,72 @@ _cat.core.manager.statecontroller = function () {
 
         next: function (config) {
 
-            var defer, methods, delay, 
+            var defer, methods, delay,
                 currentconfig, nextTest, catconfig,
                 clientManager = _cat.core.manager.client,
-                runStatus;
-            
+                runStatus, done;
+
             if (config) {
                 _scrapspool.add(config);
             }
-                        
+
             if (!_scrapspool.busy()) {
 
                 currentconfig = _scrapspool.next();
-                
-               
-                    catconfig = _cat.core.getConfig();
-                    nextTest = catconfig.getNextTest();
-                    if (nextTest) {
-                        clientManager.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));                        
-                    } else {
-                        runStatus = clientManager.getRunStatus();
-                        clientManager.endTest({}, runStatus);
+                catconfig = _cat.core.getConfig();
+                nextTest = catconfig.getNextTest();
+                if (nextTest) {
+                    // we have more tests to run
+                    clientManager.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));
+
+                    if (!catconfig.hasNextTest() ) {
+                        done = function () {
+                            // last scrap done callback
+                                                 
+                        };
                     }
+                    
+                } else {
+                    // this is the last test 
+                    runStatus = clientManager.getRunStatus();
+                    clientManager.endTest({}, runStatus);
+                }
                 if (!currentconfig) {
                     return undefined;
                 }
-                
+
                 defer = currentconfig.defer;
                 methods = currentconfig.methods;
-                delay = ("delay" in currentconfig ? currentconfig.delay : 0); 
-                
+                delay = ("delay" in currentconfig ? currentconfig.delay : 0);
+
                 _scrapspool.busy(true);
                 defer.delay(delay).then(function () {
-    
+
                     defer.fcall(function () {
                         var cell = methods.shift(),
                             def = Q.defer();
-    
+
                         _module.defer(def);
-                        
+
                         (function () {
-                            cell.call(this, def);
-                            return def;
+                            cell.call(this, def, done);
                             
+                            return def;
+
                         })(def).promise.then(function () {
                                 _scrapspool.busy(false);
-                                _module.next();
+                                _module.next();                               
                             });
+
+                        
                     });
-    
+
+                    
+
                 }).catch(function (err) {
-                    console.error(err);
-                });
-            } 
+                        console.error(err);
+                    });                              
+            }
         }
 
     };
@@ -3238,13 +3268,12 @@ _cat.core.TestAction = function () {
                                 _cat.core.TestManager.testEnd();
                             }
                         }
-                    });
-                    
-                    
+                    });                                       
                 }
             }
 
 
+            _cat.core.manager.client.clearLastInterval();
         },
 
         KILL: function () {
@@ -4103,6 +4132,76 @@ _cat.core.ui = function () {
 
                 }
 
+            },
+
+            /**
+             * print to the ui console
+             * 
+             * @param config
+             *      level {String} the log level [log | error]
+             *      title {String} The console log title
+             *      desc {String} The console log description
+             *      tips {Object} The console log tips - update the console test information
+             *      
+             *  tips details:  
+             *      passed: Number of passed tests 
+             *      failed: Number of failed tests 
+             *      total: Total tests counter
+             *      status: Test status ["succeeded" | "failed"]
+             */
+            console: function(config) {
+
+                var leveltmp, currentstatus, 
+                    level = {
+                    "log": {
+                        name: "log",
+                        style: "color:#0080FF, font-size: 10px"
+                    },
+                    "error": {
+                        name: "error",
+                        style: "color:#FF0000, font-size: 10px"
+                    }
+                };
+                
+                _cat.utils.Utils.prepareProps(
+                    {
+                        global: {
+                            obj: config
+                        },
+                        props: [
+                            {
+                                key: "level",
+                                default: "log"
+                            },
+                            {
+                                key: "title",
+                                default: ""
+                            },
+                            {
+                                key: "desc",
+                                default: ""
+                            },
+                            {
+                                key: "tips",
+                                default: {}
+                            }
+                        ]
+                    });
+
+                leveltmp = (level[config.level] ? level[config.level] : level["log"]);
+                currentstatus = _cat.core.manager.client.getCurrentState();
+                
+                if (config.title || config.desc) {
+                    
+                    _cat.core.ui.setContent({
+                        style: leveltmp.style,
+                        header: config.title,
+                        desc: config.desc,
+                        tips: config.tips,
+                        currentState: currentstatus
+                    });  
+                    
+                }                
             }
 
         };
@@ -6608,6 +6707,7 @@ function _catjs_settings() {
     _cat.core.alias("manager.defer", _cat.core.manager.statecontroller.defer);
     _cat.core.alias("plugin.get", _cat.core.plugin);
     _cat.core.alias("testdata", _cat.utils.TestsDB);
+    _cat.core.alias("ui.console", _cat.core.ui.console);
 
 }
 

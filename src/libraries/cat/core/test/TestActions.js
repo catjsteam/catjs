@@ -118,13 +118,12 @@ _cat.core.TestAction = function () {
                                 _cat.core.TestManager.testEnd();
                             }
                         }
-                    });
-                    
-                    
+                    });                                       
                 }
             }
 
 
+            _cat.core.manager.client.clearLastInterval();
         },
 
         KILL: function () {

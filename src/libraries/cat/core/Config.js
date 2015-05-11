@@ -42,9 +42,14 @@ _cat.core.Config = function(args) {
                     }
                 };
 
-                me.isTests = function() {
+                me.size = function() {
                     var tests = this.getTests();
-                    if (tests && tests.length && tests.length > 0) {
+                    return  ((tests && tests.length && tests.length > 0) ? tests.length : 0);                    
+                };
+                
+                me.isTests = function() {
+                    var size = this.size();
+                    if (size) {
                         return true;
                     }
 
@@ -84,6 +89,19 @@ _cat.core.Config = function(args) {
                         return me.getTest(idx);
                     }
                     return undefined;
+                };
+
+                me.hasNextTest = function() {
+                    var size = me.size(),
+                        state = _cat.core.manager.client.getCurrentState(),
+                        idx;
+                 
+                    if (state) {
+                        idx = state.index;
+                        return (idx < size-1); 
+                    }
+                   
+                    return false;
                 };
                 
                 me.getTest = function(idx) {
