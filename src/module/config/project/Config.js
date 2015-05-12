@@ -432,7 +432,7 @@ Config.prototype.isServerStaticPages = function () {
     return staticPages;
 };
 
-Config.prototype.getServerRunner = function () {
+Config.prototype.getRunner = function () {
     var runner = this.getInfo("runner");
     return (runner ? runner : undefined);
 };
