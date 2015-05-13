@@ -117,7 +117,7 @@ module.exports = function () {
                     });
 
                 } else {
-                    _createProject(schema.properties, appPath, initProjectType);
+                    _createProject(schema.properties, appPath, initProjectType, callback);
                 }
             }
             
