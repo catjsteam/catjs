@@ -4,7 +4,7 @@ var _jmr = require("test-model-reporter"),
     _catinfo = catrequire("cat.info"),
     _log = _global.log(),
     _fs = require("fs"),
-    _projectmanager = require('./../../../projectmanager/action');
+    _scraprest = require("./../scrap/scrap.js");
 
 /**
  * Report Entity
@@ -23,7 +23,8 @@ function Reporter(config) {
 
 Reporter.prototype.init = function (config) {
 
-    var status = config.status;
+    var status = config.status,
+        me = this;
 
     _jmr.setReporter("junit");
     
@@ -40,8 +41,16 @@ Reporter.prototype.init = function (config) {
     this._reports = ("reports" in config && config.reports ? config.reports : undefined);
 
     if (this._reports) {
-        this._isjunit = (this._reports["junit"] === 1);
-        this._isconsole = (this._reports["console"] === 1);
+        this._reports = this._reports.split(",");
+        this._reports.forEach(function(reportType){
+            if (reportType === "junit") {
+                me._isjunit = true;
+                
+            } else if (reportType === "console") {
+                me._isconsole = true;
+                
+            }
+        });
     }
     
     if (status && status !== "Start" && status != "End") {
@@ -55,6 +64,7 @@ Reporter.prototype.init = function (config) {
             id: this._id
         }
     });
+    
 };
 // TODO create test config entity
 Reporter.prototype.isManagerRunMode = function() {
@@ -228,14 +238,11 @@ Reporter.prototype.addTestCase = function (config) {
         // delete the color on test end
         me._colors.deleteColor(id);
 
-        // TODO Test need to be defined, it cannot be destroyed because of the current behavior that each test starts on a new page.
-        //_projectmanager.destroy(id);
-        //_projectmanager.resetDevice(id);
-        
         // test callback
         if (me._callback) {
             me._callback.call(me);
         }
+        
     }
     
     // set console color
@@ -282,6 +289,7 @@ Reporter.prototype.addTestCase = function (config) {
                 _testEnd(id, result);
     
                 this._status = 0;
+                _scraprest.clean(id);
             }
 
         } else if (status === 'Start') {

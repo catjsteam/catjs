@@ -85,8 +85,14 @@ _cat.core.TestManager = function() {
 
 
     return {
-        
-        init: function() {
+
+        /**
+         * Test Manager Init
+         * 
+         * @param config {Object}
+         *          currentIndex {Number} current test index
+         */
+        init: function(configparam) {
             
             // register signals
             _cat.utils.Signal.register([
@@ -98,10 +104,10 @@ _cat.core.TestManager = function() {
 
             // START test signal
             var config = _cat.core.getConfig(),
-                isIframe = _cat.utils.iframe.isIframe();
+                isIframe = _cat.utils.iframe.isIframe(),
+                currentIndex = (configparam.currentIndex || 0);
             
-            // TODO we need to set test start signal via an API
-            if (config.getTests() && !isIframe) {
+            if (config.getTests() && !isIframe && !currentIndex) {
                 _cat.core.ui.on();
                 _cat.core.TestManager.send({signal:"TESTSTART"});
                 

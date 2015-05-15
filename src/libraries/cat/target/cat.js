@@ -372,26 +372,14 @@ _cat.core = function () {
             
             
             function _configCallback(config, rootcatcore) {
-                
-                if (config) {
 
-                    if (rootcatcore) {
+                function _postinit(responseData) {
 
-                        _cat.utils.TestsDB.init( rootcatcore.utils.TestsDB.getData() );
-                        
-                    } else {
-                        _cat.utils.TestsDB.init();
+                    if (responseData) {
+                        // update the client manager with the incoming server data such as: current index
+                        _cat.core.manager.client.setCurrentState(responseData);
                     }
-
-                    _enum = _cat.core.TestManager.enum;
-
-                    if (rootcatcore) {
-                        _guid = rootcatcore.utils.Storage.getGUID();
-                        
-                    } else {
-                        _guid = _cat.utils.Storage.getGUID();
-                    }
-
+                    
                     // display the ui, if you didn't already
                     if (_config.isUI()) {
                         _cat.core.ui.enable();
@@ -405,7 +393,7 @@ _cat.core = function () {
                     }
 
                     // Test Manager Init
-                    _cat.core.TestManager.init();
+                    _cat.core.TestManager.init(responseData);
 
                     // set scrap data info
                     _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());
@@ -442,6 +430,61 @@ _cat.core = function () {
                     _cat.core.manager.client.setFailureInterval(_config);
                 }
                 
+                if (config) {
+
+                    if (rootcatcore) {
+
+                        _cat.utils.TestsDB.init( rootcatcore.utils.TestsDB.getData() );
+                        
+                    } else {
+                        _cat.utils.TestsDB.init();
+                    }
+
+                    _enum = _cat.core.TestManager.enum;
+                    
+                    if (rootcatcore) {
+                        _guid = rootcatcore.utils.Storage.getGUID();
+                        _postinit();
+                        
+                    } else {
+                        _guid = _cat.utils.Storage.getGUID();
+
+                        config.id = _guid;
+                        _cat.utils.AJAX.sendRequestAsync({
+                            url : _cat.core.getBaseUrl("catjsconfig"),
+                            method: "POST",
+                            header: [{name: "Content-Type", value: "application/json;charset=UTF-8"}],
+                            data: config,
+                            callback : {
+                                call : function(xmlhttp) {
+                                    var configText = xmlhttp.response,
+                                        currentIndex = 0,
+                                        responseObject;
+                                    
+                                    if (configText) {
+                                        
+                                        try {
+                                            // returned object {status: [ready | error], error: {msg: ''}, currentIndex:[0 | Number]}
+                                            responseObject = JSON.parse(configText);
+                                            if (responseObject) {
+                                                currentIndex = responseObject.currentIndex;
+                                            }
+                                            
+                                        } catch(e) {
+                                            // could not parse the request 
+                                        }
+                                        
+                                        _postinit({currentIndex: currentIndex});
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                  
+                }
+                
             }
             
             // set catjs path
@@ -468,6 +511,7 @@ _cat.core = function () {
                     _rootcatcore = _cat.utils.iframe.catroot(win);
                     _config = _rootcatcore.core.getConfig();                
                     _configCallback(config, _rootcatcore);
+                    
                 } catch(e) {
                     _log.error("[catjs core] failed to resolve the parent window error:",e);
                 }
@@ -1436,7 +1480,8 @@ _cat.core.Config = function(args) {
 
     try {
 
-        _cat.utils.AJAX.sendRequestAsync({url : _cat.core.getBaseUrl(catjson), 
+        _cat.utils.AJAX.sendRequestAsync({
+            url : _cat.core.getBaseUrl(catjson), 
             callback : {
                 call : function(xmlhttp) {
                     var configText = xmlhttp.response,
@@ -1750,7 +1795,8 @@ _cat.utils.chai = function () {
 }();
 _cat.core.manager.client = function () {
 
-    var tests,
+    var _module,
+        tests,
         commitScrap,
         getScrapTestInfo,
         totalDelay,
@@ -2152,7 +2198,16 @@ _cat.core.manager.client = function () {
         
         if (testitem.first()) {
             var configs = testitem.all(),
-                testconfigs = [];
+                configsize = configs.length,
+            testconfigs = [], futureIndex = 0;
+
+            // update the server with the client's test index
+            if (configsize > 1) {
+                futureIndex = (configsize + currentState.index);
+                _cat.utils.AJAX.sendRequestAsync({
+                    url: _cat.utils.Utils.getCatjsServerURL("/scraps?currentIndex=" + (futureIndex) + "&" + "testId=" + _cat.core.guid())
+                });
+            }
             
             configs.forEach(function(config) {
 
@@ -2174,7 +2229,11 @@ _cat.core.manager.client = function () {
             _cat.core.manager.controller.state().next({
                 defer: Q,
                 methods: testconfigs,
-                delay: ((test && "delay" in test) ? test.delay : 0) 
+                delay: ((test && "delay" in test) ? test.delay : 0)
+            }, function() {
+                
+                // test execution callback
+               
             });
             
             testitem.deleteAll();
@@ -2196,7 +2255,7 @@ _cat.core.manager.client = function () {
         }
     }
 
-    return {
+    _module =  {
 
 
 
@@ -2289,7 +2348,9 @@ _cat.core.manager.client = function () {
                         }
 
                         if (!response.scrapInfo) {
-                            errmsg = ["[catjs client manager] Something went wrong processing the scrap request, check your cat.json test project. current scrap index:", currentState.index, "; url:", urlAddress].join("");
+                            //errmsg = ["[catjs client manager] Something went wrong processing the scrap request, check your cat.json test project. current scrap index:", currentState.index, "; url:", urlAddress].join("");
+
+                            errmsg = ["[catjs client manager] Could not find matching test for the current index: ", currentState.index, " tests in this view:[", JSON.stringify(response.readyScraps) ,"]"];
                             _log.error(errmsg);
 
                             if (catConfig.isReport()) {
@@ -2305,7 +2366,7 @@ _cat.core.manager.client = function () {
                             
                             if (!initCurrentState && !_cat.utils.iframe.isIframe()) {
                                 initCurrentState = true;
-                                currentState.index = (response.readyScraps && response.readyScraps[0] ? response.readyScraps[0].index : 0);
+                                currentState.index = (response.readyScraps && response.readyScraps[currentState.index] ? response.readyScraps[currentState.index].index : 0);
                             }
 
 
@@ -2384,6 +2445,12 @@ _cat.core.manager.client = function () {
             return clientmanagerId;
         },
         
+        setCurrentState: function(data) {
+            if (data && "currentIndex" in data) {
+                currentState.index = data.currentIndex;
+            }
+        },
+        
         getCurrentState: function() {
             return currentState;
         },
@@ -2413,6 +2480,8 @@ _cat.core.manager.client = function () {
         endTest: endTest
     };
     
+    
+    return _module;
 }();
 _cat.core.manager.controller = function () {
 
@@ -2753,7 +2822,7 @@ _cat.core.manager.statecontroller = function () {
             };
         },
 
-        next: function (config) {
+        next: function (config, callback) {
 
             var defer, methods, delay,
                 currentconfig, nextTest, catconfig,
@@ -2772,11 +2841,11 @@ _cat.core.manager.statecontroller = function () {
                 if (nextTest) {
                     // we have more tests to run
                     clientManager.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));
-
+                                                      
                     if (!catconfig.hasNextTest() ) {
                         done = function () {
                             // last scrap done callback
-                                                 
+                                           
                         };
                     }
                     
@@ -2784,6 +2853,10 @@ _cat.core.manager.statecontroller = function () {
                     // this is the last test 
                     runStatus = clientManager.getRunStatus();
                     clientManager.endTest({}, runStatus);
+
+                    if (callback) {
+                        callback.call();
+                    }
                 }
                 if (!currentconfig) {
                     return undefined;
@@ -2809,7 +2882,9 @@ _cat.core.manager.statecontroller = function () {
 
                         })(def).promise.then(function () {
                                 _scrapspool.busy(false);
-                                _module.next();                               
+                                _module.next(undefined, callback);    
+                                
+                                
                             });
 
                         
@@ -3372,8 +3447,14 @@ _cat.core.TestManager = function() {
 
 
     return {
-        
-        init: function() {
+
+        /**
+         * Test Manager Init
+         * 
+         * @param config {Object}
+         *          currentIndex {Number} current test index
+         */
+        init: function(configparam) {
             
             // register signals
             _cat.utils.Signal.register([
@@ -3385,10 +3466,10 @@ _cat.core.TestManager = function() {
 
             // START test signal
             var config = _cat.core.getConfig(),
-                isIframe = _cat.utils.iframe.isIframe();
+                isIframe = _cat.utils.iframe.isIframe(),
+                currentIndex = (configparam.currentIndex || 0);
             
-            // TODO we need to set test start signal via an API
-            if (config.getTests() && !isIframe) {
+            if (config.getTests() && !isIframe && !currentIndex) {
                 _cat.core.ui.on();
                 _cat.core.TestManager.send({signal:"TESTSTART"});
                 
@@ -4269,30 +4350,36 @@ _cat.utils.AJAX = function () {
     return {
 
         /**
-         * TODO pass arguments on post
+         * @deprecated use sendRequestAsync
          *
          * @param config
          *      url - The url to send
          *      method - The request method
-         *      args - TODO
-         */
+         *     
+         */     
         sendRequestSync: function (config) {
 
+            _cat.core.log.error("[CAT AJAX] AJAX Sync call functionality is deprecated, use sendRequestAsync method instead \n");
+            return undefined;
+            
+            
+            /*
             var xmlhttp = new XMLHttpRequest();
-            // TODO
+           
             // config.url = encodeURI(config.url);
-            _cat.core.log.info("[catjs ajax] sending REST request: " + config.url);
+            _cat.core.log.info("[catjs AJAX] Sending REST request: " + config.url);
 
             try {
                 xmlhttp.open((config.method || "GET"), config.url, false);
                 xmlhttp.send();
                 
             } catch (err) {
-                _cat.core.log.warn("[CAT CHAI] error occurred: ", err, "\n");
+                _cat.core.log.warn("[CAT AJAX] error occurred: ", err, "\n");
 
             }
             
             return xmlhttp;
+            */
 
         },
 

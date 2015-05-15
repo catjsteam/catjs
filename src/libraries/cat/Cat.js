@@ -372,26 +372,14 @@ _cat.core = function () {
             
             
             function _configCallback(config, rootcatcore) {
-                
-                if (config) {
 
-                    if (rootcatcore) {
+                function _postinit(responseData) {
 
-                        _cat.utils.TestsDB.init( rootcatcore.utils.TestsDB.getData() );
-                        
-                    } else {
-                        _cat.utils.TestsDB.init();
+                    if (responseData) {
+                        // update the client manager with the incoming server data such as: current index
+                        _cat.core.manager.client.setCurrentState(responseData);
                     }
-
-                    _enum = _cat.core.TestManager.enum;
-
-                    if (rootcatcore) {
-                        _guid = rootcatcore.utils.Storage.getGUID();
-                        
-                    } else {
-                        _guid = _cat.utils.Storage.getGUID();
-                    }
-
+                    
                     // display the ui, if you didn't already
                     if (_config.isUI()) {
                         _cat.core.ui.enable();
@@ -405,7 +393,7 @@ _cat.core = function () {
                     }
 
                     // Test Manager Init
-                    _cat.core.TestManager.init();
+                    _cat.core.TestManager.init(responseData);
 
                     // set scrap data info
                     _cat.core.TestManager.setSummaryInfo(_cat.core.getSummaryInfo());
@@ -442,6 +430,61 @@ _cat.core = function () {
                     _cat.core.manager.client.setFailureInterval(_config);
                 }
                 
+                if (config) {
+
+                    if (rootcatcore) {
+
+                        _cat.utils.TestsDB.init( rootcatcore.utils.TestsDB.getData() );
+                        
+                    } else {
+                        _cat.utils.TestsDB.init();
+                    }
+
+                    _enum = _cat.core.TestManager.enum;
+                    
+                    if (rootcatcore) {
+                        _guid = rootcatcore.utils.Storage.getGUID();
+                        _postinit();
+                        
+                    } else {
+                        _guid = _cat.utils.Storage.getGUID();
+
+                        config.id = _guid;
+                        _cat.utils.AJAX.sendRequestAsync({
+                            url : _cat.core.getBaseUrl("catjsconfig"),
+                            method: "POST",
+                            header: [{name: "Content-Type", value: "application/json;charset=UTF-8"}],
+                            data: config,
+                            callback : {
+                                call : function(xmlhttp) {
+                                    var configText = xmlhttp.response,
+                                        currentIndex = 0,
+                                        responseObject;
+                                    
+                                    if (configText) {
+                                        
+                                        try {
+                                            // returned object {status: [ready | error], error: {msg: ''}, currentIndex:[0 | Number]}
+                                            responseObject = JSON.parse(configText);
+                                            if (responseObject) {
+                                                currentIndex = responseObject.currentIndex;
+                                            }
+                                            
+                                        } catch(e) {
+                                            // could not parse the request 
+                                        }
+                                        
+                                        _postinit({currentIndex: currentIndex});
+
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                  
+                }
+                
             }
             
             // set catjs path
@@ -468,6 +511,7 @@ _cat.core = function () {
                     _rootcatcore = _cat.utils.iframe.catroot(win);
                     _config = _rootcatcore.core.getConfig();                
                     _configCallback(config, _rootcatcore);
+                    
                 } catch(e) {
                     _log.error("[catjs core] failed to resolve the parent window error:",e);
                 }

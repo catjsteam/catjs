@@ -43,6 +43,10 @@ TestConfig.prototype.getTest = function(idx) {
     return this.testsmap[idx];
 };
 
+TestConfig.prototype.setToQueue = function(idx) {
+    this.resQueue[idx] = 1; 
+};
+
 TestConfig.prototype.remove = function(idx) {
     this.resQueue[idx] = undefined;
 };

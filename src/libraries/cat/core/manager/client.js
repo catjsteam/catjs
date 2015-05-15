@@ -1,6 +1,7 @@
 _cat.core.manager.client = function () {
 
-    var tests,
+    var _module,
+        tests,
         commitScrap,
         getScrapTestInfo,
         totalDelay,
@@ -402,7 +403,16 @@ _cat.core.manager.client = function () {
         
         if (testitem.first()) {
             var configs = testitem.all(),
-                testconfigs = [];
+                configsize = configs.length,
+            testconfigs = [], futureIndex = 0;
+
+            // update the server with the client's test index
+            if (configsize > 1) {
+                futureIndex = (configsize + currentState.index);
+                _cat.utils.AJAX.sendRequestAsync({
+                    url: _cat.utils.Utils.getCatjsServerURL("/scraps?currentIndex=" + (futureIndex) + "&" + "testId=" + _cat.core.guid())
+                });
+            }
             
             configs.forEach(function(config) {
 
@@ -424,7 +434,11 @@ _cat.core.manager.client = function () {
             _cat.core.manager.controller.state().next({
                 defer: Q,
                 methods: testconfigs,
-                delay: ((test && "delay" in test) ? test.delay : 0) 
+                delay: ((test && "delay" in test) ? test.delay : 0)
+            }, function() {
+                
+                // test execution callback
+               
             });
             
             testitem.deleteAll();
@@ -446,7 +460,7 @@ _cat.core.manager.client = function () {
         }
     }
 
-    return {
+    _module =  {
 
 
 
@@ -539,7 +553,9 @@ _cat.core.manager.client = function () {
                         }
 
                         if (!response.scrapInfo) {
-                            errmsg = ["[catjs client manager] Something went wrong processing the scrap request, check your cat.json test project. current scrap index:", currentState.index, "; url:", urlAddress].join("");
+                            //errmsg = ["[catjs client manager] Something went wrong processing the scrap request, check your cat.json test project. current scrap index:", currentState.index, "; url:", urlAddress].join("");
+
+                            errmsg = ["[catjs client manager] Could not find matching test for the current index: ", currentState.index, " tests in this view:[", JSON.stringify(response.readyScraps) ,"]"];
                             _log.error(errmsg);
 
                             if (catConfig.isReport()) {
@@ -555,7 +571,7 @@ _cat.core.manager.client = function () {
                             
                             if (!initCurrentState && !_cat.utils.iframe.isIframe()) {
                                 initCurrentState = true;
-                                currentState.index = (response.readyScraps && response.readyScraps[0] ? response.readyScraps[0].index : 0);
+                                currentState.index = (response.readyScraps && response.readyScraps[currentState.index] ? response.readyScraps[currentState.index].index : 0);
                             }
 
 
@@ -634,6 +650,12 @@ _cat.core.manager.client = function () {
             return clientmanagerId;
         },
         
+        setCurrentState: function(data) {
+            if (data && "currentIndex" in data) {
+                currentState.index = data.currentIndex;
+            }
+        },
+        
         getCurrentState: function() {
             return currentState;
         },
@@ -663,4 +685,6 @@ _cat.core.manager.client = function () {
         endTest: endTest
     };
     
+    
+    return _module;
 }();

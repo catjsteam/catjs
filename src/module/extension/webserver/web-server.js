@@ -7,11 +7,13 @@ var _url = require("url"),
     _server,
     _utils  = catrequire("cat.utils"),
      _winston = require('winston'),
-    _projectmanager = require('../projectmanager/action'),
-    _assert = require('./CatObjects/assert'),
-    _runner = require('./CatObjects/runner'),
-    _screenshot = require('./CatObjects/screenshot'),
-    _deviceinfo = require('./CatObjects/deviceinfo');
+    
+    _scrap = require('./rest/scrap/scrap.js'),    
+    _assert = require('./rest/assert'),
+    _runner = require('./rest/runner'),
+    _screenshot = require('./rest/screenshot'),
+    _deviceinfo = require('./rest/deviceinfo'),
+    _catjsconfig = require('./rest/config.js');
 
 /**
  * Web Server support mainly for serving static pages
@@ -52,6 +54,8 @@ var webserver  = function() {
                 
                 basicConfig = function() {
                     _server.set('port', process.env.PORT || port);
+                    _server.use(_express.cookieParser());
+                    _server.use(_express.session({secret:"catjs"}));
                     _server.use(_express.logger({stream: winstonStream, format: 'dev'}));
                     _server.use(_express.json());
                     _server.use(_express.urlencoded());
@@ -59,7 +63,7 @@ var webserver  = function() {
                     _server.use(_server.router);
                 };
 
-            if (!path || (path && !_fs.existsSync(path))) {
+            if (isStaticPages && (!path || (path && !_fs.existsSync(path)))) {
                 _utils.log("warning", "[catjs server] not valid location: " + path);
                 return undefined;
             }
@@ -78,7 +82,6 @@ var webserver  = function() {
                 }
             };
 
-            console.log(isStaticPages);
             if (isStaticPages) {
                 _server.configure(function () {
                     basicConfig.call(me);
@@ -93,8 +96,8 @@ var webserver  = function() {
 
                 });
 
-            }   
-           
+            }
+
             _server.get('/assert', _assert.get);
             _server.get('/runner', _runner.get);
                           
@@ -111,18 +114,36 @@ var webserver  = function() {
                 process.exit(1);
             });
 
+            _server.post('/catjsconfig', function(req, res) {
+                var obj = _catjsconfig.post(req, res),
+                    catjsconfig = obj.config,
+                    id = obj.id, currentIndex = 0;
+                
+                // get the current index by the test id
+                if (id) {
+                    currentIndex = _scrap.getCurrentIndex(id);
+                }
+                
+                // send the response to the client with the status and the current index
+                obj.currentIndex = currentIndex;
+                _catjsconfig.response(obj);
+                
+            });
+            
             _server.get('/scraps', function(req, res){
-                if (req.query && req.query.scrap
-                        && req.query.testId) {
-                    _projectmanager.checkScrap(req,res);
+                if (req.query && req.query.testId) {
+                    if (req.query.currentIndex) {
+                        _scrap.update(req, res);
+                    } else {
+                        _scrap.checkScrap(req, res);
+                    }
                 }
             });
 
             _server.post('/screenshot', _screenshot.post);
 
             _server.post('/deviceinfo', _deviceinfo.post);
-
-
+                        
             _server.listen(port, function() {
                 _utils.log("info", ("[catjs server] Server Started, listening to port:" + port));
                 if (callback) {

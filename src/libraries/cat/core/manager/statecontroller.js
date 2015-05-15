@@ -161,7 +161,7 @@ _cat.core.manager.statecontroller = function () {
             };
         },
 
-        next: function (config) {
+        next: function (config, callback) {
 
             var defer, methods, delay,
                 currentconfig, nextTest, catconfig,
@@ -180,11 +180,11 @@ _cat.core.manager.statecontroller = function () {
                 if (nextTest) {
                     // we have more tests to run
                     clientManager.setFailureInterval(catconfig, ( nextTest ? {id: nextTest.name, name: nextTest.name} : undefined ));
-
+                                                      
                     if (!catconfig.hasNextTest() ) {
                         done = function () {
                             // last scrap done callback
-                                                 
+                                           
                         };
                     }
                     
@@ -192,6 +192,10 @@ _cat.core.manager.statecontroller = function () {
                     // this is the last test 
                     runStatus = clientManager.getRunStatus();
                     clientManager.endTest({}, runStatus);
+
+                    if (callback) {
+                        callback.call();
+                    }
                 }
                 if (!currentconfig) {
                     return undefined;
@@ -217,7 +221,9 @@ _cat.core.manager.statecontroller = function () {
 
                         })(def).promise.then(function () {
                                 _scrapspool.busy(false);
-                                _module.next();                               
+                                _module.next(undefined, callback);    
+                                
+                                
                             });
 
                         

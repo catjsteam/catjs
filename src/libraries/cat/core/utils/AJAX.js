@@ -58,30 +58,36 @@ _cat.utils.AJAX = function () {
     return {
 
         /**
-         * TODO pass arguments on post
+         * @deprecated use sendRequestAsync
          *
          * @param config
          *      url - The url to send
          *      method - The request method
-         *      args - TODO
-         */
+         *     
+         */     
         sendRequestSync: function (config) {
 
+            _cat.core.log.error("[CAT AJAX] AJAX Sync call functionality is deprecated, use sendRequestAsync method instead \n");
+            return undefined;
+            
+            
+            /*
             var xmlhttp = new XMLHttpRequest();
-            // TODO
+           
             // config.url = encodeURI(config.url);
-            _cat.core.log.info("[catjs ajax] sending REST request: " + config.url);
+            _cat.core.log.info("[catjs AJAX] Sending REST request: " + config.url);
 
             try {
                 xmlhttp.open((config.method || "GET"), config.url, false);
                 xmlhttp.send();
                 
             } catch (err) {
-                _cat.core.log.warn("[CAT CHAI] error occurred: ", err, "\n");
+                _cat.core.log.warn("[CAT AJAX] error occurred: ", err, "\n");
 
             }
             
             return xmlhttp;
+            */
 
         },
 

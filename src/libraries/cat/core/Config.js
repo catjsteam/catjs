@@ -354,7 +354,8 @@ _cat.core.Config = function(args) {
 
     try {
 
-        _cat.utils.AJAX.sendRequestAsync({url : _cat.core.getBaseUrl(catjson), 
+        _cat.utils.AJAX.sendRequestAsync({
+            url : _cat.core.getBaseUrl(catjson), 
             callback : {
                 call : function(xmlhttp) {
                     var configText = xmlhttp.response,

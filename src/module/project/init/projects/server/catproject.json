@@ -1,10 +1,13 @@
 {
-    "name": "monitoring-server",   
+    "name": "{{server.name}}",   
         
     "server": {
         "host": "{{server.host}}",
         "port": "{{server.port}}",
-        "protocol": "{{server.protocol}}"     
+        "protocol": "{{server.protocol}}",
+        "services": {
+            "static-pages": false
+        }
     },
     
     "plugins": [

@@ -1,30 +1,11 @@
 var _global = catrequire("cat.global"),
     _log = _global.log(),
     _reportCreator = {},
-    _catcli = (catrequire ? catrequire("cat.cli") : null),
-    _fs = require("fs"),
-    _testconfig,   
+    _fs = require("fs"),   
     _useragent = require('express-useragent'),
     _Assert = require("./entity/Assert"),
     _ReportCreator = require("./entity/Reporter"),
     _config = require("./config");
-
-
-
-
-/**
- * Initial settings
- * - Loading colors module
- * - Loading cat configuration
- */
-function loadConfig() {
-  
-    // load cat.json test data...
-    _testconfig = _config.get();
-
-}
-
-loadConfig();
 
 
 exports.get = function (req, res) {
@@ -53,13 +34,16 @@ exports.get = function (req, res) {
         hasPhantom = params.hasPhantom,
         id = params.id,
         name = (params.name || "NA"),
-        file, checkIfAliveTimeout = (_testconfig["test-failure-timeout"] || 30) * 1000,
+        testconfig = _config.getConfig(id),
+        file, checkIfAliveTimeout = ((testconfig && testconfig["test-failure-timeout"]) || 30) * 1000,
         reportsArr = [],
         reportKey,
         testConfigMap,
         key, ua = _userAgent(req),
         checkIfAlive;
-
+    
+    if (!testconfig)
+    
     if (reports) {
         reportsArr = reports.split(",");
         reports = {};
@@ -130,7 +114,7 @@ exports.get = function (req, res) {
             filename: file,
             scenario: scenario,
             ua: ua,
-            testConfig: _testconfig,
+            testConfig: testconfig,
             reports: reports,
             callback: function() {                
                 // delete _reportCreator[id];
