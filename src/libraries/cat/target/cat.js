@@ -451,7 +451,8 @@ _cat.core = function () {
 
                         config.id = _guid;
                         _cat.utils.AJAX.sendRequestAsync({
-                            url : _cat.core.getBaseUrl("catjsconfig"),
+                            url :  _cat.utils.Request.generate({
+                                service: "catjsconfig"}),
                             method: "POST",
                             header: [{name: "Content-Type", value: "application/json;charset=UTF-8"}],
                             data: config,

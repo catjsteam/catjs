@@ -5,7 +5,8 @@ var _jmr = require("test-model-reporter"),
     _catinfo = catrequire("cat.info"),
     _log = _global.log(),
     _fs = require("fs"),
-    _scraprest = require("./../scrap/scrap.js");
+    _scraprest = require("./../scrap/scrap.js"),
+    _ = require("underscore");
 
 /**
  * Report Entity
@@ -42,7 +43,11 @@ Reporter.prototype.init = function (config) {
     this._reports = ("reports" in config && config.reports ? config.reports : undefined);
 
     if (this._reports) {
-        this._reports = this._reports.split(",");
+        if (_.isObject(this._reports)) {
+            this._reports = Object.keys(this._reports);
+        } else {
+            this._reports = this._reports.split(",");
+        }
         this._reports.forEach(function(reportType){
             if (reportType === "junit") {
                 me._isjunit = true;

@@ -8,24 +8,23 @@ var _url = require("url"),
     _utils  = catrequire("cat.utils"),
      _winston = require('winston'),
     
-    _scrap = require('./rest/scrap/scrap.js'),    
-    _assert = require('./rest/assert'),
-    _runner = require('./rest/runner'),
-    _screenshot = require('./rest/screenshot'),
-    _deviceinfo = require('./rest/deviceinfo'),
-    _catjsconfig = require('./rest/config.js');
+    _scrap,    
+    _assert,
+    _runner,
+    _screenshot,
+    _deviceinfo,
+    _catjsconfig,
+    _isinit = false,
 
-/**
- * Web Server support mainly for serving static pages
- * for testing client application with mock data
- *
- * Note: Limited for running one server
- *
- * @type {module.exports}
- */
-
-
-var webserver  = function() {
+    /**
+     * Web Server support mainly for serving static pages
+     * for testing client application with mock data
+     *
+     * Note: Limited for running one server
+     *
+     * @type {module.exports}
+     */
+    webserver  = function() {
 
     return {
 
@@ -45,6 +44,7 @@ var webserver  = function() {
                 port = (config.port || "80"),
                 setp = config.set,
                 isStaticPages = config.isStaticPages,
+                isMonitoringServer = config.isMonitoringServer,
                 
                 allowCrossDomain = function(req, res, next) {
                     res.header('Access-Control-Allow-Origin', "*");
@@ -91,58 +91,69 @@ var webserver  = function() {
                 _server.configure(function () {
                     basicConfig.call(me);
                     _server.get('/', function(req, res){
-                        res.send('<h1>CatJS Monitoring Server</h1> <div>For enabling the static pages, go to catproject.json and add a property: server: { static-pages: true } </div>');
+                        res.send('<h1>CatJS Server</h1> <div>Server configuration can be modified: see catproject.json  </div>');
                     });
 
                 });
-
-            }
-
-            _server.get('/assert', _assert.get);
-            _server.get('/runner', _runner.get);
-                          
+            }          
 
             _server.get('/*', function(req, res, next){
                 res.setHeader('Last-Modified', (new Date()).toUTCString());
                 next();
             });
+            
+            if (isMonitoringServer) {
 
+                if (!_isinit) {
+                    _scrap = require('./rest/scrap/scrap.js');
+                    _assert = require('./rest/assert');
+                    _runner = require('./rest/runner');
+                    _screenshot = require('./rest/screenshot');
+                    _deviceinfo = require('./rest/deviceinfo');
+                    _catjsconfig = require('./rest/config.js');
+                    _isinit = true;
+                }
+
+                _server.get('/assert', _assert.get);
+                _server.get('/runner', _runner.get);
+    
+                _server.post('/catjsconfig', function(req, res) {
+                    var obj = _catjsconfig.post(req, res),
+                        catjsconfig = obj.config,
+                        id = obj.id, currentIndex = 0;
+    
+                    // get the current index by the test id
+                    if (id) {
+                        currentIndex = _scrap.getCurrentIndex(id);
+                    }
+    
+                    // send the response to the client with the status and the current index
+                    obj.currentIndex = currentIndex;
+                    _catjsconfig.response(obj);
+    
+                });
+    
+                _server.get('/scraps', function(req, res){
+                    if (req.query && req.query.testId) {
+                        if (req.query.currentIndex) {
+                            _scrap.update(req, res);
+                        } else {
+                            _scrap.checkScrap(req, res);
+                        }
+                    }
+                });
+    
+                _server.post('/screenshot', _screenshot.post);
+    
+                _server.post('/deviceinfo', _deviceinfo.post);
+            }
+            
             // kill the server with get request
             _server.get('/exit', function(req, res) {
                 res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
                 res.send('{"exit": 1}');
                 process.exit(1);
-            });
-
-            _server.post('/catjsconfig', function(req, res) {
-                var obj = _catjsconfig.post(req, res),
-                    catjsconfig = obj.config,
-                    id = obj.id, currentIndex = 0;
-                
-                // get the current index by the test id
-                if (id) {
-                    currentIndex = _scrap.getCurrentIndex(id);
-                }
-                
-                // send the response to the client with the status and the current index
-                obj.currentIndex = currentIndex;
-                _catjsconfig.response(obj);
-                
-            });
-            
-            _server.get('/scraps', function(req, res){
-                if (req.query && req.query.testId) {
-                    if (req.query.currentIndex) {
-                        _scrap.update(req, res);
-                    } else {
-                        _scrap.checkScrap(req, res);
-                    }
-                }
-            });
-
-            _server.post('/screenshot', _screenshot.post);
-
-            _server.post('/deviceinfo', _deviceinfo.post);
+            });           
                         
             _server.listen(port, function() {
                 _utils.log("info", ("[catjs server] Server Started, listening to port:" + port));

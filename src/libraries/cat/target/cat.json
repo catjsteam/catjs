@@ -13,8 +13,9 @@
     },
 
     "name": "{{project.name}}",
-    "ip": null,
-    "port": null,
+    "ip": "{{project.getServerMonitoringHost()}}",
+    "port": "{{project.getServerMonitoringPort()}}",
+    "protocol": "{{project.getServerMonitoringProtocol()}}",
     "context": "{{project.info.appcontext}}",
     "tests":[
         {"name" : "general"}

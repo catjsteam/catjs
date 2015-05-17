@@ -7,7 +7,7 @@
 
     "analytics": "{{analytics}}",
     "apppath": "{{appath}}",
-    
+
     "server": {
         "host": "{{server.host}}",
         "port": "{{server.port}}",
@@ -16,7 +16,7 @@
             "static-pages": true
         }
     },
-
+    
     "runner": {
         "run": {
             "devices": [

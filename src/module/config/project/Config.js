@@ -10,6 +10,7 @@ var _typedas = require('typedas'),
     _fs = require("fs.extra"),
     _path = require("path"),
     _manifest = catrequire("cat.common.manifest"),
+    _ = require("underscore"),
 
     /**
      * Configuration Class
@@ -420,21 +421,30 @@ Config.prototype.setInfo = function (key, value) {
     return this.info[key] = value;
 };
 
-Config.prototype.getServerPort = function () {
-    var port = this.getInfo("server.port");
-    return (port || "8089");
-};
-
-Config.prototype.isServerStaticPages = function () {
-    var services = this.getInfo("server.services"),
-        staticPages = (services && ("static-pages" in services) ? services["static-pages"] : true);
-    
-    return staticPages;
-};
-
 Config.prototype.getRunner = function () {
     var runner = this.getInfo("runner");
     return (runner ? runner : undefined);
+};
+
+
+Config.prototype.getServerMonitoringPort = function () {
+    var port = this.getInfo("server.monitoring.port");
+    return (port || this.getServerPort());
+};
+
+Config.prototype.getServerMonitoringHost = function () {
+    var host = this.getInfo("server.monitoring.host");
+    return (host || this.getServerHost());
+};
+
+Config.prototype.getServerMonitoringProtocol = function () {
+    var protocol = this.getInfo("server.monitoring.protocol");
+    return (protocol || this.getServerProtocol());
+};
+
+Config.prototype.getServerPort = function () {
+    var port = this.getInfo("server.port");
+    return (port || "8089");
 };
 
 Config.prototype.getServerHost = function () {
@@ -445,6 +455,42 @@ Config.prototype.getServerHost = function () {
 Config.prototype.getServerProtocol = function () {
     var protocol = this.getInfo("server.protocol");
     return (protocol || "http://");
+};
+
+/**
+ * Get the static pages configuration and validates if this service enabled
+ *
+ * @returns {Boolean} true by default else depends on the configuration
+ */
+Config.prototype.isServerStaticPages = function () {
+    var services = this.getInfo("server.services"),
+        staticPages = (services && ("static-pages" in services) ? services["static-pages"] : true)
+
+    return staticPages;
+};
+
+/**
+ * Get the monitoring server configuration and validates if this service enabled
+ *
+ * @returns {Boolean} true by default else depends on the configuration
+ */
+
+Config.prototype.isServerMonitoring = function () {
+    var services = this.getInfo("server.services"),
+        monitoring;
+
+    if (services) {
+        if ("monitoring" in services && _.isObject(services["monitoring"]))  {
+            monitoring = services["monitoring"];
+            if ("port" in monitoring|| "host" in monitoring) {
+                // we have a custom monitoring configuration
+                return false;
+            }
+        } 
+    }
+
+    // defaults = true
+    return true;
 };
 
 Config.prototype.getContext = function () {

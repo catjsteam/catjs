@@ -1,6 +1,6 @@
 {
-    "name": "{{server.name}}",   
-        
+    "name": "{{server.name}}",
+
     "server": {
         "host": "{{server.host}}",
         "port": "{{server.port}}",

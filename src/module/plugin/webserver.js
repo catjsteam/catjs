@@ -57,7 +57,8 @@ module.exports = _basePlugin.ext(function () {
                                 set: setp,
                                 path: path,
                                 port: (extensionParams.port || _project.getServerPort()),
-                                isStaticPages: _project.isServerStaticPages()
+                                isStaticPages: _project.isServerStaticPages(),
+                                isMonitoringServer: _project.isServerMonitoring()
                             }, function () {
                                 _emitter.emit("job.done", {status: "done"});
                             });
