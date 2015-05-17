@@ -90,7 +90,8 @@ exports.get = function (req, res) {
                             message: 'failed due to network issue',
                             reports: reports,
                             error: error,
-                            id: id
+                            id: id,
+                            ua: ua
                         });
                     }
                 }

@@ -153,7 +153,8 @@ Reporter.prototype.addTestCase = function (config) {
         logmessage,
         output, symbol,
         me = this,
-        testName, status, phantomStatus, message, reports, error, id;
+        testName, status, phantomStatus, message, reports, error, id,
+        ua = (me._ua || config.ua);
 
     testName = config.testName;
     status = config.status;
@@ -209,13 +210,13 @@ Reporter.prototype.addTestCase = function (config) {
 
     function _writeTestCase() {
 
+        var ismobile = ("isMobile" in ua && ua.isMobile) ;
+        
         me._testsuite.add(_createTestCase());
         output = me._testsuite.compile();
         if (_fs.existsSync(me._fileName)) {
             _fs.unlinkSync(me._fileName);
         }
-
-        var ua = me._ua, ismobile = ("isMobile" in ua && ua.isMobile) ;
          
         _catinfo.set({
             id: me._id,
