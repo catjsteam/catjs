@@ -386,7 +386,7 @@ _cat.plugins.dom = function () {
                 function _captureCanvas(elt) {
 
                     var nodeName, tagMethod,
-                        serverURL = _cat.utils.Utils.getCatjsServerURL("/screenshot"),
+                        serverURL = _cat.utils.Request.generate({service: "screenshot"}),
                         methods = {
                             
                             "canvas": function(elt) {

@@ -410,7 +410,13 @@ _cat.core.manager.client = function () {
             if (configsize > 1) {
                 futureIndex = (configsize + currentState.index);
                 _cat.utils.AJAX.sendRequestAsync({
-                    url: _cat.utils.Utils.getCatjsServerURL("/scraps?currentIndex=" + (futureIndex) + "&" + "testId=" + _cat.core.guid())
+                    url: _cat.utils.Request.generate({
+                        service: "scraps", 
+                        params:{
+                            currentIndex: futureIndex, 
+                            testId: _cat.core.guid()
+                        }
+                    })
                 });
             }
             
@@ -489,7 +495,7 @@ _cat.core.manager.client = function () {
                 
                 setFailureInterval(catConfig, scrap);
                 
-                urlAddress = _cat.utils.Utils.getCatjsServerURL("/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid());
+                urlAddress = _cat.utils.Request.generate({service: "scraps", params:{scrap: scrapName, testId: _cat.core.guid()}});
 
                 config = {
                     

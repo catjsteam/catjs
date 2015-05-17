@@ -111,24 +111,18 @@ if (typeof(_cat) !== "undefined") {
                 }
             },
 
+
+            /**
+             * @deprecated use _cat.core.request.generate instead
+             * 
+             * @param url
+             * @returns {*|string}
+             */
             getCatjsServerURL: function (url) {
 
-                var catConfig = _cat.core.getConfig(),
-                    port = catConfig.getPort(),
-                    host = catConfig.getIp(),
-                    method = catConfig.getMethod(),
-                    slashPos = -1;
-
-                if (url) {
-                    slashPos = url.indexOf("/");
-                    if (slashPos !== 0) {
-                        url = "/" + url;
-                    }
-                } else {
-                    url = "/";
-                }
-
-                return [method, "://", host, ":", port, url].join("");
+                _cat.core.log.warn("[catjs core utils] getCatjsServerURL method is deprecated, use _cat.core.request.generate instead"); 
+                
+               return undefined;
 
             },
 

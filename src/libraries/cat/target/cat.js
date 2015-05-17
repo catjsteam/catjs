@@ -2205,7 +2205,13 @@ _cat.core.manager.client = function () {
             if (configsize > 1) {
                 futureIndex = (configsize + currentState.index);
                 _cat.utils.AJAX.sendRequestAsync({
-                    url: _cat.utils.Utils.getCatjsServerURL("/scraps?currentIndex=" + (futureIndex) + "&" + "testId=" + _cat.core.guid())
+                    url: _cat.utils.Request.generate({
+                        service: "scraps", 
+                        params:{
+                            currentIndex: futureIndex, 
+                            testId: _cat.core.guid()
+                        }
+                    })
                 });
             }
             
@@ -2284,7 +2290,7 @@ _cat.core.manager.client = function () {
                 
                 setFailureInterval(catConfig, scrap);
                 
-                urlAddress = _cat.utils.Utils.getCatjsServerURL("/scraps?scrap=" + scrapName + "&" + "testId=" + _cat.core.guid());
+                urlAddress = _cat.utils.Request.generate({service: "scraps", params:{scrap: scrapName, testId: _cat.core.guid()}});
 
                 config = {
                     
@@ -5159,24 +5165,18 @@ if (typeof(_cat) !== "undefined") {
                 }
             },
 
+
+            /**
+             * @deprecated use _cat.core.request.generate instead
+             * 
+             * @param url
+             * @returns {*|string}
+             */
             getCatjsServerURL: function (url) {
 
-                var catConfig = _cat.core.getConfig(),
-                    port = catConfig.getPort(),
-                    host = catConfig.getIp(),
-                    method = catConfig.getMethod(),
-                    slashPos = -1;
-
-                if (url) {
-                    slashPos = url.indexOf("/");
-                    if (slashPos !== 0) {
-                        url = "/" + url;
-                    }
-                } else {
-                    url = "/";
-                }
-
-                return [method, "://", host, ":", port, url].join("");
+                _cat.core.log.warn("[catjs core utils] getCatjsServerURL method is deprecated, use _cat.core.request.generate instead"); 
+                
+               return undefined;
 
             },
 
@@ -5857,7 +5857,7 @@ _cat.plugins.dom = function () {
                 function _captureCanvas(elt) {
 
                     var nodeName, tagMethod,
-                        serverURL = _cat.utils.Utils.getCatjsServerURL("/screenshot"),
+                        serverURL = _cat.utils.Request.generate({service: "screenshot"}),
                         methods = {
                             
                             "canvas": function(elt) {
