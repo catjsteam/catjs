@@ -428,17 +428,17 @@ Config.prototype.getRunner = function () {
 
 
 Config.prototype.getServerMonitoringPort = function () {
-    var port = this.getInfo("server.monitoring.port");
+    var port = this.getInfo("server.services.monitoring.port");
     return (port || this.getServerPort());
 };
 
 Config.prototype.getServerMonitoringHost = function () {
-    var host = this.getInfo("server.monitoring.host");
+    var host = this.getInfo("server.services.monitoring.host");
     return (host || this.getServerHost());
 };
 
 Config.prototype.getServerMonitoringProtocol = function () {
-    var protocol = this.getInfo("server.monitoring.protocol");
+    var protocol = this.getInfo("server.services.monitoring.protocol");
     return (protocol || this.getServerProtocol());
 };
 
