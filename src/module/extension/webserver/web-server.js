@@ -54,8 +54,8 @@ var webserver  = function() {
                 
                 basicConfig = function() {
                     _server.set('port', process.env.PORT || port);
-                    _server.use(_express.cookieParser());
-                    _server.use(_express.session({secret:"catjs"}));
+                    //_server.use(_express.cookieParser());
+                    //_server.use(_express.session({secret:"catjs"}));
                     _server.use(_express.logger({stream: winstonStream, format: 'dev'}));
                     _server.use(_express.json());
                     _server.use(_express.urlencoded());
