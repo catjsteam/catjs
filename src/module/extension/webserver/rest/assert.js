@@ -128,7 +128,8 @@ exports.get = function (req, res) {
         testName: testName,
         phantomStatus: phantomStatus,
         message: message,       
-        error: error
+        error: error,
+        ua: ua
     });
 };
 
