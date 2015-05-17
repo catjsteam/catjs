@@ -156,6 +156,8 @@ Reporter.prototype.addTestCase = function (config) {
         testName, status, phantomStatus, message, reports, error, id,
         ua = (me._ua || config.ua);
 
+    console.log("--> ", JSON.stringify(me._ua), JSON.stringify(config.ua));
+    
     testName = config.testName;
     status = config.status;
     phantomStatus = config.phantomStatus;
@@ -210,6 +212,8 @@ Reporter.prototype.addTestCase = function (config) {
 
     function _writeTestCase() {
 
+        console.log(JSON.stringify(ua));
+        
         var ismobile = ("isMobile" in ua && ua.isMobile) ;
         
         me._testsuite.add(_createTestCase());
