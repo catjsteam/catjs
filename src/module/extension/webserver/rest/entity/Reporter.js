@@ -211,8 +211,6 @@ Reporter.prototype.addTestCase = function (config) {
 
     function _writeTestCase() {
 
-        console.log(" --- > ", JSON.stringify(ua));
-        
         var ismobile = _utils.getProperty(ua, "isMobile") ;
         
         me._testsuite.add(_createTestCase());
