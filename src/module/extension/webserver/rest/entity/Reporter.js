@@ -1,4 +1,5 @@
 var _jmr = require("test-model-reporter"),
+    _utils = catrequire("cat.utils"),
     _colors = require("./../helpers/colors.js"),
     _global = catrequire("cat.global"),
     _catinfo = catrequire("cat.info"),
@@ -142,7 +143,7 @@ Reporter.prototype.getName = function () {
 Reporter.prototype.getTitle = function () {
     var ua = this._ua, uainfo;
 
-    uainfo = (ua ? [" ", this.getName(), " ", ua.Browser, " " , ua.Version, " " , ua.OS, " "].join("") : "");
+    uainfo = (ua ? [" ", this.getName(), " ", _utils.getProperty(ua, "Browser"), " " ,_utils.getProperty(ua, "Version"), " " , _utils.getProperty(ua, "OS"), " "].join("") : "");
 
     return uainfo;
 };
@@ -155,8 +156,6 @@ Reporter.prototype.addTestCase = function (config) {
         me = this,
         testName, status, phantomStatus, message, reports, error, id,
         ua = (me._ua || config.ua);
-
-    console.log("--> ", JSON.stringify(me._ua), JSON.stringify(config.ua));
     
     testName = config.testName;
     status = config.status;
@@ -212,9 +211,9 @@ Reporter.prototype.addTestCase = function (config) {
 
     function _writeTestCase() {
 
-        console.log(JSON.stringify(ua));
+        console.log(" --- > ", JSON.stringify(ua));
         
-        var ismobile = ("isMobile" in ua && ua.isMobile) ;
+        var ismobile = _utils.getProperty(ua, "isMobile") ;
         
         me._testsuite.add(_createTestCase());
         output = me._testsuite.compile();
@@ -225,8 +224,8 @@ Reporter.prototype.addTestCase = function (config) {
         _catinfo.set({
             id: me._id,
             device: (ismobile ? "device" : "browser"), 
-            model : (ua.Version),
-            type: (ismobile ? ua.Platform : ua.Browser),
+            model : _utils.getProperty(ua, "Version"),
+            type: (ismobile ? _utils.getProperty(ua, "Platform") : _utils.getProperty(ua, "Browser")),
             entity: "junit",
             data: output
         });

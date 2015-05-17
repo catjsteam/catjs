@@ -13,7 +13,8 @@ module.exports = function () {
     /**
      * Synchronized process for creating folder recursively
      */
-    var _mkdirSync = function (folder) {
+    var _module,
+        _mkdirSync = function (folder) {
             if (!_fs.existsSync(folder)) {
                 try {
                     _fs.mkdirRecursiveSync(folder);
@@ -66,8 +67,40 @@ module.exports = function () {
             }
         };
 
-    return {
+    _module = {
 
+        /**
+         * Get a specific property's value
+         *
+         * @param obj {Object} The reference object 
+         * @param key {String} The key to look for
+         */
+        getProperty: function(obj, key) {
+            var value;
+            
+            value = (key in obj ? obj[key] : undefined);
+            if (value === undefined) {
+                key = key.toLowerCase();
+                value = (key in obj ? obj[key] : undefined);;
+                if (value === undefined) {
+                    key = _module.capitalise(key);
+                    value =(key in obj ? obj[key] : undefined);;
+                }                
+            }
+            
+            return value;
+        },
+
+
+        capitalise: function(string) {
+            if (!string) {
+                return string;
+            }
+            return string.charAt(0).toUpperCase() + string.slice(1);
+            
+        },
+
+    
         /**
          *
          *
@@ -608,4 +641,6 @@ module.exports = function () {
 
     };
 
+    
+    return _module;
 }();
