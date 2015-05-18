@@ -111,7 +111,10 @@ _cat.core.manager.statecontroller = function () {
 
                     if (counter === steps) {
                         if (!test) {
-                            console.warn("one or more items was not resolved, but the timeout expired");
+                            console.warn("[catjs wait] One or more Objects was not resolved, but the timeout expired");
+                            if (chai) {
+                                chai.assert.ok(test, 'One or more Objects was not resolved, but the timeout expired');
+                            }
                         }
 
                         if ("callback" in item) {
