@@ -330,7 +330,7 @@ _cat.plugins.dom = function () {
         actions: {
 
 
-            snapshot: function (idName) {
+            snapshot: function (idName, overrideScrapName) {
 
                 var elt,
                     me = this;
@@ -452,7 +452,7 @@ _cat.plugins.dom = function () {
                                 method: "POST",
                                 data: {
                                     pic: _prepareImage(data),
-                                    scrapName: ( "scrap" in me ? me.scrap.name : "temp" ),
+                                    scrapName: (overrideScrapName || ( "scrap" in me ? me.scrap.name : "temp" )),
                                     deviceId: _cat.core.guid()
                                 },
                                 header: [

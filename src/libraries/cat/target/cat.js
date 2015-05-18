@@ -2779,7 +2779,10 @@ _cat.core.manager.statecontroller = function () {
 
                     if (counter === steps) {
                         if (!test) {
-                            console.warn("one or more items was not resolved, but the timeout expired");
+                            console.warn("[catjs wait] One or more Objects was not resolved, but the timeout expired");
+                            if (chai) {
+                                chai.assert.ok(test, 'One or more Objects was not resolved, but the timeout expired');
+                            }
                         }
 
                         if ("callback" in item) {
@@ -4411,7 +4414,7 @@ _cat.utils.AJAX = function () {
                 data = ("data" in config ? config.data : undefined),
                 requestHeader, requestHeaderType, requestHeaderList,
                 onerror = function (e) {
-                    _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
+                    _cat.core.log.error("[catjs AJAX Util] failed to process request:", ( config || " undefined "), " \ncheck catjs server configuration  \nError: ", e, "\n");
                 },
                 onreadystatechange = function () {
                     
@@ -5802,7 +5805,7 @@ _cat.plugins.dom = function () {
         actions: {
 
 
-            snapshot: function (idName) {
+            snapshot: function (idName, overrideScrapName) {
 
                 var elt,
                     me = this;
@@ -5924,7 +5927,7 @@ _cat.plugins.dom = function () {
                                 method: "POST",
                                 data: {
                                     pic: _prepareImage(data),
-                                    scrapName: ( "scrap" in me ? me.scrap.name : "temp" ),
+                                    scrapName: (overrideScrapName || ( "scrap" in me ? me.scrap.name : "temp" )),
                                     deviceId: _cat.core.guid()
                                 },
                                 header: [
