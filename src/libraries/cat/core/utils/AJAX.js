@@ -112,7 +112,7 @@ _cat.utils.AJAX = function () {
                 data = ("data" in config ? config.data : undefined),
                 requestHeader, requestHeaderType, requestHeaderList,
                 onerror = function (e) {
-                    _cat.core.log.error("[CAT CHAI] error occurred: ", e, "\n");
+                    _cat.core.log.error("[catjs AJAX Util] failed to process request:", ( config || " undefined "), " \ncheck catjs server configuration  \nError: ", e, "\n");
                 },
                 onreadystatechange = function () {
                     
