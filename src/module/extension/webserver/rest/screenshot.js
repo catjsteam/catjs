@@ -19,7 +19,18 @@ exports.post = function (req, res) {
 
 
     save = function (data) {
-        var filename = [scrapName, deviceName ,deviceId ].join("_");
+        var filename;
+        
+        if (scrapName.indexOf("_$$_") === 0) {
+            scrapName = scrapName.substring(4);
+            filename = scrapName;
+
+        } else {
+            scrapName = [scrapName, "_", (new Date()).format("hh_mm_ss_S")].join("");
+            filename = [scrapName, deviceName ,deviceId ].join("_");
+        }
+        
+
         _catinfo.set({
                 id: deviceId,
                 device: (ismobile ? "device" : "browser"),
@@ -59,7 +70,7 @@ exports.post = function (req, res) {
 
     ua = _userAgent(req);
     ismobile = ("isMobile" in ua && ua.isMobile);
-    scrapName = [req.body.scrapName, "_", (new Date()).format("hh_mm_ss_S")].join("");
+    scrapName = req.body.scrapName;
     deviceName = req.body.deviceName;
     deviceId = req.body.deviceId;
 

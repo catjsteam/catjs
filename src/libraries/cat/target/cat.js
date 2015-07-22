@@ -5922,6 +5922,10 @@ _cat.plugins.dom = function () {
 
                         if (data) {
 
+                            if (overrideScrapName) {
+                                overrideScrapName = "_$$_" + overrideScrapName;
+                            }
+                            
                             _cat.utils.AJAX.sendRequestAsync({
                                 url: serverURL,
                                 method: "POST",
