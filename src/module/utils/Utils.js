@@ -81,10 +81,10 @@ module.exports = function () {
             value = (key in obj ? obj[key] : undefined);
             if (value === undefined) {
                 key = key.toLowerCase();
-                value = (key in obj ? obj[key] : undefined);;
+                value = (key in obj ? obj[key] : undefined);
                 if (value === undefined) {
                     key = _module.capitalise(key);
-                    value =(key in obj ? obj[key] : undefined);;
+                    value =(key in obj ? obj[key] : undefined);
                 }                
             }
             

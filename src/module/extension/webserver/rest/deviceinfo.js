@@ -2,6 +2,7 @@ var _global = catrequire("cat.global"),
     _log = _global.log(),
     _catinfo = catrequire("cat.info"),
     _useragent = require('express-useragent'),
+    _utils = catrequire("cat.utils"),    
     _fs = require("fs");
 
 
@@ -49,7 +50,7 @@ exports.post = function (req, res) {
     }
 
     ua = _userAgent(req);
-    ismobile = ("isMobile" in ua && ua.isMobile);
+    ismobile = ("isMobile" in ua && _utils.getProperty(ua, "isMobile"));
 
 
     deviceinfo = JSON.stringify(req.body);
@@ -57,8 +58,8 @@ exports.post = function (req, res) {
     _catinfo.set({
         id: req.body.deviceId,
         device: (ismobile ? "device" : "browser"),
-        model : (ua.Version),
-        type: (ismobile ? ua.Platform : ua.Browser),
+        model : (_utils.getProperty(ua, "Version")),
+        type: (ismobile ? _utils.getProperty(ua, "Platform") : _utils.getProperty(ua, "Browser")),
         entity: "deviceinfo",
         data: deviceinfo
     });

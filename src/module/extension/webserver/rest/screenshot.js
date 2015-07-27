@@ -3,6 +3,7 @@ var _global = catrequire("cat.global"),
     _catinfo = catrequire("cat.info"),
     _useragent = require('express-useragent'),
     _fs = require("fs"),
+    _utils = catrequire("cat.utils"),
     _date = require("date-format-lite");
 
 
@@ -34,8 +35,8 @@ exports.post = function (req, res) {
         _catinfo.set({
                 id: deviceId,
                 device: (ismobile ? "device" : "browser"),
-                model : (ua.Version),
-                type: (ismobile ? ua.Platform : ua.Browser),
+                model :  _utils.getProperty(ua, "Version"),
+                type: (ismobile ?  _utils.getProperty(ua, "platform") :  _utils.getProperty(ua, "Browser")),
                 entity: "screenshot",
                 filename: filename,
                 data: data
@@ -69,7 +70,7 @@ exports.post = function (req, res) {
     };
 
     ua = _userAgent(req);
-    ismobile = ("isMobile" in ua && ua.isMobile);
+    ismobile = _utils.getProperty(ua, "isMobile");
     scrapName = req.body.scrapName;
     deviceName = req.body.deviceName;
     deviceId = req.body.deviceId;
