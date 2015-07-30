@@ -343,7 +343,8 @@ module.exports = _basePlugin.ext(function () {
                                                     html2canvas: true,
                                                     canvg: true,
                                                     jsutilsObject: true,
-                                                    jsutilsArray: true
+                                                    jsutilsArray: true,
+                                                    resemble: true
                                                 }
                                             }
                                         });

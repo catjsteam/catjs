@@ -137,6 +137,14 @@
             "exports": "canvg",
             "globals": true,
             "install": "static"
+        },
+        {
+            "name": "resemble",
+            "prod" :["resemble.js"],
+            "dev" :["resemble.js"],        
+            "exports": "resemble",
+            "globals": true,
+            "install": "static"
         }
     ]
 }

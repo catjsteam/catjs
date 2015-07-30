@@ -109,6 +109,7 @@ module.exports = _basePlugin.ext(function () {
                 jshint.globals["canvg"] = true;
                 jshint.globals["jsutilsObject"] = true;
                 jshint.globals["jsutilsArray"] = true;
+                jshint.globals["resemble"] = true;
 
 
                 task({
