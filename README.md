@@ -1,4 +1,4 @@
-catjs 1.0.1 (origins 0.5.0) 
+catjs 1.0.2 (origins 0.5.0) 
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
