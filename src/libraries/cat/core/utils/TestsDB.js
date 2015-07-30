@@ -121,6 +121,15 @@ _cat.utils.TestsDB = function() {
             return (new Function("JSPath", "_data", "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, [(typeof JSPath !== "undefined" ? JSPath : undefined), _data]) || "");
         },
         
+        findFirst: function(query) {
+            var result = this.find(query);
+            if (typeof result !== "string" && result.length && result.length > 0) {
+                result = result[0];               
+            } 
+            
+            return result;
+        },
+        
         random: function(query) {
 
             function _random(min, max) {
