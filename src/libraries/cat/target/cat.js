@@ -4954,6 +4954,15 @@ _cat.utils.TestsDB = function() {
             return (new Function("JSPath", "_data", "if (JSPath) { return " + code + "} else { console.log('Missing dependency : JSPath');  }").apply(this, [(typeof JSPath !== "undefined" ? JSPath : undefined), _data]) || "");
         },
         
+        findFirst: function(query) {
+            var result = this.find(query);
+            if (typeof result !== "string" && result.length && result.length > 0) {
+                result = result[0];               
+            } 
+            
+            return result;
+        },
+        
         random: function(query) {
 
             function _random(min, max) {
@@ -5805,7 +5814,59 @@ _cat.plugins.dom = function () {
         actions: {
 
 
-            snapshot: function (idName, overrideScrapName) {
+            /**
+             * A basic compare a given base64 image to a snapshot
+             * TODO TBD support additional functionality: ignore colors, antialiasing, etc..
+             * 
+             * @param config
+             *          name {String} The snapshot name
+             *          base64 {String} base64 encoded image string
+             *          selector {String} snapshot query selector
+             *          callback {Function} data rgument passed represent the compare result { analysis: .. , compare: }
+             */
+            snapshotCompare: function(config) {
+                
+                if (! config ) {
+                    config = {};
+                }
+                _catjs.plugin.get("dom").actions.snapshot(config.selector, config.name , function(data){
+
+                    var result = { analysis: null, compare: null},
+                        deferred = Q.defer();
+                    
+                    resemble( data ).onComplete(function(data){
+                        result.analysis = data;
+                        if (!config.base64) {
+                            deferred.resolve(result);
+                        }
+                    });
+
+                    if (config.base64) {
+                        resemble(data).compareTo(config.base64).onComplete(function(data){
+                            result.compare = data;
+                            deferred.resolve(result);
+                        });
+                    }
+                    
+                    deferred.promise.then(function(data) {
+                        if (config.callback) {
+                            config.callback.call(this, data);
+                        }                        
+                    });
+                    
+                });  
+                
+            },
+
+            /**
+             * Take a snapshot
+             *
+             * @param config
+             *          selector {String} snapshot query selector
+             *          overrideScrapName {String} Override the system name
+             *          callback {Function} data argument passed represents the snapshot as base64 string 
+             */
+            snapshot: function (idName, overrideScrapName, callback) {
 
                 var elt,
                     me = this;
@@ -5858,7 +5919,7 @@ _cat.plugins.dom = function () {
                  * @returns {undefined}
                  * @private
                  */
-                function _captureCanvas(elt) {
+                function _captureCanvas(elt, callback) {
 
                     var nodeName, tagMethod,
                         serverURL = _cat.utils.Request.generate({service: "screenshot"}),
@@ -5916,6 +5977,8 @@ _cat.plugins.dom = function () {
 
                     function _save(data) {
 
+                        var base64;
+                        
                         function _prepareImage(data) {
                             return data.replace(/^data:image\/png;base64,/, "");
                         }
@@ -5925,12 +5988,14 @@ _cat.plugins.dom = function () {
                             if (overrideScrapName) {
                                 overrideScrapName = "_$$_" + overrideScrapName;
                             }
+
+                            base64 = _prepareImage(data);
                             
                             _cat.utils.AJAX.sendRequestAsync({
                                 url: serverURL,
                                 method: "POST",
                                 data: {
-                                    pic: _prepareImage(data),
+                                    pic: base64,
                                     scrapName: (overrideScrapName || ( "scrap" in me ? me.scrap.name : "temp" )),
                                     deviceId: _cat.core.guid()
                                 },
@@ -5943,6 +6008,10 @@ _cat.plugins.dom = function () {
                                     }
                                 }
                             });
+
+                            if (callback) {
+                                callback.call(this, data);
+                            }
                         }
                     }
 
@@ -5979,7 +6048,7 @@ _cat.plugins.dom = function () {
 
 
                     } else {
-                        _captureCanvas(elt);
+                        _captureCanvas(elt, callback);
                     }
                 }
 
