@@ -1536,6 +1536,10 @@ _cat.core.errors = function () {
         _listeners.forEach(function(listener) {
             listener.call(me, message, filename, lineno, colno, error);
         });
+        
+        if (console && console.error) {
+           console.error(("line, col: [" + lineno + " , " +  colno + "]"), ("message: " + message), (" url: " + filename), " \nerror: ", error); 
+        }
     };
 
     return {
@@ -4419,9 +4423,8 @@ _cat.utils.AJAX = function () {
                 onreadystatechange = function () {
                     
                     if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-                        // _cat.core.log("completed\n" + xmlhttp.responseText);
                         if ("callback" in config && config.callback) {
-                            config.callback.call(this, xmlhttp);
+                            config.callback.call(xmlhttp, xmlhttp);
                         }
 
                         _running--;
