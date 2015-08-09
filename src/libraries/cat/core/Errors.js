@@ -24,6 +24,10 @@ _cat.core.errors = function () {
         _listeners.forEach(function(listener) {
             listener.call(me, message, filename, lineno, colno, error);
         });
+        
+        if (console && console.error) {
+           console.error(("line, col: [" + lineno + " , " +  colno + "]"), ("message: " + message), (" url: " + filename), " \nerror: ", error); 
+        }
     };
 
     return {
