@@ -153,7 +153,7 @@ _cat.core.ui = function () {
 
 
     function _subscribeUI() {
-        flyer.subscribe({
+        /*flyer.subscribe({
             channel: "default",
             topic: "setContent.*",
             callback: function(data, topic, channel) {
@@ -164,10 +164,10 @@ _cat.core.ui = function () {
                 }
 
             }
-        });
+        });*/
     }
 
-    _subscribeUI();
+    //_subscribeUI();
 
     var __cache = [],
         __catElement,
@@ -496,15 +496,24 @@ _cat.core.ui = function () {
                 var isIframe = _cat.utils.iframe.isIframe(),
                     topic;
 
+                function _broadcast(data, topic, channel) {
+                    var clientTopic = "setContent." + _cat.core.manager.client.getClientmanagerId();
+                    // check if it's the same frame
+                    if (topic !== clientTopic && !_cat.utils.iframe.isIframe()) {
+                        _cat.core.ui.setContent(data);
+                    }
+                }
+                
                 if (isIframe) { // && (config.header || config.desc)) {
 //                    catParent = window.parent._cat;
 //                    catParent.core.ui.setContent(config);
                     topic = "setContent." + _cat.core.manager.client.getClientmanagerId();
-                    flyer.broadcast({
+                    /*flyer.broadcast({
                         channel: "default",
                         topic: topic,
                         data: config
-                    });
+                    });*/
+                    _broadcast(config, topic, "default");
 
                 }
 

@@ -2100,7 +2100,7 @@ _cat.core.manager.client = function () {
         doprocess = (doprocess === undefined ? true : doprocess);
         dostate = (dostate === undefined ? true : dostate);
         
-        flyer.broadcast({
+        /*flyer.broadcast({
             channel: "default",
             topic: topic,
             data: {
@@ -2108,7 +2108,12 @@ _cat.core.manager.client = function () {
                 currentState: (dostate ? currentState : undefined),
                 doprocess: (doprocess || true)
             }
-        });
+        });*/
+        _subscribeProcess({
+            totalDelay: totalDelay,
+            currentState: (dostate ? currentState : undefined),
+            doprocess: (doprocess || true)
+        }, topic, "default" );
     }
 
 
@@ -2117,8 +2122,8 @@ _cat.core.manager.client = function () {
      * 
      * @private
      */
-    function _subscribeProcess() {
-        flyer.subscribe({
+    function _subscribeProcess(data, topic, channel) {
+       /* flyer.subscribe({
             channel: "default",
             topic: "process.*",
             callback: function(data, topic, channel) {
@@ -2143,27 +2148,57 @@ _cat.core.manager.client = function () {
 
                 }
             }
-        });
+        });*/
+
+        var clientTopic = "process." + _cat.core.manager.client.getClientmanagerId();
+
+        // update the current state
+        if ("currentState" in data && data.currentState) {
+            currentState = data.currentState;
+        }
+
+        // update the total delay
+        if ("currentState" in data && data.totalDelay) {
+            totalDelay = data.totalDelay;
+        }
+
+        // check if it's the same frame
+        if (topic !== clientTopic) {
+
+            if (data.doprocess) {
+                _processReadyScraps(true);
+            }
+
+        }
+        
     }
 
-    _subscribeProcess();
+    //_subscribeProcess();
 
 
     function broadcastAfterProcess(fullScrap) {
         var topic = "afterprocess." + _cat.core.manager.client.getClientmanagerId();
 
-        flyer.broadcast({
+        /*flyer.broadcast({
             channel: "default",
             topic: topic,
             data: fullScrap
-        });
+        });*/
+        _subscribeAfterProcess(fullScrap, topic, "default");
 
     }
 
 
 
-    function _subscribeAfterProcess() {
-        flyer.subscribe({
+    function _subscribeAfterProcess(data, topic, channel) {
+
+        //var clientTopic = "afterprocess." + _cat.core.manager.client.getClientmanagerId();
+        // check if it's the same frame
+        //if (topic !== clientTopic) {
+        _cat.core.manager.client.removeIntervalFromBroadcast(data);
+        //}
+        
+        /*flyer.subscribe({
             channel: "default",
             topic: "afterprocess.*",
             callback: function(data, topic, channel) {
@@ -2174,10 +2209,10 @@ _cat.core.manager.client = function () {
                 //}
 
             }
-        });
+        });*/
     }
 
-    _subscribeAfterProcess();
+    //_subscribeAfterProcess();
 
 
     function _processReadyScraps(cameFromBroadcast) {
@@ -3872,7 +3907,7 @@ _cat.core.ui = function () {
 
 
     function _subscribeUI() {
-        flyer.subscribe({
+        /*flyer.subscribe({
             channel: "default",
             topic: "setContent.*",
             callback: function(data, topic, channel) {
@@ -3883,10 +3918,10 @@ _cat.core.ui = function () {
                 }
 
             }
-        });
+        });*/
     }
 
-    _subscribeUI();
+    //_subscribeUI();
 
     var __cache = [],
         __catElement,
@@ -4215,15 +4250,24 @@ _cat.core.ui = function () {
                 var isIframe = _cat.utils.iframe.isIframe(),
                     topic;
 
+                function _broadcast(data, topic, channel) {
+                    var clientTopic = "setContent." + _cat.core.manager.client.getClientmanagerId();
+                    // check if it's the same frame
+                    if (topic !== clientTopic && !_cat.utils.iframe.isIframe()) {
+                        _cat.core.ui.setContent(data);
+                    }
+                }
+                
                 if (isIframe) { // && (config.header || config.desc)) {
 //                    catParent = window.parent._cat;
 //                    catParent.core.ui.setContent(config);
                     topic = "setContent." + _cat.core.manager.client.getClientmanagerId();
-                    flyer.broadcast({
+                    /*flyer.broadcast({
                         channel: "default",
                         topic: topic,
                         data: config
-                    });
+                    });*/
+                    _broadcast(config, topic, "default");
 
                 }
 
