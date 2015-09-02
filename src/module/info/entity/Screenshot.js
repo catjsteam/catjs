@@ -12,7 +12,9 @@ _generic.setProto("write", function() {
 
 _generic.setProto("add", function(record) {
 
-    _fs.writeFile(this.filename, record, function (err) {
+    var imageBuffer = new Buffer(record, 'base64');
+    
+    _fs.writeFile(this.filename, imageBuffer, function (err) {
         if (err) {
             _utils.error("[Scrap Plugin] failed to save screenshot: ", this.filename, " error: ",  err);
         } else {

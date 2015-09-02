@@ -10,7 +10,6 @@ var _global = catrequire("cat.global"),
 exports.post = function (req, res) {
 
      var    pic,
-            imageBuffer,
             scrapName,
             _userAgent,
             deviceName, deviceId,
@@ -31,7 +30,6 @@ exports.post = function (req, res) {
             filename = [scrapName, deviceName ,deviceId ].join("_");
         }
         
-
         _catinfo.set({
                 id: deviceId,
                 device: (ismobile ? "device" : "browser"),
@@ -78,9 +76,8 @@ exports.post = function (req, res) {
     // get the screenshot and convert to base64
     pic = (req.body.pic);
     pic = pic.replace(new RegExp('\n| ', 'g'), '');
-
-    imageBuffer = new Buffer(pic, 'base64');
-    save(imageBuffer);
+       
+    save(pic);
 
 };
 
