@@ -193,9 +193,9 @@ _cat.core.Config = function(args) {
                                     }
 
                                     temp = scenarios[currTest.name];
-                                    if (temp.tests) {
-                                        _addToGlobal(temp);
-                                    }
+//                                    if (temp.tests) {
+//                                        _addToGlobal(temp);
+//                                    }
 
                                     continue;
                                 }
