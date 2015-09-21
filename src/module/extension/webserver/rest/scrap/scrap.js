@@ -132,23 +132,37 @@ module.exports = function () {
          * @param testId
          */
         clean: function (testId) {
+            this.setCurrentIndex(testId, 0);
             _testsCache.delete(testId);
         },
 
         getCurrentIndex: function(id) {
             
-            var currentTestCache,
-                currentTestConfig;
-            
-            // load tests according to the current test id
-            if (_testsCache.exists(id)) {
-            
-                currentTestCache = _testsCache.cache(id);
-                currentTestConfig = currentTestCache.testConfig();               
-            }
+          var currentTestConfig = this.getCurrentTestConfig(id);
 
             // test data for the test id currentTestConfig.scrapReadyIndex
            return (currentTestConfig ? currentTestConfig.getIndex() : 0);  
+        },
+        
+        setCurrentIndex: function(id, index) {
+            var currentTestConfig = this.getCurrentTestConfig(id);
+            if (currentTestConfig) {
+                currentTestConfig.setIndex(index);   
+            }
+        },
+        
+        getCurrentTestConfig: function(id) {
+            var currentTestCache,
+                currentTestConfig;
+
+            // load tests according to the current test id
+            if (_testsCache.exists(id)) {
+
+                currentTestCache = _testsCache.cache(id);
+                currentTestConfig = currentTestCache.testConfig();
+            }
+            
+            return currentTestConfig;
         },
         
         /**
@@ -174,11 +188,13 @@ module.exports = function () {
 
             var requestValues = _getRequestValues(req);
             if (requestValues) {
-                //console.log("requestValues", requestValues);
+                console.log("[scrap] update: index", requestValues.currentIndex);
+                this.setCurrentIndex(requestValues.id, requestValues.currentIndex);
             }
 
             var result = {
-                status: 200
+                status: 200,
+                currentIndex: requestValues.currentIndex
             };
 
             res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
@@ -262,7 +278,7 @@ module.exports = function () {
 
                         return innerConfigMap;
 
-                    };
+                    }
                 
                 if (catjstests) {
 
@@ -331,11 +347,10 @@ module.exports = function () {
 
                 return scraplist;
 
-            };
+            }
 
             function  _getScrap(scrapName, tests) {
-                var indexTests,
-                    tempScrap,
+                var tempScrap,
                     indexTests = 0, size,
                     scrap;
 
@@ -351,7 +366,7 @@ module.exports = function () {
                 }
 
                 return {scrap: scrap, run: (scrap ? scrap.run : false) };
-            };
+            }
             
             function _response(isReady, scraps, readyinfo) {
                 // send back response
@@ -403,7 +418,7 @@ module.exports = function () {
                 
                 // handle scrap response
                 scrap = _getScrap(scrapName, currentTestConfig.getTests());
-                if (scrap.run) {
+                /*if (scrap.run) {
                     if (scrap.scrap) {
                         console.warn("[catjs monitoring server] scrap:", scrap.scrap.name, " already processed ");
                     } else {
@@ -417,30 +432,32 @@ module.exports = function () {
                     _response(isReady, currentTestCache.scraps(), false);
                     
                     return undefined;
-                }
+                }*/
 
-                if (scrap && scrap.scrap && !scrap.run) {
+                if (scrap && scrap.scrap) { // && !scrap.run) {
                     scrap = scrap.scrap;
                 }
 
                 currTest = currentTestConfig.getTests();
-                currTest[scrap.index].signed = true;
-
-                // if this is the next scrap
-                if (scrap.index <= currReadyIndex) {
-
-                    currTest[scrap.index].run = true;
-                    isReady = true;
-                    currentTestCache.scraps(scrap);
-                    currentTestConfig.next();
-
-                    currentTestCache.scraps(_emptyQueue(id));
-
-                } else {
-
-                    // set the scrap index into queue
-                    currentTestConfig.setToQueue(scrap.index);
-
+                if (currTest && currTest[scrap.index]) {
+                    currTest[scrap.index].signed = true;
+    
+                    // if this is the next scrap
+                    if (scrap.index <= currReadyIndex) {
+    
+                        currTest[scrap.index].run = true;
+                        isReady = true;
+                        currentTestCache.scraps(scrap);
+                        currentTestConfig.next();
+    
+                        currentTestCache.scraps(_emptyQueue(id));
+    
+                    } else {
+    
+                        // set the scrap index into queue
+                        currentTestConfig.setToQueue(scrap.index);
+    
+                    }
                 }
                 
                 // response back to the client
@@ -453,6 +470,5 @@ module.exports = function () {
 
     return _module;
 
-}
-    ();
+}();
 
