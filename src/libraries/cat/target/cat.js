@@ -369,7 +369,21 @@ _cat.core = function () {
 
                     return undefined;
                 }, win = (_ownerWin((config && "win" in config ? config.win : undefined)) || window);
-            
+
+
+
+            _cat.utils.Utils.addEventListener(window, "beforeunload", function (e) {
+                var core = _cat.core;
+                _cat.utils.AJAX.sendRequestAsync({
+                    url: _cat.utils.Request.generate({
+                        service: "scraps",
+                        params:{
+                            currentIndex: (core.manager.client.getCurrentState().index || 0),
+                            testId: core.guid()
+                        }
+                    })
+                });
+            });       
             
             function _configCallback(config, rootcatcore) {
 
@@ -410,7 +424,7 @@ _cat.core = function () {
                                 reportFormats = catconfig.getReportFormats();
                             }
 
-                            // create catjs assertion entry
+                            // create catjs assertion entrysc
                             _cat.utils.assert.create({
                                 name: "generalJSError",
                                 displayName: "General JavaScript Error",
@@ -1320,9 +1334,9 @@ _cat.core.Config = function(args) {
                                     }
 
                                     temp = scenarios[currTest.name];
-                                    if (temp.tests) {
-                                        _addToGlobal(temp);
-                                    }
+//                                    if (temp.tests) {
+//                                        _addToGlobal(temp);
+//                                    }
 
                                     continue;
                                 }
@@ -2244,15 +2258,15 @@ _cat.core.manager.client = function () {
             // update the server with the client's test index
             if (configsize > 1) {
                 futureIndex = (configsize + currentState.index);
-                _cat.utils.AJAX.sendRequestAsync({
-                    url: _cat.utils.Request.generate({
-                        service: "scraps", 
-                        params:{
-                            currentIndex: futureIndex, 
-                            testId: _cat.core.guid()
-                        }
-                    })
-                });
+//                _cat.utils.AJAX.sendRequestAsync({
+//                    url: _cat.utils.Request.generate({
+//                        service: "scraps", 
+//                        params:{
+//                            currentIndex: futureIndex, 
+//                            testId: _cat.core.guid()
+//                        }
+//                    })
+//                });              
             }
             
             configs.forEach(function(config) {
@@ -2373,7 +2387,8 @@ _cat.core.manager.client = function () {
                                     }
                                     
                                     size = tests.length;
-                                    if (test && "name" in test &&  scrapInfo.index < size && counter < size && counter > scrapInfo.index) {
+                                    //if (test && "name" in test &&  scrapInfo.index < size && counter < size && counter > scrapInfo.index) {
+                                    if (test && "name" in test && counter < size) {
                                         name = _cat.core.getScrapName(scrapInfo.name);
                                         testname = _cat.core.getScrapName(test.name);
                                         
@@ -2412,7 +2427,7 @@ _cat.core.manager.client = function () {
                             
                             if (!initCurrentState && !_cat.utils.iframe.isIframe()) {
                                 initCurrentState = true;
-                                currentState.index = (response.readyScraps && response.readyScraps[currentState.index] ? response.readyScraps[currentState.index].index : 0);
+                                //currentState.index = (response.readyScraps && response.readyScraps[currentState.index] ? response.readyScraps[currentState.index].index : 0);
                             }
 
 
@@ -5118,6 +5133,29 @@ if (typeof(_cat) !== "undefined") {
 
         var _module = {
 
+            addEventListener: function (elem, event, fn) {
+                
+                if (typeof($) !== "undefined") {
+                    if (event === "load") {
+                        $( document ).ready(fn);
+                    } else {
+                        $( elem ).on( event, fn);
+                    }
+                } else {
+                    if (!elem) {
+                        return undefined;
+                    }
+                    if (elem.addEventListener) {
+                        elem.addEventListener(event, fn, false);
+                    } else {
+                        elem.attachEvent("on" + event, function () {
+                            return(fn.call(elem, window.event));
+                        });
+                    }
+    
+                }
+            },
+            
             /**
              * check if the path argument exists in the current location  
              *
