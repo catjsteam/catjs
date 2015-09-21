@@ -99,6 +99,7 @@ var _url = require("url"),
             }          
 
             _server.get('/*', function(req, res, next){
+
                 res.setHeader('Last-Modified', (new Date()).toUTCString());
                 next();
             });
@@ -143,10 +144,39 @@ var _url = require("url"),
                         }
                     }
                 });
-    
-                _server.post('/screenshot', _screenshot.post);
+
+                 _server.post('/screenshot', _screenshot.post);
     
                 _server.post('/deviceinfo', _deviceinfo.post);
+
+                _server.get('/catjs/:testType/:id?*', function(req, res){
+
+                    var type,
+                        id, params = req.params,
+                        result = {
+                            status: 200,
+                            type: null,
+                            id: null
+                        };
+
+                    if (params) {
+                        type = params.testType;
+                        id = params.id;
+                    }
+
+                    if (type && (id !== null && id !== undefined)) {
+                        if (type === "end") {
+                            result.type = "end";
+                        }
+                        result.id = id;
+
+                        // TODO end the test functionality
+                    }
+
+                    res.setHeader('Content-Type', 'text/javascript;charset=UTF-8');
+                    res.send(result);
+                });
+
             }
             
             // kill the server with get request
