@@ -4,6 +4,29 @@ if (typeof(_cat) !== "undefined") {
 
         var _module = {
 
+            addEventListener: function (elem, event, fn) {
+                
+                if (typeof($) !== "undefined") {
+                    if (event === "load") {
+                        $( document ).ready(fn);
+                    } else {
+                        $( elem ).on( event, fn);
+                    }
+                } else {
+                    if (!elem) {
+                        return undefined;
+                    }
+                    if (elem.addEventListener) {
+                        elem.addEventListener(event, fn, false);
+                    } else {
+                        elem.attachEvent("on" + event, function () {
+                            return(fn.call(elem, window.event));
+                        });
+                    }
+    
+                }
+            },
+            
             /**
              * check if the path argument exists in the current location  
              *
