@@ -369,7 +369,21 @@ _cat.core = function () {
 
                     return undefined;
                 }, win = (_ownerWin((config && "win" in config ? config.win : undefined)) || window);
-            
+
+
+
+            _cat.utils.Utils.addEventListener(window, "beforeunload", function (e) {
+                var core = _cat.core;
+                _cat.utils.AJAX.sendRequestAsync({
+                    url: _cat.utils.Request.generate({
+                        service: "scraps",
+                        params:{
+                            currentIndex: (core.manager.client.getCurrentState().index || 0),
+                            testId: core.guid()
+                        }
+                    })
+                });
+            });       
             
             function _configCallback(config, rootcatcore) {
 
@@ -410,7 +424,7 @@ _cat.core = function () {
                                 reportFormats = catconfig.getReportFormats();
                             }
 
-                            // create catjs assertion entry
+                            // create catjs assertion entrysc
                             _cat.utils.assert.create({
                                 name: "generalJSError",
                                 displayName: "General JavaScript Error",
