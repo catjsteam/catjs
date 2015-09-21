@@ -444,15 +444,15 @@ _cat.core.manager.client = function () {
             // update the server with the client's test index
             if (configsize > 1) {
                 futureIndex = (configsize + currentState.index);
-                _cat.utils.AJAX.sendRequestAsync({
-                    url: _cat.utils.Request.generate({
-                        service: "scraps", 
-                        params:{
-                            currentIndex: futureIndex, 
-                            testId: _cat.core.guid()
-                        }
-                    })
-                });
+//                _cat.utils.AJAX.sendRequestAsync({
+//                    url: _cat.utils.Request.generate({
+//                        service: "scraps", 
+//                        params:{
+//                            currentIndex: futureIndex, 
+//                            testId: _cat.core.guid()
+//                        }
+//                    })
+//                });              
             }
             
             configs.forEach(function(config) {
@@ -573,7 +573,8 @@ _cat.core.manager.client = function () {
                                     }
                                     
                                     size = tests.length;
-                                    if (test && "name" in test &&  scrapInfo.index < size && counter < size && counter > scrapInfo.index) {
+                                    //if (test && "name" in test &&  scrapInfo.index < size && counter < size && counter > scrapInfo.index) {
+                                    if (test && "name" in test && counter < size) {
                                         name = _cat.core.getScrapName(scrapInfo.name);
                                         testname = _cat.core.getScrapName(test.name);
                                         
@@ -612,7 +613,7 @@ _cat.core.manager.client = function () {
                             
                             if (!initCurrentState && !_cat.utils.iframe.isIframe()) {
                                 initCurrentState = true;
-                                currentState.index = (response.readyScraps && response.readyScraps[currentState.index] ? response.readyScraps[currentState.index].index : 0);
+                                //currentState.index = (response.readyScraps && response.readyScraps[currentState.index] ? response.readyScraps[currentState.index].index : 0);
                             }
 
 
