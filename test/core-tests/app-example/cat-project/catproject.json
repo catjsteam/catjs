@@ -1,0 +1,69 @@
+{
+    "name": "app-example-test",
+
+    "source": "src/",
+    "target": "target/",
+    "cattarget": "./",
+    "jshint": {
+        "opt": {
+            "evil": true,
+            "strict": false,
+            "curly": true,
+            "eqeqeq": true,
+            "immed": false,
+            "latedef": true,
+            "newcap": false,
+            "noarg": true,
+            "sub": true,
+            "undef": true,
+            "boss": true,
+            "eqnull": true,
+            "node": true,
+            "es5": false
+        },
+        "globals": {
+         
+        }
+    },
+
+    "runner": {
+         "run": {
+             "devices": [
+                 {
+                    "disable": false,
+                    "type": "androidBrowser",
+                    "id": "all",
+                    "runner": {
+                        "name": "chrome",
+                        "address": ""
+                    }
+                 }            
+             ]
+         },
+         "server": {
+             "host" : "www.google.com",
+             "port" : "80"         
+         }
+    },
+
+    "analytics" : "N",
+    "apppath": "./..",
+    "server": {
+        "host": "localhost",
+        "port": "8089",
+        "protocol": "http",
+        "services": {
+            "static-pages": true
+        }
+    },
+
+    "plugins": [
+
+    ],
+
+    "tasks": [
+
+    ]
+
+
+}
