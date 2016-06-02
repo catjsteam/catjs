@@ -1,4 +1,4 @@
-catjs 1.1.0 
+catjs 1.1.01 
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -52,6 +52,8 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
+* **select - option** HTML element simulation support  @@dom select({element: "#select_test"}, 2) (see: https://github.com/catjsteam/catjstests/blob/master/app/angular-dnd/index.html)
+* 
 * **snapshot for the browser** DOM snapshot annotation added that saves an image of a given **SVG**, **Canvas** or **DOM**(html2canvas) element. The images will be available in the reports folder.
 
         @[scrap
