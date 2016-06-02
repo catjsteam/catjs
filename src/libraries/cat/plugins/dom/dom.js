@@ -555,10 +555,8 @@ _cat.plugins.dom = function () {
                 }
 
                 elt = _module.utils.getElt(idName);
-                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
-                    elt = elt[0];
-                }
-                
+                elt = _cat.utils.plugins.jqhelper.dom(elt);
+                    
                 if (elt) {
                     if (_cat.utils.Utils.getType(elt) === "array") {
 
@@ -600,9 +598,7 @@ _cat.plugins.dom = function () {
 
                 var elt = _module.utils.getElt(opt.element);
                 // todo a generic code please..
-                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular() ) {
-                    elt = elt[0];
-                }
+                elt = _cat.utils.plugins.jqhelper.dom(elt);
                 if (elt) {
                     _addEventListener(event, elt, opt.listener);
                 }
@@ -673,7 +669,7 @@ _cat.plugins.dom = function () {
                 opt.target = (opt.target ? _module.utils.getElt(opt.target) : opt.target);
                 
                 // todo a generic code please..
-                if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
+                if ( _cat.utils.plugins.jqhelper.isdom())  {
                     opt.element = opt.element[0];
                     if (opt.target && opt.target[0]) {
                         opt.target = opt.target[0];
@@ -690,6 +686,46 @@ _cat.plugins.dom = function () {
 
                 size = items.length;
                 _fireEvent(items[index], opt, firecallback);
+
+            },
+
+            select: function(opt, index) {
+
+                _cat.utils.Utils.prepareProps({
+                    global: {
+                        obj: opt
+                    },
+                    props: [
+                        {
+                            key: "element",
+                            require: true
+                        }
+                    ]
+                });
+
+                var elt = _module.utils.getElt(opt.element);
+                elt = _cat.utils.plugins.jqhelper.dom(elt);                
+                if (elt) {                  
+
+                    _module.actions.fire("mouseenter", {element: elt});                    
+                    _module.actions.fire("mouseover", {element: elt});                    
+                    _module.actions.fire("mousemove", {element: elt});                    
+
+                    if (elt[index]) {
+                        elt[index].selected = true;                    
+                    }
+
+                    _module.actions.fire("mousedown", {element: elt});                    
+                    _module.actions.fire("focus", {element: elt});
+                    _module.actions.fire("input", {element: elt});
+                    _module.actions.fire("change", {element: elt});
+                    
+                    setTimeout(function() {
+                        _module.actions.fire("mouseup", {element: elt});                                                            
+                        _module.actions.fire("click", {element: elt});
+                        _module.actions.fire("blur", {element: elt});
+                    }, 0);
+                }
 
             }
 

@@ -7,7 +7,9 @@
  */
 _cat.utils.plugins.jqhelper = function() {
     
-    var _module = {
+    var _$jqlite = false,
+
+        _module = {
 
         isjquery: function() {
             if (typeof $ !== "undefined") {
@@ -22,9 +24,20 @@ _cat.utils.plugins.jqhelper = function() {
             }
             return false;
         },
+
+        isjqlite: function() {
+            return _$jqlite;
+        },
         
+        isdom: function() {
+            return  (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular());
+        },
+
         dom: function(elt) {
-            if (_cat.utils.plugins.jqhelper.isjquery() || _cat.utils.plugins.jqhelper.isangular()) {
+            if (!elt) {
+                return elt;
+            }
+            if ( !(("nodeType" in elt) && elt.nodeType) )  {
                 elt = (elt.length ? elt[0] : undefined);
             }
             return elt;
@@ -80,7 +93,11 @@ _cat.utils.plugins.jqhelper = function() {
             };
             
             _map["angular"] = function() {
-                return (_methods._jqlite() || _methods._empty());
+                var jqlit = _methods._jqlite();
+                if (jqlit) {
+                    _$jqlite = true;
+                }
+                return (jqlit || _methods._empty());
             };
             
             _map["jquery"] = function() {
@@ -88,7 +105,12 @@ _cat.utils.plugins.jqhelper = function() {
             };
             
             _map["*"] = function() {
-                var _$ =  (_methods._jquery() || _methods._jqlite());
+                var jqlit = _methods._jqlite();
+                if (jqlit) {
+                    _$jqlite = true;
+                }
+
+                var _$ =  (_methods._jquery() || jqlit);
                 return (_$ || _methods._empty());
             };
             
@@ -106,17 +128,36 @@ _cat.utils.plugins.jqhelper = function() {
          * @returns {*}
          */
         getElt: function (val, autodetect) {
-            var sign,
+            var el$, sign,
                 _$ = _module.$(autodetect);
             
             if ( typeof val === "string") {
                 val = val.trim();
                 sign = val.charAt(0);
 
-                return (_$ ? _$(val) : undefined);
+                if (_$) {
+                    try {
+                        el$ = _$(val);
+                    } catch(e) {
+                        _cat.core.log.warn("[catjs jqhelper plugin] jqlite does not support query selector, using DOM API instead:: full error details: ", e);
+                        el$ = document.querySelector(val);                                                
+                    }
+                }
+               
+                return el$;
 
             } else if (typeof val === "object") {
-                return _$(val);
+
+                 if (_$) {
+                    try {
+                        el$ = _$(val);
+                    } catch(e) {
+                        _cat.core.log.warn("[catjs jqhelper plugin] jqlite does not support query selector, using DOM API instead:: full error details: ", e);
+                        el$ = val;
+                    }
+                }
+                
+                return el$;
             }
         },
 
@@ -141,8 +182,7 @@ _cat.utils.plugins.jqhelper = function() {
                 typeOfEventArrayItem,
                 _$ = _module.$(autodetect),
                 isAngular = ( autodetect && autodetect === "angular" ),
-                triggerFn = (isAngular ? "triggerHandler" : "trigger"),
-                eventFn;
+                triggerFn = (isAngular ? "triggerHandler" : "trigger");
 
             function getOpt(opt) {
                 var key, newOpt = {};
@@ -170,7 +210,7 @@ _cat.utils.plugins.jqhelper = function() {
                 return newEvent; 
             }
             
-            eventFn = function(elt, triggerFn, event, eventType) {
+            function eventFn(elt, triggerFn, event, eventType) {
                 var opt;
                 
                 if (!isAngular) {
@@ -187,7 +227,7 @@ _cat.utils.plugins.jqhelper = function() {
                         elt[triggerFn](event);
                     }
                 }
-            };
+            }
             
             if (elt && eventType) {
                 if (typeOfEventArgument === "string") {

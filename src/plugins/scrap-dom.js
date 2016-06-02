@@ -50,6 +50,9 @@ module.exports = function () {
                                         api: "fire"
                                     },
                                     {
+                                        api: "select"
+                                    },
+                                    {
                                         api: "snapshot"
                                     }
                                 ];
