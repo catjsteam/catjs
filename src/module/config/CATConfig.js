@@ -32,7 +32,7 @@ var _global = catrequire("cat.global"),
             librariesConfig = [],
             librariesDefault = [{name: "underscore"}, {name: "q"}, {name: "js.utils"}, {name: "jspath"}, {name: "chai"},  {name:"cat"}],
             libraryBuildConfig, dependenciesInfo,
-            appTargetPath, appPath, jshint, minifyplugin,
+            appTargetPath, appPath, appfilter, jshint, minifyplugin,
             scrapfilter, projectcopy,
             scrapscan, customPlugins,
             cattarget, targetfolder,
@@ -105,6 +105,7 @@ var _global = catrequire("cat.global"),
 
                     appTargetPath = _path.join("./", _path.relative(_path.resolve("."), targetfolder), project.name);
                     appPath = project.getInfo("apppath");
+                    appfilter = (project.getInfo("appfilter") || []);
                     
                     if (appPath) {
                         appPath = _path.resolve(appPath); 
@@ -125,7 +126,7 @@ var _global = catrequire("cat.global"),
                                     "pattern": ["**/cat-project**", "**/cat-project/**"],
                                     "exclude": true
                                 }
-                            ]
+                            ].concat(appfilter)
 
                         };
                         customPlugins.push(projectcopy);
