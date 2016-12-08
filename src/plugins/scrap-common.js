@@ -303,7 +303,7 @@ module.exports = function () {
                 }});
 
             /**
-             * Annotation for javascript catui
+             * Annotation for javascript standalone
              *
              *  properties:
              *  name    - catui
@@ -320,6 +320,28 @@ module.exports = function () {
                         this.$setStandalone(true);
                     }
                 }});
+
+           /**
+             * Annotation for javascript resolve
+             *
+             *  properties:
+             *  name    - catui
+             *  singleton - 1[default -1]
+             *  $type   - js
+             */
+            _Scrap.add({name: "resolve",
+                func: function (config) {
+
+                    var me = this,
+                        resolve = me.get("resolve");
+
+                    if (resolve && resolve.trim().toLowerCase() === "true") {
+                        this.$setResolve(true);
+                    } else  if (resolve && resolve.trim().toLowerCase() === "false") {
+                        this.$setResolve(false);
+                    }
+                }});
+
 
             /**
              * Annotation for javascript signal

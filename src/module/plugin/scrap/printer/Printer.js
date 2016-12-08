@@ -29,7 +29,7 @@ module.exports = function() {
                 delay = ((ref && ("delay" in ref)) ? ref.delay : undefined);
                 steps = ((ref && ("steps" in ref)) ? ref.steps : 0);
                 
-                return [(first ? "_cat.core.manager.controller.state().wait({delay: _supportedDelay('" + cell + "', "+ delay +"), steps: " + steps +", match: " + wait2object + ",callback:" : ".wait({delay: _supportedDelay('" + cell + "', "+ delay +"), steps: " + steps + ", match: " + wait2object + ", callback:"), " function(){ return ", out, "}  })"].join("");
+                return [(first ? "_cat.core.manager.controller.state().wait({context:context, delay: _supportedDelay('" + cell + "', "+ delay +"), steps: " + steps +", match: " + wait2object + ",callback:" : ".wait({delay: _supportedDelay('" + cell + "', "+ delay +"), steps: " + steps + ", match: " + wait2object + ", callback:"), " function(){ return ", out, "}  })"].join("");
             }
             
             if (order) {

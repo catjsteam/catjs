@@ -37,12 +37,17 @@ _cat.core.manager.statecontroller = function () {
         _steps = 10,
         _defer,
         _module,
-        _scrapspool = new _queue();
+        _scrapspool = new _queue(),
+        // in case resolve flag is false, wait until the user executed 'resolve' called manually
+        _masterresolve = true;
 
     _module = {
 
         defer: function (def) {
-            _defer = def;
+            if (def) {
+                _defer = def;
+            }
+            return _defer;
         },
 
 
@@ -94,7 +99,16 @@ _cat.core.manager.statecontroller = function () {
             function _wait(item) {
 
                 var steps = ( ("steps" in item) ? (item.steps || 1) : _steps ),
+                    resolve = ( ("resolve" in item ) ? item.resolve : true ),
                     wait = Math.max(Math.floor(item.delay / steps), 0);
+
+                if ( config.context && config.context.scrap && "$resolve" in config.context.scrap ) {
+                    resolve = config.context.scrap["$resolve"];                    
+                }
+
+                if (!resolve) {
+                    _masterresolve = false;
+                }
 
                 ihandle = setInterval(function () {
 
@@ -118,14 +132,24 @@ _cat.core.manager.statecontroller = function () {
                         }
 
                         if ("callback" in item) {
-                            item.callback.apply(_module, ("context" in config ? config.context : []));
+                            var temp = item.callback.apply(_module, ("context" in config ? config.context : []));
                         }
 
                         counter = 0;
                         clearInterval(ihandle);
+
+                        if (!resolve) {
+                            _defer.promise.done(function() {
+                                _masterresolve = true;
+                                resolve = true;
+                            });
+                        }
+
                         if (_q.empty()) {
                             _q.busy(false);
-                            _defer.resolve();
+                            if (_masterresolve) {                                
+                                _defer.resolve();
+                            }
                         } else {
                             _q.busy(true);
                             _wait(_q.next());

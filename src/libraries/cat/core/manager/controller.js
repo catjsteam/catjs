@@ -166,7 +166,7 @@ _cat.core.manager.controller = function () {
             commands = commands.concat((codeCommands || []));
             commands = commands.concat((methods || []));
 
-            delayManagerCommands(commands, context);
+            return delayManagerCommands(commands, context);
         }
     };
 
