@@ -52,7 +52,7 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 
 ## Release Notes Log
 
-* **Scanner Filters** Filter out file types | Folder patterns 
+* **Scanner Filters** Filter out file types | Folder patterns   
 Add the following section to your cat-project.json:
 
         "appfilter": [
@@ -63,7 +63,8 @@ Add the following section to your cat-project.json:
             }
         ]
 
-* **Manual scrap resolve** Set the scrap for manual resolve. Only when your test script is ready set to resolved.
+* **Manual scrap resolve** Set the scrap for manual resolve  
+Only when your test script is ready set to resolved.
         
         // catjs promise declaration 
         var catjsdef = _catjs.manager.defer();
@@ -72,7 +73,7 @@ Add the following section to your cat-project.json:
         catjsdef.resolve();
 
 * **select - option** HTML element simulation support  @@dom select({element: "#select_test"}, 2) (see: https://github.com/catjsteam/catjstests/blob/master/app/angular-dnd/index.html)
-* 
+
 * **snapshot for the browser** DOM snapshot annotation added that saves an image of a given **SVG**, **Canvas** or **DOM**(html2canvas) element. The images will be available in the reports folder.
 
         @[scrap
