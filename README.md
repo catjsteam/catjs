@@ -65,7 +65,14 @@ Add the following section to your cat-project.json:
 
 * **Manual scrap resolve** Set the scrap for manual resolve  
 Only when your test script is ready set to resolved.
+
+  First add an annotation to the scrap: 
+  
+    
+        @@resolve false  
         
+  Then in the script code:  
+  
         // catjs promise declaration 
         var catjsdef = _catjs.manager.defer();
         ...
