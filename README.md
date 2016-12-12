@@ -1,4 +1,4 @@
-catjs 1.1.01 
+catjs 1.1.03 
 ==============
 
 <img align="right" width="201" height="94" src="https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/Logo48x48-01.png">
@@ -51,6 +51,25 @@ Take a look on the [demo](http://ransnir.github.io/cat-project/target/catexample
 [![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/gtac.jpg)](https://www.youtube.com/watch?v=gGdDc5SlBq4) [![ScreenShot](https://raw.githubusercontent.com/catjsteam/catjs/master/resources/images/velocity.jpg)](https://www.youtube.com/watch?v=nRcKAFS-Gyg)
 
 ## Release Notes Log
+
+* **Scanner Filters** Filter out file types | Folder patterns 
+Add the following section to your cat-project.json:
+
+        "appfilter": [
+            {
+                "type": "file",
+                "pattern": ["*.txt"],
+                "exclude": true
+            }
+        ]
+
+* **Manual scrap resolve** Set the scrap for manual resolve. Only when your test script is ready set to resolved.
+        
+        // catjs promise declaration 
+        var catjsdef = _catjs.manager.defer();
+        ...
+        // resolve when ready
+        catjsdef.resolve();
 
 * **select - option** HTML element simulation support  @@dom select({element: "#select_test"}, 2) (see: https://github.com/catjsteam/catjstests/blob/master/app/angular-dnd/index.html)
 * 
